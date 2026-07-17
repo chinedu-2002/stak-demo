@@ -1619,6 +1619,34 @@ function FooterBottomBand() {
 	);
 }
 
+/* Mobile/tablet STAK watermark band — Figma Frame 162 (tablet 1554:10521 810x251,
+   phone 1554:11022 390x115 in the updated design file). Same design language as
+   the desktop FooterBottomBand: hairline divider at y 5.5 + giant Squarish "STAK"
+   with the vertical fade gradient, rendered as SVG text (no baked image asset). */
+function MobileWatermarkBand({ w, h, fontSize, textLength, baseline, id }: { w: number; h: number; fontSize: number; textLength: number; baseline: number; id: string }) {
+	return (
+		<div style={{ width: "100%", height: h, background: SECTION_BG, overflow: "hidden", position: "relative" }}>
+			<div style={{ position: "absolute", left: 0, top: 5.5, width: "100%", height: 0.5, background: "rgba(255,255,255,0.47)" }} aria-hidden="true" />
+			<svg height={h} viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" style={{ position: "absolute", left: 0, top: 0, width: "100%", height: h, overflow: "hidden", pointerEvents: "none" }} aria-hidden="true">
+				<defs>
+					<linearGradient id={id} gradientUnits="userSpaceOnUse" x1={0} y1={0} x2={0} y2={h}>
+						<stop offset="0%" stopColor="#e6eef8" stopOpacity="1" />
+						<stop offset="15%" stopColor="#bccad8" stopOpacity="1" />
+						<stop offset="30%" stopColor="#7e92ad" stopOpacity="0.9" />
+						<stop offset="46%" stopColor="#384a66" stopOpacity="0.55" />
+						<stop offset="64%" stopColor="#1a263e" stopOpacity="0.25" />
+						<stop offset="80%" stopColor="#0e1626" stopOpacity="0.07" />
+						<stop offset="100%" stopColor="#0a1020" stopOpacity="0" />
+					</linearGradient>
+				</defs>
+				<text x={w / 2 + 0.5} y={baseline} textAnchor="middle" fontFamily="'Squarish Sans CT', 'Orbitron', 'Chakra Petch', sans-serif" fontWeight={400} fontSize={fontSize} fill={`url(#${id})`} lengthAdjust="spacingAndGlyphs" textLength={textLength}>
+					STAK
+				</text>
+			</svg>
+		</div>
+	);
+}
+
 /* Footer copyright (Figma node 1:1077) — wrapper containing the copyright text
    └── "2026 All right reserved" (1:1078) — Sora Light 12/25, white */
 function FooterCopyright() {
@@ -2305,7 +2333,7 @@ function MobileFooter({ onSubscribe, onScrollTo }: { onSubscribe: (email: string
 
 function MobileLanding({ scale, onSignup, onEmail, onSubscribe, onScrollTo }: { scale: number; onSignup: () => void; onEmail: () => void; onSubscribe: (email: string) => void; onScrollTo: (k: keyof typeof SEC) => void }) {
 	// full mobile canvas height (Figma node 1:1123 / Frame 220)
-	const H = 8417.48;
+	const H = 8668.48;
 	return (
 		<div className="landing-wrapper" style={{ width: "100%", height: H * scale, overflow: "hidden", display: "flex", justifyContent: "center", alignItems: "flex-start" }}>
 			<div className="landing-canvas" style={{ width: MOBILE_WIDTH, height: H, position: "relative", flexShrink: 0, background: SECTION_BG, transform: `scale(${scale})`, transformOrigin: "top center" }}>
@@ -2318,6 +2346,9 @@ function MobileLanding({ scale, onSignup, onEmail, onSubscribe, onScrollTo }: { 
 				<MobileFaq onEmail={onEmail} />
 				<MobileFinalCta />
 				<MobileFooter onSubscribe={onSubscribe} onScrollTo={onScrollTo} />
+				<section style={{ position: "absolute", left: 0, top: 8417.48, width: MOBILE_WIDTH, height: 251 }}>
+					<MobileWatermarkBand w={810} h={251} fontSize={250} textLength={715} baseline={189} id="stakWatermark810" />
+				</section>
 			</div>
 		</div>
 	);
@@ -2750,7 +2781,7 @@ function MobileFooter390({ onSubscribe }: { onSubscribe: (email: string) => void
 function MobileLanding390({ scale, onSignup, onEmail, onSubscribe, onScrollTo }: { scale: number; onSignup: () => void; onEmail: () => void; onSubscribe: (email: string) => void; onScrollTo: (k: keyof typeof SEC) => void }) {
 	// 390px phone canvas (Figma node 1:1586 / Frame 222). Height grows as sections are added.
 	void onEmail; void onSubscribe;
-	const H = 9826.93;
+	const H = 9941.93;
 	return (
 		<div className="landing-wrapper" style={{ width: "100%", height: H * scale, overflow: "hidden", display: "flex", justifyContent: "center", alignItems: "flex-start" }}>
 			<div className="landing-canvas" style={{ width: MOBILE390_WIDTH, height: H, position: "relative", flexShrink: 0, background: SECTION_BG, transform: `scale(${scale})`, transformOrigin: "top center" }}>
@@ -2763,6 +2794,9 @@ function MobileLanding390({ scale, onSignup, onEmail, onSubscribe, onScrollTo }:
 				<MobileFaq390 onEmail={onEmail} />
 				<MobileFinalCta390 />
 				<MobileFooter390 onSubscribe={onSubscribe} />
+				<section style={{ position: "absolute", left: 0, top: 9826.93, width: MOBILE390_WIDTH, height: 115 }}>
+					<MobileWatermarkBand w={390} h={115} fontSize={120} textLength={343} baseline={96} id="stakWatermark390" />
+				</section>
 			</div>
 		</div>
 	);

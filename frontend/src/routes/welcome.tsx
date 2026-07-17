@@ -14,8 +14,8 @@ const A = {
 	gifAlpha: "/images/landing-v2/hero-gif-alpha.png",
 	boxBeamComposite: "/images/landing-v2/hero-beam-composite-2xb.png",
 	boxFlareComposite: "/images/landing-v2/hero-flare-composite-2xb.png",
-	boxM390: "/images/landing-v2/hero-box-frame124-m390-2x.png",
-	boxT810: "/images/landing-v2/hero-box-frame124-t810-2x.png",
+	boxV3: "/images/landing-v2/hero-box-v3-dt-2x.png",
+	boxV3p: "/images/landing-v2/hero-box-v3-p390-2x.png",
 	boxFlap1: "/images/landing-v2/hero-box-flap-1.svg",
 	boxFlap2: "/images/landing-v2/hero-box-flap-2.svg",
 	boxFlap3: "/images/landing-v2/hero-box-flap-3.svg",
@@ -408,11 +408,11 @@ function Hero({ onLogin, onSignup, onScrollTo }: { onLogin: () => void; onSignup
 				</div>
 			</div>
 
-			{/* Frame 124 (1:343) — the design now uses the tight-beam composition on the desktop
-			    too (identical geometry to the tablet frame), rendered from the same flattened 2x
-			    export. left 406 = frame x; top 314 = frame y 325.77 minus 11.77px render spill. */}
-			<div style={{ position: "absolute", left: 406, top: 314, width: 587.309, height: 563.5, pointerEvents: "none" }}>
-				<img src={A.boxT810} alt="" style={{ width: "100%", height: "100%", display: "block" }} />
+			{/* New-file hero box (Frame 1618869053, 1554:9276 at 542/386.8, 316.431x428) —
+			    flattened 2x export, alpha un-premultiplied vs the page bg. Placement = node
+			    minus render spill (14 left / 87 top), verified by edge-correlation. */}
+			<div style={{ position: "absolute", left: 528, top: 299.8, width: 353, height: 553.5, pointerEvents: "none" }}>
+				<img src={A.boxV3} alt="" style={{ width: "100%", height: "100%", display: "block" }} />
 			</div>
 
 			<div style={{ position: "absolute", left: "calc(50% - 0.43px)", top: 895, transform: "translateX(-50%)" }}>
@@ -1825,12 +1825,10 @@ function MobileHero({ onSignup, onScrollTo }: { onSignup: () => void; onScrollTo
 				</div>
 			</div>
 
-			{/* Tablet Frame 124 (1:1135) is the tight-beam mobile composition (208x299 beam, no
-			    desktop flare) — rendered from a flattened 2x export of the node, alpha
-			    un-premultiplied vs the baked page bg. left 111 = frame x (verified by edge
-			    correlation); top 284 = frame y 295.77 minus 11.8px effect spill in the render. */}
-			<div style={{ position: "absolute", left: 111, top: 284, width: 587.309, height: 563.5, pointerEvents: "none" }}>
-				<img src={A.boxT810} alt="" style={{ width: "100%", height: "100%", display: "block" }} />
+			{/* New-file hero box (Frame 1618869052, 1554:10069 at 247/357.8, 316.431x428 — same
+			    composition as desktop). Flattened 2x export; placement measured at (233, 270). */}
+			<div style={{ position: "absolute", left: 233, top: 270, width: 353, height: 553.5, pointerEvents: "none" }}>
+				<img src={A.boxV3} alt="" style={{ width: "100%", height: "100%", display: "block" }} />
 			</div>
 
 			<div style={{ position: "absolute", left: "50%", bottom: 39.55, transform: "translateX(-50%)" }}>
@@ -2385,13 +2383,10 @@ function MobileHero390({ onSignup, onScrollTo }: { onSignup: () => void; onScrol
 					</div>
 				</div>
 			</div>
-			{/* Frame 124 (mobile) is its own composition — narrower beam frame (156x224 at x142.5),
-			    no desktop flare layer — so it renders from a flattened 2x export of the node itself
-			    (alpha un-premultiplied against the baked page bg; coins/box/glows baked at mobile
-			    truth). Placement (top 375: bounds include ~9px blur spill above the frame) measured
-			    by edge-correlation against Figma's own hero render. */}
-			<div style={{ position: "absolute", left: 0, top: 375, width: 390, height: 422.5, pointerEvents: "none" }}>
-				<img src={A.boxM390} alt="" style={{ width: "100%", height: "100%", display: "block" }} />
+			{/* New-file hero box (Frame 1618869052, 1554:10577 at 73/442.8, 244.139x330.218 —
+			    the shared composition at 0.772 scale). Flattened 2x export; placement (62, 375). */}
+			<div style={{ position: "absolute", left: 62, top: 375, width: 272.5, height: 427, pointerEvents: "none" }}>
+				<img src={A.boxV3p} alt="" style={{ width: "100%", height: "100%", display: "block" }} />
 			</div>
 			<button type="button" onClick={onSignup} style={{ ...btnReset, position: "absolute", left: 138.6, top: 849, width: 112.905, height: 32.453, background: CTA_GRADIENT, border: CTA_BORDER, borderRadius: 5.781, display: "flex", alignItems: "center", justifyContent: "center", filter: CTA_SHADOW, cursor: "pointer", boxSizing: "border-box" }}>
 				<span style={{ fontFamily: SR, fontWeight: 400, fontSize: 14.453, color: "#fff", whiteSpace: "nowrap" }}>Get started</span>

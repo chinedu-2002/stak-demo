@@ -120,15 +120,15 @@ describe("breakpoint routing", () => {
 describe("hero", () => {
 	it("each view renders its own flattened Figma box composition", () => {
 		renderAt(PHONE);
-		expect(document.querySelector('img[src*="hero-box-frame124-m390-2x"]')).not.toBeNull();
-		expect(document.querySelector('img[src*="hero-box-frame124-t810-2x"]')).toBeNull();
+		expect(document.querySelector('img[src*="hero-box-v3-p390-2x"]')).not.toBeNull();
+		expect(document.querySelector('img[src*="hero-box-v3-dt-2x"]')).toBeNull();
 		cleanup();
 		renderAt(TABLET);
-		expect(document.querySelector('img[src*="hero-box-frame124-t810-2x"]')).not.toBeNull();
-		expect(document.querySelector('img[src*="hero-box-frame124-m390-2x"]')).toBeNull();
+		expect(document.querySelector('img[src*="hero-box-v3-dt-2x"]')).not.toBeNull();
+		expect(document.querySelector('img[src*="hero-box-v3-p390-2x"]')).toBeNull();
 		cleanup();
 		renderAt(DESKTOP);
-		expect(document.querySelector('img[src*="hero-box-frame124-t810-2x"]')).not.toBeNull();
+		expect(document.querySelector('img[src*="hero-box-v3-dt-2x"]')).not.toBeNull();
 	});
 
 	it.each(ALL)("%s: 'Get started' navigates to /signup", (_name, width) => {

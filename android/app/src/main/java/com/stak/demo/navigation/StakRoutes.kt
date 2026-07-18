@@ -7,6 +7,7 @@ object StakRoutes {
 	const val BRAND_PICKS = "onboarding/brand-picks"
 	const val SWIPE_TUTORIAL = "onboarding/swipe-tutorial"
 	const val GOAL = "onboarding/goal"
+	const val RISK = "onboarding/risk"
 	const val SIGN_IN = "auth/sign-in"
 	const val CREATE_ACCOUNT = "onboarding/create-account"
 	const val VERIFY_EMAIL = "onboarding/verify-email"

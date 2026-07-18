@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Compose-only app: framework base theme, branded window/system-bar colors. -->
+    <style name="Theme.STAK" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">#0A1020</item>
+        <item name="android:statusBarColor">#0A1020</item>
+        <item name="android:navigationBarColor">#10172A</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+</resources>

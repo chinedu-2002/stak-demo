@@ -30,6 +30,7 @@ import com.stak.demo.ui.onboarding.SwipeTutorialScreen
 import com.stak.demo.ui.onboarding.GoalScreen
 import com.stak.demo.ui.onboarding.RiskScreen
 import com.stak.demo.ui.onboarding.PreparingDeckScreen
+import com.stak.demo.ui.onboarding.TasteRevealScreen
 import com.stak.demo.ui.onboarding.NotificationsScreen
 import com.stak.demo.ui.onboarding.QuizScreen
 import com.stak.demo.ui.onboarding.VerifyEmailScreen
@@ -83,6 +84,16 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
 		composable(StakRoutes.PREPARING_DECK) {
 			PreparingDeckScreen(
 				onDone = {
+					navController.navigate(StakRoutes.TASTE_REVEAL) {
+						popUpTo(StakRoutes.PREPARING_DECK) { inclusive = true }
+					}
+				},
+			)
+		}
+		composable(StakRoutes.TASTE_REVEAL) {
+			TasteRevealScreen(
+				onBack = { navController.popBackStack() },
+				onLetsGo = {
 					navController.navigate(StakRoutes.CREATE_ACCOUNT) {
 						popUpTo(StakRoutes.INTRO) { inclusive = true }
 					}

@@ -29,6 +29,7 @@ import com.stak.demo.ui.onboarding.BrandPicksScreen
 import com.stak.demo.ui.onboarding.SwipeTutorialScreen
 import com.stak.demo.ui.onboarding.GoalScreen
 import com.stak.demo.ui.onboarding.RiskScreen
+import com.stak.demo.ui.onboarding.PreparingDeckScreen
 import com.stak.demo.ui.onboarding.NotificationsScreen
 import com.stak.demo.ui.onboarding.QuizScreen
 import com.stak.demo.ui.onboarding.VerifyEmailScreen
@@ -76,7 +77,16 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
 		composable(StakRoutes.RISK) {
 			RiskScreen(
 				onBack = { navController.popBackStack() },
-				onContinue = { navController.navigate(StakRoutes.CREATE_ACCOUNT) },
+				onContinue = { navController.navigate(StakRoutes.PREPARING_DECK) },
+			)
+		}
+		composable(StakRoutes.PREPARING_DECK) {
+			PreparingDeckScreen(
+				onDone = {
+					navController.navigate(StakRoutes.CREATE_ACCOUNT) {
+						popUpTo(StakRoutes.INTRO) { inclusive = true }
+					}
+				},
 			)
 		}
 		composable(StakRoutes.CREATE_ACCOUNT) {

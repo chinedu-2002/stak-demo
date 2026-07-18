@@ -1,0 +1,114 @@
+package com.stak.demo.ui.onboarding
+
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.stak.demo.R
+import com.stak.demo.ui.theme.Geist
+import com.stak.demo.ui.theme.Sora
+import com.stak.demo.ui.theme.StakColors
+import kotlinx.coroutines.delay
+
+/**
+ * Onboarding · 06 Preparing deck — Figma node 1554:8998.
+ *
+ * The closing loader: the box-and-coins hero (same flattened render as
+ * the intro), "Building your first deck..." in Sora SemiBold 22, and a
+ * live spinner with "Reading your brand picks". Auto-advances into the
+ * account flow once the deck is "ready".
+ */
+@Composable
+fun PreparingDeckScreen(onDone: () -> Unit) {
+	LaunchedEffect(Unit) {
+		delay(2600)
+		onDone()
+	}
+	Column(
+		horizontalAlignment = Alignment.CenterHorizontally,
+		verticalArrangement = Arrangement.spacedBy(18.dp, Alignment.CenterVertically),
+		modifier = Modifier
+			.fillMaxSize()
+			.background(StakColors.Bg)
+			.systemBarsPadding()
+			.padding(horizontal = 24.dp),
+	) {
+		Image(
+			painter = painterResource(R.drawable.intro_hero_box),
+			contentDescription = null,
+			contentScale = ContentScale.Fit,
+			modifier = Modifier.size(342.dp, 460.dp),
+		)
+		Text(
+			text = "Building your first deck...",
+			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 22.sp, textAlign = TextAlign.Center),
+			color = StakColors.TextPrimary,
+			modifier = Modifier.fillMaxWidth(),
+		)
+		Row(
+			verticalAlignment = Alignment.CenterVertically,
+			horizontalArrangement = Arrangement.spacedBy(5.dp),
+		) {
+			Spinner()
+			Text(
+				text = "Reading your brand picks",
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 12.sp),
+				color = Auth.FaintText,
+			)
+		}
+	}
+}
+
+/** 14dp rotating three-quarter arc in the caption gray. */
+@Composable
+private fun Spinner() {
+	val transition = rememberInfiniteTransition(label = "spinner")
+	val angle by transition.animateFloat(
+		initialValue = 0f,
+		targetValue = 360f,
+		animationSpec = infiniteRepeatable(tween(900, easing = LinearEasing)),
+		label = "spinnerAngle",
+	)
+	Canvas(modifier = Modifier.size(14.dp).rotate(angle)) {
+		val stroke = 1.6.dp.toPx()
+		drawArc(
+			color = Auth.FaintText,
+			startAngle = 0f,
+			sweepAngle = 270f,
+			useCenter = false,
+			topLeft = Offset(stroke / 2f, stroke / 2f),
+			size = Size(size.width - stroke, size.height - stroke),
+			style = Stroke(width = stroke, cap = StrokeCap.Round),
+		)
+	}
+}

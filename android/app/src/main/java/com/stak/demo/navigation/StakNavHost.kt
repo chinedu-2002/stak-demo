@@ -14,11 +14,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
 import com.stak.demo.ui.components.StakTab
 import com.stak.demo.ui.components.StakTabBar
 import com.stak.demo.ui.onboarding.CreateAccountScreen
@@ -31,11 +29,6 @@ import com.stak.demo.ui.onboarding.GoalScreen
 import com.stak.demo.ui.onboarding.RiskScreen
 import com.stak.demo.ui.onboarding.PreparingDeckScreen
 import com.stak.demo.ui.onboarding.TasteRevealScreen
-import com.stak.demo.ui.onboarding.NotificationsScreen
-import com.stak.demo.ui.onboarding.QuizScreen
-import com.stak.demo.ui.onboarding.VerifyEmailScreen
-import com.stak.demo.ui.onboarding.WelcomeScreen
-import com.stak.demo.ui.onboarding.YourTypeScreen
 import com.stak.demo.ui.theme.StakColors
 
 /** Root of the app: onboarding flow first, then the bottom-tab shell. */
@@ -102,7 +95,11 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
 		}
 		composable(StakRoutes.CREATE_ACCOUNT) {
 			CreateAccountScreen(
-				onCreateAccount = { navController.navigate(StakRoutes.VERIFY_EMAIL) },
+				onCreateAccount = {
+					navController.navigate(StakRoutes.MAIN) {
+						popUpTo(0) { inclusive = true }
+					}
+				},
 				onLogIn = { navController.navigate(StakRoutes.SIGN_IN) },
 			)
 		}
@@ -115,48 +112,6 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
 					}
 				},
 				onCreateAccount = { navController.popBackStack() },
-			)
-		}
-		composable(StakRoutes.VERIFY_EMAIL) {
-			VerifyEmailScreen(
-				onBack = { navController.popBackStack() },
-				onContinue = { navController.navigate(StakRoutes.NOTIFICATIONS) },
-			)
-		}
-		composable(StakRoutes.NOTIFICATIONS) {
-			NotificationsScreen(
-				onBack = { navController.popBackStack() },
-				onAllow = { navController.navigate(StakRoutes.quiz(1)) },
-				onSkip = { navController.navigate(StakRoutes.quiz(1)) },
-			)
-		}
-		composable(
-			StakRoutes.QUIZ,
-			arguments = listOf(navArgument("step") { type = NavType.IntType }),
-		) { entry ->
-			val step = entry.arguments?.getInt("step") ?: 1
-			QuizScreen(
-				step = step,
-				onBack = { navController.popBackStack() },
-				onContinue = {
-					if (step < 4) navController.navigate(StakRoutes.quiz(step + 1))
-					else navController.navigate(StakRoutes.YOUR_TYPE)
-				},
-			)
-		}
-		composable(StakRoutes.YOUR_TYPE) {
-			YourTypeScreen(
-				onBack = { navController.popBackStack() },
-				onContinue = { navController.navigate(StakRoutes.WELCOME) },
-			)
-		}
-		composable(StakRoutes.WELCOME) {
-			WelcomeScreen(
-				onEnter = {
-					navController.navigate(StakRoutes.MAIN) {
-						popUpTo(0) { inclusive = true }
-					}
-				},
 			)
 		}
 		composable(StakRoutes.MAIN) { MainTabsShell() }

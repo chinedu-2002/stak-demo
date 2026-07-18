@@ -12,13 +12,6 @@ object StakRoutes {
 	const val TASTE_REVEAL = "onboarding/taste-reveal"
 	const val SIGN_IN = "auth/sign-in"
 	const val CREATE_ACCOUNT = "onboarding/create-account"
-	const val VERIFY_EMAIL = "onboarding/verify-email"
-	const val NOTIFICATIONS = "onboarding/notifications"
-	const val QUIZ = "onboarding/quiz/{step}" // 1..4
-	fun quiz(step: Int) = "onboarding/quiz/$step"
-	const val YOUR_TYPE = "onboarding/your-type"
-	const val WELCOME = "onboarding/welcome"
-
 	const val MAIN = "main" // bottom-tab shell (Home/Discover/Watchlist/Simulate/Profile)
 
 	const val STOCK_DETAIL = "stock/{symbol}"

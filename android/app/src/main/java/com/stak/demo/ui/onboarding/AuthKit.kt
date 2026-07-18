@@ -210,6 +210,26 @@ internal fun AuthCta(text: String, onClick: () -> Unit) {
 	}
 }
 
+/** Secondary flow button — h51, r5.78, rgba(52,59,79,0.33) hairline, Sora 14.45 muted. */
+@Composable
+internal fun AuthSecondaryButton(text: String, onClick: () -> Unit) {
+	Box(
+		modifier = Modifier
+			.fillMaxWidth()
+			.padding(horizontal = 20.dp)
+			.height(51.dp)
+			.border(0.36.dp, Color(0x54343B4F), RoundedCornerShape(5.78.dp))
+			.clickable(onClick = onClick),
+		contentAlignment = Alignment.Center,
+	) {
+		Text(
+			text = text,
+			style = TextStyle(fontFamily = com.stak.demo.ui.theme.Sora, fontWeight = FontWeight.Normal, fontSize = 14.45.sp),
+			color = StakColors.Muted,
+		)
+	}
+}
+
 /** "Already have an account? Sign in" / "New to STAK? Create account" row. */
 @Composable
 internal fun AuthSwitchRow(prefix: String, link: String, onClick: () -> Unit) {

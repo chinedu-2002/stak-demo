@@ -25,6 +25,7 @@ import com.stak.demo.ui.onboarding.CreateAccountScreen
 import com.stak.demo.ui.onboarding.SplashScreen
 import com.stak.demo.ui.onboarding.SignInScreen
 import com.stak.demo.ui.onboarding.IntroScreen
+import com.stak.demo.ui.onboarding.BrandPicksScreen
 import com.stak.demo.ui.onboarding.NotificationsScreen
 import com.stak.demo.ui.onboarding.QuizScreen
 import com.stak.demo.ui.onboarding.VerifyEmailScreen
@@ -49,7 +50,13 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
 			)
 		}
 		composable(StakRoutes.INTRO) {
-			IntroScreen(onGetStarted = { navController.navigate(StakRoutes.CREATE_ACCOUNT) })
+			IntroScreen(onGetStarted = { navController.navigate(StakRoutes.BRAND_PICKS) })
+		}
+		composable(StakRoutes.BRAND_PICKS) {
+			BrandPicksScreen(
+				onBack = { navController.popBackStack() },
+				onContinue = { navController.navigate(StakRoutes.CREATE_ACCOUNT) },
+			)
 		}
 		composable(StakRoutes.CREATE_ACCOUNT) {
 			CreateAccountScreen(

@@ -4,6 +4,7 @@ package com.stak.demo.navigation
 object StakRoutes {
 	const val SPLASH = "splash"
 	const val INTRO = "onboarding/intro"
+	const val BRAND_PICKS = "onboarding/brand-picks"
 	const val SIGN_IN = "auth/sign-in"
 	const val CREATE_ACCOUNT = "onboarding/create-account"
 	const val VERIFY_EMAIL = "onboarding/verify-email"

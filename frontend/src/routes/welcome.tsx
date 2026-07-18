@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useAuth } from "../context/AuthContext";
-import { useEffect, useState, useRef, useCallback, type CSSProperties } from "react";
+import { useEffect, useState, useRef, useCallback, type CSSProperties, type ReactNode } from "react";
 
 export const Route = createFileRoute("/welcome")({
 	component: LandingPage,
@@ -16,6 +16,27 @@ const A = {
 	boxFlareComposite: "/images/landing-v2/hero-flare-composite-2xb.png",
 	boxV3: "/images/landing-v2/hero-box-v3-dt-2x.png",
 	boxV3p: "/images/landing-v2/hero-box-v3-p390-2x.png",
+	hiwD1: "/images/landing-v2/hiw-d-1-2x.png",
+	hiwD2: "/images/landing-v2/hiw-d-2-2x.png",
+	hiwD3: "/images/landing-v2/hiw-d-3-2x.png",
+	hiwT1: "/images/landing-v2/hiw-t-1-2x.png",
+	hiwT2: "/images/landing-v2/hiw-t-2-2x.png",
+	hiwT3: "/images/landing-v2/hiw-t-3-2x.png",
+	hiwP1: "/images/landing-v2/hiw-p-1-2x.png",
+	hiwP2: "/images/landing-v2/hiw-p-2-2x.png",
+	hiwP3: "/images/landing-v2/hiw-p-3-2x.png",
+	featTrendsD: "/images/landing-v2/feat-d-b-2x.png",
+	featDeckD: "/images/landing-v2/feat-d-d-2x.png",
+	featSimD: "/images/landing-v2/feat-d-c-2x.png",
+	featIntelD: "/images/landing-v2/feat-d-a-2x.png",
+	featTrendsT: "/images/landing-v2/feat-t-b-2x.png",
+	featDeckT: "/images/landing-v2/feat-t-c-2x.png",
+	featSimT: "/images/landing-v2/feat-t-d-2x.png",
+	featIntelT: "/images/landing-v2/feat-t-a-2x.png",
+	featTrendsP: "/images/landing-v2/feat-p-b-2x.png",
+	featDeckP: "/images/landing-v2/feat-p-c-2x.png",
+	featSimP: "/images/landing-v2/feat-p-d-2x.png",
+	featIntelP: "/images/landing-v2/feat-p-a-2x.png",
 	boxFlap1: "/images/landing-v2/hero-box-flap-1.svg",
 	boxFlap2: "/images/landing-v2/hero-box-flap-2.svg",
 	boxFlap3: "/images/landing-v2/hero-box-flap-3.svg",
@@ -64,31 +85,13 @@ const A = {
 	ctaMqBb: "/images/landing-v2/cta-mq-bb.jpg",
 	navMenu: "/images/landing-v2/nav-button.svg",
 	// Problem
-	problemScreenshot: "/images/landing-v2/problem-screenshot.png",
+	problemApp: "/images/landing-v2/problem-app-composite.png",
 	problemEllipse: "/images/landing-v2/problem-ellipse.svg",
 	// How It Works
 	hiwEllipse1: "/images/landing-v2/hiw-ellipse-1.svg",
 	hiwEllipse2: "/images/landing-v2/hiw-ellipse-2.svg",
 	// Features (phone mockup parts)
-	featPhoneScreen: "/images/landing-v2/feat-phone-screen.svg",
-	featG1506: "/images/landing-v2/feat-iphone-g1506.svg",
-	featG1507: "/images/landing-v2/feat-iphone-g1507.svg",
-	featR2415499: "/images/landing-v2/feat-iphone-rect2415499.svg",
-	featR241549: "/images/landing-v2/feat-iphone-rect241549.svg",
-	featR2415496: "/images/landing-v2/feat-iphone-rect2415496.svg",
-	featR24154: "/images/landing-v2/feat-iphone-rect24154.svg",
-	featR2163: "/images/landing-v2/feat-iphone-rect2163.svg",
-	featR21631: "/images/landing-v2/feat-iphone-rect21631.svg",
-	featR2172: "/images/landing-v2/feat-iphone-rect2172.svg",
-	featR1093: "/images/landing-v2/feat-iphone-rect1093.svg",
-	featR3540: "/images/landing-v2/feat-iphone-rect3540.svg",
-	featR1030: "/images/landing-v2/feat-iphone-rect1030.svg",
-	featG2819: "/images/landing-v2/feat-iphone-g2819.svg",
-	featG2820: "/images/landing-v2/feat-iphone-g2820.svg",
-	featSubtract: "/images/landing-v2/feat-iphone-subtract.svg",
 	featVec: "/images/landing-v2/feat-iphone-vec.svg",
-	featG2170: "/images/landing-v2/feat-iphone-g2170.svg",
-	featG2171: "/images/landing-v2/feat-iphone-g2171.svg",
 	// Early Momentum
 	emAvatar: "/images/landing-v2/em-avatar.jpg",
 	emStatArrow: "/images/landing-v2/em-stat-arrow.svg",
@@ -489,12 +492,10 @@ function Problem({ onSignup }: { onSignup: () => void }) {
 			</div>
 
 			<div style={{ position: "absolute", left: "calc(50% - 0.02px)", top: 311, transform: "translateX(-50%)", width: 1237.95, height: 767, overflow: "hidden" }}>
-				{/* Phone screenshot — Figma node 1:440. Figma applies a `blur-[3.285px]`
-				    filter to the image, but we render it crisp (no blur) per design
-				    intent — the blur in Figma was a stylization that obscured the
-				    actual screenshot content. */}
-				<div style={{ position: "absolute", left: "calc(50% + 1.48px)", top: 128.09, transform: "translateX(-50%)", width: 621.781, height: 639.024 }}>
-					<img src={A.problemScreenshot} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", maskImage: "linear-gradient(to bottom, black 94%, transparent 96.5%)", WebkitMaskImage: "linear-gradient(to bottom, black 94%, transparent 96.5%)" }} />
+				{/* Real STAK app composite — new-file node 1638:6335 (328.045x660.721 at top 93.58,
+				    centered). Renders sharp and ends above the clip edge, so no mask is needed. */}
+				<div style={{ position: "absolute", left: "50%", top: 93.58, transform: "translateX(-50%)", width: 328.045, height: 660.721 }}>
+					<img src={A.problemApp} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
 				</div>
 				{/* Bottom fade — Figma node 1:441, EXACT values. A `to top`
 				    gradient: solid #0a1020 up to 30.374%, fading to transparent
@@ -544,6 +545,11 @@ function HowItWorks({ onScrollTo }: { onScrollTo: (k: keyof typeof SEC) => void 
 					<div style={{ display: "flex", gap: 17 }}>
 						{cards.map((c, i) => (
 							<div key={i} style={{ background: CARD_BG, width: 389, height: 391, borderRadius: 12, overflow: "hidden", position: "relative" }}>
+								{/* new-design app screenshots (baked #10172a bg blends into the card) */}
+								{i === 0 && <div style={{ position: "absolute", left: 96.49, top: 7.63, width: 191.509, height: 193.749 }}><img src={A.hiwD1} alt="" style={{ width: "100%", height: "100%", display: "block" }} /></div>}
+								{i === 1 && <div style={{ position: "absolute", left: "calc(50% - 3.64px)", top: 19.1, transform: "translateX(-50%)", width: 122.281, height: 185.66 }}><img src={A.hiwD2} alt="" style={{ width: "100%", height: "100%", display: "block" }} /></div>}
+								{i === 2 && <div style={{ position: "absolute", left: 96.49, top: 15.63, width: 191.509, height: 193.749 }}><img src={A.hiwD3} alt="" style={{ width: "100%", height: "100%", display: "block" }} /></div>}
+								<div style={{ position: "absolute", left: "50%", top: 174, transform: "translateX(-50%)", width: 389, height: 45, background: "linear-gradient(to bottom, rgba(16,23,42,0) 40.429%, #10172a 73.762%)", pointerEvents: "none" }} />
 								<div style={{ position: "absolute", bottom: i === 0 ? 37 : 32, left: "calc(50% + 0.5px)", transform: "translateX(-50%)", display: "flex", flexDirection: "column", alignItems: "flex-start", gap: i === 2 ? 13 : 17, width: 330 }}>
 									<p style={{ fontFamily: SQ, fontSize: 30, color: "#fff", margin: 0, lineHeight: "normal" }}>{c.n}</p>
 									<div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 8, width: "100%" }}>
@@ -568,58 +574,6 @@ function HowItWorks({ onScrollTo }: { onScrollTo: (k: keyof typeof SEC) => void 
 /* ═══════════════════════════════════════════════════════════════════ */
 /*  SECTION 4: FEATURES                                                 */
 /* ═══════════════════════════════════════════════════════════════════ */
-function PhoneMockup({ variant }: { variant: 1 | 2 }) {
-	const g1506 = variant === 1 ? A.featG1506 : A.featG1507;
-	const g2819 = variant === 1 ? A.featG2819 : A.featG2820;
-	const g2170 = variant === 1 ? A.featG2170 : A.featG2171;
-	return (
-		<div style={{ position: "absolute", left: "calc(50% - 0.39px)", top: "calc(50% - 28.76px)", transform: "translate(-50%, -50%)", width: 515.477, height: 490.504 }}>
-			<div style={{ position: "absolute", left: 140.03, top: 46.95, width: 219.369, height: 443.558 }}>
-				<div style={{ position: "absolute", top: "20.09%", bottom: "55.66%", left: 0, right: 0 }}><img src={g1506} alt="" style={{ width: "100%", height: "100%" }} /></div>
-				<div style={{ position: "absolute", top: "29.92%", bottom: "58.54%", left: "97.2%", right: 0 }}><img src={A.featR2415499} alt="" style={{ width: "100%", height: "100%" }} /></div>
-				<div style={{ position: "absolute", top: "27.52%", bottom: "65.36%", left: "0.02%", right: "97.18%" }}><img src={A.featR241549} alt="" style={{ width: "100%", height: "100%" }} /></div>
-				<div style={{ position: "absolute", top: "37.13%", bottom: "55.76%", left: 0, right: "97.2%" }}><img src={A.featR2415496} alt="" style={{ width: "100%", height: "100%" }} /></div>
-				<div style={{ position: "absolute", top: "20.23%", bottom: "76.19%", left: 0, right: "97.2%" }}><img src={A.featR24154} alt="" style={{ width: "100%", height: "100%" }} /></div>
-				<div style={{ position: "absolute", top: "0.07%", bottom: "0.07%", left: "0.72%", right: "0.69%" }}>
-					<div style={{ position: "absolute", inset: "0 -0.14%" }}><img src={A.featR2163} alt="" style={{ width: "100%", height: "100%" }} /></div>
-				</div>
-				<div style={{ position: "absolute", top: "0.34%", bottom: "0.34%", left: "1.26%", right: "1.23%" }}>
-					<div style={{ position: "absolute", inset: "-0.27% -0.55%" }}><img src={A.featR21631} alt="" style={{ width: "100%", height: "100%" }} /></div>
-				</div>
-				<div style={{ position: "absolute", top: 0, bottom: 0, left: "0.58%", right: "0.55%" }}><img src={A.featR2172} alt="" style={{ width: "100%", height: "100%" }} /></div>
-				<div style={{ position: "absolute", top: "0.66%", bottom: "98.65%", left: "41.51%", right: "40.95%" }}><img src={A.featR1093} alt="" style={{ width: "100%", height: "100%" }} /></div>
-				<div style={{ position: "absolute", top: "0.7%", bottom: "0.7%", left: "1.86%", right: "1.84%" }}><img src={A.featR3540} alt="" style={{ width: "100%", height: "100%" }} /></div>
-				<div style={{ position: "absolute", top: "0.7%", bottom: "98.33%", left: "42.15%", right: "41.59%" }}>
-					<div style={{ position: "absolute", inset: "-3.53% -0.43%" }}><img src={A.featR1030} alt="" style={{ width: "100%", height: "100%" }} /></div>
-				</div>
-				<div style={{ position: "absolute", top: "0.9%", bottom: "98.53%", left: "42.59%", right: "42.03%" }}>
-					<div style={{ position: "absolute", inset: "-50.03% -6.33% -49.48% -6.33%" }}><img src={g2819} alt="" style={{ width: "100%", height: "100%" }} /></div>
-				</div>
-				<div style={{ position: "absolute", top: "2.33%", bottom: "2.23%", left: "5.54%", right: "5.34%", background: "#fff", overflow: "hidden", borderRadius: 23 }}>
-					<img src={A.featPhoneScreen} alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }} />
-				</div>
-				<div style={{ position: "absolute", top: "2.33%", bottom: "94.04%", left: "29.66%", right: "29.43%" }}><img src={A.featSubtract} alt="" style={{ width: "100%", height: "100%" }} /></div>
-				<div style={{ position: "absolute", top: "2.82%", bottom: "95.61%", left: "35.68%", right: "61.14%" }}><img src={g2170} alt="" style={{ width: "100%", height: "100%" }} /></div>
-			</div>
-			<div style={{ position: "absolute", inset: "0 0 -1px", background: "linear-gradient(to bottom, rgba(16,23,42,0) 40.429%, #10172a 73.762%)", borderRadius: 10.647, pointerEvents: "none" }} />
-		</div>
-	);
-}
-
-function SwipeDeckIllustration() {
-	return (
-		<div style={{ position: "absolute", left: "calc(50% + 0.07px)", top: 122.09, transform: "translateX(-50%)", width: 331.895, height: 184.655 }}>
-			<div style={{ position: "absolute", left: 180.19, top: 15.18, width: 151.696, height: 169.472, display: "flex", alignItems: "center", justifyContent: "center" }}>
-				<div style={{ transform: "rotate(12.75deg)", width: 122.486, height: 146.041, background: "#b4b4b4", borderRadius: 9.422 }} />
-			</div>
-			<div style={{ position: "absolute", left: 93.36, top: 0, width: 145.182, height: 173.101, background: "#d9d9d9", borderRadius: 11.168 }} />
-			<div style={{ position: "absolute", left: 0, top: 14, width: 151.696, height: 169.472, display: "flex", alignItems: "center", justifyContent: "center" }}>
-				<div style={{ transform: "rotate(-12.75deg)", width: 122.486, height: 146.041, background: "rgba(217,217,217,0.8)", borderRadius: 9.422 }} />
-			</div>
-		</div>
-	);
-}
-
 function Features({ onScrollTo }: { onScrollTo: (k: keyof typeof SEC) => void }) {
 	return (
 		<section style={{ position: "absolute", left: 0, top: SEC.features, width: CANVAS_WIDTH, height: 1788, background: SECTION_BG, overflow: "hidden" }}>
@@ -633,7 +587,7 @@ function Features({ onScrollTo }: { onScrollTo: (k: keyof typeof SEC) => void })
 					<div style={{ display: "flex", flexDirection: "column", gap: 27.13, width: "100%" }}>
 						<div style={{ display: "flex", gap: 27.13 }}>
 							<div style={{ position: "relative", width: 575.935, height: 548.033, background: CARD_BG, borderRadius: 11.895, overflow: "hidden" }}>
-								<PhoneMockup variant={1} />
+								<div style={{ position: "absolute", left: "calc(50% - 0.47px)", top: 26.13, transform: "translateX(-50%)", width: 223, height: 449 }}><img src={A.featTrendsD} alt="" style={{ width: "100%", height: "100%", display: "block" }} /></div><div style={{ position: "absolute", left: "calc(50% - 0.39px)", top: 0, transform: "translateX(-50%)", width: 515.477, height: 490.504, background: "linear-gradient(to bottom, rgba(16,23,42,0) 40.429%, #10172a 73.762%)", borderRadius: 10.647, pointerEvents: "none" }} />
 								<div style={{ position: "absolute", left: "calc(50% + 0.07px)", top: "calc(50% + 150.73px)", transform: "translate(-50%, -50%)", width: 342.747, display: "flex", flexDirection: "column", gap: 18.087 }}>
 									<p style={{ fontFamily: SR, fontWeight: 600, fontSize: 20, color: "#fff", margin: 0 }}>Trends</p>
 									<div style={{ fontFamily: SR, fontWeight: 300, fontSize: 14, color: BODY_DIM, whiteSpace: "pre-wrap" }}>
@@ -643,7 +597,7 @@ function Features({ onScrollTo }: { onScrollTo: (k: keyof typeof SEC) => void })
 								</div>
 							</div>
 							<div style={{ position: "relative", width: 575.935, height: 548.033, background: CARD_BG, borderRadius: 11.895, overflow: "hidden" }}>
-								<SwipeDeckIllustration />
+								<div style={{ position: "absolute", left: "calc(50% + 0.47px)", top: 32.92, transform: "translateX(-50%)", width: 223, height: 449.022 }}><img src={A.featDeckD} alt="" style={{ width: "100%", height: "100%", display: "block" }} /></div><div style={{ position: "absolute", left: "50%", top: 28.76, transform: "translateX(-50%)", width: 515.477, height: 490.504, background: "linear-gradient(to bottom, rgba(16,23,42,0) 40.429%, #10172a 73.762%)", borderRadius: 10.647, pointerEvents: "none" }} />
 								<div style={{ position: "absolute", left: "calc(50% + 0.06px)", top: 376.2, transform: "translateX(-50%)", width: 342.747, display: "flex", flexDirection: "column", gap: 18.087 }}>
 									<p style={{ fontFamily: SR, fontWeight: 600, fontSize: 20, color: "#fff", margin: 0 }}>Swipe Deck</p>
 									<p style={{ fontFamily: SR, fontWeight: 300, fontSize: 14, color: BODY_DIM, margin: 0 }}>Discover stocks the way you discover everything else by swiping. Right to STAK it. Left to pass. Up to go deeper. Your feed, your pace.</p>
@@ -652,14 +606,14 @@ function Features({ onScrollTo }: { onScrollTo: (k: keyof typeof SEC) => void })
 						</div>
 						<div style={{ display: "flex", gap: 27.13 }}>
 							<div style={{ position: "relative", width: 575.935, height: 548.033, background: CARD_BG, borderRadius: 11.895, overflow: "hidden" }}>
-								<SwipeDeckIllustration />
+								<div style={{ position: "absolute", left: "calc(50% - 0.47px)", top: 36.84, transform: "translateX(-50%)", width: 223, height: 449 }}><img src={A.featSimD} alt="" style={{ width: "100%", height: "100%", display: "block" }} /></div><div style={{ position: "absolute", left: "50%", top: 28.76, transform: "translateX(-50%)", width: 515.477, height: 490.504, background: "linear-gradient(to bottom, rgba(16,23,42,0) 40.429%, #10172a 73.762%)", borderRadius: 10.647, pointerEvents: "none" }} />
 								<div style={{ position: "absolute", left: "calc(50% + 0.06px)", top: 376.2, transform: "translateX(-50%)", width: 342.747, display: "flex", flexDirection: "column", gap: 18.087 }}>
 									<p style={{ fontFamily: SR, fontWeight: 600, fontSize: 20, color: "#fff", margin: 0 }}>Simulated STAK</p>
 									<p style={{ fontFamily: SR, fontWeight: 300, fontSize: 14, color: BODY_DIM, margin: 0 }}>Buy. Sell. Watch. Learn. All with fake money, real market data. Zero risk, full experience. Build your portfolio before it counts.</p>
 								</div>
 							</div>
 							<div style={{ position: "relative", width: 575.935, height: 548.033, background: CARD_BG, borderRadius: 11.895, overflow: "hidden" }}>
-								<PhoneMockup variant={2} />
+								<div style={{ position: "absolute", left: 169.87, top: 35.93, width: 223, height: 449 }}><img src={A.featIntelD} alt="" style={{ width: "100%", height: "100%", display: "block" }} /></div><div style={{ position: "absolute", left: "calc(50% - 0.38px)", top: 0, transform: "translateX(-50%)", width: 515.477, height: 490.504, background: "linear-gradient(to bottom, rgba(16,23,42,0) 40.429%, #10172a 73.762%)", borderRadius: 10.647, pointerEvents: "none" }} />
 								<div style={{ position: "absolute", left: "calc(50% + 0.07px)", top: "calc(50% + 159.73px)", transform: "translate(-50%, -50%)", width: 342.747, display: "flex", flexDirection: "column", gap: 18.087 }}>
 									<p style={{ fontFamily: SR, fontWeight: 600, fontSize: 20, color: "#fff", margin: 0 }}>Intel Injections</p>
 									<div style={{ fontFamily: SR, fontWeight: 300, fontSize: 14, color: BODY_DIM, whiteSpace: "pre-wrap" }}>
@@ -685,25 +639,25 @@ function Features({ onScrollTo }: { onScrollTo: (k: keyof typeof SEC) => void })
    Row 2 (middle, 1:792):    Buzz / Tsla / STAK / STAK / STAK
    Row 3 (bottom, 1:771):    Bullish / printing / Gold / STAK / STAK */
 const CHAT_BUBBLES_R1 = [
-	{ t: "Just STAKed Amazon!", dark: false },
+	{ t: "Lets fvking STAK i!", dark: false },
 	{ t: "Time to save more!", dark: true },
 	{ t: "Woooo!!", dark: false },
-	{ t: "Portfolio up this week!", dark: false },
-	{ t: "New to STAK, loving it!", dark: false },
+	{ t: "Lets fvking STAK i!", dark: false },
+	{ t: "Lets fvking STAK i!", dark: false },
 ];
 const CHAT_BUBBLES_R2 = [
-	{ t: "What's the Buzz About?", dark: true },
+	{ t: "Whats the Buzz About?", dark: true },
 	{ t: "Is $Tsla a good buy?", dark: false },
-	{ t: "Bullish on tech stocks!", dark: true },
-	{ t: "STAKed Apple today!", dark: false },
-	{ t: "Up 12% this month!", dark: false },
+	{ t: "Lets fvking STAK i!", dark: true },
+	{ t: "Lets fvking STAK i!", dark: false },
+	{ t: "Lets fvking STAK i!", dark: false },
 ];
 const CHAT_BUBBLES_R3 = [
 	{ t: "Bullish! on S&P 500", dark: false },
-	{ t: "My portfolio is growing!", dark: true },
+	{ t: "I love printing money", dark: true },
 	{ t: "Gold, Google", dark: false },
-	{ t: "Big gains incoming!", dark: false },
-	{ t: "This app is different!", dark: false },
+	{ t: "Lets fvking STAK i!", dark: false },
+	{ t: "Lets fvking STAK i!", dark: false },
 ];
 
 function ChatBubble({ text, dark }: { text: string; dark: boolean }) {
@@ -733,8 +687,8 @@ function EarlyMomentum({ onSignup }: { onSignup: () => void }) {
 			    within the wrapper, so the stats column left edge lands at canvas x=96. */}
 				<div style={{ position: "absolute", left: 0, top: 350, display: "flex", gap: 85, alignItems: "center", justifyContent: "flex-start" }}>
 					<div style={{ width: 252.275, display: "flex", flexDirection: "column", gap: 48 }}>
-						<StatBlock value="50M+" label="Millennials & Gen Z investing today" />
-						<StatBlock value="30M+" label="Investors seeking better tools" />
+						<StatBlock value="50M" label="Young active Users" />
+						<StatBlock value="30M" label="Sign up for early access" />
 					</div>
 
 					<div style={{ position: "relative" }}>
@@ -1888,11 +1842,11 @@ function MobileProblem({ onSignup }: { onSignup: () => void }) {
 			{/* Phone — centered 611px window onto the 1238px mockup frame (Figma 1:1191) */}
 			<div style={{ position: "absolute", left: "calc(50% + 0.5px)", top: 642, transform: "translate(-50%, -50%)", width: 611, height: 598, overflow: "hidden" }}>
 				<div style={{ position: "absolute", left: "calc(50% + 0.5px)", top: "calc(50% - 10px)", transform: "translate(-50%, -50%)", width: 1238, height: 746 }}>
-					<div style={{ position: "absolute", left: "calc(50% + 1.46px)", top: 128.09, transform: "translateX(-50%)", width: 621.781, height: 639.024 }}>
-						{/* mask rows sit entirely under the fade's solid zone (container y 574-590 < clip 598):
-						    visually invisible, but zeroes the photo at the clip row so no per-layer rounding
-						    hairline can leak — same treatment as the 390 mockup */}
-						<img src={A.problemScreenshot} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", maskImage: "linear-gradient(to bottom, black 83%, transparent 85.5%)", WebkitMaskImage: "linear-gradient(to bottom, black 83%, transparent 85.5%)" }} />
+					<div style={{ position: "absolute", left: "calc(50% + 1.46px)", top: 132.09, transform: "translateX(-50%)", width: 328.045, height: 660.721 }}>
+						{/* Real STAK app composite (new-file node 1638:6337). Its bottom is clipped by the
+						    598px viewport; the mask rows sit entirely under the fade's solid zone —
+						    invisible, but they zero the image at the clip row (no rounding hairline). */}
+						<img src={A.problemApp} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", maskImage: "linear-gradient(to bottom, black 79.5%, transparent 82%)", WebkitMaskImage: "linear-gradient(to bottom, black 79.5%, transparent 82%)" }} />
 					</div>
 					<div style={{ position: "absolute", bottom: 31, left: -84, width: 1400, height: 214, background: "linear-gradient(to top, #0a1020 30.374%, rgba(10,16,32,0) 96.262%)", filter: "blur(12.798px)", pointerEvents: "none" }} />
 				</div>
@@ -1928,6 +1882,8 @@ function MobileHowItWorks({ onSignup }: { onSignup: () => void }) {
 				<div style={{ display: "flex", flexDirection: "column", gap: 12.952 }}>
 					<div style={{ display: "flex", gap: 12.952 }}>
 						<div style={{ ...cardBg, width: 296.366 }}>
+								<div style={{ position: "absolute", left: 73, top: 8.63, width: 141.785, height: 143.444 }}><img src={A.hiwT1} alt="" style={{ width: "100%", height: "100%", display: "block" }} /></div>
+								<div style={{ position: "absolute", left: "calc(50% - 4.18px)", top: 131.8, transform: "translateX(-50%)", width: 288, height: 33.316, background: "linear-gradient(to bottom, rgba(16,23,42,0) 40.429%, #10172a 73.762%)", borderRadius: 4.885, pointerEvents: "none" }} />
 							<div style={{ position: "absolute", bottom: 28.19, left: "calc(50% + 0.38px)", transform: "translateX(-50%)", display: "flex", flexDirection: "column", gap: 10.666, alignItems: "flex-start", width: 251.415 }}>
 								<p style={numS}>01/</p>
 								<div style={{ display: "flex", flexDirection: "column", gap: 6.095, alignItems: "flex-start" }}>
@@ -1940,6 +1896,8 @@ function MobileHowItWorks({ onSignup }: { onSignup: () => void }) {
 							</div>
 						</div>
 						<div style={{ ...cardBg, width: 296.366 }}>
+								<div style={{ position: "absolute", left: "calc(50% - 1.52px)", top: 14.17, transform: "translateX(-50%)", width: 96.091, height: 145.774 }}><img src={A.hiwT2} alt="" style={{ width: "100%", height: "100%", display: "block" }} /></div>
+								<div style={{ position: "absolute", left: "calc(50% - 4.18px)", top: 131.8, transform: "translateX(-50%)", width: 288, height: 33.316, background: "linear-gradient(to bottom, rgba(16,23,42,0) 40.429%, #10172a 73.762%)", borderRadius: 4.885, pointerEvents: "none" }} />
 							<div style={{ position: "absolute", bottom: 24.38, left: "calc(50% + 0.38px)", transform: "translateX(-50%)", display: "flex", flexDirection: "column", gap: 10.666, alignItems: "flex-start", width: 251.415 }}>
 								<p style={numS}>02/</p>
 								<div style={{ display: "flex", flexDirection: "column", gap: 6.095, alignItems: "flex-start", width: "100%" }}>
@@ -1953,6 +1911,8 @@ function MobileHowItWorks({ onSignup }: { onSignup: () => void }) {
 						</div>
 					</div>
 					<div style={{ ...cardBg, width: 605.683 }}>
+							<div style={{ position: "absolute", left: "calc(50% + 111.57px)", top: 56.23, transform: "translateX(-50%)", width: 188.242, height: 190.444 }}><img src={A.hiwT3} alt="" style={{ width: "100%", height: "100%", display: "block" }} /></div>
+							<div style={{ position: "absolute", left: "calc(50% + 106.94px)", top: 213.08, transform: "translateX(-50%)", width: 360.243, height: 41.673, background: "linear-gradient(to bottom, rgba(16,23,42,0) 40.429%, #10172a 73.762%)", borderRadius: 6.111, pointerEvents: "none" }} />
 						<div style={{ position: "absolute", bottom: 47.24, left: "calc(50% - 148.18px)", transform: "translateX(-50%)", display: "flex", flexDirection: "column", gap: 7.619, alignItems: "flex-start", width: 251.415 }}>
 							<p style={numS}>03/</p>
 							<div style={{ display: "flex", flexDirection: "column", gap: 6.095, alignItems: "flex-start", width: "100%" }}>
@@ -1976,26 +1936,6 @@ function MobileFeatures({ onSignup }: { onSignup: () => void }) {
 	const card: CSSProperties = { background: "#10172a", width: 295.539, height: 281.221, borderRadius: 6.104, overflow: "hidden", position: "relative", flexShrink: 0 };
 	const titleS: CSSProperties = { fontFamily: SR, fontWeight: 600, fontSize: 10.263, color: "#fff", margin: 0, lineHeight: "normal", whiteSpace: "nowrap" };
 	const bodyS: CSSProperties = { fontFamily: SR, fontWeight: 300, color: "rgba(255,255,255,0.62)", lineHeight: "normal", textAlign: "center", margin: 0 };
-	const renderPhone = (variant: 1 | 2) => (
-		<div style={{ position: "absolute", inset: 0, overflow: "hidden" }}>
-			<div style={{ position: "absolute", left: 0, top: 0, width: 575.935, height: 548.033, transform: "scale(0.5131)", transformOrigin: "top left" }}>
-				<div style={{ position: "relative", width: "100%", height: "100%" }}>
-					<PhoneMockup variant={variant} />
-				</div>
-			</div>
-		</div>
-	);
-	const renderStack = () => (
-		<div style={{ position: "absolute", left: "calc(50% + 0.04px)", top: 62.65, transform: "translateX(-50%)", width: 170.311, height: 94.755 }}>
-			<div style={{ position: "absolute", left: 92.47, top: 7.79, width: 77.843, height: 86.964, display: "flex", alignItems: "center", justifyContent: "center" }}>
-				<div style={{ transform: "rotate(12.75deg)", width: 62.853, height: 74.94, background: "#b4b4b4", borderRadius: 4.835 }} />
-			</div>
-			<div style={{ position: "absolute", left: 47.91, top: 0, width: 74.499, height: 88.826, background: "#d9d9d9", borderRadius: 5.731 }} />
-			<div style={{ position: "absolute", left: 0, top: 7.18, width: 77.842, height: 86.964, display: "flex", alignItems: "center", justifyContent: "center" }}>
-				<div style={{ transform: "rotate(-12.75deg)", width: 62.853, height: 74.94, background: "rgba(217,217,217,0.8)", borderRadius: 4.835 }} />
-			</div>
-		</div>
-	);
 	return (
 		<section style={{ position: "absolute", left: 0, top: 3298, width: MOBILE_WIDTH, height: 1185, background: SECTION_BG, overflow: "hidden" }}>
 			<div style={{ position: "absolute", left: 102.66, top: 110, width: 605.683, display: "flex", flexDirection: "column", alignItems: "center", gap: 60 }}>
@@ -2013,7 +1953,7 @@ function MobileFeatures({ onSignup }: { onSignup: () => void }) {
 				<div style={{ display: "flex", flexDirection: "column", gap: 13.922 }}>
 					<div style={{ display: "flex", gap: 13.922 }}>
 						<div style={card}>
-							{renderPhone(1)}
+							<div style={{ position: "absolute", left: "calc(50% - 0.12px)", top: 17.09, transform: "translateX(-50%)", width: 113.275, height: 228.15 }}><img src={A.featTrendsT} alt="" style={{ width: "100%", height: "100%", display: "block" }} /></div><div style={{ position: "absolute", left: "calc(50% - 0.19px)", top: 0, transform: "translateX(-50%)", width: 264.515, height: 251.701, background: "linear-gradient(to bottom, rgba(16,23,42,0) 40.429%, #10172a 73.762%)", borderRadius: 5.463, pointerEvents: "none" }} />
 							<div style={{ position: "absolute", left: "50%", top: 218, transform: "translate(-50%, -50%)", display: "flex", flexDirection: "column", gap: 9.281, alignItems: "center", width: 230 }}>
 								<p style={titleS}>Trends</p>
 								<div style={{ ...bodyS, fontSize: 10, width: 230 }}>
@@ -2023,7 +1963,7 @@ function MobileFeatures({ onSignup }: { onSignup: () => void }) {
 							</div>
 						</div>
 						<div style={card}>
-							{renderStack()}
+							<div style={{ position: "absolute", left: "calc(50% + 0.41px)", top: 14.65, transform: "translateX(-50%)", width: 113.28, height: 228.096 }}><img src={A.featDeckT} alt="" style={{ width: "100%", height: "100%", display: "block" }} /></div><div style={{ position: "absolute", left: "50%", top: 14.76, transform: "translateX(-50%)", width: 264.515, height: 251.701, background: "linear-gradient(to bottom, rgba(16,23,42,0) 40.429%, #10172a 73.762%)", borderRadius: 5.463, pointerEvents: "none" }} />
 							<div style={{ position: "absolute", left: "50%", top: 193.05, transform: "translateX(-50%)", display: "flex", flexDirection: "column", gap: 9.281, alignItems: "center", width: 175.879 }}>
 								<p style={titleS}>Swipe Deck</p>
 								<p style={{ ...bodyS, fontSize: 7.184, width: "100%" }}>Discover stocks the way you discover everything else by swiping. Right to STAK it. Left to pass. Up to go deeper. Your feed, your pace.</p>
@@ -2032,14 +1972,14 @@ function MobileFeatures({ onSignup }: { onSignup: () => void }) {
 					</div>
 					<div style={{ display: "flex", gap: 13.922 }}>
 						<div style={card}>
-							{renderStack()}
+							<div style={{ position: "absolute", left: "calc(50% - 0.13px)", top: 13.66, transform: "translateX(-50%)", width: 113.28, height: 228.159 }}><img src={A.featSimT} alt="" style={{ width: "100%", height: "100%", display: "block" }} /></div><div style={{ position: "absolute", left: "50%", top: 14.76, transform: "translateX(-50%)", width: 264.515, height: 251.701, background: "linear-gradient(to bottom, rgba(16,23,42,0) 40.429%, #10172a 73.762%)", borderRadius: 5.463, pointerEvents: "none" }} />
 							<div style={{ position: "absolute", left: "50%", top: 193.05, transform: "translateX(-50%)", display: "flex", flexDirection: "column", gap: 9.281, alignItems: "center", width: 175.879 }}>
 								<p style={titleS}>Simulated STAK</p>
 								<p style={{ ...bodyS, fontSize: 7.184, width: "100%" }}>Buy. Sell. Watch. Learn. All with fake money, real market data. Zero risk, full experience. Build your portfolio before it counts.</p>
 							</div>
 						</div>
 						<div style={card}>
-							{renderPhone(2)}
+							<div style={{ position: "absolute", left: "calc(50% - 0.59px)", top: 19.09, transform: "translateX(-50%)", width: 113.28, height: 228.159 }}><img src={A.featIntelT} alt="" style={{ width: "100%", height: "100%", display: "block" }} /></div><div style={{ position: "absolute", left: "calc(50% - 0.19px)", top: 0, transform: "translateX(-50%)", width: 264.515, height: 251.701, background: "linear-gradient(to bottom, rgba(16,23,42,0) 40.429%, #10172a 73.762%)", borderRadius: 5.463, pointerEvents: "none" }} />
 							<div style={{ position: "absolute", left: "50%", top: 222, transform: "translate(-50%, -50%)", display: "flex", flexDirection: "column", gap: 9.281, alignItems: "center", width: 175.879 }}>
 								<p style={titleS}>Intel Injections</p>
 								<div style={{ ...bodyS, fontSize: 7.184, width: "100%" }}>
@@ -2098,8 +2038,8 @@ function MobileEarlyMomentum({ onSignup }: { onSignup: () => void }) {
 			</div>
 			{/* stats */}
 			<div style={{ position: "absolute", left: 49, top: 421, width: 199.412, display: "flex", flexDirection: "column", gap: 39.523, alignItems: "center" }}>
-				{stat(A.emStatArrow, "50M+", "Millennials & Gen Z investing today")}
-				{stat(A.emStatArrow, "30M+", "Investors seeking better tools")}
+				{stat(A.emStatArrow, "50M", "Young active Users")}
+				{stat(A.emStatArrow, "30M", "Sign up for early access")}
 			</div>
 			{/* chat bubbles (3 staggered rows, overflow right with fade) */}
 			<div style={{ position: "absolute", left: 315.6, top: 402, width: 494.4, height: 209.231, overflow: "hidden" }}>
@@ -2110,7 +2050,7 @@ function MobileEarlyMomentum({ onSignup }: { onSignup: () => void }) {
 			</div>
 			<div style={{ position: "absolute", left: "50%", top: 735.3, transform: "translateX(-50%)" }}>
 				<button type="button" onClick={onSignup} style={{ background: CTA_GRADIENT, border: "0.275px solid rgba(101,158,173,0.63)", borderRadius: 4.404, padding: "5.505px 11.011px", display: "flex", alignItems: "center", justifyContent: "center", gap: 5.505, filter: "drop-shadow(0px 9.359px 4.68px rgba(82,170,199,0.09)) drop-shadow(0px 2.891px 3.252px rgba(82,170,199,0.10))", cursor: "pointer" }}>
-					<span style={{ fontFamily: SR, fontWeight: 400, fontSize: 13.714, lineHeight: "17px", color: "#fff", whiteSpace: "nowrap" }}>Join our Community</span>
+					<span style={{ fontFamily: SR, fontWeight: 400, fontSize: 13.714, lineHeight: "17px", color: "#fff", whiteSpace: "nowrap" }}>Explore STAK</span>
 					<div style={{ width: 14.48, height: 12.067, flexShrink: 0 }}><img src={A.ctaArrow} alt="" style={{ width: "100%", height: "100%" }} /></div>
 				</button>
 			</div>
@@ -2425,10 +2365,10 @@ function MobileProblem390({ onSignup }: { onSignup: () => void }) {
 				<img src={A.ellipse109} alt="" style={{ position: "absolute", top: "-337.79%", left: "-108.2%", width: "316.4%", height: "775.58%", maxWidth: "none" }} />
 			</div>
 			<div style={{ position: "absolute", left: "calc(50% - 0.21px)", top: "calc(50% + 128.5px)", transform: "translate(-50%, -50%)", width: 403.587, height: 395, overflow: "hidden" }}>
-				{/* Figma 1:1659/1:1660 geometry, but the photo stays SHARP — the user rejected the
-				    design's layer blur (re-confirmed 2026-07-01). The bottom mask rows sit entirely
-				    under the solid overlay (kills a compositing hairline, invisible otherwise). */}
-				<img src={A.problemScreenshot} alt="" style={{ position: "absolute", left: "calc(50% + 1.29px)", top: 29.12, transform: "translateX(-50%)", width: 410.708, height: 422.098, objectFit: "cover", maskImage: "linear-gradient(to bottom, black 84%, transparent 86.5%)", WebkitMaskImage: "linear-gradient(to bottom, black 84%, transparent 86.5%)" }} />
+				{/* Real STAK app composite — new-file node 1638:6339 (172.192x346.816). Figma nests it
+				    at top 94.56 inside wrapper 1554:10638, whose own top is -55.49 in this clip's
+				    coords, so the flattened top is 39.07. Sharp, fully inside the clip — no mask. */}
+				<img src={A.problemApp} alt="" style={{ position: "absolute", left: "calc(50% + 0.11px)", top: 39.07, transform: "translateX(-50%)", width: 172.192, height: 346.816, objectFit: "cover" }} />
 				<div style={{ position: "absolute", left: "calc(50% + 1.21px)", bottom: -22, transform: "translateX(-50%)", width: 410, height: 142, background: "linear-gradient(to top, #0a1020 30.374%, rgba(10,16,32,0) 96.262%)", filter: "blur(8.453px)" }} />
 			</div>
 			<div style={{ position: "absolute", left: "calc(50% + 0.5px)", top: 70, transform: "translateX(-50%)", display: "flex", flexDirection: "column", alignItems: "center", gap: 60 }}>
@@ -2458,9 +2398,11 @@ function MobileProblem390({ onSignup }: { onSignup: () => void }) {
 	);
 }
 
-function MobileHowCard390({ num, title, body, bottom }: { num: string; title: string; body: string; bottom: number }) {
+function MobileHowCard390({ num, title, body, bottom, graphic }: { num: string; title: string; body: string; bottom: number; graphic?: ReactNode }) {
 	return (
 		<div style={{ background: "#10172a", height: 297.889, width: 296.366, borderRadius: 9.142, overflow: "hidden", position: "relative", flexShrink: 0 }}>
+			{graphic}
+			{graphic && <div style={{ position: "absolute", left: "calc(50% - 4.18px)", top: 131.8, transform: "translateX(-50%)", width: 288, height: 33.316, background: "linear-gradient(to bottom, rgba(16,23,42,0) 40.429%, #10172a 73.762%)", borderRadius: 4.885, pointerEvents: "none" }} />}
 			<div style={{ position: "absolute", bottom, left: "calc(50% + 0.38px)", transform: "translateX(-50%)", display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 10.666, width: 251.415 }}>
 				<p style={{ fontFamily: SQ, fontSize: 22.856, color: "#fff", margin: 0, whiteSpace: "nowrap" }}>{num}</p>
 				<div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 6.095, width: "100%" }}>
@@ -2482,16 +2424,25 @@ function MobileHowItWorks390({ onSignup }: { onSignup: () => void }) {
 						<p style={{ fontFamily: SR, fontWeight: 300, fontSize: 12, lineHeight: "12px", color: "#fff", margin: 0, whiteSpace: "nowrap" }}>How it works</p>
 						<div style={{ width: 10.338, height: 8.615, flexShrink: 0 }}><img src={A.pillArrow} alt="" style={{ width: "100%", height: "100%" }} /></div>
 					</div>
-					<div style={{ fontFamily: SQ, fontSize: 30, textAlign: "center", width: "100%" }}>
-						<p style={{ margin: 0, lineHeight: "35px", whiteSpace: "nowrap" }}>Three Swipes to</p>
-						<p style={{ margin: 0, lineHeight: "35px", whiteSpace: "nowrap" }}>Smarter Investing.</p>
+					<div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 15, width: "100%", textAlign: "center", color: "#fff" }}>
+						<div style={{ fontFamily: SQ, fontSize: 30, lineHeight: "35px" }}>
+							<p style={{ margin: 0, whiteSpace: "pre" }}>{"The Market Isn't "}</p>
+							<p style={{ margin: 0, whiteSpace: "pre" }}>{"Hard. "}</p>
+							<p style={{ margin: 0, whiteSpace: "pre" }}>{"It's Just Been "}</p>
+							<p style={{ margin: 0, whiteSpace: "pre" }}>Made That Way.</p>
+						</div>
+						<div style={{ fontFamily: SR, fontWeight: 300, fontSize: 16, lineHeight: "25px", width: 308, whiteSpace: "pre-wrap" }}>
+							<p style={{ margin: 0 }}>{'You\'ve heard the advice — "invest early, invest often."  '}</p>
+							<p style={{ margin: 0 }}>{"But nobody tells you how. "}</p>
+							<p style={{ margin: 0 }}>{"Here’s how:"}</p>
+						</div>
 					</div>
 				</div>
 				<div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 83.805 }}>
 					<div style={{ display: "flex", flexDirection: "column", gap: 12.952, alignItems: "flex-start" }}>
-						<MobileHowCard390 num="01/" title="Tell Us Who You Are" body={"Take a quick risk quiz. STAK learns your personality, your goals, and your vibe.\nNo spreadsheets. No jargon."} bottom={28.19} />
-						<MobileHowCard390 num="02/" title="Swipe Through Stocks" body="Like a stock? Swipe right. Not feeling it? Swipe left. Want to know more? Swipe up. It's that simple." bottom={24.38} />
-						<MobileHowCard390 num="03/" title="STAK Before You Spend" body="Practice with real market data and zero real money. Build confidence before you commit a single dollar." bottom={24.38} />
+						<MobileHowCard390 graphic={<div style={{ position: "absolute", left: 73, top: 8.63, width: 141.785, height: 143.444 }}><img src={A.hiwP1} alt="" style={{ width: "100%", height: "100%", display: "block" }} /></div>} num="01/" title="Tell Us Who You Are" body={"Take a quick risk quiz. STAK learns your personality, your goals, and your vibe.\nNo spreadsheets. No jargon."} bottom={28.19} />
+						<MobileHowCard390 graphic={<div style={{ position: "absolute", left: "calc(50% - 1.52px)", top: 14.17, transform: "translateX(-50%)", width: 96.091, height: 145.774 }}><img src={A.hiwP2} alt="" style={{ width: "100%", height: "100%", display: "block" }} /></div>} num="02/" title="Swipe Through Stocks" body="Like a stock? Swipe right. Not feeling it? Swipe left. Want to know more? Swipe up. It's that simple." bottom={24.38} />
+						<MobileHowCard390 graphic={<div style={{ position: "absolute", left: "calc(50% - 0.49px)", top: 12, transform: "translateX(-50%)", width: 150.492, height: 152.252 }}><img src={A.hiwP3} alt="" style={{ width: "100%", height: "100%", display: "block" }} /></div>} num="03/" title="STAK Before You Spend" body="Practice with real market data and zero real money. Build confidence before you commit a single dollar." bottom={24.38} />
 					</div>
 					<button type="button" onClick={onSignup} style={{ ...btnReset, border: CTA_BORDER, background: CTA_GRADIENT, borderRadius: 4.404, padding: "5.505px 11.011px", display: "flex", alignItems: "center", justifyContent: "center", gap: 5.505, filter: CTA_SHADOW, cursor: "pointer" }}>
 						<span style={{ fontFamily: SR, fontWeight: 400, fontSize: 13.714, color: "#fff", whiteSpace: "nowrap" }}>Explore STAK</span>
@@ -2507,33 +2458,18 @@ function MobileFeatures390({ onSignup }: { onSignup: () => void }) {
 	const card: CSSProperties = { background: "#10172a", width: 295, height: 338, borderRadius: 6.104, overflow: "hidden", position: "relative", flexShrink: 0 };
 	const titleS: CSSProperties = { fontFamily: SR, fontWeight: 600, fontSize: 16, color: "#fff", margin: 0, lineHeight: "normal" };
 	const bodyS: CSSProperties = { fontFamily: SR, fontWeight: 300, fontSize: 11, color: "rgba(255,255,255,0.62)", lineHeight: "normal", whiteSpace: "pre-line", margin: 0 };
-	const renderPhone = (variant: 1 | 2) => (
-		<div style={{ position: "absolute", left: 20.3, top: 24.2, width: 515.477, height: 490.504, transform: "scale(0.4928)", transformOrigin: "top left" }}>
-			<div style={{ position: "relative", width: "100%", height: "100%" }}><PhoneMockup variant={variant} /></div>
-		</div>
+	const gfx = (src: string, left: string, top: number, w: number, h: number) => (
+		<div style={{ position: "absolute", left, top, transform: "translateX(-50%)", width: w, height: h }}><img src={src} alt="" style={{ width: "100%", height: "100%", display: "block" }} /></div>
 	);
-	const renderStack = () => (
-		<div style={{ position: "absolute", left: "50%", top: "calc(50% - 33.65px)", transform: "translate(-50%, -50%)", width: 205.149, height: 114.138 }}>
-			<div style={{ position: "absolute", left: 111.38, top: 9.38, width: 93.766, height: 104.753, display: "flex", alignItems: "center", justifyContent: "center" }}><div style={{ transform: "rotate(12.75deg)", width: 75.71, height: 90.27, background: "#b4b4b4", borderRadius: 5.824 }} /></div>
-			<div style={{ position: "absolute", left: 57.72, top: 0, width: 89.739, height: 106.996, background: "#d9d9d9", borderRadius: 6.903 }} />
-			<div style={{ position: "absolute", left: 0, top: 8.65, width: 93.765, height: 104.753, display: "flex", alignItems: "center", justifyContent: "center" }}><div style={{ transform: "rotate(-12.75deg)", width: 75.71, height: 90.27, background: "rgba(217,217,217,0.8)", borderRadius: 5.824 }} /></div>
-		</div>
+	const fadeBox = (left: string, top: number, w: number, h: number) => (
+		<div style={{ position: "absolute", left, top, transform: "translateX(-50%)", width: w, height: h, background: "linear-gradient(to bottom, rgba(16,23,42,0) 40.429%, #10172a 73.762%)", borderRadius: 5.246, pointerEvents: "none" }} />
 	);
-	const phoneCard = (variant: 1 | 2, title: string, body: string) => (
+	const featCard = (graphic: ReactNode, title: string, body: string, bodyW: number) => (
 		<div style={card}>
-			{renderPhone(variant)}
+			{graphic}
 			<div style={{ position: "absolute", left: "50%", top: "calc(50% + 101.7px)", transform: "translate(-50%, -50%)", display: "flex", flexDirection: "column", gap: 9.281, alignItems: "flex-start", width: 259 }}>
 				<p style={titleS}>{title}</p>
-				<p style={{ ...bodyS, width: 231 }}>{body}</p>
-			</div>
-		</div>
-	);
-	const stackCard = (title: string, body: string) => (
-		<div style={card}>
-			{renderStack()}
-			<div style={{ position: "absolute", left: "50%", top: "calc(50% + 101.7px)", transform: "translate(-50%, -50%)", display: "flex", flexDirection: "column", gap: 9.281, alignItems: "flex-start", width: 259 }}>
-				<p style={titleS}>{title}</p>
-				<p style={{ ...bodyS, width: 259 }}>{body}</p>
+				<p style={{ ...bodyS, width: bodyW }}>{body}</p>
 			</div>
 		</div>
 	);
@@ -2553,10 +2489,10 @@ function MobileFeatures390({ onSignup }: { onSignup: () => void }) {
 				</div>
 				<div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 83.805 }}>
 					<div style={{ display: "flex", flexDirection: "column", gap: 13.922 }}>
-						{phoneCard(1, "Trends", "See what's moving, what's hot, and what the market is actually doing — in plain English. Stay in the loop without the noise")}
-						{stackCard("Swipe Deck", "Discover stocks the way you discover everything else by swiping. Right to STAK it. Left to pass. Up to go deeper. Your feed,\nyour pace.")}
-						{phoneCard(2, "Intel Injections", "Bite-sized lessons delivered in-app, right when you need them. No textbooks. No boring lectures. Just context that makes you smarter on the spot.")}
-						{stackCard("Simulated STAK", "Buy. Sell. Watch. Learn. All with fake money, real market data. Zero risk, full experience. Build your portfolio before it counts.")}
+						{featCard(<>{gfx(A.featTrendsP, "calc(50% - 0.14px)", 17.67, 113.275, 228.15)}{fadeBox("calc(50% - 0.24px)", 24.2, 253.98, 241.676)}</>, "Trends", "See what's moving, what's hot, and what the market is actually doing — in plain English. Stay in the loop without the noise", 231)}
+						{featCard(<>{gfx(A.featDeckP, "calc(50% + 0.14px)", 21.3, 113.28, 228.096)}{fadeBox("calc(50% + 0.49px)", 29.27, 253.98, 242.69)}</>, "Swipe Deck", "Discover stocks the way you discover everything else by swiping. Right to STAK it. Left to pass. Up to go deeper. Your feed,\nyour pace.", 259)}
+						{featCard(<>{gfx(A.featIntelP, "calc(50% + 0.14px)", 17.34, 113.28, 228.159)}{fadeBox("calc(50% - 0.24px)", 44.21, 253.98, 241.676)}</>, "Intel Injections", "Bite-sized lessons delivered in-app, right when you need them. No textbooks. No boring lectures. Just context that makes you smarter on the spot.", 231)}
+						{featCard(<>{gfx(A.featSimP, "calc(50% + 0.14px)", 11.44, 113.28, 228.159)}{fadeBox("calc(50% + 0.49px)", 50.29, 253.98, 241.67)}</>, "Simulated STAK", "Buy. Sell. Watch. Learn. All with fake money, real market data. Zero risk, full experience. Build your portfolio before it counts.", 259)}
 					</div>
 					<button type="button" onClick={onSignup} style={{ ...btnReset, border: CTA_BORDER, background: CTA_GRADIENT, borderRadius: 4.404, padding: "5.505px 11.011px", display: "flex", alignItems: "center", justifyContent: "center", gap: 5.505, filter: CTA_SHADOW, cursor: "pointer" }}>
 						<span style={{ fontFamily: SR, fontWeight: 400, fontSize: 13.714, color: "#fff", whiteSpace: "nowrap" }}>Explore STAK</span>
@@ -2609,11 +2545,11 @@ function MobileEarlyMomentum390({ onSignup }: { onSignup: () => void }) {
 			<div style={{ position: "absolute", left: 23.94, top: 511.92, display: "flex", gap: 10.52 }}>{r2.map(([t, d], i) => bubble(t, d, i))}</div>
 			<div style={{ position: "absolute", left: -1.78, top: 358.8, width: 183.516, height: 209.231, background: "linear-gradient(to right, rgba(10,16,32,1) 0%, rgba(18,29,58,0.75) 25%, rgba(26,42,83,0.5) 50%, rgba(34,54,108,0.25) 75%, rgba(42,67,134,0) 100%)", pointerEvents: "none" }} />
 			<div style={{ position: "absolute", left: "calc(50% - 0.03px)", top: 623.22, transform: "translateX(-50%)", display: "flex", gap: 27.243, alignItems: "flex-start" }}>
-				{stat("50M+", "Millennials & Gen Z investing today")}
-				{stat("30M+", "Investors seeking better tools")}
+				{stat("50M", "Young active Users")}
+				{stat("30M", "Sign up for early access")}
 			</div>
 			<button type="button" onClick={onSignup} style={{ ...btnReset, position: "absolute", left: "50%", top: 785.1, transform: "translateX(-50%)", background: CTA_GRADIENT, border: "0.275px solid rgba(101,158,173,0.63)", borderRadius: 4.404, padding: "5.505px 11.011px", display: "flex", alignItems: "center", justifyContent: "center", gap: 5.505, filter: CTA_SHADOW, cursor: "pointer" }}>
-				<span style={{ fontFamily: SR, fontWeight: 400, fontSize: 13.714, color: "#fff", whiteSpace: "nowrap" }}>Join our Community</span>
+				<span style={{ fontFamily: SR, fontWeight: 400, fontSize: 13.714, color: "#fff", whiteSpace: "nowrap" }}>Explore STAK</span>
 				<div style={{ width: 14.48, height: 12.067, flexShrink: 0 }}><img src={A.ctaArrow} alt="" style={{ width: "100%", height: "100%" }} /></div>
 			</button>
 		</section>

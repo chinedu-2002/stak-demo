@@ -246,7 +246,7 @@ describe("footer", () => {
 describe("design invariants", () => {
 	it.each(ALL)("%s: the problem mockup photo renders SHARP (no blur filter)", (_name, width) => {
 		renderAt(width);
-		const img = document.querySelector('img[src*="problem-screenshot"]') as HTMLImageElement;
+		const img = document.querySelector('img[src*="problem-app-composite"]') as HTMLImageElement;
 		expect(img).not.toBeNull();
 		expect(img.style.filter || "").not.toContain("blur");
 	});

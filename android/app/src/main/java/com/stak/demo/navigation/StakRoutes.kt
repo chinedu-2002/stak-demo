@@ -3,6 +3,7 @@ package com.stak.demo.navigation
 /** Route names for the whole app. Onboarding runs once, then the tabs. */
 object StakRoutes {
 	const val SPLASH = "splash"
+	const val SIGN_IN = "auth/sign-in"
 	const val CREATE_ACCOUNT = "onboarding/create-account"
 	const val VERIFY_EMAIL = "onboarding/verify-email"
 	const val NOTIFICATIONS = "onboarding/notifications"

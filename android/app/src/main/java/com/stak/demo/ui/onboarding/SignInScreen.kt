@@ -1,8 +1,6 @@
 package com.stak.demo.ui.onboarding
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -13,15 +11,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,18 +24,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.stak.demo.R
@@ -52,18 +35,20 @@ import com.stak.demo.ui.theme.Sora
 import com.stak.demo.ui.theme.StakColors
 
 /**
- * Onboarding · Create account — Figma node 1554:9126 ("Auth · Sign up").
- *
- * The 10%-opacity glass ball watermark sits behind the lower half; white
- * social pills carry the real Google/Apple marks; three #181f30 inputs
- * (password with a Show/Hide toggle); sharp-cornered 51dp gradient CTA
- * (#a6e4f7 → #5da8bf → #3c98b4) with white Geist Medium label.
+ * Auth · Sign in — Figma node 1554:11288. Same kit as Sign up:
+ * "Welcome back" header, social pills, two inputs (password with
+ * Show/Hide), a teal "Forgot password?" link, the 10% glass-ball
+ * watermark and the sharp gradient "Sign in" CTA with the
+ * "New to STAK? Create account" switch row.
  */
 @Composable
-fun CreateAccountScreen(onCreateAccount: () -> Unit, onLogIn: () -> Unit) {
+fun SignInScreen(
+	onBack: () -> Unit,
+	onSignIn: () -> Unit,
+	onCreateAccount: () -> Unit,
+) {
 	var email by rememberSaveable { mutableStateOf("") }
 	var password by rememberSaveable { mutableStateOf("") }
-	var confirm by rememberSaveable { mutableStateOf("") }
 	var showPassword by rememberSaveable { mutableStateOf(false) }
 
 	Box(modifier = Modifier.fillMaxSize().background(StakColors.Bg)) {
@@ -71,7 +56,7 @@ fun CreateAccountScreen(onCreateAccount: () -> Unit, onLogIn: () -> Unit) {
 
 		Column(modifier = Modifier.fillMaxSize().systemBarsPadding()) {
 			Row(modifier = Modifier.fillMaxWidth().padding(start = 20.dp, top = 10.dp, bottom = 4.dp)) {
-				AuthBackCircle(onClick = onLogIn)
+				AuthBackCircle(onClick = onBack)
 			}
 
 			Column(
@@ -85,20 +70,20 @@ fun CreateAccountScreen(onCreateAccount: () -> Unit, onLogIn: () -> Unit) {
 			) {
 				Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
 					Text(
-						text = "Create your account",
+						text = "Welcome back",
 						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 26.sp),
 						color = StakColors.TextPrimary,
 					)
 					Text(
-						text = "Enter your details below to continue",
+						text = "Your deck kept learning while you were away.",
 						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 12.sp),
 						color = Auth.SubtitleGray,
 					)
 				}
 				Spacer(modifier = Modifier.height(4.dp))
 
-				SocialPill(text = "Continue with Google", iconRes = R.drawable.ic_google_g, onClick = onCreateAccount)
-				SocialPill(text = "Continue with Apple", iconRes = R.drawable.ic_apple_logo, onClick = onCreateAccount)
+				SocialPill(text = "Continue with Google", iconRes = R.drawable.ic_google_g, onClick = onSignIn)
+				SocialPill(text = "Continue with Apple", iconRes = R.drawable.ic_apple_logo, onClick = onSignIn)
 
 				AuthOrDivider()
 
@@ -111,29 +96,24 @@ fun CreateAccountScreen(onCreateAccount: () -> Unit, onLogIn: () -> Unit) {
 					hidden = !showPassword,
 					trailing = { ShowHideToggle(shown = showPassword, onToggle = { showPassword = !showPassword }) },
 				)
-				AuthInput(
-					value = confirm,
-					onValueChange = { confirm = it },
-					placeholder = "Confirm Password",
-					keyboardType = KeyboardType.Password,
-					hidden = !showPassword,
+				Text(
+					text = "Forgot password?",
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 12.sp),
+					color = Auth.LinkTeal,
+					modifier = Modifier.clickable(
+						interactionSource = remember { MutableInteractionSource() },
+						indication = null,
+					) { /* recovery flow not designed yet */ },
 				)
 			}
 
-			// CTA block — sharp-cornered gradient button, switch link, fine print.
 			Column(
 				horizontalAlignment = Alignment.CenterHorizontally,
 				verticalArrangement = Arrangement.spacedBy(12.dp),
 				modifier = Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 26.dp),
 			) {
-				AuthCta(text = "Create account", onClick = onCreateAccount)
-				AuthSwitchRow(prefix = "Already have an account?", link = "Sign in", onClick = onLogIn)
-				Text(
-					text = "By continuing you agree to the Terms and Privacy Policy.",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 10.sp, textAlign = TextAlign.Center),
-					color = Auth.FaintText,
-					modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
-				)
+				AuthCta(text = "Sign in", onClick = onSignIn)
+				AuthSwitchRow(prefix = "New to STAK?", link = "Create account", onClick = onCreateAccount)
 			}
 		}
 	}

@@ -27,6 +27,7 @@ import com.stak.demo.ui.onboarding.SignInScreen
 import com.stak.demo.ui.onboarding.IntroScreen
 import com.stak.demo.ui.onboarding.BrandPicksScreen
 import com.stak.demo.ui.onboarding.SwipeTutorialScreen
+import com.stak.demo.ui.onboarding.GoalScreen
 import com.stak.demo.ui.onboarding.NotificationsScreen
 import com.stak.demo.ui.onboarding.QuizScreen
 import com.stak.demo.ui.onboarding.VerifyEmailScreen
@@ -61,6 +62,12 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
 		}
 		composable(StakRoutes.SWIPE_TUTORIAL) {
 			SwipeTutorialScreen(
+				onBack = { navController.popBackStack() },
+				onContinue = { navController.navigate(StakRoutes.GOAL) },
+			)
+		}
+		composable(StakRoutes.GOAL) {
+			GoalScreen(
 				onBack = { navController.popBackStack() },
 				onContinue = { navController.navigate(StakRoutes.CREATE_ACCOUNT) },
 			)

@@ -24,6 +24,7 @@ import com.stak.demo.ui.components.StakTabBar
 import com.stak.demo.ui.onboarding.CreateAccountScreen
 import com.stak.demo.ui.onboarding.SplashScreen
 import com.stak.demo.ui.onboarding.SignInScreen
+import com.stak.demo.ui.onboarding.IntroScreen
 import com.stak.demo.ui.onboarding.NotificationsScreen
 import com.stak.demo.ui.onboarding.QuizScreen
 import com.stak.demo.ui.onboarding.VerifyEmailScreen
@@ -41,11 +42,14 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
 		composable(StakRoutes.SPLASH) {
 			SplashScreen(
 				onContinue = {
-					navController.navigate(StakRoutes.CREATE_ACCOUNT) {
+					navController.navigate(StakRoutes.INTRO) {
 						popUpTo(StakRoutes.SPLASH) { inclusive = true }
 					}
 				},
 			)
+		}
+		composable(StakRoutes.INTRO) {
+			IntroScreen(onGetStarted = { navController.navigate(StakRoutes.CREATE_ACCOUNT) })
 		}
 		composable(StakRoutes.CREATE_ACCOUNT) {
 			CreateAccountScreen(

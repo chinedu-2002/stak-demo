@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Onboarding 04 goal icon "goal_first" - converted from the Figma SVG (stroke #819ABB). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="21.06dp" android:height="21.06dp"
+    android:viewportWidth="21.0559" android:viewportHeight="21.0559">
+    <path android:pathData="M10.5271 18.0146C14.6618 18.0146 18.0136 14.6628 18.0136 10.5281C18.0136 6.39336 14.6618 3.04152 10.5271 3.04152C6.3924 3.04152 3.04056 6.39336 3.04056 10.5281C3.04056 14.6628 6.3924 18.0146 10.5271 18.0146Z" android:strokeColor="#819ABB" android:strokeWidth="1.75466" android:strokeLineCap="butt" android:strokeLineJoin="miter" />
+    <path android:pathData="M10.528 13.3354C12.0785 13.3354 13.3355 12.0785 13.3355 10.5279C13.3355 8.97743 12.0785 7.72049 10.528 7.72049C8.9775 7.72049 7.72056 8.97743 7.72056 10.5279C7.72056 12.0785 8.9775 13.3354 10.528 13.3354Z" android:fillColor="#819ABB" />
+</vector>

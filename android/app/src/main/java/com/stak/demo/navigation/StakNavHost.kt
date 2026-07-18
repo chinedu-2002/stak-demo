@@ -23,6 +23,7 @@ import com.stak.demo.ui.components.StakTab
 import com.stak.demo.ui.components.StakTabBar
 import com.stak.demo.ui.onboarding.CreateAccountScreen
 import com.stak.demo.ui.onboarding.SplashScreen
+import com.stak.demo.ui.onboarding.SignInScreen
 import com.stak.demo.ui.onboarding.NotificationsScreen
 import com.stak.demo.ui.onboarding.QuizScreen
 import com.stak.demo.ui.onboarding.VerifyEmailScreen
@@ -49,7 +50,18 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
 		composable(StakRoutes.CREATE_ACCOUNT) {
 			CreateAccountScreen(
 				onCreateAccount = { navController.navigate(StakRoutes.VERIFY_EMAIL) },
-				onLogIn = { navController.navigate(StakRoutes.VERIFY_EMAIL) },
+				onLogIn = { navController.navigate(StakRoutes.SIGN_IN) },
+			)
+		}
+		composable(StakRoutes.SIGN_IN) {
+			SignInScreen(
+				onBack = { navController.popBackStack() },
+				onSignIn = {
+					navController.navigate(StakRoutes.MAIN) {
+						popUpTo(0) { inclusive = true }
+					}
+				},
+				onCreateAccount = { navController.popBackStack() },
 			)
 		}
 		composable(StakRoutes.VERIFY_EMAIL) {

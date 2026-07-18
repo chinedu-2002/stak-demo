@@ -31,3 +31,21 @@ val Sora = FontFamily(
 
 val Squarish = FontFamily(Font(R.font.squarish_sans_ct))
 val SquarishSC = FontFamily(Font(R.font.squarish_sans_ct_sc))
+
+@OptIn(ExperimentalTextApi::class)
+private fun geist(weight: FontWeight) = Font(
+	R.font.geist_variable,
+	weight = weight,
+	style = FontStyle.Normal,
+	variationSettings = FontVariation.Settings(FontVariation.weight(weight.weight)),
+)
+
+/** Geist — the in-app data/UI face used by the splash subtitle and stat chips. */
+@OptIn(ExperimentalTextApi::class)
+val Geist = FontFamily(
+	geist(FontWeight.Light),
+	geist(FontWeight.Normal),
+	geist(FontWeight.Medium),
+	geist(FontWeight.SemiBold),
+	geist(FontWeight.Bold),
+)

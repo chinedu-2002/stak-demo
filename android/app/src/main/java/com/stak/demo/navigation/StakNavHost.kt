@@ -22,6 +22,7 @@ import androidx.navigation.navArgument
 import com.stak.demo.ui.components.StakTab
 import com.stak.demo.ui.components.StakTabBar
 import com.stak.demo.ui.onboarding.CreateAccountScreen
+import com.stak.demo.ui.onboarding.SplashScreen
 import com.stak.demo.ui.onboarding.NotificationsScreen
 import com.stak.demo.ui.onboarding.QuizScreen
 import com.stak.demo.ui.onboarding.VerifyEmailScreen
@@ -34,8 +35,17 @@ import com.stak.demo.ui.theme.StakColors
 fun StakRoot(navController: NavHostController = rememberNavController()) {
 	NavHost(
 		navController = navController,
-		startDestination = StakRoutes.CREATE_ACCOUNT,
+		startDestination = StakRoutes.SPLASH,
 	) {
+		composable(StakRoutes.SPLASH) {
+			SplashScreen(
+				onContinue = {
+					navController.navigate(StakRoutes.CREATE_ACCOUNT) {
+						popUpTo(StakRoutes.SPLASH) { inclusive = true }
+					}
+				},
+			)
+		}
 		composable(StakRoutes.CREATE_ACCOUNT) {
 			CreateAccountScreen(
 				onCreateAccount = { navController.navigate(StakRoutes.VERIFY_EMAIL) },

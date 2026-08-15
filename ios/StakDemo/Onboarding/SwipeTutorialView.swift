@@ -53,19 +53,21 @@ struct SwipeTutorialView: View {
 				}
 				.frame(maxWidth: .infinity, alignment: .leading)
 
-				VStack(spacing: 9) {
-					// The deck — cards keep their designed poses; the front one drags down.
+				let u = figmaUnit
+				VStack(spacing: 9 * u) {
+					// The deck — cards keep their designed poses scaled to the
+					// artboard unit; the front one drags down.
 					ZStack(alignment: .topLeading) {
 						let remaining = Array(cards.dropFirst(swiped))
 						ForEach(Array(remaining.reversed().enumerated()), id: \.element.asset) { index, card in
 							let isTop = index == remaining.count - 1
 							Image(card.asset)
 								.resizable()
-								.frame(width: card.w, height: card.h)
-								.offset(x: card.x, y: card.y + (isTop ? dragOffset : 0))
+								.frame(width: card.w * u, height: card.h * u)
+								.offset(x: card.x * u, y: card.y * u + (isTop ? dragOffset : 0))
 						}
 					}
-					.frame(width: 306, height: 423.07, alignment: .topLeading)
+					.frame(width: 306 * u, height: 423.07 * u, alignment: .topLeading)
 					.contentShape(Rectangle())
 					.gesture(
 						DragGesture()
@@ -87,14 +89,14 @@ struct SwipeTutorialView: View {
 					)
 
 					// Gesture hint — twin chevrons at 50% + "Swipe down".
-					VStack(spacing: 4) {
-						VStack(spacing: 1) {
-							ChevronDown()
-							ChevronDown()
+					VStack(spacing: 4 * u) {
+						VStack(spacing: 1 * u) {
+							ChevronDown(u: u)
+							ChevronDown(u: u)
 						}
 						.opacity(0.5)
 						Text("Swipe down")
-							.font(StakFont.geist(8.73))
+							.font(StakFont.geist(8.73 * u))
 							.foregroundStyle(Auth.faintText)
 					}
 				}
@@ -117,12 +119,14 @@ struct SwipeTutorialView: View {
 	}
 }
 
-/// 13.97x6.98 down-chevron stroke, StakColors.muted.
+/// 13.97x6.98 down-chevron stroke (artboard-scaled), StakColors.muted.
 private struct ChevronDown: View {
+	let u: CGFloat
+
 	var body: some View {
 		ChevronShape()
-			.stroke(StakColors.muted, style: StrokeStyle(lineWidth: 1.6, lineCap: .round, lineJoin: .round))
-			.frame(width: 13.97, height: 6.98)
+			.stroke(StakColors.muted, style: StrokeStyle(lineWidth: 1.6 * u, lineCap: .round, lineJoin: .round))
+			.frame(width: 13.97 * u, height: 6.98 * u)
 	}
 }
 

@@ -5,6 +5,15 @@ import SwiftUI
 // sharp-cornered gradient CTA and the switch link row. Mirrors the Android
 // AuthKit.kt so both apps speak the same dialect. 1 Figma px = 1 pt.
 
+/// Figma-artboard scale: 1 design px = `figmaUnit` pt. The CHINEDU
+/// frames are fixed 390pt artboards; fixed compositions (hero renders,
+/// the swipe deck) multiply by this so their proportions hold on wider
+/// devices instead of shrinking relative to the screen. Text/paddings
+/// stay plain pt.
+var figmaUnit: CGFloat {
+	UIScreen.main.bounds.width / 390
+}
+
 /// 10%-alpha glass ball rotated 174.3°, centered 10pt left / 159.8pt below screen center.
 struct AuthWatermark: View {
 	var body: some View {

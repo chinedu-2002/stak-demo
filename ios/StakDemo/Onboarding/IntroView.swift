@@ -24,11 +24,12 @@ struct IntroView: View {
 				}
 				.frame(maxWidth: .infinity, alignment: .leading)
 
-				// Hero — flattened Figma group (render bounds 342x488 at 1x).
+				// Hero — flattened Figma group (render bounds 342x488 at 1x),
+				// scaled to the artboard unit so proportions hold on wide devices.
 				Image("IntroHeroBox")
 					.resizable()
 					.scaledToFit()
-					.frame(maxWidth: 342, maxHeight: 488)
+					.frame(maxWidth: 342 * figmaUnit, maxHeight: 488 * figmaUnit)
 					.frame(maxWidth: .infinity, maxHeight: .infinity)
 					.padding(.top, 10)
 			}

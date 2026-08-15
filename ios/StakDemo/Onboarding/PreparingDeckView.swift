@@ -14,7 +14,7 @@ struct PreparingDeckView: View {
 			Image("IntroHeroBox")
 				.resizable()
 				.scaledToFit()
-				.frame(maxWidth: 342, maxHeight: 488)
+				.frame(maxWidth: 342 * figmaUnit, maxHeight: 488 * figmaUnit)
 			Text("Building your first deck...")
 				.font(StakFont.sora(22, .semiBold))
 				.multilineTextAlignment(.center)

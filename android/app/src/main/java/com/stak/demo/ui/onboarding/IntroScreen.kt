@@ -56,7 +56,9 @@ fun IntroScreen(onGetStarted: () -> Unit) {
 					color = Auth.SubtitleGray,
 				)
 			}
-			// Hero — flattened Figma group 1554:8495 (render bounds 342x488 at 1x).
+			// Hero — flattened Figma group (render bounds 342x488 at 1x),
+			// scaled to the artboard unit so proportions hold on wide devices.
+			val u = figmaUnit()
 			Box(
 				modifier = Modifier.weight(1f).fillMaxWidth().padding(top = 10.dp),
 				contentAlignment = Alignment.Center,
@@ -65,7 +67,7 @@ fun IntroScreen(onGetStarted: () -> Unit) {
 					painter = painterResource(R.drawable.intro_hero_box),
 					contentDescription = null,
 					contentScale = ContentScale.Fit,
-					modifier = Modifier.size(342.dp, 488.dp),
+					modifier = Modifier.size((342 * u).dp, (488 * u).dp),
 				)
 			}
 		}

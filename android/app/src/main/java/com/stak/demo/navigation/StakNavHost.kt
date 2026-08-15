@@ -115,7 +115,18 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
 				onContinue = { navController.navigate(StakRoutes.PREPARING_DECK) },
 			)
 		}
-		composable(StakRoutes.PREPARING_DECK) {
+		composable(
+			StakRoutes.PREPARING_DECK,
+			// Prototype: the loader dissolves into the taste reveal (350ms
+			// ease out) after its 1800ms hold.
+			exitTransition = {
+				if (targetState.destination.route == StakRoutes.TASTE_REVEAL) {
+					fadeOut(tween(350, easing = EaseOut))
+				} else {
+					null
+				}
+			},
+		) {
 			PreparingDeckScreen(
 				onDone = {
 					navController.navigate(StakRoutes.TASTE_REVEAL) {
@@ -124,7 +135,16 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
 				},
 			)
 		}
-		composable(StakRoutes.TASTE_REVEAL) {
+		composable(
+			StakRoutes.TASTE_REVEAL,
+			enterTransition = {
+				if (initialState.destination.route == StakRoutes.PREPARING_DECK) {
+					fadeIn(tween(350, easing = EaseOut))
+				} else {
+					null
+				}
+			},
+		) {
 			TasteRevealScreen(
 				onBack = { navController.popBackStack() },
 				onLetsGo = { navController.navigate(StakRoutes.PERMISSIONS) },

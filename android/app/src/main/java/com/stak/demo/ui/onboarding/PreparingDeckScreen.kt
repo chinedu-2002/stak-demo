@@ -51,7 +51,7 @@ import kotlinx.coroutines.delay
 @Composable
 fun PreparingDeckScreen(onDone: () -> Unit) {
 	LaunchedEffect(Unit) {
-		delay(2600)
+		delay(1800) // prototype: "After delay 1800ms" → 07 Taste reveal
 		onDone()
 	}
 	Column(

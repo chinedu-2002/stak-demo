@@ -1,0 +1,70 @@
+# STAK iOS (SwiftUI)
+
+Native SwiftUI sibling of the `android/` Kotlin/Compose app — same Figma
+frames, same flow, equal design fidelity. Written from the CHINEDU Figma
+file (`vB8TOvR1WyyXEKVZ8frstU`, section "01 · Onboarding & Auth", node
+1:178) with the Android build as the reference implementation
+(1 Figma px = 1 pt; screens are stateless views + callbacks wired in
+`RootFlowView`).
+
+## Opening the project (on the Mac)
+
+The Swift sources, asset catalog, fonts and Info.plist are all committed;
+only the `.xcodeproj` needs generating. Two options:
+
+**Option A — XcodeGen (recommended):**
+
+```sh
+brew install xcodegen
+cd ios
+xcodegen generate
+open StakDemo.xcodeproj
+```
+
+**Option B — manual:** create a new iOS App project in Xcode named
+`StakDemo` inside `ios/` (SwiftUI, iOS 17), delete its template
+`ContentView.swift`/`Assets.xcassets`, then drag the `StakDemo/` folder in
+(create groups), and point the target's Info.plist setting at
+`StakDemo/Info.plist`.
+
+Then build & run — no third-party dependencies.
+
+## Screen inventory (CHINEDU node IDs)
+
+| Screen | View | Node |
+|---|---|---|
+| 00 Splash | `SplashView` | 1:926 |
+| 01 Welcome | `IntroView` | 1:179 |
+| 02 Brand picks | `BrandPicksView` | 1:232 |
+| 03 Swipe tutorial | `SwipeTutorialView` | 1:344 |
+| 04 Goal matrix | `GoalView` (`MatrixQuizView`) | 1:498 |
+| 05 Risk matrix | `RiskView` (`MatrixQuizView`) | 1:569 |
+| 06 Preparing deck | `PreparingDeckView` | 1:634 |
+| 07 Taste reveal | `TasteRevealView` | 1:687 |
+| 08 Permissions | `PermissionsView` | 1:749 |
+| 09 Profile setup | `ProfileSetupView` | 1:793 |
+| Auth · Sign up | `CreateAccountView` | 1:830 |
+| Auth · Sign in | `SignInView` | 1:879 |
+
+Flow: splash → 01 → … → 07 → sign up (⇄ sign in) → 08 → 09 → tab shell
+(sign-in goes straight to the shell). `MainTabsView` is the phase-3
+placeholder with the real Figma tab bar (`StakTabBar`).
+
+## Fonts
+
+`Resources/Fonts/` carries static instances (Light/Regular/Medium/
+SemiBold/Bold) cut from the same Sora and Geist variable TTFs the Android
+app bundles — Sora's variable file has no per-instance PostScript names,
+which iOS needs, hence the static cuts. PostScript names are
+`Sora-SemiBold`, `Geist-Medium`, etc. (see `Theme/StakFonts.swift`), all
+registered in Info.plist `UIAppFonts`. Squarish Sans CT ships as-is
+(`SquarishSansCTRegular` / `...SC`).
+
+## Assets
+
+`Assets.xcassets` mirrors the Android `res/` exports: flattened Figma
+renders (glass ball, hero box, tutorial cards, 12 brand circles,
+Google/Apple marks) plus the icon SVGs (back chevron, goal/risk glyphs,
+STAK logo mark) with vector data preserved. Tab-bar icons, chevrons,
+spinner and the 42x24 toggle are drawn in code from the Figma geometry,
+same as the Android Canvas ports.

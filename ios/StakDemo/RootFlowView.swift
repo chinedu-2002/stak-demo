@@ -173,9 +173,10 @@ struct RootFlowView: View {
 		case .profileSetup:
 			ProfileSetupView(
 				onBack: { pop() },
+				// Prototype: "Proceed to home" → Home first run, Push Right.
 				onProceed: {
-					anim = .dissolve
-					withAnimation(FlowAnim.dissolve.animation) { phase = .main }
+					anim = .pushRight
+					withAnimation(FlowAnim.pushRight.animation) { phase = .main }
 				}
 			)
 			.id(FlowScreen.profileSetup)

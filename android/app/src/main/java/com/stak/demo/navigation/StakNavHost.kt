@@ -124,10 +124,19 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
 		}
 		composable(
 			StakRoutes.CREATE_ACCOUNT,
-			// Prototype: splash dissolves into sign up (350ms ease out).
+			// Prototype: splash and the sign-in "Create account" link both
+			// dissolve into sign up (350ms ease out).
 			enterTransition = {
-				if (initialState.destination.route == StakRoutes.SPLASH) {
-					fadeIn(tween(350, easing = EaseOut))
+				when (initialState.destination.route) {
+					StakRoutes.SPLASH, StakRoutes.SIGN_IN -> fadeIn(tween(350, easing = EaseOut))
+					else -> null
+				}
+			},
+			// Prototype (sign-in frame): its back circle returns here as
+			// Push Left — sign up slides in from the right (300ms).
+			popEnterTransition = {
+				if (initialState.destination.route == StakRoutes.SIGN_IN) {
+					slideInHorizontally(tween(300, easing = EaseOut)) { it }
 				} else {
 					null
 				}
@@ -180,6 +189,20 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
 					null
 				}
 			},
+			// Prototype (sign-in frame): socials/CTA leave toward Home
+			// first run as Push Right; the "Create account" link dissolves
+			// back over sign up.
+			exitTransition = {
+				when (targetState.destination.route) {
+					StakRoutes.MAIN -> slideOutHorizontally(tween(300, easing = EaseOut)) { it }
+					StakRoutes.CREATE_ACCOUNT -> fadeOut(tween(350, easing = EaseOut))
+					else -> null
+				}
+			},
+			// Prototype (sign-in frame): back circle exits as Push Left.
+			popExitTransition = {
+				slideOutHorizontally(tween(300, easing = EaseOut)) { -it }
+			},
 		) {
 			SignInScreen(
 				onBack = { navController.popBackStack() },
@@ -188,10 +211,25 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
 						popUpTo(0) { inclusive = true }
 					}
 				},
-				onCreateAccount = { navController.popBackStack() },
+				onCreateAccount = {
+					navController.navigate(StakRoutes.CREATE_ACCOUNT) {
+						popUpTo(StakRoutes.CREATE_ACCOUNT) { inclusive = true }
+					}
+				},
 			)
 		}
-		composable(StakRoutes.MAIN) { MainTabsShell() }
+		composable(
+			StakRoutes.MAIN,
+			// Prototype (sign-in frame): "Home first run" arrives as Push
+			// Right — in from the left, 300ms ease out.
+			enterTransition = {
+				if (initialState.destination.route == StakRoutes.SIGN_IN) {
+					slideInHorizontally(tween(300, easing = EaseOut)) { -it }
+				} else {
+					null
+				}
+			},
+		) { MainTabsShell() }
 	}
 }
 

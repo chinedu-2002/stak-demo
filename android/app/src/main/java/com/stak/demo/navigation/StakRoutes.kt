@@ -3,7 +3,10 @@ package com.stak.demo.navigation
 /** Route names for the whole app. Onboarding runs once, then the tabs. */
 object StakRoutes {
 	const val SPLASH = "splash"
-	const val INTRO = "onboarding/intro"
+
+	/** 01 Welcome — `via` picks the prototype push direction (forward/back). */
+	const val INTRO = "onboarding/intro?via={via}"
+	fun intro(via: String) = "onboarding/intro?via=$via"
 	const val BRAND_PICKS = "onboarding/brand-picks"
 	const val SWIPE_TUTORIAL = "onboarding/swipe-tutorial"
 	const val GOAL = "onboarding/goal"

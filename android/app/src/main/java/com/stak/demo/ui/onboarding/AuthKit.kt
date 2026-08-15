@@ -55,6 +55,17 @@ internal object Auth {
 	val DarkOnWhite = Color(0xFF0E162B)
 }
 
+/**
+ * Figma-artboard scale: 1 design px = `figmaUnit()` dp. The CHINEDU
+ * frames are fixed 390dp artboards; fixed compositions (hero renders,
+ * the swipe deck) multiply by this so their proportions hold on wider
+ * devices (e.g. the 411dp Pixel 7) instead of shrinking relative to
+ * the screen. Text/paddings stay plain dp.
+ */
+@Composable
+internal fun figmaUnit(): Float =
+	androidx.compose.ui.platform.LocalConfiguration.current.screenWidthDp / 390f
+
 /** 10%-alpha glass ball rotated 174.3°, centered 10dp left / 159.8dp below screen center. */
 @Composable
 internal fun BoxScope.AuthWatermark() {

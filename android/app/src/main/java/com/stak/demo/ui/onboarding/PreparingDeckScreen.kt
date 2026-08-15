@@ -63,11 +63,12 @@ fun PreparingDeckScreen(onDone: () -> Unit) {
 			.systemBarsPadding()
 			.padding(horizontal = 24.dp),
 	) {
+		val u = figmaUnit()
 		Image(
 			painter = painterResource(R.drawable.intro_hero_box),
 			contentDescription = null,
 			contentScale = ContentScale.Fit,
-			modifier = Modifier.size(342.dp, 488.dp),
+			modifier = Modifier.size((342 * u).dp, (488 * u).dp),
 		)
 		Text(
 			text = "Building your first deck...",

@@ -107,14 +107,16 @@ fun SwipeTutorialScreen(onBack: () -> Unit, onContinue: () -> Unit) {
 				)
 			}
 
+			val u = figmaUnit()
 			Column(
 				horizontalAlignment = Alignment.CenterHorizontally,
 				modifier = Modifier.weight(1f).fillMaxWidth().padding(top = 10.dp),
 			) {
-				// The deck — cards keep their designed poses; the front one drags down.
+				// The deck — cards keep their designed poses scaled to the
+				// artboard unit; the front one drags down.
 				Box(
 					modifier = Modifier
-						.size(306.dp, 423.07.dp)
+						.size((306 * u).dp, (423.07 * u).dp)
 						.pointerInput(swiped) {
 							detectVerticalDragGestures(
 								onDragEnd = {
@@ -144,30 +146,30 @@ fun SwipeTutorialScreen(onBack: () -> Unit, onContinue: () -> Unit) {
 							painter = painterResource(card.res),
 							contentDescription = null,
 							modifier = Modifier
-								.offset(x = card.x.dp, y = card.y.dp)
-								.size(card.w.dp, card.h.dp)
+								.offset(x = (card.x * u).dp, y = (card.y * u).dp)
+								.size((card.w * u).dp, (card.h * u).dp)
 								.then(
 									if (isTop) Modifier.offset { IntOffset(0, topOffset.value.roundToInt()) } else Modifier,
 								),
 						)
 					}
 				}
-				Spacer(modifier = Modifier.size(9.dp))
+				Spacer(modifier = Modifier.size((9 * u).dp))
 				// Gesture hint — twin chevrons at 50% + "Swipe down".
 				Column(
 					horizontalAlignment = Alignment.CenterHorizontally,
-					verticalArrangement = Arrangement.spacedBy(4.dp),
+					verticalArrangement = Arrangement.spacedBy((4 * u).dp),
 				) {
 					Column(
-						verticalArrangement = Arrangement.spacedBy(1.dp),
+						verticalArrangement = Arrangement.spacedBy((1 * u).dp),
 						modifier = Modifier.alpha(0.5f),
 					) {
-						ChevronDown()
-						ChevronDown()
+						ChevronDown(u)
+						ChevronDown(u)
 					}
 					Text(
 						text = "Swipe down",
-						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 8.73.sp),
+						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (8.73 * u).sp),
 						color = Auth.FaintText,
 					)
 				}
@@ -184,10 +186,10 @@ fun SwipeTutorialScreen(onBack: () -> Unit, onContinue: () -> Unit) {
 	}
 }
 
-/** 13.97x6.98 down-chevron stroke, StakColors.Muted. */
+/** 13.97x6.98 down-chevron stroke (artboard-scaled), StakColors.Muted. */
 @Composable
-private fun ChevronDown() {
-	Canvas(modifier = Modifier.size(13.97.dp, 6.98.dp)) {
+private fun ChevronDown(u: Float) {
+	Canvas(modifier = Modifier.size((13.97 * u).dp, (6.98 * u).dp)) {
 		val p = Path().apply {
 			moveTo(0f, 0f)
 			lineTo(size.width / 2f, size.height)

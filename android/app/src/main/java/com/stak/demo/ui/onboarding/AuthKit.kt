@@ -181,14 +181,14 @@ internal fun ShowHideToggle(shown: Boolean, onToggle: () -> Unit) {
 	)
 }
 
-/** Sharp-cornered 51dp CTA — 3-stop a6e4f7/5da8bf/3c98b4 gradient, white Geist Medium 14. */
+/** Sharp-cornered 52dp CTA — 3-stop a6e4f7/5da8bf/3c98b4 gradient, white Geist Medium 14 (CHINEDU 1:873). */
 @Composable
 internal fun AuthCta(text: String, onClick: () -> Unit) {
 	Box(
 		modifier = Modifier
 			.fillMaxWidth()
 			.padding(horizontal = 20.dp)
-			.height(51.dp)
+			.height(52.dp)
 			.background(
 				Brush.verticalGradient(
 					0.0889f to Color(0xFFA6E4F7),
@@ -196,9 +196,9 @@ internal fun AuthCta(text: String, onClick: () -> Unit) {
 					0.7255f to Color(0xFF3C98B4),
 					1f to Color(0xFF3C98B4),
 				),
-				RoundedCornerShape(5.78.dp),
+				RoundedCornerShape(6.dp),
 			)
-			.border(0.36.dp, StakColors.CtaBorder, RoundedCornerShape(5.78.dp))
+			.border(0.36.dp, StakColors.CtaBorder, RoundedCornerShape(6.dp))
 			.clickable(onClick = onClick),
 		contentAlignment = Alignment.Center,
 	) {
@@ -210,21 +210,21 @@ internal fun AuthCta(text: String, onClick: () -> Unit) {
 	}
 }
 
-/** Secondary flow button — h51, r5.78, rgba(52,59,79,0.33) hairline, Sora 14.45 muted. */
+/** Secondary flow button — h52, r6, rgba(52,59,79,0.33) hairline, Sora 14 muted (CHINEDU 1:791). */
 @Composable
 internal fun AuthSecondaryButton(text: String, onClick: () -> Unit) {
 	Box(
 		modifier = Modifier
 			.fillMaxWidth()
 			.padding(horizontal = 20.dp)
-			.height(51.dp)
-			.border(0.36.dp, Color(0x54343B4F), RoundedCornerShape(5.78.dp))
+			.height(52.dp)
+			.border(0.36.dp, Color(0x54343B4F), RoundedCornerShape(6.dp))
 			.clickable(onClick = onClick),
 		contentAlignment = Alignment.Center,
 	) {
 		Text(
 			text = text,
-			style = TextStyle(fontFamily = com.stak.demo.ui.theme.Sora, fontWeight = FontWeight.Normal, fontSize = 14.45.sp),
+			style = TextStyle(fontFamily = com.stak.demo.ui.theme.Sora, fontWeight = FontWeight.Normal, fontSize = 14.sp),
 			color = StakColors.Muted,
 		)
 	}

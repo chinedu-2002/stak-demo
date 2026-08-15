@@ -173,7 +173,7 @@ struct ShowHideToggle: View {
 	}
 }
 
-/// Sharp-cornered 51pt CTA — 3-stop a6e4f7/5da8bf/3c98b4 gradient, white Geist Medium 14.
+/// Sharp-cornered 52pt CTA — 3-stop a6e4f7/5da8bf/3c98b4 gradient, white Geist Medium 14 (CHINEDU 1:873).
 struct AuthCta: View {
 	let text: String
 	let action: () -> Void
@@ -184,7 +184,7 @@ struct AuthCta: View {
 				.font(StakFont.geist(14, .medium))
 				.foregroundStyle(StakColors.textPrimary)
 				.frame(maxWidth: .infinity)
-				.frame(height: 51)
+				.frame(height: 52)
 				.background(
 					LinearGradient(
 						stops: [
@@ -196,10 +196,10 @@ struct AuthCta: View {
 						startPoint: .top,
 						endPoint: .bottom
 					),
-					in: RoundedRectangle(cornerRadius: 5.78)
+					in: RoundedRectangle(cornerRadius: 6)
 				)
 				.overlay(
-					RoundedRectangle(cornerRadius: 5.78)
+					RoundedRectangle(cornerRadius: 6)
 						.strokeBorder(StakColors.ctaBorder, lineWidth: 0.36)
 				)
 		}
@@ -208,7 +208,7 @@ struct AuthCta: View {
 	}
 }
 
-/// Secondary flow button — h51, r5.78, rgba(52,59,79,0.33) hairline, Sora 14.45 muted.
+/// Secondary flow button — h52, r6, rgba(52,59,79,0.33) hairline, Sora 14 muted (CHINEDU 1:791).
 struct AuthSecondaryButton: View {
 	let text: String
 	let action: () -> Void
@@ -216,12 +216,12 @@ struct AuthSecondaryButton: View {
 	var body: some View {
 		Button(action: action) {
 			Text(text)
-				.font(StakFont.sora(14.45))
+				.font(StakFont.sora(14))
 				.foregroundStyle(StakColors.muted)
 				.frame(maxWidth: .infinity)
-				.frame(height: 51)
+				.frame(height: 52)
 				.overlay(
-					RoundedRectangle(cornerRadius: 5.78)
+					RoundedRectangle(cornerRadius: 6)
 						.strokeBorder(Color(argb: 0x54343B4F), lineWidth: 0.36)
 				)
 				.contentShape(Rectangle())

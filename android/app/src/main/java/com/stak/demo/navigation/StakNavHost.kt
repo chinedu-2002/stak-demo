@@ -54,6 +54,14 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
 	NavHost(
 		navController = navController,
 		startDestination = StakRoutes.SPLASH,
+		// Prototype house style (confirmed on the splash/sign-up/sign-in/
+		// 01 Welcome frames): forward = Push Right (in from the left),
+		// back = Push Left (in from the right), ease out 300ms. These are
+		// the defaults; frames with their own wiring override per edge.
+		enterTransition = { slideInHorizontally(tween(300, easing = EaseOut)) { -it } },
+		exitTransition = { slideOutHorizontally(tween(300, easing = EaseOut)) { it } },
+		popEnterTransition = { slideInHorizontally(tween(300, easing = EaseOut)) { it } },
+		popExitTransition = { slideOutHorizontally(tween(300, easing = EaseOut)) { -it } },
 	) {
 		composable(
 			StakRoutes.SPLASH,

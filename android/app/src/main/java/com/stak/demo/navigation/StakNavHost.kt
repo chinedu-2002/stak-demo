@@ -4,6 +4,9 @@ import androidx.compose.animation.core.EaseOut
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.navigation.navArgument
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -65,7 +68,19 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
 				},
 			)
 		}
-		composable(StakRoutes.INTRO) {
+		composable(
+			StakRoutes.INTRO,
+			arguments = listOf(navArgument("via") { defaultValue = "forward" }),
+			// Prototype (sign-up frame): socials/CTA arrive as Push Right
+			// (in from the left), the back circle as Push Left (in from
+			// the right) — both ease out, 300ms.
+			enterTransition = {
+				when (targetState.arguments?.getString("via")) {
+					"back" -> slideInHorizontally(tween(300, easing = EaseOut)) { it }
+					else -> slideInHorizontally(tween(300, easing = EaseOut)) { -it }
+				}
+			},
+		) {
 			IntroScreen(onGetStarted = { navController.navigate(StakRoutes.BRAND_PICKS) })
 		}
 		composable(StakRoutes.BRAND_PICKS) {
@@ -117,10 +132,26 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
 					null
 				}
 			},
+			// Prototype (sign-up frame): leaving toward 01 Welcome pushes
+			// with the arriving screen; toward Sign in it dissolves.
+			exitTransition = {
+				val target = targetState.destination.route.orEmpty()
+				when {
+					target.startsWith("onboarding/intro") ->
+						if (targetState.arguments?.getString("via") == "back") {
+							slideOutHorizontally(tween(300, easing = EaseOut)) { -it }
+						} else {
+							slideOutHorizontally(tween(300, easing = EaseOut)) { it }
+						}
+					target == StakRoutes.SIGN_IN -> fadeOut(tween(350, easing = EaseOut))
+					else -> null
+				}
+			},
 		) {
 			CreateAccountScreen(
-				onCreateAccount = { navController.navigate(StakRoutes.INTRO) },
-				onLogIn = { navController.navigate(StakRoutes.SIGN_IN) },
+				onBack = { navController.navigate(StakRoutes.intro(via = "back")) },
+				onCreateAccount = { navController.navigate(StakRoutes.intro(via = "forward")) },
+				onSignIn = { navController.navigate(StakRoutes.SIGN_IN) },
 			)
 		}
 		composable(StakRoutes.PERMISSIONS) {
@@ -139,7 +170,17 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
 				},
 			)
 		}
-		composable(StakRoutes.SIGN_IN) {
+		composable(
+			StakRoutes.SIGN_IN,
+			// Prototype: the "Sign in" link dissolves over (350ms ease out).
+			enterTransition = {
+				if (initialState.destination.route == StakRoutes.CREATE_ACCOUNT) {
+					fadeIn(tween(350, easing = EaseOut))
+				} else {
+					null
+				}
+			},
+		) {
 			SignInScreen(
 				onBack = { navController.popBackStack() },
 				onSignIn = {

@@ -60,7 +60,7 @@ import com.stak.demo.ui.theme.StakColors
  * (#a6e4f7 → #5da8bf → #3c98b4) with white Geist Medium label.
  */
 @Composable
-fun CreateAccountScreen(onCreateAccount: () -> Unit, onLogIn: () -> Unit) {
+fun CreateAccountScreen(onBack: () -> Unit, onCreateAccount: () -> Unit, onSignIn: () -> Unit) {
 	var email by rememberSaveable { mutableStateOf("") }
 	var password by rememberSaveable { mutableStateOf("") }
 	var confirm by rememberSaveable { mutableStateOf("") }
@@ -71,7 +71,7 @@ fun CreateAccountScreen(onCreateAccount: () -> Unit, onLogIn: () -> Unit) {
 
 		Column(modifier = Modifier.fillMaxSize().systemBarsPadding()) {
 			Row(modifier = Modifier.fillMaxWidth().padding(start = 20.dp, top = 10.dp, bottom = 4.dp)) {
-				AuthBackCircle(onClick = onLogIn)
+				AuthBackCircle(onClick = onBack)
 			}
 
 			Column(
@@ -127,7 +127,7 @@ fun CreateAccountScreen(onCreateAccount: () -> Unit, onLogIn: () -> Unit) {
 				modifier = Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 26.dp),
 			) {
 				AuthCta(text = "Create account", onClick = onCreateAccount)
-				AuthSwitchRow(prefix = "Already have an account?", link = "Sign in", onClick = onLogIn)
+				AuthSwitchRow(prefix = "Already have an account?", link = "Sign in", onClick = onSignIn)
 				Text(
 					text = "By continuing you agree to the Terms and Privacy Policy.",
 					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 10.sp, textAlign = TextAlign.Center),

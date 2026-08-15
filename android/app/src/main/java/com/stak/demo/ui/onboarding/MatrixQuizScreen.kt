@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
@@ -48,6 +49,7 @@ internal data class MatrixOption(
 	val subtitle: String,
 	val iconRes: Int,
 	val iconSize: Dp = 21.06.dp,
+	val circleSize: Dp = 37.9.dp,
 )
 
 /**
@@ -147,7 +149,7 @@ private fun MatrixCard(option: MatrixOption, selected: Boolean, onClick: () -> U
 			.padding(horizontal = 14.74.dp),
 	) {
 		Box(
-			modifier = Modifier.size(37.9.dp).background(Color(0xFF242B3D), RoundedCornerShape(18.95.dp)),
+			modifier = Modifier.size(option.circleSize).background(Color(0xFF242B3D), CircleShape),
 			contentAlignment = Alignment.Center,
 		) {
 			Image(

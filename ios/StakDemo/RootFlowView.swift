@@ -46,12 +46,12 @@ enum FlowAnim {
 /// Root of the app: splash → auth → onboarding → the bottom-tab shell.
 ///
 /// The flow runs in a custom stack container (not NavigationStack) so
-/// each edge can play its exact Figma prototype animation. Confirmed
-/// edges so far (CHINEDU proto panels): splash →1200ms→ sign up
-/// (dissolve 350ms); sign-up socials/CTA → 01 Welcome (Push Right
-/// 300ms); sign-up back circle → 01 Welcome (Push Left 300ms); sign-up
-/// "Sign in" link → Sign in (dissolve 350ms). All ease out. Remaining
-/// edges use provisional push directions until their frames confirm.
+/// each edge can play its exact Figma prototype animation. House style
+/// confirmed across the splash/sign-up/sign-in/01 Welcome proto panels:
+/// forward = Push Right (in from the left), back = Push Left (in from
+/// the right), dissolves for auth switches — all ease out, 300ms pushes
+/// / 350ms dissolves. Unconfirmed edges follow the house style until
+/// their frames say otherwise.
 struct RootFlowView: View {
 	private enum Phase {
 		case splash
@@ -91,7 +91,7 @@ struct RootFlowView: View {
 		withAnimation(a.animation) { stack.append(screen) }
 	}
 
-	private func pop(_ a: FlowAnim = .pushRight) {
+	private func pop(_ a: FlowAnim = .pushLeft) {
 		anim = a
 		withAnimation(a.animation) {
 			if stack.count > 1 { stack.removeLast() }
@@ -122,30 +122,30 @@ struct RootFlowView: View {
 			)
 			.id(FlowScreen.signIn)
 		case .welcome:
-			IntroView { push(.brandPicks, .pushLeft) }
+			IntroView { push(.brandPicks, .pushRight) }
 				.id(FlowScreen.welcome)
 		case .brandPicks:
 			BrandPicksView(
 				onBack: { pop() },
-				onContinue: { push(.swipeTutorial, .pushLeft) }
+				onContinue: { push(.swipeTutorial, .pushRight) }
 			)
 			.id(FlowScreen.brandPicks)
 		case .swipeTutorial:
 			SwipeTutorialView(
 				onBack: { pop() },
-				onContinue: { push(.goal, .pushLeft) }
+				onContinue: { push(.goal, .pushRight) }
 			)
 			.id(FlowScreen.swipeTutorial)
 		case .goal:
 			GoalView(
 				onBack: { pop() },
-				onContinue: { push(.risk, .pushLeft) }
+				onContinue: { push(.risk, .pushRight) }
 			)
 			.id(FlowScreen.goal)
 		case .risk:
 			RiskView(
 				onBack: { pop() },
-				onContinue: { push(.preparingDeck, .pushLeft) }
+				onContinue: { push(.preparingDeck, .pushRight) }
 			)
 			.id(FlowScreen.risk)
 		case .preparingDeck:
@@ -161,13 +161,13 @@ struct RootFlowView: View {
 		case .tasteReveal:
 			TasteRevealView(
 				onBack: { pop() },
-				onLetsGo: { push(.permissions, .pushLeft) }
+				onLetsGo: { push(.permissions, .pushRight) }
 			)
 			.id(FlowScreen.tasteReveal)
 		case .permissions:
 			PermissionsView(
 				onBack: { pop() },
-				onContinue: { push(.profileSetup, .pushLeft) }
+				onContinue: { push(.profileSetup, .pushRight) }
 			)
 			.id(FlowScreen.permissions)
 		case .profileSetup:

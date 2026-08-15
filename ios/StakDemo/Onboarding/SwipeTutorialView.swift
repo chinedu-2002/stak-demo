@@ -12,8 +12,8 @@ private struct TutorialCard {
 
 private let cards: [TutorialCard] = [
 	TutorialCard(asset: "TutorialCardNVDA", x: 0, y: 47.71, w: 305.53, h: 376.9),
-	TutorialCard(asset: "TutorialCardAAPL", x: 15.59, y: 31.77, w: 273.41, h: 309.46),
-	TutorialCard(asset: "TutorialCardGOOGL", x: 52.96, y: 0, w: 238.66, h: 290.59)
+	TutorialCard(asset: "TutorialCardAAPL", x: 15.59, y: 21.13, w: 273.41, h: 309.46),
+	TutorialCard(asset: "TutorialCardGOOGL", x: 33.57, y: 0, w: 238.66, h: 290.59)
 ]
 
 /// Onboarding · 03 Swipe tutorial — Figma node 1:344 (CHINEDU file, "STEP 3 OF 6").
@@ -94,7 +94,7 @@ struct SwipeTutorialView: View {
 						}
 						.opacity(0.5)
 						Text("Swipe down")
-							.font(StakFont.geist(12))
+							.font(StakFont.geist(8.73))
 							.foregroundStyle(Auth.faintText)
 					}
 				}

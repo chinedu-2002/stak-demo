@@ -8,6 +8,7 @@ struct MatrixOption: Identifiable {
 	let subtitle: String
 	let icon: String
 	var iconSize: CGFloat = 21.06
+	var circleSize: CGFloat = 37.9
 	var id: String { title }
 }
 
@@ -94,7 +95,7 @@ private struct MatrixCard: View {
 						.resizable()
 						.frame(width: option.iconSize, height: option.iconSize)
 				}
-				.frame(width: 37.9, height: 37.9)
+				.frame(width: option.circleSize, height: option.circleSize)
 				VStack(alignment: .leading, spacing: 5.26) {
 					Text(option.title)
 						.font(StakFont.geist(12, .medium))

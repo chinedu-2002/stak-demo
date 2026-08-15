@@ -1,5 +1,9 @@
 package com.stak.demo.navigation
 
+import androidx.compose.animation.core.EaseOut
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -33,17 +37,29 @@ import com.stak.demo.ui.onboarding.ProfileSetupScreen
 import com.stak.demo.ui.onboarding.TasteRevealScreen
 import com.stak.demo.ui.theme.StakColors
 
-/** Root of the app: onboarding flow first, then the bottom-tab shell. */
+/**
+ * Root of the app: splash → auth → onboarding → the bottom-tab shell.
+ *
+ * Prototype-confirmed edges (CHINEDU proto panel): splash auto-advances
+ * to Auth · Sign up after 1200ms with a 350ms ease-out dissolve. The
+ * post-auth ordering (create account → 01 Welcome → … → 07 Taste reveal
+ * → 08 Permissions → 09 Profile setup → shell) follows the canvas order
+ * pending per-frame prototype confirmation.
+ */
 @Composable
 fun StakRoot(navController: NavHostController = rememberNavController()) {
 	NavHost(
 		navController = navController,
 		startDestination = StakRoutes.SPLASH,
 	) {
-		composable(StakRoutes.SPLASH) {
+		composable(
+			StakRoutes.SPLASH,
+			// Prototype: dissolve, ease out, 350ms.
+			exitTransition = { fadeOut(tween(350, easing = EaseOut)) },
+		) {
 			SplashScreen(
 				onContinue = {
-					navController.navigate(StakRoutes.INTRO) {
+					navController.navigate(StakRoutes.CREATE_ACCOUNT) {
 						popUpTo(StakRoutes.SPLASH) { inclusive = true }
 					}
 				},
@@ -88,16 +104,22 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
 		composable(StakRoutes.TASTE_REVEAL) {
 			TasteRevealScreen(
 				onBack = { navController.popBackStack() },
-				onLetsGo = {
-					navController.navigate(StakRoutes.CREATE_ACCOUNT) {
-						popUpTo(StakRoutes.INTRO) { inclusive = true }
-					}
-				},
+				onLetsGo = { navController.navigate(StakRoutes.PERMISSIONS) },
 			)
 		}
-		composable(StakRoutes.CREATE_ACCOUNT) {
+		composable(
+			StakRoutes.CREATE_ACCOUNT,
+			// Prototype: splash dissolves into sign up (350ms ease out).
+			enterTransition = {
+				if (initialState.destination.route == StakRoutes.SPLASH) {
+					fadeIn(tween(350, easing = EaseOut))
+				} else {
+					null
+				}
+			},
+		) {
 			CreateAccountScreen(
-				onCreateAccount = { navController.navigate(StakRoutes.PERMISSIONS) },
+				onCreateAccount = { navController.navigate(StakRoutes.INTRO) },
 				onLogIn = { navController.navigate(StakRoutes.SIGN_IN) },
 			)
 		}

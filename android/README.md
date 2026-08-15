@@ -57,9 +57,11 @@ platform rule; iOS uses PascalCase.
 | Auth · Sign up | `CreateAccountScreen` | 1:830 |
 | Auth · Sign in | `SignInScreen` | 1:879 |
 
-Flow: splash → 01 → … → 07 → sign up (⇄ sign in) → 08 → 09 → tab shell
-(sign-in goes straight to the shell). `MainTabsShell` is the phase-3
-placeholder with the real Figma tab bar (`StakTabBar`).
+Flow: splash → sign up (⇄ sign in) → 01 → … → 07 → 08 → 09 → tab shell
+(sign-in goes straight to the shell). The splash auto-advances to sign
+up after 1200ms with a 350ms ease-out dissolve, per the file's
+prototype wiring. `MainTabsShell` is the phase-3 placeholder with the
+real Figma tab bar (`StakTabBar`).
 
 ## Fonts & assets
 

@@ -74,13 +74,13 @@ struct RootFlowView: View {
 				.transition(.opacity)
 			case .main:
 				MainTabsView()
-					.transition(.opacity)
+					.transition(anim.transition)
 			case .flow:
 				ZStack {
 					screen(for: stack.last ?? .createAccount)
 						.transition(anim.transition)
 				}
-				.transition(.opacity)
+				.transition(anim.transition)
 			}
 		}
 		.background(StakColors.bg.ignoresSafeArea())
@@ -110,8 +110,14 @@ struct RootFlowView: View {
 			.id(FlowScreen.createAccount)
 		case .signIn:
 			SignInView(
-				onBack: { pop(.dissolve) },
-				onSignIn: { withAnimation(.easeOut(duration: 0.35)) { phase = .main } },
+				// Prototype (sign-in frame): back circle returns to sign up
+				// as Push Left; socials/CTA leave to Home first run as Push
+				// Right; the "Create account" link dissolves back.
+				onBack: { pop(.pushLeft) },
+				onSignIn: {
+					anim = .pushRight
+					withAnimation(FlowAnim.pushRight.animation) { phase = .main }
+				},
 				onCreateAccount: { pop(.dissolve) }
 			)
 			.id(FlowScreen.signIn)
@@ -167,7 +173,10 @@ struct RootFlowView: View {
 		case .profileSetup:
 			ProfileSetupView(
 				onBack: { pop() },
-				onProceed: { withAnimation(.easeOut(duration: 0.35)) { phase = .main } }
+				onProceed: {
+					anim = .dissolve
+					withAnimation(FlowAnim.dissolve.animation) { phase = .main }
+				}
 			)
 			.id(FlowScreen.profileSetup)
 		}

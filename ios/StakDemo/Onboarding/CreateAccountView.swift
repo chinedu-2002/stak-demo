@@ -7,8 +7,9 @@ import SwiftUI
 /// (password with a Show/Hide toggle); sharp-cornered 51pt gradient CTA
 /// (#a6e4f7 → #5da8bf → #3c98b4) with white Geist Medium label.
 struct CreateAccountView: View {
+	let onBack: () -> Void
 	let onCreateAccount: () -> Void
-	let onLogIn: () -> Void
+	let onSignIn: () -> Void
 
 	@State private var email = ""
 	@State private var password = ""
@@ -21,7 +22,7 @@ struct CreateAccountView: View {
 
 			VStack(spacing: 0) {
 				HStack {
-					AuthBackCircle(action: onLogIn)
+					AuthBackCircle(action: onBack)
 					Spacer()
 				}
 				.padding(.leading, 20)
@@ -59,7 +60,7 @@ struct CreateAccountView: View {
 				// CTA block — sharp-cornered gradient button, switch link, fine print.
 				VStack(spacing: 12) {
 					AuthCta(text: "Create account", action: onCreateAccount)
-					AuthSwitchRow(prefix: "Already have an account?", link: "Sign in", action: onLogIn)
+					AuthSwitchRow(prefix: "Already have an account?", link: "Sign in", action: onSignIn)
 					Text("By continuing you agree to the Terms and Privacy Policy.")
 						.font(StakFont.geist(10))
 						.multilineTextAlignment(.center)

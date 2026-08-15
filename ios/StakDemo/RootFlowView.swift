@@ -1,11 +1,12 @@
 import SwiftUI
 
-/// Route names for the auth + onboarding flow — mirrors the Android
+/// Screens of the auth + onboarding flow — mirrors the Android
 /// StakNavHost: splash → sign up (⇄ sign in) → 01 welcome →
 /// 02 brand picks → 03 swipe tutorial → 04 goal → 05 risk →
 /// 06 preparing deck → 07 taste reveal → 08 permissions →
 /// 09 profile setup → tab shell.
-enum OnboardingRoute: Hashable {
+enum FlowScreen: Hashable {
+	case createAccount
 	case signIn
 	case welcome
 	case brandPicks
@@ -18,13 +19,39 @@ enum OnboardingRoute: Hashable {
 	case profileSetup
 }
 
+/// Figma prototype animations, mapped onto SwiftUI transitions.
+/// Push Left = everything moves left (new screen in from the right);
+/// Push Right = everything moves right (new screen in from the left).
+enum FlowAnim {
+	case pushLeft
+	case pushRight
+	case dissolve
+
+	var transition: AnyTransition {
+		switch self {
+		case .pushLeft: .asymmetric(insertion: .move(edge: .trailing), removal: .move(edge: .leading))
+		case .pushRight: .asymmetric(insertion: .move(edge: .leading), removal: .move(edge: .trailing))
+		case .dissolve: .opacity
+		}
+	}
+
+	var animation: Animation {
+		switch self {
+		case .dissolve: .easeOut(duration: 0.35)
+		case .pushLeft, .pushRight: .easeOut(duration: 0.3)
+		}
+	}
+}
+
 /// Root of the app: splash → auth → onboarding → the bottom-tab shell.
 ///
-/// Prototype-confirmed edges (CHINEDU proto panel): splash auto-advances
-/// to Auth · Sign up after 1200ms with a 350ms ease-out dissolve. The
-/// post-auth ordering (create account → 01 Welcome → … → 07 Taste reveal
-/// → 08 Permissions → 09 Profile setup → shell) follows the canvas order
-/// pending per-frame prototype confirmation.
+/// The flow runs in a custom stack container (not NavigationStack) so
+/// each edge can play its exact Figma prototype animation. Confirmed
+/// edges so far (CHINEDU proto panels): splash →1200ms→ sign up
+/// (dissolve 350ms); sign-up socials/CTA → 01 Welcome (Push Right
+/// 300ms); sign-up back circle → 01 Welcome (Push Left 300ms); sign-up
+/// "Sign in" link → Sign in (dissolve 350ms). All ease out. Remaining
+/// edges use provisional push directions until their frames confirm.
 struct RootFlowView: View {
 	private enum Phase {
 		case splash
@@ -33,7 +60,8 @@ struct RootFlowView: View {
 	}
 
 	@State private var phase = Phase.splash
-	@State private var path: [OnboardingRoute] = []
+	@State private var stack: [FlowScreen] = [.createAccount]
+	@State private var anim = FlowAnim.dissolve
 
 	var body: some View {
 		ZStack {
@@ -48,78 +76,100 @@ struct RootFlowView: View {
 				MainTabsView()
 					.transition(.opacity)
 			case .flow:
-				NavigationStack(path: $path) {
-					CreateAccountView(
-						onCreateAccount: { path.append(.welcome) },
-						onLogIn: { path.append(.signIn) }
-					)
-					.toolbar(.hidden, for: .navigationBar)
-					.navigationDestination(for: OnboardingRoute.self) { route in
-						destination(for: route)
-							.toolbar(.hidden, for: .navigationBar)
-					}
+				ZStack {
+					screen(for: stack.last ?? .createAccount)
+						.transition(anim.transition)
 				}
 				.transition(.opacity)
 			}
 		}
+		.background(StakColors.bg.ignoresSafeArea())
 	}
 
-	@ViewBuilder
-	private func destination(for route: OnboardingRoute) -> some View {
-		switch route {
-		case .signIn:
-			SignInView(
-				onBack: pop,
-				onSignIn: { phase = .main },
-				onCreateAccount: pop
-			)
-		case .welcome:
-			IntroView { path.append(.brandPicks) }
-		case .brandPicks:
-			BrandPicksView(
-				onBack: pop,
-				onContinue: { path.append(.swipeTutorial) }
-			)
-		case .swipeTutorial:
-			SwipeTutorialView(
-				onBack: pop,
-				onContinue: { path.append(.goal) }
-			)
-		case .goal:
-			GoalView(
-				onBack: pop,
-				onContinue: { path.append(.risk) }
-			)
-		case .risk:
-			RiskView(
-				onBack: pop,
-				onContinue: { path.append(.preparingDeck) }
-			)
-		case .preparingDeck:
-			PreparingDeckView {
-				// Replace the loader so Back from the reveal skips it.
-				path.removeLast()
-				path.append(.tasteReveal)
-			}
-		case .tasteReveal:
-			TasteRevealView(
-				onBack: pop,
-				onLetsGo: { path.append(.permissions) }
-			)
-		case .permissions:
-			PermissionsView(
-				onBack: pop,
-				onContinue: { path.append(.profileSetup) }
-			)
-		case .profileSetup:
-			ProfileSetupView(
-				onBack: pop,
-				onProceed: { phase = .main }
-			)
+	private func push(_ screen: FlowScreen, _ a: FlowAnim) {
+		anim = a
+		withAnimation(a.animation) { stack.append(screen) }
+	}
+
+	private func pop(_ a: FlowAnim = .pushRight) {
+		anim = a
+		withAnimation(a.animation) {
+			if stack.count > 1 { stack.removeLast() }
 		}
 	}
 
-	private func pop() {
-		if !path.isEmpty { path.removeLast() }
+	@ViewBuilder
+	private func screen(for screen: FlowScreen) -> some View {
+		switch screen {
+		case .createAccount:
+			CreateAccountView(
+				onBack: { push(.welcome, .pushLeft) },
+				onCreateAccount: { push(.welcome, .pushRight) },
+				onSignIn: { push(.signIn, .dissolve) }
+			)
+			.id(FlowScreen.createAccount)
+		case .signIn:
+			SignInView(
+				onBack: { pop(.dissolve) },
+				onSignIn: { withAnimation(.easeOut(duration: 0.35)) { phase = .main } },
+				onCreateAccount: { pop(.dissolve) }
+			)
+			.id(FlowScreen.signIn)
+		case .welcome:
+			IntroView { push(.brandPicks, .pushLeft) }
+				.id(FlowScreen.welcome)
+		case .brandPicks:
+			BrandPicksView(
+				onBack: { pop() },
+				onContinue: { push(.swipeTutorial, .pushLeft) }
+			)
+			.id(FlowScreen.brandPicks)
+		case .swipeTutorial:
+			SwipeTutorialView(
+				onBack: { pop() },
+				onContinue: { push(.goal, .pushLeft) }
+			)
+			.id(FlowScreen.swipeTutorial)
+		case .goal:
+			GoalView(
+				onBack: { pop() },
+				onContinue: { push(.risk, .pushLeft) }
+			)
+			.id(FlowScreen.goal)
+		case .risk:
+			RiskView(
+				onBack: { pop() },
+				onContinue: { push(.preparingDeck, .pushLeft) }
+			)
+			.id(FlowScreen.risk)
+		case .preparingDeck:
+			PreparingDeckView {
+				// Replace the loader so Back from the reveal skips it.
+				anim = .dissolve
+				withAnimation(FlowAnim.dissolve.animation) {
+					stack.removeLast()
+					stack.append(.tasteReveal)
+				}
+			}
+			.id(FlowScreen.preparingDeck)
+		case .tasteReveal:
+			TasteRevealView(
+				onBack: { pop() },
+				onLetsGo: { push(.permissions, .pushLeft) }
+			)
+			.id(FlowScreen.tasteReveal)
+		case .permissions:
+			PermissionsView(
+				onBack: { pop() },
+				onContinue: { push(.profileSetup, .pushLeft) }
+			)
+			.id(FlowScreen.permissions)
+		case .profileSetup:
+			ProfileSetupView(
+				onBack: { pop() },
+				onProceed: { withAnimation(.easeOut(duration: 0.35)) { phase = .main } }
+			)
+			.id(FlowScreen.profileSetup)
+		}
 	}
 }

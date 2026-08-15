@@ -48,7 +48,7 @@ import kotlinx.coroutines.delay
 @Composable
 fun SplashScreen(onContinue: () -> Unit) {
 	LaunchedEffect(Unit) {
-		delay(2000)
+		delay(1200) // prototype: "After delay 1200ms" → Auth · Sign up
 		onContinue()
 	}
 	BoxWithConstraints(

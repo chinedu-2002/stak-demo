@@ -30,7 +30,8 @@ struct PreparingDeckView: View {
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
 		.background(StakColors.bg.ignoresSafeArea())
 		.task {
-			try? await Task.sleep(for: .seconds(2.6))
+			// Prototype: "After delay 1800ms" → 07 Taste reveal (dissolve).
+			try? await Task.sleep(for: .seconds(1.8))
 			onDone()
 		}
 	}

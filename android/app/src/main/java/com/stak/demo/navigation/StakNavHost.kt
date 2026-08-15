@@ -27,7 +27,9 @@ import com.stak.demo.ui.onboarding.BrandPicksScreen
 import com.stak.demo.ui.onboarding.SwipeTutorialScreen
 import com.stak.demo.ui.onboarding.GoalScreen
 import com.stak.demo.ui.onboarding.RiskScreen
+import com.stak.demo.ui.onboarding.PermissionsScreen
 import com.stak.demo.ui.onboarding.PreparingDeckScreen
+import com.stak.demo.ui.onboarding.ProfileSetupScreen
 import com.stak.demo.ui.onboarding.TasteRevealScreen
 import com.stak.demo.ui.theme.StakColors
 
@@ -95,12 +97,24 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
 		}
 		composable(StakRoutes.CREATE_ACCOUNT) {
 			CreateAccountScreen(
-				onCreateAccount = {
+				onCreateAccount = { navController.navigate(StakRoutes.PERMISSIONS) },
+				onLogIn = { navController.navigate(StakRoutes.SIGN_IN) },
+			)
+		}
+		composable(StakRoutes.PERMISSIONS) {
+			PermissionsScreen(
+				onBack = { navController.popBackStack() },
+				onContinue = { navController.navigate(StakRoutes.PROFILE_SETUP) },
+			)
+		}
+		composable(StakRoutes.PROFILE_SETUP) {
+			ProfileSetupScreen(
+				onBack = { navController.popBackStack() },
+				onProceed = {
 					navController.navigate(StakRoutes.MAIN) {
 						popUpTo(0) { inclusive = true }
 					}
 				},
-				onLogIn = { navController.navigate(StakRoutes.SIGN_IN) },
 			)
 		}
 		composable(StakRoutes.SIGN_IN) {

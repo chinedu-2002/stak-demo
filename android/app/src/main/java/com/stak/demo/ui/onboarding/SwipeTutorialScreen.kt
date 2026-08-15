@@ -52,8 +52,8 @@ private data class TutorialCard(val res: Int, val x: Float, val y: Float, val w:
 
 private val CARDS = listOf(
 	TutorialCard(R.drawable.tutorial_card_nvda, 0f, 47.71f, 305.53f, 376.9f),
-	TutorialCard(R.drawable.tutorial_card_aapl, 15.59f, 31.77f, 273.41f, 309.46f),
-	TutorialCard(R.drawable.tutorial_card_googl, 52.96f, 0f, 238.66f, 290.59f),
+	TutorialCard(R.drawable.tutorial_card_aapl, 15.59f, 21.13f, 273.41f, 309.46f),
+	TutorialCard(R.drawable.tutorial_card_googl, 33.57f, 0f, 238.66f, 290.59f),
 )
 
 /**
@@ -167,7 +167,7 @@ fun SwipeTutorialScreen(onBack: () -> Unit, onContinue: () -> Unit) {
 					}
 					Text(
 						text = "Swipe down",
-						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 12.sp),
+						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 8.73.sp),
 						color = Auth.FaintText,
 					)
 				}

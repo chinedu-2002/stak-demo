@@ -67,7 +67,7 @@ fun PreparingDeckScreen(onDone: () -> Unit) {
 			painter = painterResource(R.drawable.intro_hero_box),
 			contentDescription = null,
 			contentScale = ContentScale.Fit,
-			modifier = Modifier.size(342.dp, 460.dp),
+			modifier = Modifier.size(342.dp, 488.dp),
 		)
 		Text(
 			text = "Building your first deck...",

@@ -18,8 +18,8 @@ fun RiskScreen(onBack: () -> Unit, onContinue: () -> Unit) {
 		options = listOf(
 			MatrixOption("Buy more after checking why", "Comfortable with dips if the story holds", R.drawable.ic_risk_plus, iconSize = 37.9.dp),
 			MatrixOption("Hold and watch it closely", "I can handle short-term drops", R.drawable.ic_risk_eye, iconSize = 37.9.dp),
-			MatrixOption("Step away for now", "Big drops make me uncomfortable", R.drawable.ic_risk_pause, iconSize = 36.dp),
-			MatrixOption("Sell some, reduce risk", "I’d rather protect part of my money", R.drawable.ic_risk_shield, iconSize = 20.dp),
+			MatrixOption("Step away for now", "Big drops make me uncomfortable", R.drawable.ic_risk_pause, iconSize = 36.dp, circleSize = 36.dp),
+			MatrixOption("Sell some, reduce risk", "I’d rather protect part of my money", R.drawable.ic_risk_shield, iconSize = 20.dp, circleSize = 36.dp),
 		),
 		onBack = onBack,
 		onContinue = onContinue,

@@ -49,7 +49,8 @@ struct SplashView: View {
 		.contentShape(Rectangle())
 		.onTapGesture(perform: onContinue)
 		.task {
-			try? await Task.sleep(for: .seconds(2))
+			// Prototype: "After delay 1200ms" → Auth · Sign up.
+			try? await Task.sleep(for: .seconds(1.2))
 			onContinue()
 		}
 	}

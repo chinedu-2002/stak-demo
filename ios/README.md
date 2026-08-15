@@ -66,9 +66,11 @@ same words on both platforms.
 | Auth · Sign up | `CreateAccountView` | 1:830 |
 | Auth · Sign in | `SignInView` | 1:879 |
 
-Flow: splash → 01 → … → 07 → sign up (⇄ sign in) → 08 → 09 → tab shell
-(sign-in goes straight to the shell). `MainTabsView` is the phase-3
-placeholder with the real Figma tab bar (`StakTabBar`).
+Flow: splash → sign up (⇄ sign in) → 01 → … → 07 → 08 → 09 → tab shell
+(sign-in goes straight to the shell). The splash auto-advances to sign
+up after 1200ms with a 350ms ease-out dissolve, per the file's
+prototype wiring. `MainTabsView` is the phase-3 placeholder with the
+real Figma tab bar (`StakTabBar`).
 
 ## Fonts
 

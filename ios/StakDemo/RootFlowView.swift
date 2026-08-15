@@ -1,27 +1,34 @@
 import SwiftUI
 
-/// Route names for the onboarding/auth flow — mirrors the Android
-/// StakNavHost: splash → 01 intro → 02 brand picks → 03 swipe tutorial →
-/// 04 goal → 05 risk → 06 preparing deck → 07 taste reveal → auth
-/// (sign up ⇄ sign in) → 08 permissions → 09 profile setup → tab shell.
+/// Route names for the auth + onboarding flow — mirrors the Android
+/// StakNavHost: splash → sign up (⇄ sign in) → 01 welcome →
+/// 02 brand picks → 03 swipe tutorial → 04 goal → 05 risk →
+/// 06 preparing deck → 07 taste reveal → 08 permissions →
+/// 09 profile setup → tab shell.
 enum OnboardingRoute: Hashable {
+	case signIn
+	case welcome
 	case brandPicks
 	case swipeTutorial
 	case goal
 	case risk
 	case preparingDeck
 	case tasteReveal
-	case createAccount
-	case signIn
 	case permissions
 	case profileSetup
 }
 
-/// Root of the app: onboarding flow first, then the bottom-tab shell.
+/// Root of the app: splash → auth → onboarding → the bottom-tab shell.
+///
+/// Prototype-confirmed edges (CHINEDU proto panel): splash auto-advances
+/// to Auth · Sign up after 1200ms with a 350ms ease-out dissolve. The
+/// post-auth ordering (create account → 01 Welcome → … → 07 Taste reveal
+/// → 08 Permissions → 09 Profile setup → shell) follows the canvas order
+/// pending per-frame prototype confirmation.
 struct RootFlowView: View {
 	private enum Phase {
 		case splash
-		case onboarding
+		case flow
 		case main
 	}
 
@@ -29,19 +36,30 @@ struct RootFlowView: View {
 	@State private var path: [OnboardingRoute] = []
 
 	var body: some View {
-		switch phase {
-		case .splash:
-			SplashView { phase = .onboarding }
-		case .main:
-			MainTabsView()
-		case .onboarding:
-			NavigationStack(path: $path) {
-				IntroView { path.append(.brandPicks) }
+		ZStack {
+			switch phase {
+			case .splash:
+				SplashView {
+					// Prototype: dissolve, ease out, 350ms.
+					withAnimation(.easeOut(duration: 0.35)) { phase = .flow }
+				}
+				.transition(.opacity)
+			case .main:
+				MainTabsView()
+					.transition(.opacity)
+			case .flow:
+				NavigationStack(path: $path) {
+					CreateAccountView(
+						onCreateAccount: { path.append(.welcome) },
+						onLogIn: { path.append(.signIn) }
+					)
 					.toolbar(.hidden, for: .navigationBar)
 					.navigationDestination(for: OnboardingRoute.self) { route in
 						destination(for: route)
 							.toolbar(.hidden, for: .navigationBar)
 					}
+				}
+				.transition(.opacity)
 			}
 		}
 	}
@@ -49,6 +67,14 @@ struct RootFlowView: View {
 	@ViewBuilder
 	private func destination(for route: OnboardingRoute) -> some View {
 		switch route {
+		case .signIn:
+			SignInView(
+				onBack: pop,
+				onSignIn: { phase = .main },
+				onCreateAccount: pop
+			)
+		case .welcome:
+			IntroView { path.append(.brandPicks) }
 		case .brandPicks:
 			BrandPicksView(
 				onBack: pop,
@@ -78,18 +104,7 @@ struct RootFlowView: View {
 		case .tasteReveal:
 			TasteRevealView(
 				onBack: pop,
-				onLetsGo: { path = [.createAccount] }
-			)
-		case .createAccount:
-			CreateAccountView(
-				onCreateAccount: { path.append(.permissions) },
-				onLogIn: { path.append(.signIn) }
-			)
-		case .signIn:
-			SignInView(
-				onBack: pop,
-				onSignIn: { phase = .main },
-				onCreateAccount: pop
+				onLetsGo: { path.append(.permissions) }
 			)
 		case .permissions:
 			PermissionsView(

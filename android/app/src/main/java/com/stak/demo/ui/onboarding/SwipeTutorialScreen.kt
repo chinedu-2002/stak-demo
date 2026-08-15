@@ -51,13 +51,13 @@ import kotlinx.coroutines.launch
 private data class TutorialCard(val res: Int, val x: Float, val y: Float, val w: Float, val h: Float)
 
 private val CARDS = listOf(
-	TutorialCard(R.drawable.tutorial_card_nvda, 0f, 44.35f, 284f, 350.67f),
-	TutorialCard(R.drawable.tutorial_card_aapl, 14.49f, 19.64f, 254.99f, 308.48f),
-	TutorialCard(R.drawable.tutorial_card_googl, 31.21f, 0f, 222.08f, 273.53f),
+	TutorialCard(R.drawable.tutorial_card_nvda, 0f, 47.71f, 305.53f, 376.9f),
+	TutorialCard(R.drawable.tutorial_card_aapl, 15.59f, 31.77f, 273.41f, 309.46f),
+	TutorialCard(R.drawable.tutorial_card_googl, 52.96f, 0f, 238.66f, 290.59f),
 )
 
 /**
- * Onboarding · 03 Swipe tutorial — Figma node 1554:8666 ("STEP 3 OF 6").
+ * Onboarding · 03 Swipe tutorial — Figma node 1:344 (CHINEDU file, "STEP 3 OF 6").
  *
  * The stacked swipe deck: NVDA in front with AAPL and GOOGL peeking
  * behind at their designed tilts (each card is its full Figma render).
@@ -109,13 +109,12 @@ fun SwipeTutorialScreen(onBack: () -> Unit, onContinue: () -> Unit) {
 
 			Column(
 				horizontalAlignment = Alignment.CenterHorizontally,
-				modifier = Modifier.weight(1f).fillMaxWidth().padding(top = 6.dp),
+				modifier = Modifier.weight(1f).fillMaxWidth().padding(top = 10.dp),
 			) {
-				Spacer(modifier = Modifier.weight(1f))
 				// The deck — cards keep their designed poses; the front one drags down.
 				Box(
 					modifier = Modifier
-						.size(284.dp, 394.dp)
+						.size(306.dp, 423.07.dp)
 						.pointerInput(swiped) {
 							detectVerticalDragGestures(
 								onDragEnd = {
@@ -153,14 +152,14 @@ fun SwipeTutorialScreen(onBack: () -> Unit, onContinue: () -> Unit) {
 						)
 					}
 				}
-				Spacer(modifier = Modifier.size(8.dp))
+				Spacer(modifier = Modifier.size(9.dp))
 				// Gesture hint — twin chevrons at 50% + "Swipe down".
 				Column(
 					horizontalAlignment = Alignment.CenterHorizontally,
-					verticalArrangement = Arrangement.spacedBy(6.dp),
+					verticalArrangement = Arrangement.spacedBy(4.dp),
 				) {
 					Column(
-						verticalArrangement = Arrangement.spacedBy(0.8.dp),
+						verticalArrangement = Arrangement.spacedBy(1.dp),
 						modifier = Modifier.alpha(0.5f),
 					) {
 						ChevronDown()
@@ -172,7 +171,6 @@ fun SwipeTutorialScreen(onBack: () -> Unit, onContinue: () -> Unit) {
 						color = Auth.FaintText,
 					)
 				}
-				Spacer(modifier = Modifier.weight(1f))
 			}
 		}
 
@@ -186,10 +184,10 @@ fun SwipeTutorialScreen(onBack: () -> Unit, onContinue: () -> Unit) {
 	}
 }
 
-/** 12.98x6.49 down-chevron stroke, StakColors.Muted. */
+/** 13.97x6.98 down-chevron stroke, StakColors.Muted. */
 @Composable
 private fun ChevronDown() {
-	Canvas(modifier = Modifier.size(12.98.dp, 6.49.dp)) {
+	Canvas(modifier = Modifier.size(13.97.dp, 6.98.dp)) {
 		val p = Path().apply {
 			moveTo(0f, 0f)
 			lineTo(size.width / 2f, size.height)

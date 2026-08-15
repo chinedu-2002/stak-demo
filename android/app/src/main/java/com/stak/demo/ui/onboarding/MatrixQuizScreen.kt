@@ -33,14 +33,22 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.stak.demo.ui.theme.Geist
 import com.stak.demo.ui.theme.Sora
 import com.stak.demo.ui.theme.StakColors
 
-/** One 2x2 matrix option — icon in a #242b3d circle, Geist title/subtitle. */
-internal data class MatrixOption(val title: String, val subtitle: String, val iconRes: Int)
+/** One 2x2 matrix option — icon in a #242b3d circle, Geist title/subtitle.
+ * Icon glyphs keep their native Figma frame size (21.06 for the goal set,
+ * up to the full 37.9 circle for the risk plus/eye). */
+internal data class MatrixOption(
+	val title: String,
+	val subtitle: String,
+	val iconRes: Int,
+	val iconSize: Dp = 21.06.dp,
+)
 
 /**
  * Shared single-select 2x2 matrix quiz screen — the layout of Figma
@@ -145,7 +153,7 @@ private fun MatrixCard(option: MatrixOption, selected: Boolean, onClick: () -> U
 			Image(
 				painter = painterResource(option.iconRes),
 				contentDescription = null,
-				modifier = Modifier.size(21.06.dp),
+				modifier = Modifier.size(option.iconSize),
 			)
 		}
 		Column(verticalArrangement = Arrangement.spacedBy(5.26.dp), modifier = Modifier.height(66.33.dp)) {

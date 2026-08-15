@@ -45,8 +45,8 @@
 		<string>Geist-Medium.ttf</string>
 		<string>Geist-SemiBold.ttf</string>
 		<string>Geist-Bold.ttf</string>
-		<string>squarish_sans_ct.ttf</string>
-		<string>squarish_sans_ct_sc.ttf</string>
+		<string>SquarishSansCT.ttf</string>
+		<string>SquarishSansCT-SC.ttf</string>
 	</array>
 </dict>
 </plist>

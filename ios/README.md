@@ -29,6 +29,26 @@ open StakDemo.xcodeproj
 
 Then build & run — no third-party dependencies.
 
+## Project layout
+
+Mirrors the `android/` package layout one-to-one so engineers can hop
+between the two codebases:
+
+| ios/StakDemo/ | android/ …/com/stak/demo/ | Contents |
+|---|---|---|
+| `StakDemoApp.swift` | `StakApp.kt` / `MainActivity.kt` | App entry |
+| `RootFlowView.swift` | `navigation/StakNavHost.kt` + `StakRoutes.kt` | Flow routing |
+| `MainTabsView.swift` | `MainTabsShell` (in `StakNavHost.kt`) | Tab shell placeholder |
+| `Theme/` | `ui/theme/` | Color + font tokens |
+| `Components/` | `ui/components/` | Shared chrome (tab bar) |
+| `Onboarding/` | `ui/onboarding/` | The 12 flow screens + `AuthKit` |
+| `Assets.xcassets` / `Resources/Fonts` | `res/drawable*` / `res/font` | Exports + fonts |
+
+Asset naming convention: an iOS asset is the PascalCase of its Android
+res name (`brand_apple` ↔ `BrandApple`, `ic_google_g` ↔ `IcGoogleG`,
+`splash_glass_ball` ↔ `SplashGlassBall`), so any export lives under the
+same words on both platforms.
+
 ## Screen inventory (CHINEDU node IDs)
 
 | Screen | View | Node |
@@ -57,8 +77,9 @@ SemiBold/Bold) cut from the same Sora and Geist variable TTFs the Android
 app bundles — Sora's variable file has no per-instance PostScript names,
 which iOS needs, hence the static cuts. PostScript names are
 `Sora-SemiBold`, `Geist-Medium`, etc. (see `Theme/StakFonts.swift`), all
-registered in Info.plist `UIAppFonts`. Squarish Sans CT ships as-is
-(`SquarishSansCTRegular` / `...SC`).
+registered in Info.plist `UIAppFonts`. Squarish Sans CT ships as-is —
+`SquarishSansCT.ttf` / `SquarishSansCT-SC.ttf` (PostScript names
+`SquarishSansCTRegular` / `SquarishSansCTRegularSC`).
 
 ## Assets
 

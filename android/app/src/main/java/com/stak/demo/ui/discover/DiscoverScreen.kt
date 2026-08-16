@@ -168,14 +168,11 @@ fun DiscoverScreen(onLearnMore: () -> Unit = {}) {
 						color = Color.White,
 					)
 					Spacer(modifier = Modifier.weight(1f))
+					val count = (seen + 1).coerceAtMost(12)
 					Box(contentAlignment = Alignment.Center, modifier = Modifier.size(44.dp)) {
-						Image(
-							painter = painterResource(R.drawable.ic_discover_ring),
-							contentDescription = null,
-							modifier = Modifier.size(44.dp),
-						)
+						ProgressRing(progress = count / 12f)
 						Text(
-							text = "${(seen % 12) + 1}/12",
+							text = "$count/12",
 							style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = 11.sp),
 							color = Color.White,
 						)
@@ -189,6 +186,12 @@ fun DiscoverScreen(onLearnMore: () -> Unit = {}) {
 				)
 			}
 			Spacer(modifier = Modifier.height(27.dp))
+			if (seen >= 12) {
+				EndOfDeck(
+					onPracticeBuySaves = { showBuy = true },
+					onSwipeAgain = { seen = 0 },
+				)
+			} else {
 			// Deck — three stacked gradient cards, front one drags down.
 			Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f).fillMaxWidth()) {
 				Box(
@@ -283,6 +286,7 @@ fun DiscoverScreen(onLearnMore: () -> Unit = {}) {
 					}
 				}
 				Spacer(modifier = Modifier.height(19.dp))
+			}
 			}
 		}
 		// Saved toast (frame 1:1796) — centered pill under the header.
@@ -737,6 +741,120 @@ private fun OrderFilledSheet(onDismiss: () -> Unit) {
 				SheetCta(text = "View in My STAK", onClick = onDismiss)
 				SheetSecondary(text = "Keep exploring", onClick = onDismiss)
 			}
+		}
+	}
+}
+
+/** 44dp progress ring — #2a3346 track + #69b3ca arc from 12 o'clock. */
+@Composable
+private fun ProgressRing(progress: Float) {
+	Canvas(modifier = Modifier.size(44.dp)) {
+		val stroke = 3.dp.toPx()
+		val inset = stroke / 2f + 4.dp.toPx()
+		val arcSize = androidx.compose.ui.geometry.Size(size.width - inset * 2f, size.height - inset * 2f)
+		drawArc(
+			color = Color(0xFF2A3346),
+			startAngle = 0f, sweepAngle = 360f, useCenter = false,
+			topLeft = Offset(inset, inset), size = arcSize,
+			style = Stroke(width = stroke, cap = StrokeCap.Round),
+		)
+		drawArc(
+			color = Disc.Teal,
+			startAngle = -90f, sweepAngle = 360f * progress, useCenter = false,
+			topLeft = Offset(inset, inset), size = arcSize,
+			style = Stroke(width = stroke, cap = StrokeCap.Round),
+		)
+	}
+}
+
+/** Discover · End of deck (CHINEDU 1:2330) — receipt stats + CTAs. */
+@Composable
+private fun EndOfDeck(onPracticeBuySaves: () -> Unit, onSwipeAgain: () -> Unit) {
+	Column(
+		horizontalAlignment = Alignment.CenterHorizontally,
+		modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
+	) {
+		Spacer(modifier = Modifier.height(47.dp))
+		Text(
+			text = "Deck complete",
+			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 22.sp),
+			color = Disc.BrightInk,
+		)
+		Spacer(modifier = Modifier.height(14.dp))
+		Text(
+			text = "Twelve cards, twelve signals. Your taste graph got smarter.",
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 12.sp),
+			color = Disc.Muted,
+		)
+		Spacer(modifier = Modifier.height(33.dp))
+		Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+			listOf("Seen" to "12", "Saved" to "7", "Bought" to "2").forEach { (label, value) ->
+				Column(
+					horizontalAlignment = Alignment.CenterHorizontally,
+					verticalArrangement = Arrangement.spacedBy(4.dp),
+					modifier = Modifier
+						.width(110.dp)
+						.clip(RoundedCornerShape(12.dp))
+						.background(Disc.SheetBg)
+						.padding(horizontal = 10.dp, vertical = 14.dp),
+				) {
+					Text(
+						text = label,
+						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 10.sp),
+						color = Disc.Muted,
+					)
+					Text(
+						text = value,
+						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 20.sp),
+						color = Disc.BrightInk,
+					)
+				}
+			}
+		}
+		Spacer(modifier = Modifier.height(56.dp))
+		SheetCta(text = "Practice buy your saves", onClick = onPracticeBuySaves)
+		Spacer(modifier = Modifier.height(9.dp))
+		Box(
+			contentAlignment = Alignment.Center,
+			modifier = Modifier
+				.fillMaxWidth()
+				.height(52.dp)
+				.border(0.36.dp, Color(0x54343B4F), RoundedCornerShape(6.dp))
+				.clickable(
+					interactionSource = remember { MutableInteractionSource() },
+					indication = null,
+				) { /* My STAK lands in a later phase. */ },
+		) {
+			Text(
+				text = "Review saves in My STAK",
+				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = 13.sp),
+				color = Disc.Muted,
+			)
+		}
+		Spacer(modifier = Modifier.height(14.dp))
+		Text(
+			text = "A new deck lands tomorrow with your morning brief.",
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 10.sp),
+			color = Disc.Muted,
+		)
+		Spacer(modifier = Modifier.height(22.dp))
+		Box(
+			contentAlignment = Alignment.Center,
+			modifier = Modifier
+				.fillMaxWidth()
+				.height(32.dp)
+				.clip(RoundedCornerShape(14.dp))
+				.clickable(
+					interactionSource = remember { MutableInteractionSource() },
+					indication = null,
+					onClick = onSwipeAgain,
+				),
+		) {
+			Text(
+				text = "Swipe today’s deck again",
+				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = 13.sp),
+				color = Disc.Muted,
+			)
 		}
 	}
 }

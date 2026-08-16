@@ -30,11 +30,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.requiredHeight
@@ -57,7 +53,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.stak.demo.R
 import com.stak.demo.ui.theme.Geist
-import com.stak.demo.ui.theme.Inter
 import com.stak.demo.ui.theme.Sora
 import com.stak.demo.ui.theme.StakColors
 
@@ -71,14 +66,6 @@ private object Home {
 	val NavCircle = Color(0xFF192238)
 }
 
-private val HOME_TABS = listOf(
-	"Home" to R.drawable.ic_tab_home,
-	"News" to R.drawable.ic_tab_news,
-	"Discover" to R.drawable.ic_tab_discover,
-	"My STAK" to R.drawable.ic_tab_mystak,
-	"Simulate" to R.drawable.ic_tab_simulate,
-)
-
 /**
  * 02 · Home — CHINEDU "Home first run" (1:958) and "Home Main" (1:1097).
  *
@@ -87,12 +74,11 @@ private val HOME_TABS = listOf(
  * with its clipped news-deck stack, the "Why this matters" row and the
  * teal deck banner. First run replaces the tab bar with a bottom scrim
  * and the frosted "See Todays Pick" pill; tapping it reveals Home Main
- * (prototype: Swap overlay · Instant).
+ * (prototype: Swap overlay · Instant). The tab bar itself lives in the
+ * MainShell so the other tabs share it.
  */
 @Composable
-fun HomeScreen(onProfile: () -> Unit = {}) {
-	var firstRun by rememberSaveable { mutableStateOf(true) }
-
+fun HomeScreen(firstRun: Boolean, onSeeTodaysPick: () -> Unit, onProfile: () -> Unit = {}) {
 	BoxWithConstraints(modifier = Modifier.fillMaxSize().background(StakColors.Bg)) {
 		val statusPad = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
 		Column(modifier = Modifier.fillMaxSize()) {
@@ -113,9 +99,6 @@ fun HomeScreen(onProfile: () -> Unit = {}) {
 				DeckBanner()
 				Spacer(modifier = Modifier.height(if (firstRun) 140.dp else 20.dp))
 			}
-			if (!firstRun) {
-				HomeTabBar()
-			}
 		}
 		if (firstRun) {
 			// The frame pins the scrim 41px above the deck banner (Tab bar
@@ -123,7 +106,7 @@ fun HomeScreen(onProfile: () -> Unit = {}) {
 			// banner top = status inset + 626, so the scrim starts 585 below
 			// the inset and runs to the physical bottom of the screen.
 			FirstRunOverlay(
-				onSeeTodaysPick = { firstRun = false },
+				onSeeTodaysPick = onSeeTodaysPick,
 				modifier = Modifier
 					.align(Alignment.BottomCenter)
 					.height(this@BoxWithConstraints.maxHeight - statusPad - 585.dp),
@@ -415,40 +398,6 @@ private fun DeckBanner() {
 						painter = painterResource(R.drawable.ic_arrow_right_small),
 						contentDescription = null,
 						modifier = Modifier.size(16.dp),
-					)
-				}
-			}
-		}
-	}
-}
-
-/** Home Main tab bar — 86px #060c1d, five 24px icons with Inter 12 labels, gap 28. */
-@Composable
-private fun HomeTabBar() {
-	Box(modifier = Modifier.fillMaxWidth().background(Home.TabBg).navigationBarsPadding()) {
-		Row(
-			horizontalArrangement = Arrangement.spacedBy(28.dp),
-			verticalAlignment = Alignment.CenterVertically,
-			modifier = Modifier.align(Alignment.Center).height(86.dp),
-		) {
-			HOME_TABS.forEach { (label, iconRes) ->
-				Column(
-					horizontalAlignment = Alignment.CenterHorizontally,
-					verticalArrangement = Arrangement.spacedBy(10.dp),
-					modifier = Modifier.clickable(
-						interactionSource = remember { MutableInteractionSource() },
-						indication = null,
-					) { /* Other tabs land in later phases. */ },
-				) {
-					Image(
-						painter = painterResource(iconRes),
-						contentDescription = null,
-						modifier = Modifier.size(24.dp),
-					)
-					Text(
-						text = label,
-						style = TextStyle(fontFamily = Inter, fontWeight = FontWeight.Normal, fontSize = 12.sp),
-						color = Color.White,
 					)
 				}
 			}

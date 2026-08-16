@@ -858,3 +858,14 @@ private fun EndOfDeck(onPracticeBuySaves: () -> Unit, onSwipeAgain: () -> Unit) 
 		}
 	}
 }
+
+/** Buy → Order-filled flow, reused by the Stock Detail page. */
+@Composable
+internal fun DiscoverBuyFlow(onClose: () -> Unit) {
+	var filled by rememberSaveable { mutableStateOf(false) }
+	if (!filled) {
+		PracticeBuySheet(onConfirm = { filled = true }, onDismiss = onClose)
+	} else {
+		OrderFilledSheet(onDismiss = onClose)
+	}
+}

@@ -152,9 +152,10 @@ struct DiscoverView: View {
 								.offset(y: 54.65 + dragOffset)
 								.onTapGesture(perform: onLearnMore)
 						}
+						.scaleEffect(figmaUnit, anchor: .top)
 						.padding(.horizontal, 20)
 						.frame(maxWidth: .infinity)
-						.frame(height: 484.65, alignment: .top)
+						.frame(height: 484.65 * figmaUnit, alignment: .top)
 						.contentShape(Rectangle())
 						.gesture(
 							DragGesture()
@@ -357,7 +358,7 @@ private struct SaveChip: View {
 			Text("Save")
 				.font(StakFont.geist(12, .medium))
 				.foregroundStyle(Color.white)
-			Image("IcSavedBookmark")
+			Image("IcHeroBookmark")
 				.resizable()
 				.frame(width: 12, height: 12)
 		}

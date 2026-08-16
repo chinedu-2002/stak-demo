@@ -23,6 +23,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.stak.demo.ui.components.MainTab
 import com.stak.demo.ui.components.MainTabBar
+import com.stak.demo.ui.discover.DiscoverScreen
 import com.stak.demo.ui.home.HomeScreen
 import com.stak.demo.ui.news.NewsDetailScreen
 import com.stak.demo.ui.news.NewsScreen
@@ -282,6 +283,7 @@ private fun MainShell(onOpenArticle: () -> Unit) {
 					onSeeTodaysPick = { homeFirstRun = false },
 				)
 				MainTab.News -> NewsScreen(onOpenArticle = onOpenArticle)
+				MainTab.Discover -> DiscoverScreen()
 				else -> HomeScreen(firstRun = false, onSeeTodaysPick = {})
 			}
 		}

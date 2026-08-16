@@ -43,16 +43,17 @@ enum class MainTab(val label: String, val activeIcon: Int, val inactiveIcon: Int
  */
 @Composable
 fun MainTabBar(selected: MainTab, onSelect: (MainTab) -> Unit) {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Box(modifier = Modifier.fillMaxWidth().background(Color(0xFF060C1D)).navigationBarsPadding()) {
 		Row(
-			horizontalArrangement = Arrangement.spacedBy(28.dp),
+			horizontalArrangement = Arrangement.spacedBy((28 * u).dp),
 			verticalAlignment = Alignment.CenterVertically,
-			modifier = Modifier.align(Alignment.Center).height(86.dp),
+			modifier = Modifier.align(Alignment.Center).height((86 * u).dp),
 		) {
 			MainTab.entries.forEach { tab ->
 				Column(
 					horizontalAlignment = Alignment.CenterHorizontally,
-					verticalArrangement = Arrangement.spacedBy(10.dp),
+					verticalArrangement = Arrangement.spacedBy((10 * u).dp),
 					modifier = Modifier.clickable(
 						interactionSource = remember { MutableInteractionSource() },
 						indication = null,
@@ -61,11 +62,11 @@ fun MainTabBar(selected: MainTab, onSelect: (MainTab) -> Unit) {
 					Image(
 						painter = painterResource(if (tab == selected) tab.activeIcon else tab.inactiveIcon),
 						contentDescription = tab.label,
-						modifier = Modifier.size(24.dp),
+						modifier = Modifier.size((24 * u).dp),
 					)
 					Text(
 						text = tab.label,
-						style = TextStyle(fontFamily = Inter, fontWeight = FontWeight.Normal, fontSize = 12.sp),
+						style = TextStyle(fontFamily = Inter, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp),
 						color = Color.White,
 					)
 				}

@@ -241,8 +241,8 @@ fun DiscoverScreen(onLearnMore: () -> Unit = {}) {
 						},
 				) {
 					val order = listOf(DECK[(seen + 2) % 3], DECK[(seen + 1) % 3], DECK[seen % 3])
-					BackDeckCard(order[0], scale = 251.81f / 350f, rotation = 4.03f, offsetX = (0.29 * u).dp, offsetY = (-53.85 * u).dp, u = u)
-					BackDeckCard(order[1], scale = 299.51f / 350f, rotation = -2.33f, offsetX = (-0.58 * u).dp, offsetY = (-2.0 * u).dp, u = u)
+					BackDeckCard(order[0], scale = 251.81f / 350f, rotation = 4.03f, offsetX = (0.29 * u).dp, offsetY = (-53.85 * u).dp, u = u, authoredHeight = 444.4f)
+					BackDeckCard(order[1], scale = 299.51f / 350f, rotation = -2.33f, offsetX = (-0.58 * u).dp, offsetY = (1.4 * u).dp, u = u, authoredHeight = 398.5f)
 					FrontDeckCard(
 						card = order[2],
 						onSave = { savedToast = true },
@@ -349,7 +349,7 @@ fun DiscoverScreen(onLearnMore: () -> Unit = {}) {
 
 /** One of the two tilted back cards, drawn at its designed scale. */
 @Composable
-private fun BoxScope.BackDeckCard(card: DeckCard, scale: Float, rotation: Float, offsetX: Dp, offsetY: Dp, u: Float) {
+private fun BoxScope.BackDeckCard(card: DeckCard, scale: Float, rotation: Float, offsetX: Dp, offsetY: Dp, u: Float, authoredHeight: Float) {
 	// The card composable is authored at the 350x444.4 front size and
 	// scaled down; the offsets place the rotated bounds so the card tops
 	// peek exactly as in the frame (GOOGL at deck-y 0, AAPL at 24.2).
@@ -357,7 +357,7 @@ private fun BoxScope.BackDeckCard(card: DeckCard, scale: Float, rotation: Float,
 		modifier = Modifier
 			.align(Alignment.TopStart)
 			.offset(x = offsetX, y = offsetY)
-			.size((350 * u).dp, (444.4 * u).dp)
+			.size((350 * u).dp, (authoredHeight * u).dp)
 			.graphicsLayer {
 				scaleX = scale
 				scaleY = scale
@@ -402,7 +402,7 @@ private fun DeckCardBody(card: DeckCard, onSave: (() -> Unit)?, u: Float) {
 			if (card.artRes != R.drawable.disc_card_nvda) {
 				// NVDA's chip is baked into its art; the others draw it live —
 				// on the back cards as well, as the frame shows.
-				SaveChip(u = u, modifier = Modifier.align(Alignment.TopEnd).padding(top = (6 * u).dp, end = (10 * u).dp))
+				SaveChip(u = u, modifier = Modifier.align(Alignment.TopEnd).padding(top = (5 * u).dp, end = (2.8 * u).dp))
 			}
 			if (onSave != null) {
 				Box(

@@ -148,9 +148,9 @@ fun StockDetailScreen(onBack: () -> Unit) {
 				) {
 					RiskFitCard()
 					NumbersCard()
-					CollapsedCard("Analyst view", "↑ 6.7% upside", Green)
+					AnalystCard()
 					NewsSignalCard()
-					CollapsedCard("Compare and learn", "vs MSFT · GOOGL", Muted)
+					CompareCard()
 					Row(
 						horizontalArrangement = Arrangement.spacedBy(8.dp),
 						modifier = Modifier
@@ -508,4 +508,203 @@ private fun DetailSavedSheet(onDone: () -> Unit) {
 @Composable
 private fun DetailBuyHost(onClose: () -> Unit) {
 	DiscoverBuyFlow(onClose = onClose)
+}
+
+/** Kicker label — Geist Medium 10, tracking 0.8, muted. */
+@Composable
+private fun Kicker(text: String) {
+	Text(
+		text,
+		style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 10.sp, letterSpacing = 0.8.sp),
+		color = Muted,
+	)
+}
+
+/** Analyst view (collapsed 1:2454 / open 1:2651) — caret toggles. */
+@Composable
+private fun AnalystCard() {
+	var open by rememberSaveable { mutableStateOf(false) }
+	Column(
+		verticalArrangement = Arrangement.spacedBy(12.dp),
+		modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(Card)
+			.clickable(
+				interactionSource = remember { MutableInteractionSource() },
+				indication = null,
+			) { open = !open }
+			.padding(horizontal = 16.dp, vertical = 14.dp),
+	) {
+		Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+			Text(
+				"Analyst view",
+				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 15.sp),
+				color = Bright,
+			)
+			Spacer(modifier = Modifier.weight(1f))
+			if (!open) {
+				Image(painterResource(R.drawable.ic_sd_caret), null, modifier = Modifier.size(20.dp))
+			}
+		}
+		if (!open) {
+			Text(
+				"↑ 6.7% upside",
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 11.sp),
+				color = Green,
+			)
+		} else {
+			Kicker("PRICE TARGET RANGE")
+			Box(modifier = Modifier.fillMaxWidth().height(8.dp).clip(RoundedCornerShape(4.dp)).background(Color(0xFF10182B))) {
+				Box(modifier = Modifier.width(180.dp).height(8.dp).background(Color(0x8C5DA8BF), RoundedCornerShape(4.dp)))
+				Image(painterResource(R.drawable.ic_sd_marker), null, modifier = Modifier.offset(x = 173.dp, y = (-3).dp).size(14.dp))
+			}
+			Row(modifier = Modifier.fillMaxWidth()) {
+				Column(verticalArrangement = Arrangement.spacedBy(1.dp)) {
+					Text("Low", style = TextStyle(fontFamily = Geist, fontSize = 10.sp), color = Muted)
+					Text("$180", style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 12.sp), color = Bright)
+				}
+				Spacer(modifier = Modifier.weight(1f))
+				Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(1.dp)) {
+					Text("Avg", style = TextStyle(fontFamily = Geist, fontSize = 10.sp), color = Muted)
+					Text("$248", style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 12.sp), color = Bright)
+				}
+				Spacer(modifier = Modifier.weight(1f))
+				Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(1.dp)) {
+					Text("High", style = TextStyle(fontFamily = Geist, fontSize = 10.sp), color = Muted)
+					Text("$300", style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 12.sp), color = Bright)
+				}
+			}
+			Text(
+				"↑ 6.7% upside",
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 11.sp),
+				color = Green,
+			)
+			Kicker("WALL ST. CONSENSUS · 42 ANALYSTS")
+			Box(modifier = Modifier.fillMaxWidth().height(8.dp).clip(RoundedCornerShape(4.dp)).background(Color(0xFF10182B))) {
+				Box(modifier = Modifier.width(212.dp).height(8.dp).background(Green, RoundedCornerShape(4.dp)))
+			}
+			Row(modifier = Modifier.fillMaxWidth()) {
+				Text("● Buy 28", style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 11.sp), color = Green)
+				Spacer(modifier = Modifier.weight(1f))
+				Text("Hold 12", style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 11.sp), color = Muted)
+				Spacer(modifier = Modifier.weight(1f))
+				Text("Sell 2", style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 11.sp), color = Muted)
+			}
+			Kicker("RECENT ACTIONS")
+			listOf(
+				Triple("Morgan Stanley", "Buy", "$260"),
+				Triple("Wedbush", "Buy", "$285"),
+				Triple("Goldman Sachs", "Buy", "$256"),
+				Triple("UBS", "Hold", "$236"),
+				Triple("Barclays", "Hold", "$230"),
+			).forEach { (name, action, target) ->
+				Row(
+					verticalAlignment = Alignment.CenterVertically,
+					modifier = Modifier
+						.fillMaxWidth()
+						.height(38.dp)
+						.clip(RoundedCornerShape(10.dp))
+						.background(Color(0xFF10182B))
+						.padding(horizontal = 12.dp),
+				) {
+					Text(name, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 12.sp), color = Bright)
+					Spacer(modifier = Modifier.weight(1f))
+					Text(
+						action,
+						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 11.sp),
+						color = if (action == "Buy") Green else Muted,
+					)
+					Spacer(modifier = Modifier.width(10.dp))
+					Text(target, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 12.sp), color = Bright)
+				}
+			}
+		}
+	}
+}
+
+/** Compare and learn (collapsed 1:2526 / open 1:2719) — peer table. */
+@Composable
+private fun CompareCard() {
+	var open by rememberSaveable { mutableStateOf(false) }
+	Column(
+		verticalArrangement = Arrangement.spacedBy(if (open) 21.dp else 12.dp),
+		modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(Card)
+			.clickable(
+				interactionSource = remember { MutableInteractionSource() },
+				indication = null,
+			) { open = !open }
+			.padding(horizontal = 16.dp, vertical = 14.dp),
+	) {
+		Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+			Text(
+				"Compare and learn",
+				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 15.sp),
+				color = Bright,
+			)
+			Spacer(modifier = Modifier.weight(1f))
+			if (!open) {
+				Image(painterResource(R.drawable.ic_sd_caret), null, modifier = Modifier.size(20.dp))
+			}
+		}
+		if (!open) {
+			Text(
+				"vs MSFT · GOOGL",
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 11.sp),
+				color = Muted,
+			)
+		} else {
+			Box(modifier = Modifier.fillMaxWidth()) {
+				// AAPL column tint spans the table rows (frame 1:2721).
+				Box(
+					modifier = Modifier
+						.offset(x = 78.dp, y = 0.dp)
+						.size(81.dp, 170.dp)
+						.background(Color(0x125DA8BF), RoundedCornerShape(8.dp)),
+				)
+				Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
+					CompareRow("", "AAPL", "MSFT", "GOOGL", header = true)
+					CompareRow("P/E ratio", "31.2", "36x", "24x")
+					CompareRow("Rev growth", "+6.1%", "+15%", "+12%", valueColor = Green)
+					CompareRow("Profit margin", "24.3%", "36%", "29%")
+					CompareRow("Market cap", "$3.5T", "$3.4T", "$2.3T")
+				}
+			}
+			Text(
+				"Cultural context only, not financial advice.",
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 10.sp),
+				color = Muted,
+			)
+		}
+	}
+}
+
+@Composable
+private fun CompareRow(label: String, a: String, m: String, g: String, header: Boolean = false, valueColor: Color? = null) {
+	Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth().height(20.dp)) {
+		Text(
+			label,
+			style = TextStyle(fontFamily = Geist, fontSize = 11.sp),
+			color = Muted,
+			modifier = Modifier.weight(1f),
+		)
+		Text(
+			a,
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 11.sp),
+			color = valueColor ?: Bright,
+			textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+			modifier = Modifier.weight(1f),
+		)
+		Text(
+			m,
+			style = TextStyle(fontFamily = Geist, fontWeight = if (header) FontWeight.Medium else FontWeight.Normal, fontSize = 11.sp),
+			color = valueColor ?: Bright,
+			textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+			modifier = Modifier.weight(1f),
+		)
+		Text(
+			g,
+			style = TextStyle(fontFamily = Geist, fontWeight = if (header) FontWeight.Medium else FontWeight.Normal, fontSize = 11.sp),
+			color = valueColor ?: Bright,
+			textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+			modifier = Modifier.weight(1f),
+		)
+	}
 }

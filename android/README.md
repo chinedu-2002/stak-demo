@@ -62,6 +62,13 @@ platform rule; iOS uses PascalCase.
 | 03 · News detail | `NewsDetailScreen` | 1:1495 |
 | 03 · News save success | `NewsDetailScreen` (sheet) | 101:1005 |
 | 03 · News detail saved | `NewsDetailScreen` (saved) | 1:1359 |
+| 04 · Discover deck | `DiscoverScreen` | 1:1627 |
+| 04 · Practice buy / filled | `PracticeBuySheet` / `OrderFilledSheet` | 1:1970, 85:1205 |
+| 04 · Deck complete | `DiscoverScreen` (EndOfDeck) | 1:2330 |
+| 04 · Stock Detail | `StockDetailScreen` | 1:2382, 1:2579 |
+| 06 · My STAK overview | `MyStakScreen` | 1:3155 |
+| 06 · Collection | `CollectionScreen` | 1:3333 |
+| 06 · Saved detail | `StockDetailScreen` (fromMyStak) | 16:1012 |
 
 Flow: splash → sign up (⇄ sign in) → 01 → … → 07 → 08 → 09 → Home
 first run → (See Todays Pick) → Home Main; sign-in goes straight to

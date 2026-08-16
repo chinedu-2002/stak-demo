@@ -29,6 +29,7 @@ import com.stak.demo.ui.home.HomeScreen
 import com.stak.demo.ui.mystak.CollectionScreen
 import com.stak.demo.ui.mystak.MyStakScreen
 import com.stak.demo.ui.news.NewsDetailScreen
+import com.stak.demo.ui.profile.ProfileScreen
 import com.stak.demo.ui.news.NewsScreen
 import com.stak.demo.ui.onboarding.CreateAccountScreen
 import com.stak.demo.ui.onboarding.SplashScreen
@@ -265,6 +266,7 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
 				onOpenArticle = { navController.navigate(StakRoutes.NEWS_DETAIL) },
 				onOpenStock = { navController.navigate(StakRoutes.stockDetail("AAPL")) },
 				onOpenCollection = { navController.navigate(StakRoutes.COLLECTION) },
+				onOpenProfile = { navController.navigate(StakRoutes.PROFILE) },
 			)
 		}
 		composable(StakRoutes.STOCK_DETAIL) {
@@ -279,6 +281,9 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
 		composable(StakRoutes.MYSTAK_STOCK) {
 			StockDetailScreen(onBack = { navController.popBackStack() }, fromMyStak = true)
 		}
+		composable(StakRoutes.PROFILE) {
+			ProfileScreen(onBack = { navController.popBackStack() })
+		}
 		composable(StakRoutes.NEWS_DETAIL) {
 			NewsDetailScreen(onBack = { navController.popBackStack() })
 		}
@@ -291,7 +296,12 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
  * Tab switches are the prototype's "Swap overlay · Instant".
  */
 @Composable
-private fun MainShell(onOpenArticle: () -> Unit, onOpenStock: () -> Unit, onOpenCollection: () -> Unit) {
+private fun MainShell(
+	onOpenArticle: () -> Unit,
+	onOpenStock: () -> Unit,
+	onOpenCollection: () -> Unit,
+	onOpenProfile: () -> Unit,
+) {
 	var tab by rememberSaveable { mutableStateOf(MainTab.Home) }
 	var homeFirstRun by rememberSaveable { mutableStateOf(true) }
 	Column(modifier = Modifier.fillMaxSize()) {
@@ -300,6 +310,7 @@ private fun MainShell(onOpenArticle: () -> Unit, onOpenStock: () -> Unit, onOpen
 				MainTab.Home -> HomeScreen(
 					firstRun = homeFirstRun,
 					onSeeTodaysPick = { homeFirstRun = false },
+					onProfile = onOpenProfile,
 				)
 				MainTab.News -> NewsScreen(onOpenArticle = onOpenArticle)
 				MainTab.Discover -> DiscoverScreen(onLearnMore = onOpenStock)

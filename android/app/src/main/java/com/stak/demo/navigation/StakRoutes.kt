@@ -21,6 +21,7 @@ object StakRoutes {
 	const val NEWS_DETAIL = "news/detail"
 	const val COLLECTION = "mystak/collection"
 	const val MYSTAK_STOCK = "mystak/stock"
+	const val PROFILE = "profile"
 
 	const val STOCK_DETAIL = "stock/{symbol}"
 	fun stockDetail(symbol: String) = "stock/$symbol"

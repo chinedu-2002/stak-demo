@@ -144,8 +144,8 @@ struct DiscoverView: View {
 						// Deck — three stacked gradient cards, front one drags down.
 						ZStack(alignment: .topLeading) {
 							let order = [deck[(seen + 2) % 3], deck[(seen + 1) % 3], deck[seen % 3]]
-							BackDeckCard(card: order[0], scale: 251.81 / 350, rotation: 4.03, offsetX: 0.29, offsetY: -53.85)
-							BackDeckCard(card: order[1], scale: 299.51 / 350, rotation: -2.33, offsetX: -0.58, offsetY: -2.0)
+							BackDeckCard(card: order[0], scale: 251.81 / 350, rotation: 4.03, offsetX: 0.29, offsetY: -53.85, authoredHeight: 444.4)
+							BackDeckCard(card: order[1], scale: 299.51 / 350, rotation: -2.33, offsetX: -0.58, offsetY: 1.4, authoredHeight: 398.5)
 							DeckCardBody(card: order[2], onSave: { savedToast = true })
 								.frame(width: 350)
 								.frame(maxWidth: .infinity)
@@ -269,10 +269,11 @@ private struct BackDeckCard: View {
 	let rotation: Double
 	let offsetX: CGFloat
 	let offsetY: CGFloat
+	let authoredHeight: CGFloat
 
 	var body: some View {
 		DeckCardBody(card: card, onSave: nil)
-			.frame(width: 350, height: 444.4, alignment: .top)
+			.frame(width: 350, height: authoredHeight, alignment: .top)
 			.scaleEffect(scale)
 			.rotationEffect(.degrees(rotation))
 			.offset(x: offsetX, y: offsetY)
@@ -295,8 +296,8 @@ private struct DeckCardBody: View {
 					// NVDA's chip is baked into its art; the others draw it live —
 					// on the back cards as well, as the frame shows.
 					SaveChip()
-						.padding(.top, 6)
-						.padding(.trailing, 10)
+						.padding(.top, 5)
+						.padding(.trailing, 2.8)
 				}
 				if let onSave {
 					Button(action: onSave) {

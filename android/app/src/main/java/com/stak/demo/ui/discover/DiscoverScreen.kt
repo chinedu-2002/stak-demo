@@ -209,13 +209,15 @@ fun DiscoverScreen(onLearnMore: () -> Unit = {}) {
 					onSwipeAgain = { seen = 0 },
 				)
 			} else {
-			// Deck — three stacked gradient cards, front one drags down.
+			// Deck — a fixed composition: every dimension scales by the 390dp
+			// artboard unit so proportions match the frame on any device.
+			val u = com.stak.demo.ui.onboarding.figmaUnit()
 			Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f).fillMaxWidth()) {
 				Box(
 					modifier = Modifier
-						.padding(horizontal = 20.dp)
+						.padding(horizontal = (20 * u).dp)
 						.fillMaxWidth()
-						.height(484.65.dp)
+						.height((484.65 * u).dp)
 						.pointerInput(seen) {
 							detectVerticalDragGestures(
 								onDragEnd = {
@@ -239,14 +241,15 @@ fun DiscoverScreen(onLearnMore: () -> Unit = {}) {
 						},
 				) {
 					val order = listOf(DECK[(seen + 2) % 3], DECK[(seen + 1) % 3], DECK[seen % 3])
-					BackDeckCard(order[0], scale = 251.81f / 350f, rotation = 4.03f, offsetX = 0.29.dp, offsetY = (-53.85).dp)
-					BackDeckCard(order[1], scale = 299.51f / 350f, rotation = -2.33f, offsetX = (-0.58).dp, offsetY = (-2.0).dp)
+					BackDeckCard(order[0], scale = 251.81f / 350f, rotation = 4.03f, offsetX = (0.29 * u).dp, offsetY = (-53.85 * u).dp, u = u)
+					BackDeckCard(order[1], scale = 299.51f / 350f, rotation = -2.33f, offsetX = (-0.58 * u).dp, offsetY = (-2.0 * u).dp, u = u)
 					FrontDeckCard(
 						card = order[2],
 						onSave = { savedToast = true },
+					u = u,
 						modifier = Modifier
 							.align(Alignment.TopCenter)
-							.offset(y = 54.65.dp)
+							.offset(y = (54.65 * u).dp)
 							.offset { androidx.compose.ui.unit.IntOffset(0, topOffset.value.roundToInt()) }
 							.clickable(
 								interactionSource = remember { MutableInteractionSource() },
@@ -346,7 +349,7 @@ fun DiscoverScreen(onLearnMore: () -> Unit = {}) {
 
 /** One of the two tilted back cards, drawn at its designed scale. */
 @Composable
-private fun BoxScope.BackDeckCard(card: DeckCard, scale: Float, rotation: Float, offsetX: Dp, offsetY: Dp) {
+private fun BoxScope.BackDeckCard(card: DeckCard, scale: Float, rotation: Float, offsetX: Dp, offsetY: Dp, u: Float) {
 	// The card composable is authored at the 350x444.4 front size and
 	// scaled down; the offsets place the rotated bounds so the card tops
 	// peek exactly as in the frame (GOOGL at deck-y 0, AAPL at 24.2).
@@ -354,59 +357,59 @@ private fun BoxScope.BackDeckCard(card: DeckCard, scale: Float, rotation: Float,
 		modifier = Modifier
 			.align(Alignment.TopStart)
 			.offset(x = offsetX, y = offsetY)
-			.size(350.dp, 444.4.dp)
+			.size((350 * u).dp, (444.4 * u).dp)
 			.graphicsLayer {
 				scaleX = scale
 				scaleY = scale
 				rotationZ = rotation
 			},
 	) {
-		DeckCardBody(card = card, onSave = null)
+		DeckCardBody(card = card, onSave = null, u = u)
 	}
 }
 
 /** The full-size front card (350 wide) with its live Save chip. */
 @Composable
-private fun FrontDeckCard(card: DeckCard, onSave: () -> Unit, modifier: Modifier = Modifier) {
-	Box(modifier = modifier.width(350.dp)) {
-		DeckCardBody(card = card, onSave = onSave)
+private fun FrontDeckCard(card: DeckCard, onSave: () -> Unit, u: Float, modifier: Modifier = Modifier) {
+	Box(modifier = modifier.width((350 * u).dp)) {
+		DeckCardBody(card = card, onSave = onSave, u = u)
 	}
 }
 
 @Composable
-private fun DeckCardBody(card: DeckCard, onSave: (() -> Unit)?) {
+private fun DeckCardBody(card: DeckCard, onSave: (() -> Unit)?, u: Float) {
 	Column(
 		horizontalAlignment = Alignment.CenterHorizontally,
-		verticalArrangement = Arrangement.spacedBy(25.dp),
+		verticalArrangement = Arrangement.spacedBy((25 * u).dp),
 		modifier = Modifier
 			.fillMaxWidth()
-			.clip(RoundedCornerShape(22.dp))
+			.clip(RoundedCornerShape((22 * u).dp))
 			.background(Brush.verticalGradient(0f to card.cardTop, 1f to Color(0xFF0C1526)))
-			.padding(vertical = 4.dp),
+			.padding(vertical = (4 * u).dp),
 	) {
 		Box(
 			modifier = Modifier
-				.size(340.dp, 229.dp)
-				.clip(RoundedCornerShape(18.dp))
+				.size((340 * u).dp, (229 * u).dp)
+				.clip(RoundedCornerShape((18 * u).dp))
 				.background(card.artBg),
 		) {
 			Image(
 				painter = painterResource(card.artRes),
 				contentDescription = null,
 				contentScale = ContentScale.FillBounds,
-				modifier = Modifier.size(340.dp, 229.dp),
+				modifier = Modifier.size((340 * u).dp, (229 * u).dp),
 			)
 			if (card.artRes != R.drawable.disc_card_nvda) {
 				// NVDA's chip is baked into its art; the others draw it live —
 				// on the back cards as well, as the frame shows.
-				SaveChip(modifier = Modifier.align(Alignment.TopEnd).padding(top = 6.dp, end = 10.dp))
+				SaveChip(u = u, modifier = Modifier.align(Alignment.TopEnd).padding(top = (6 * u).dp, end = (10 * u).dp))
 			}
 			if (onSave != null) {
 				Box(
 					modifier = Modifier
 						.align(Alignment.TopEnd)
-						.padding(top = 2.dp, end = 6.dp)
-						.size(86.dp, 38.dp)
+						.padding(top = (2 * u).dp, end = (6 * u).dp)
+						.size((86 * u).dp, (38 * u).dp)
 						.clickable(
 							interactionSource = remember { MutableInteractionSource() },
 							indication = null,
@@ -416,51 +419,51 @@ private fun DeckCardBody(card: DeckCard, onSave: (() -> Unit)?) {
 			}
 		}
 		Column(
-			verticalArrangement = Arrangement.spacedBy(19.dp),
-			modifier = Modifier.fillMaxWidth().padding(horizontal = 18.dp).padding(bottom = 16.dp),
+			verticalArrangement = Arrangement.spacedBy((19 * u).dp),
+			modifier = Modifier.fillMaxWidth().padding(horizontal = (18 * u).dp).padding(bottom = (16 * u).dp),
 		) {
-			Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+			Column(verticalArrangement = Arrangement.spacedBy((8 * u).dp)) {
 				Text(
 					text = card.ticker,
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 10.sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (10 * u).sp),
 					color = Disc.Muted,
 				)
 				Text(
 					text = card.headline,
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 16.sp, lineHeight = 23.sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (16 * u).sp, lineHeight = (23 * u).sp),
 					color = Color.White,
 				)
-				Row(verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(9.dp)) {
+				Row(verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy((9 * u).dp)) {
 					Text(
 						text = card.price,
-						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 20.sp),
+						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (20 * u).sp),
 						color = Color.White,
 					)
 					Text(
 						text = card.change,
-						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 11.sp),
+						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (11 * u).sp),
 						color = Disc.Green,
-						modifier = Modifier.padding(bottom = 2.dp),
+						modifier = Modifier.padding(bottom = (2 * u).dp),
 					)
 				}
 			}
 			Row(
 				verticalAlignment = Alignment.CenterVertically,
-				horizontalArrangement = Arrangement.spacedBy(8.dp),
+				horizontalArrangement = Arrangement.spacedBy((8 * u).dp),
 				modifier = Modifier
 					.fillMaxWidth()
-					.clip(RoundedCornerShape(10.dp))
+					.clip(RoundedCornerShape((10 * u).dp))
 					.background(Disc.TipBg)
-					.padding(horizontal = 12.dp, vertical = 9.dp),
+					.padding(horizontal = (12 * u).dp, vertical = (9 * u).dp),
 			) {
 				Text(
 					text = "TIP",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 10.sp, letterSpacing = 0.9.sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, letterSpacing = (0.9 * u).sp),
 					color = Disc.Teal,
 				)
 				Text(
 					text = card.tip,
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 11.sp, lineHeight = 15.sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp, lineHeight = (15 * u).sp),
 					color = Disc.Body,
 					modifier = Modifier.weight(1f),
 				)
@@ -471,21 +474,21 @@ private fun DeckCardBody(card: DeckCard, onSave: (() -> Unit)?) {
 
 /** rgba(255,255,255,0.09) Save pill with the small bookmark. */
 @Composable
-private fun SaveChip(modifier: Modifier = Modifier) {
+private fun SaveChip(u: Float, modifier: Modifier = Modifier) {
 	Row(
 		verticalAlignment = Alignment.CenterVertically,
-		horizontalArrangement = Arrangement.spacedBy(6.dp),
+		horizontalArrangement = Arrangement.spacedBy((6 * u).dp),
 		modifier = modifier
-			.clip(RoundedCornerShape(16.dp))
+			.clip(RoundedCornerShape((16 * u).dp))
 			.background(Disc.SaveChipBg)
-			.padding(horizontal = 13.dp, vertical = 7.dp),
+			.padding(horizontal = (13 * u).dp, vertical = (7 * u).dp),
 	) {
 		Text(
 			text = "Save",
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 12.sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp),
 			color = Color.White,
 		)
-		Image(painterResource(R.drawable.ic_saved_bookmark), null, modifier = Modifier.size(12.dp))
+		Image(painterResource(R.drawable.ic_hero_bookmark), null, modifier = Modifier.size((12 * u).dp))
 	}
 }
 

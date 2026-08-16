@@ -18,7 +18,7 @@ enum MainTab: String, CaseIterable, Identifiable {
 		case .news: return "IcTabNewsActive"
 		case .discover: return "TabDiscoverActive"
 		case .myStak: return "IcTabMystakActive"
-		case .simulate: return "IcTabSimulate"
+		case .simulate: return "TabSimulateActive"
 		}
 	}
 
@@ -33,9 +33,8 @@ enum MainTab: String, CaseIterable, Identifiable {
 		}
 	}
 
-	/// Simulate's screen isn't built — its tab renders but doesn't switch.
 	var built: Bool {
-		self != .simulate
+		true
 	}
 }
 

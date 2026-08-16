@@ -6,6 +6,9 @@ private enum PushedPage: Identifiable, Equatable {
 	case stockDetail(fromMyStak: Bool)
 	case collection
 	case profile
+	case simPortfolio
+	case simPick
+	case leaderboard
 
 	var id: String {
 		switch self {
@@ -13,6 +16,9 @@ private enum PushedPage: Identifiable, Equatable {
 		case .stockDetail(let fromMyStak): return "stockDetail-\(fromMyStak)"
 		case .collection: return "collection"
 		case .profile: return "profile"
+		case .simPortfolio: return "simPortfolio"
+		case .simPick: return "simPick"
+		case .leaderboard: return "leaderboard"
 		}
 	}
 }
@@ -20,8 +26,9 @@ private enum PushedPage: Identifiable, Equatable {
 /// The bottom-tab shell — mirrors android/ MainShell (StakNavHost.kt).
 /// The bar hides while Home is in its first-run state (the scrim + pill
 /// own the bottom). Tab switches are the prototype's "Swap overlay ·
-/// Instant"; pushed pages (article, stock detail, collection, profile)
-/// slide in with the house Push Right. Simulate awaits its port.
+/// Instant"; pushed pages (article, stock detail, collection, profile,
+/// the Simulate portfolio/pick/leaderboard) slide in with the house
+/// Push Right.
 struct MainTabsView: View {
 	@State private var tab = MainTab.home
 	@State private var homeFirstRun = true
@@ -82,6 +89,15 @@ struct MainTabsView: View {
 			)
 		case .profile:
 			ProfileView(onBack: { pop() })
+		case .simPortfolio:
+			SimPortfolioView(
+				onBack: { pop() },
+				onOpenPick: { push(.simPick) }
+			)
+		case .simPick:
+			PickDetailView(onBack: { pop() })
+		case .leaderboard:
+			LeaderboardView(onBack: { pop() })
 		}
 	}
 

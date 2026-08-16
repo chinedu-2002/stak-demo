@@ -56,9 +56,12 @@ platform rule; iOS uses PascalCase.
 | 09 Profile setup | `ProfileSetupScreen` | 1:793 |
 | Auth · Sign up | `CreateAccountScreen` | 1:830 |
 | Auth · Sign in | `SignInScreen` | 1:879 |
+| 02 · Home first run | `HomeScreen` (firstRun) | 1:958 |
+| 02 · Home Main | `HomeScreen` | 1:1097 |
 
-Flow: splash → sign up (⇄ sign in) → 01 → … → 07 → 08 → 09 → tab shell
-(sign-in goes straight to the shell). The splash auto-advances to sign
+Flow: splash → sign up (⇄ sign in) → 01 → … → 07 → 08 → 09 → Home
+first run → (See Todays Pick) → Home Main; sign-in goes straight to
+Home first run. The splash auto-advances to sign
 up after 1200ms with a 350ms ease-out dissolve, per the file's
 prototype wiring. `MainTabsShell` is the phase-3 placeholder with the
 real Figma tab bar (`StakTabBar`).

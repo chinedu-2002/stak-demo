@@ -49,3 +49,18 @@ val Geist = FontFamily(
 	geist(FontWeight.SemiBold),
 	geist(FontWeight.Bold),
 )
+
+@OptIn(ExperimentalTextApi::class)
+private fun inter(weight: FontWeight) = Font(
+	R.font.inter_variable,
+	weight = weight,
+	style = FontStyle.Normal,
+	variationSettings = FontVariation.Settings(FontVariation.weight(weight.weight)),
+)
+
+/** Inter — the CHINEDU tab-bar label face (Home tab bar, node 1:1220). */
+@OptIn(ExperimentalTextApi::class)
+val Inter = FontFamily(
+	inter(FontWeight.Normal),
+	inter(FontWeight.Medium),
+)

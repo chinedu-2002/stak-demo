@@ -7,25 +7,12 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.navigation.navArgument
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.stak.demo.ui.components.StakTab
-import com.stak.demo.ui.components.StakTabBar
+import com.stak.demo.ui.home.HomeScreen
 import com.stak.demo.ui.onboarding.CreateAccountScreen
 import com.stak.demo.ui.onboarding.SplashScreen
 import com.stak.demo.ui.onboarding.SignInScreen
@@ -38,7 +25,6 @@ import com.stak.demo.ui.onboarding.PermissionsScreen
 import com.stak.demo.ui.onboarding.PreparingDeckScreen
 import com.stak.demo.ui.onboarding.ProfileSetupScreen
 import com.stak.demo.ui.onboarding.TasteRevealScreen
-import com.stak.demo.ui.theme.StakColors
 
 /**
  * Root of the app: splash → auth → onboarding → the bottom-tab shell.
@@ -257,24 +243,6 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
 					null
 				}
 			},
-		) { MainTabsShell() }
-	}
-}
-
-/** Bottom-tab shell. Tab screens land here in the next build phase. */
-@Composable
-fun MainTabsShell() {
-	var tab by rememberSaveable { mutableStateOf(StakTab.Home) }
-	Scaffold(
-		containerColor = StakColors.Bg,
-		bottomBar = { StakTabBar(selected = tab, onSelect = { tab = it }) },
-	) { padding ->
-		Box(
-			modifier = Modifier.fillMaxSize().padding(padding),
-			contentAlignment = Alignment.Center,
-		) {
-			// Placeholder until the tab screens are implemented (phase 3).
-			Text(text = tab.label, color = Color.White)
-		}
+		) { HomeScreen() }
 	}
 }

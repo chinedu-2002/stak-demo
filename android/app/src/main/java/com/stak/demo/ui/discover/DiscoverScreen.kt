@@ -96,6 +96,22 @@ private val CtaGradient = Brush.verticalGradient(
 )
 private val CtaBorder = Color(0xA1659EAD)
 
+/** A practice-buy ticket's stock values (Buy NVDA? 1:2159 / Buy AAPL? 1:3423). */
+internal data class BuySpec(
+	val title: String,
+	val badge: String,
+	val name: String,
+	val priceLine: String,
+	val change: String,
+	val cashBefore: String,
+	val cashAfter: String,
+	val shares: String,
+	val symbol: String,
+)
+
+internal val NVDA_BUY = BuySpec("Buy NVDA?", "N", "NVIDIA Corp", "$122.10 today", "\u25b2 2.4%", "$8,800.00", "$8,775.00", "0.2048", "NVDA")
+internal val AAPL_BUY = BuySpec("Buy AAPL?", "A", "Apple", "$229.35 today", "\u25b2 1.2%", "$8,800.00", "$8,775.00", "0.1090", "AAPL")
+
 /** One deck card's designed content (art + copy at the front-card scale). */
 private data class DeckCard(
 	val artRes: Int,
@@ -517,7 +533,7 @@ private fun SheetScaffold(onDismiss: () -> Unit, content: @Composable () -> Unit
 
 /** NVDA row used by both sheets — teal-tinted, badge + price + change. */
 @Composable
-private fun NvdaStockRow() {
+private fun NvdaStockRow(spec: BuySpec = NVDA_BUY) {
 	Row(
 		verticalAlignment = Alignment.CenterVertically,
 		horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -529,25 +545,25 @@ private fun NvdaStockRow() {
 	) {
 		Box(contentAlignment = Alignment.Center, modifier = Modifier.size(38.dp).background(Disc.ChipBg, CircleShape)) {
 			Text(
-				text = "N",
+				text = spec.badge,
 				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 15.sp),
 				color = Disc.BadgeInk,
 			)
 		}
 		Column(verticalArrangement = Arrangement.spacedBy(2.dp), modifier = Modifier.weight(1f)) {
 			Text(
-				text = "NVIDIA Corp",
+				text = spec.name,
 				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 13.sp),
 				color = Color.White,
 			)
 			Text(
-				text = "$122.10 today",
+				text = spec.priceLine,
 				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 10.sp),
 				color = Disc.Muted,
 			)
 		}
 		Text(
-			text = "▲ 2.4%",
+			text = spec.change,
 			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 12.sp),
 			color = Disc.Green,
 		)
@@ -601,16 +617,16 @@ private fun SheetSecondary(text: String, onClick: () -> Unit) {
 
 /** "Buy NVDA?" practice ticket (frame 1:1970, sheet 1:2159). */
 @Composable
-private fun PracticeBuySheet(onConfirm: () -> Unit, onDismiss: () -> Unit) {
+private fun PracticeBuySheet(onConfirm: () -> Unit, onDismiss: () -> Unit, spec: BuySpec = NVDA_BUY) {
 	var selected by rememberSaveable { mutableIntStateOf(1) }
 	SheetScaffold(onDismiss = onDismiss) {
 		Column(verticalArrangement = Arrangement.spacedBy(14.dp), modifier = Modifier.fillMaxWidth()) {
 			Text(
-				text = "Buy NVDA?",
+				text = spec.title,
 				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 18.sp),
 				color = Color.White,
 			)
-			NvdaStockRow()
+			NvdaStockRow(spec)
 			Text(
 				text = "Your paper stake starts at today’s price and tracks the real move live, in either direction.",
 				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 12.sp, lineHeight = 18.sp),
@@ -624,7 +640,7 @@ private fun PracticeBuySheet(onConfirm: () -> Unit, onDismiss: () -> Unit) {
 						color = Disc.Muted,
 					)
 					Text(
-						text = "$8,800.00",
+						text = spec.cashBefore,
 						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 12.sp),
 						color = Disc.BrightInk,
 					)
@@ -670,12 +686,12 @@ private fun PracticeBuySheet(onConfirm: () -> Unit, onDismiss: () -> Unit) {
 					color = Disc.Muted,
 				)
 				Text(
-					text = "0.2048",
+					text = spec.shares,
 					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 15.sp),
 					color = Disc.BrightInk,
 				)
 				Text(
-					text = "shares of NVDA",
+					text = "shares of ${spec.symbol}",
 					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 12.sp),
 					color = Disc.Muted,
 				)
@@ -690,7 +706,7 @@ private fun PracticeBuySheet(onConfirm: () -> Unit, onDismiss: () -> Unit) {
 
 /** "Order filled" sheet (frame 85:1205, sheet 85:1394). */
 @Composable
-private fun OrderFilledSheet(onDismiss: () -> Unit) {
+private fun OrderFilledSheet(onDismiss: () -> Unit, spec: BuySpec = NVDA_BUY) {
 	SheetScaffold(onDismiss = onDismiss) {
 		Column(
 			horizontalAlignment = Alignment.CenterHorizontally,
@@ -703,7 +719,7 @@ private fun OrderFilledSheet(onDismiss: () -> Unit) {
 				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 18.sp),
 				color = Color.White,
 			)
-			NvdaStockRow()
+			NvdaStockRow(spec)
 			Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth()) {
 				Text(
 					text = "Cash available",
@@ -711,7 +727,7 @@ private fun OrderFilledSheet(onDismiss: () -> Unit) {
 					color = Disc.Muted,
 				)
 				Text(
-					text = "$8,775.00",
+					text = spec.cashAfter,
 					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 12.sp),
 					color = Disc.BrightInk,
 				)
@@ -727,12 +743,12 @@ private fun OrderFilledSheet(onDismiss: () -> Unit) {
 					color = Disc.Muted,
 				)
 				Text(
-					text = "0.2048",
+					text = spec.shares,
 					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 15.sp),
 					color = Disc.BrightInk,
 				)
 				Text(
-					text = "shares of NVDA",
+					text = "shares of ${spec.symbol}",
 					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 12.sp),
 					color = Disc.Muted,
 				)
@@ -861,11 +877,11 @@ private fun EndOfDeck(onPracticeBuySaves: () -> Unit, onSwipeAgain: () -> Unit) 
 
 /** Buy → Order-filled flow, reused by the Stock Detail page. */
 @Composable
-internal fun DiscoverBuyFlow(onClose: () -> Unit) {
+internal fun DiscoverBuyFlow(onClose: () -> Unit, spec: BuySpec = NVDA_BUY) {
 	var filled by rememberSaveable { mutableStateOf(false) }
 	if (!filled) {
-		PracticeBuySheet(onConfirm = { filled = true }, onDismiss = onClose)
+		PracticeBuySheet(onConfirm = { filled = true }, onDismiss = onClose, spec = spec)
 	} else {
-		OrderFilledSheet(onDismiss = onClose)
+		OrderFilledSheet(onDismiss = onClose, spec = spec)
 	}
 }

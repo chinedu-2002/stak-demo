@@ -26,6 +26,8 @@ import com.stak.demo.ui.components.MainTabBar
 import com.stak.demo.ui.discover.DiscoverScreen
 import com.stak.demo.ui.discover.StockDetailScreen
 import com.stak.demo.ui.home.HomeScreen
+import com.stak.demo.ui.mystak.CollectionScreen
+import com.stak.demo.ui.mystak.MyStakScreen
 import com.stak.demo.ui.news.NewsDetailScreen
 import com.stak.demo.ui.news.NewsScreen
 import com.stak.demo.ui.onboarding.CreateAccountScreen
@@ -262,10 +264,20 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
 			MainShell(
 				onOpenArticle = { navController.navigate(StakRoutes.NEWS_DETAIL) },
 				onOpenStock = { navController.navigate(StakRoutes.stockDetail("AAPL")) },
+				onOpenCollection = { navController.navigate(StakRoutes.COLLECTION) },
 			)
 		}
 		composable(StakRoutes.STOCK_DETAIL) {
 			StockDetailScreen(onBack = { navController.popBackStack() })
+		}
+		composable(StakRoutes.COLLECTION) {
+			CollectionScreen(
+				onBack = { navController.popBackStack() },
+				onOpenStock = { navController.navigate(StakRoutes.MYSTAK_STOCK) },
+			)
+		}
+		composable(StakRoutes.MYSTAK_STOCK) {
+			StockDetailScreen(onBack = { navController.popBackStack() }, fromMyStak = true)
 		}
 		composable(StakRoutes.NEWS_DETAIL) {
 			NewsDetailScreen(onBack = { navController.popBackStack() })
@@ -279,7 +291,7 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
  * Tab switches are the prototype's "Swap overlay · Instant".
  */
 @Composable
-private fun MainShell(onOpenArticle: () -> Unit, onOpenStock: () -> Unit) {
+private fun MainShell(onOpenArticle: () -> Unit, onOpenStock: () -> Unit, onOpenCollection: () -> Unit) {
 	var tab by rememberSaveable { mutableStateOf(MainTab.Home) }
 	var homeFirstRun by rememberSaveable { mutableStateOf(true) }
 	Column(modifier = Modifier.fillMaxSize()) {
@@ -291,6 +303,10 @@ private fun MainShell(onOpenArticle: () -> Unit, onOpenStock: () -> Unit) {
 				)
 				MainTab.News -> NewsScreen(onOpenArticle = onOpenArticle)
 				MainTab.Discover -> DiscoverScreen(onLearnMore = onOpenStock)
+				MainTab.MySTAK -> MyStakScreen(
+					onOpenCollection = onOpenCollection,
+					onStartSwiping = { tab = MainTab.Discover },
+				)
 				else -> HomeScreen(firstRun = false, onSeeTodaysPick = {})
 			}
 		}

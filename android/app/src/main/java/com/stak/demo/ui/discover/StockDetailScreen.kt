@@ -62,8 +62,8 @@ private val Teal = Color(0xFF69B3CA)
  * sheet and flips the CTA area to the saved state.
  */
 @Composable
-fun StockDetailScreen(onBack: () -> Unit) {
-	var saved by rememberSaveable { mutableStateOf(false) }
+fun StockDetailScreen(onBack: () -> Unit, fromMyStak: Boolean = false) {
+	var saved by rememberSaveable { mutableStateOf(fromMyStak) }
 	var showSuccess by rememberSaveable { mutableStateOf(false) }
 	var showBuy by rememberSaveable { mutableStateOf(false) }
 
@@ -146,6 +146,9 @@ fun StockDetailScreen(onBack: () -> Unit) {
 					verticalArrangement = Arrangement.spacedBy(14.dp),
 					modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 12.dp),
 				) {
+					if (fromMyStak) {
+						SinceYouSavedCard()
+					}
 					RiskFitCard()
 					NumbersCard()
 					AnalystCard()
@@ -176,7 +179,10 @@ fun StockDetailScreen(onBack: () -> Unit) {
 					verticalArrangement = Arrangement.spacedBy(10.dp),
 					modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp).padding(top = 4.dp, bottom = 16.dp),
 				) {
-					if (saved) {
+					if (fromMyStak) {
+						DetailCta("Practice buy") { showBuy = true }
+						DetailSecondary("Unsave") { onBack() }
+					} else if (saved) {
 						Box(
 							contentAlignment = Alignment.Center,
 							modifier = Modifier
@@ -193,10 +199,11 @@ fun StockDetailScreen(onBack: () -> Unit) {
 								)
 							}
 						}
+						DetailSecondary("Practice buy") { showBuy = true }
 					} else {
 						DetailCta("Save") { showSuccess = true }
+						DetailSecondary("Practice buy") { showBuy = true }
 					}
-					DetailSecondary("Practice buy") { showBuy = true }
 				}
 			}
 		}
@@ -507,7 +514,7 @@ private fun DetailSavedSheet(onDone: () -> Unit) {
 /** The practice-buy ticket reused from the deck (public host wrapper). */
 @Composable
 private fun DetailBuyHost(onClose: () -> Unit) {
-	DiscoverBuyFlow(onClose = onClose)
+	DiscoverBuyFlow(onClose = onClose, spec = AAPL_BUY)
 }
 
 /** Kicker label — Geist Medium 10, tracking 0.8, muted. */
@@ -705,6 +712,39 @@ private fun CompareRow(label: String, a: String, m: String, g: String, header: B
 			color = valueColor ?: Bright,
 			textAlign = androidx.compose.ui.text.style.TextAlign.Center,
 			modifier = Modifier.weight(1f),
+		)
+	}
+}
+
+/** "SINCE YOU SAVED +4.6%" banner (16:1012) for the My STAK entry. */
+@Composable
+private fun SinceYouSavedCard() {
+	Column(
+		verticalArrangement = Arrangement.spacedBy(12.dp),
+		modifier = Modifier
+			.fillMaxWidth()
+			.clip(RoundedCornerShape(16.dp))
+			.background(Card)
+			.padding(16.dp),
+	) {
+		Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+			Image(painterResource(R.drawable.ic_saved_bookmark), null, modifier = Modifier.size(12.dp))
+			Text(
+				"SINCE YOU SAVED",
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 10.sp, letterSpacing = 0.8.sp),
+				color = Muted,
+			)
+			Spacer(modifier = Modifier.width(8.dp))
+			Text(
+				"+4.6%",
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 12.sp),
+				color = Green,
+			)
+		}
+		Text(
+			"Saved 5 weeks ago. AAPL is up 4.6% since, moving roughly with the market. Steady giants tend to.",
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 11.sp, lineHeight = 14.sp),
+			color = Muted,
 		)
 	}
 }

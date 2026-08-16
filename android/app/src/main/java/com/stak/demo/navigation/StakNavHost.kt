@@ -24,6 +24,7 @@ import androidx.navigation.compose.rememberNavController
 import com.stak.demo.ui.components.MainTab
 import com.stak.demo.ui.components.MainTabBar
 import com.stak.demo.ui.discover.DiscoverScreen
+import com.stak.demo.ui.discover.StockDetailScreen
 import com.stak.demo.ui.home.HomeScreen
 import com.stak.demo.ui.news.NewsDetailScreen
 import com.stak.demo.ui.news.NewsScreen
@@ -258,7 +259,13 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
 				}
 			},
 		) {
-			MainShell(onOpenArticle = { navController.navigate(StakRoutes.NEWS_DETAIL) })
+			MainShell(
+				onOpenArticle = { navController.navigate(StakRoutes.NEWS_DETAIL) },
+				onOpenStock = { navController.navigate(StakRoutes.stockDetail("AAPL")) },
+			)
+		}
+		composable(StakRoutes.STOCK_DETAIL) {
+			StockDetailScreen(onBack = { navController.popBackStack() })
 		}
 		composable(StakRoutes.NEWS_DETAIL) {
 			NewsDetailScreen(onBack = { navController.popBackStack() })
@@ -272,7 +279,7 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
  * Tab switches are the prototype's "Swap overlay · Instant".
  */
 @Composable
-private fun MainShell(onOpenArticle: () -> Unit) {
+private fun MainShell(onOpenArticle: () -> Unit, onOpenStock: () -> Unit) {
 	var tab by rememberSaveable { mutableStateOf(MainTab.Home) }
 	var homeFirstRun by rememberSaveable { mutableStateOf(true) }
 	Column(modifier = Modifier.fillMaxSize()) {
@@ -283,7 +290,7 @@ private fun MainShell(onOpenArticle: () -> Unit) {
 					onSeeTodaysPick = { homeFirstRun = false },
 				)
 				MainTab.News -> NewsScreen(onOpenArticle = onOpenArticle)
-				MainTab.Discover -> DiscoverScreen()
+				MainTab.Discover -> DiscoverScreen(onLearnMore = onOpenStock)
 				else -> HomeScreen(firstRun = false, onSeeTodaysPick = {})
 			}
 		}

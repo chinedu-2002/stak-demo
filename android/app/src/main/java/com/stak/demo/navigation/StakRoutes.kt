@@ -17,7 +17,8 @@ object StakRoutes {
 	const val CREATE_ACCOUNT = "onboarding/create-account"
 	const val PERMISSIONS = "onboarding/permissions"
 	const val PROFILE_SETUP = "onboarding/profile-setup"
-	const val MAIN = "main" // bottom-tab shell (Home/Discover/Watchlist/Simulate/Profile)
+	const val MAIN = "main" // bottom-tab shell (Home/News/Discover/My STAK/Simulate)
+	const val NEWS_DETAIL = "news/detail"
 
 	const val STOCK_DETAIL = "stock/{symbol}"
 	fun stockDetail(symbol: String) = "stock/$symbol"

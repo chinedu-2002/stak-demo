@@ -7,12 +7,25 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.navigation.navArgument
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.stak.demo.ui.components.MainTab
+import com.stak.demo.ui.components.MainTabBar
 import com.stak.demo.ui.home.HomeScreen
+import com.stak.demo.ui.news.NewsDetailScreen
+import com.stak.demo.ui.news.NewsScreen
 import com.stak.demo.ui.onboarding.CreateAccountScreen
 import com.stak.demo.ui.onboarding.SplashScreen
 import com.stak.demo.ui.onboarding.SignInScreen
@@ -243,6 +256,37 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
 					null
 				}
 			},
-		) { HomeScreen() }
+		) {
+			MainShell(onOpenArticle = { navController.navigate(StakRoutes.NEWS_DETAIL) })
+		}
+		composable(StakRoutes.NEWS_DETAIL) {
+			NewsDetailScreen(onBack = { navController.popBackStack() })
+		}
+	}
+}
+
+/**
+ * The bottom-tab shell — Home and News are built; the bar hides while
+ * Home is in its first-run state (the scrim + pill own the bottom).
+ * Tab switches are the prototype's "Swap overlay · Instant".
+ */
+@Composable
+private fun MainShell(onOpenArticle: () -> Unit) {
+	var tab by rememberSaveable { mutableStateOf(MainTab.Home) }
+	var homeFirstRun by rememberSaveable { mutableStateOf(true) }
+	Column(modifier = Modifier.fillMaxSize()) {
+		Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
+			when (tab) {
+				MainTab.Home -> HomeScreen(
+					firstRun = homeFirstRun,
+					onSeeTodaysPick = { homeFirstRun = false },
+				)
+				MainTab.News -> NewsScreen(onOpenArticle = onOpenArticle)
+				else -> HomeScreen(firstRun = false, onSeeTodaysPick = {})
+			}
+		}
+		if (!(tab == MainTab.Home && homeFirstRun)) {
+			MainTabBar(selected = tab, onSelect = { tab = it })
+		}
 	}
 }

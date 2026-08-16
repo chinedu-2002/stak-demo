@@ -31,7 +31,7 @@ enum class MainTab(val label: String, val activeIcon: Int, val inactiveIcon: Int
 	Home("Home", R.drawable.ic_tab_home, R.drawable.ic_tab_home_inactive, true),
 	News("News", R.drawable.ic_tab_news_active, R.drawable.ic_tab_news, true),
 	Discover("Discover", R.drawable.tab_discover_active, R.drawable.ic_tab_discover, true),
-	MySTAK("My STAK", R.drawable.ic_tab_mystak, R.drawable.ic_tab_mystak, false),
+	MySTAK("My STAK", R.drawable.ic_tab_mystak_active, R.drawable.ic_tab_mystak, true),
 	Simulate("Simulate", R.drawable.ic_tab_simulate, R.drawable.ic_tab_simulate, false),
 }
 

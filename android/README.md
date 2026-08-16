@@ -58,6 +58,10 @@ platform rule; iOS uses PascalCase.
 | Auth · Sign in | `SignInScreen` | 1:879 |
 | 02 · Home first run | `HomeScreen` (firstRun) | 1:958 |
 | 02 · Home Main | `HomeScreen` | 1:1097 |
+| 03 · News listing | `NewsScreen` | 1:1228 |
+| 03 · News detail | `NewsDetailScreen` | 1:1495 |
+| 03 · News save success | `NewsDetailScreen` (sheet) | 101:1005 |
+| 03 · News detail saved | `NewsDetailScreen` (saved) | 1:1359 |
 
 Flow: splash → sign up (⇄ sign in) → 01 → … → 07 → 08 → 09 → Home
 first run → (See Todays Pick) → Home Main; sign-in goes straight to

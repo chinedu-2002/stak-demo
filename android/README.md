@@ -69,6 +69,7 @@ platform rule; iOS uses PascalCase.
 | 06 · My STAK overview | `MyStakScreen` | 1:3155 |
 | 06 · Collection | `CollectionScreen` | 1:3333 |
 | 06 · Saved detail | `StockDetailScreen` (fromMyStak) | 16:1012 |
+| 05 · Profile hub | `ProfileScreen` | 171:995 |
 
 Flow: splash → sign up (⇄ sign in) → 01 → … → 07 → 08 → 09 → Home
 first run → (See Todays Pick) → Home Main; sign-in goes straight to

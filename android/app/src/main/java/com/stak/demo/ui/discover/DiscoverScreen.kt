@@ -163,6 +163,7 @@ fun DiscoverScreen(onLearnMore: () -> Unit = {}) {
 	val topOffset = remember(seen) { Animatable(0f) }
 	val scope = rememberCoroutineScope()
 	val density = LocalDensity.current
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
 
 	LaunchedEffect(savedToast) {
 		if (savedToast) {
@@ -175,34 +176,34 @@ fun DiscoverScreen(onLearnMore: () -> Unit = {}) {
 		Column(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
 			// Header — Discover + progress ring, kicker below.
 			Column(
-				verticalArrangement = Arrangement.spacedBy(5.dp),
-				modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp).padding(top = 10.dp),
+				verticalArrangement = Arrangement.spacedBy((5 * u).dp),
+				modifier = Modifier.fillMaxWidth().padding(horizontal = (20 * u).dp).padding(top = (10 * u).dp),
 			) {
 				Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
 					Text(
 						text = "Discover",
-						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 26.sp),
+						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (26 * u).sp),
 						color = Color.White,
 					)
 					Spacer(modifier = Modifier.weight(1f))
 					val count = (seen + 1).coerceAtMost(12)
-					Box(contentAlignment = Alignment.Center, modifier = Modifier.size(44.dp)) {
-						ProgressRing(progress = count / 12f)
+					Box(contentAlignment = Alignment.Center, modifier = Modifier.size((44 * u).dp)) {
+						ProgressRing(progress = count / 12f, u = u)
 						Text(
 							text = "$count/12",
-							style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = 11.sp),
+							style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp),
 							color = Color.White,
 						)
 					}
 				}
 				Text(
 					text = "TODAY · AI & CHIPS",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 10.sp, letterSpacing = 0.9.sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, letterSpacing = (0.9 * u).sp),
 					color = Disc.Faint,
-					modifier = Modifier.padding(horizontal = 2.dp),
+					modifier = Modifier.padding(horizontal = (2 * u).dp),
 				)
 			}
-			Spacer(modifier = Modifier.height(27.dp))
+			Spacer(modifier = Modifier.height((27 * u).dp))
 			if (seen >= 12) {
 				EndOfDeck(
 					onPracticeBuySaves = { showBuy = true },
@@ -211,7 +212,6 @@ fun DiscoverScreen(onLearnMore: () -> Unit = {}) {
 			} else {
 			// Deck — a fixed composition: every dimension scales by the 390dp
 			// artboard unit so proportions match the frame on any device.
-			val u = com.stak.demo.ui.onboarding.figmaUnit()
 			Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f).fillMaxWidth()) {
 				Box(
 					modifier = Modifier
@@ -258,29 +258,29 @@ fun DiscoverScreen(onLearnMore: () -> Unit = {}) {
 							),
 					)
 				}
-				Spacer(modifier = Modifier.height(10.dp))
+				Spacer(modifier = Modifier.height((10 * u).dp))
 				Column(
 					horizontalAlignment = Alignment.CenterHorizontally,
-					verticalArrangement = Arrangement.spacedBy(5.dp),
+					verticalArrangement = Arrangement.spacedBy((5 * u).dp),
 				) {
-					Column(verticalArrangement = Arrangement.spacedBy(1.dp), modifier = Modifier.alpha(0.5f)) {
-						GestureChevron()
-						GestureChevron()
+					Column(verticalArrangement = Arrangement.spacedBy((1 * u).dp), modifier = Modifier.alpha(0.5f)) {
+						GestureChevron(u)
+						GestureChevron(u)
 					}
 					Text(
 						text = "Swipe down",
-						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 10.sp),
+						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (10 * u).sp),
 						color = Disc.Faint,
 					)
 				}
-				Spacer(modifier = Modifier.height(19.dp))
-				Row(horizontalArrangement = Arrangement.spacedBy(36.dp)) {
+				Spacer(modifier = Modifier.height((19 * u).dp))
+				Row(horizontalArrangement = Arrangement.spacedBy((36 * u).dp)) {
 					Box(
 						contentAlignment = Alignment.Center,
 						modifier = Modifier
-							.size(120.dp, 52.dp)
-							.background(CtaGradient, RoundedCornerShape(6.dp))
-							.border(0.36.dp, CtaBorder, RoundedCornerShape(6.dp))
+							.size((120 * u).dp, (52 * u).dp)
+							.background(CtaGradient, RoundedCornerShape((6 * u).dp))
+							.border((0.36 * u).dp, CtaBorder, RoundedCornerShape((6 * u).dp))
 							.clickable(
 								interactionSource = remember { MutableInteractionSource() },
 								indication = null,
@@ -288,15 +288,15 @@ fun DiscoverScreen(onLearnMore: () -> Unit = {}) {
 					) {
 						Text(
 							text = "Practice buy",
-							style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 14.sp),
+							style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp),
 							color = Color.White,
 						)
 					}
 					Box(
 						contentAlignment = Alignment.Center,
 						modifier = Modifier
-							.size(120.dp, 52.dp)
-							.border(0.36.dp, Color(0x54343B4F), RoundedCornerShape(6.dp))
+							.size((120 * u).dp, (52 * u).dp)
+							.border((0.36 * u).dp, Color(0x54343B4F), RoundedCornerShape((6 * u).dp))
 							.clickable(
 								interactionSource = remember { MutableInteractionSource() },
 								indication = null,
@@ -305,12 +305,12 @@ fun DiscoverScreen(onLearnMore: () -> Unit = {}) {
 					) {
 						Text(
 							text = "Learn more",
-							style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = 12.sp),
+							style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp),
 							color = Disc.Muted,
 						)
 					}
 				}
-				Spacer(modifier = Modifier.height(19.dp))
+				Spacer(modifier = Modifier.height((19 * u).dp))
 			}
 			}
 		}
@@ -318,19 +318,19 @@ fun DiscoverScreen(onLearnMore: () -> Unit = {}) {
 		if (savedToast) {
 			Row(
 				verticalAlignment = Alignment.CenterVertically,
-				horizontalArrangement = Arrangement.spacedBy(6.dp),
+				horizontalArrangement = Arrangement.spacedBy((6 * u).dp),
 				modifier = Modifier
 					.align(Alignment.TopCenter)
 					.statusBarsPadding()
-					.padding(top = 78.dp)
-					.clip(RoundedCornerShape(19.5.dp))
+					.padding(top = (78 * u).dp)
+					.clip(RoundedCornerShape((19.5 * u).dp))
 					.background(Disc.ChipBg)
-					.padding(horizontal = 14.dp, vertical = 10.dp),
+					.padding(horizontal = (14 * u).dp, vertical = (10 * u).dp),
 			) {
-				Image(painterResource(R.drawable.ic_saved_bookmark), null, modifier = Modifier.size(12.dp))
+				Image(painterResource(R.drawable.ic_saved_bookmark), null, modifier = Modifier.size((12 * u).dp))
 				Text(
 					text = "Saved to My STAK",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 12.sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp),
 					color = Color.White,
 				)
 			}
@@ -494,14 +494,14 @@ private fun SaveChip(u: Float, modifier: Modifier = Modifier) {
 
 /** 16x8 down-chevron stroke (Muted). */
 @Composable
-private fun GestureChevron() {
-	Canvas(modifier = Modifier.size(16.dp, 8.dp)) {
+private fun GestureChevron(u: Float) {
+	Canvas(modifier = Modifier.size((16 * u).dp, (8 * u).dp)) {
 		val p = Path().apply {
 			moveTo(0f, 0f)
 			lineTo(size.width / 2f, size.height)
 			lineTo(size.width, 0f)
 		}
-		drawPath(p, StakColors.Muted, style = Stroke(width = 1.6.dp.toPx(), cap = StrokeCap.Round, join = StrokeJoin.Round))
+		drawPath(p, StakColors.Muted, style = Stroke(width = (1.6 * u).dp.toPx(), cap = StrokeCap.Round, join = StrokeJoin.Round))
 	}
 }
 
@@ -774,10 +774,10 @@ private fun OrderFilledSheet(onDismiss: () -> Unit, spec: BuySpec = NVDA_BUY) {
 
 /** 44dp progress ring — #2a3346 track + #69b3ca arc from 12 o'clock. */
 @Composable
-private fun ProgressRing(progress: Float) {
-	Canvas(modifier = Modifier.size(44.dp)) {
-		val stroke = 3.dp.toPx()
-		val inset = stroke / 2f + 4.dp.toPx()
+private fun ProgressRing(progress: Float, u: Float) {
+	Canvas(modifier = Modifier.size((44 * u).dp)) {
+		val stroke = (3 * u).dp.toPx()
+		val inset = stroke / 2f + (4 * u).dp.toPx()
 		val arcSize = androidx.compose.ui.geometry.Size(size.width - inset * 2f, size.height - inset * 2f)
 		drawArc(
 			color = Color(0xFF2A3346),

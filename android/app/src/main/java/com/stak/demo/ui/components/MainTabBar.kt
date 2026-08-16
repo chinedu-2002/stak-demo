@@ -32,7 +32,7 @@ enum class MainTab(val label: String, val activeIcon: Int, val inactiveIcon: Int
 	News("News", R.drawable.ic_tab_news_active, R.drawable.ic_tab_news, true),
 	Discover("Discover", R.drawable.tab_discover_active, R.drawable.ic_tab_discover, true),
 	MySTAK("My STAK", R.drawable.ic_tab_mystak_active, R.drawable.ic_tab_mystak, true),
-	Simulate("Simulate", R.drawable.ic_tab_simulate, R.drawable.ic_tab_simulate, false),
+	Simulate("Simulate", R.drawable.tab_simulate_active, R.drawable.ic_tab_simulate, true),
 }
 
 /**

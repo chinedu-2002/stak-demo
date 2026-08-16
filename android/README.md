@@ -70,6 +70,12 @@ platform rule; iOS uses PascalCase.
 | 06 · Collection | `CollectionScreen` | 1:3333 |
 | 06 · Saved detail | `StockDetailScreen` (fromMyStak) | 16:1012 |
 | 05 · Profile hub | `ProfileScreen` | 171:995 |
+| 07 · Simulate home | `SimulateScreen` | 1:3898 |
+| 07 · Buy PLTR / filled | `PracticeBuySheet` (PLTR_BUY) | 1:4232, 85:895 |
+| 07 · Portfolio | `SimPortfolioScreen` | 1:4496 |
+| 07 · Pick detail | `PickDetailScreen` | 1:4631 |
+| 07 · Sell confirm / closed | `SellConfirmSheet` / `PositionClosedSheet` | 1:4698, 73:855 |
+| 07 · Leaderboard | `LeaderboardScreen` | 1:4124 |
 
 Flow: splash → sign up (⇄ sign in) → 01 → … → 07 → 08 → 09 → Home
 first run → (See Todays Pick) → Home Main; sign-in goes straight to

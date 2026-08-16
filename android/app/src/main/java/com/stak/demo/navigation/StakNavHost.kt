@@ -30,6 +30,10 @@ import com.stak.demo.ui.mystak.CollectionScreen
 import com.stak.demo.ui.mystak.MyStakScreen
 import com.stak.demo.ui.news.NewsDetailScreen
 import com.stak.demo.ui.profile.ProfileScreen
+import com.stak.demo.ui.simulate.LeaderboardScreen
+import com.stak.demo.ui.simulate.PickDetailScreen
+import com.stak.demo.ui.simulate.SimPortfolioScreen
+import com.stak.demo.ui.simulate.SimulateScreen
 import com.stak.demo.ui.news.NewsScreen
 import com.stak.demo.ui.onboarding.CreateAccountScreen
 import com.stak.demo.ui.onboarding.SplashScreen
@@ -267,6 +271,9 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
 				onOpenStock = { navController.navigate(StakRoutes.stockDetail("AAPL")) },
 				onOpenCollection = { navController.navigate(StakRoutes.COLLECTION) },
 				onOpenProfile = { navController.navigate(StakRoutes.PROFILE) },
+				onOpenSimPortfolio = { navController.navigate(StakRoutes.SIM_PORTFOLIO) },
+				onOpenSimPick = { navController.navigate(StakRoutes.SIM_PICK) },
+				onOpenLeaderboard = { navController.navigate(StakRoutes.LEADERBOARD) },
 			)
 		}
 		composable(StakRoutes.STOCK_DETAIL) {
@@ -280,6 +287,18 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
 		}
 		composable(StakRoutes.MYSTAK_STOCK) {
 			StockDetailScreen(onBack = { navController.popBackStack() }, fromMyStak = true)
+		}
+		composable(StakRoutes.SIM_PORTFOLIO) {
+			SimPortfolioScreen(
+				onBack = { navController.popBackStack() },
+				onOpenPick = { navController.navigate(StakRoutes.SIM_PICK) },
+			)
+		}
+		composable(StakRoutes.SIM_PICK) {
+			PickDetailScreen(onBack = { navController.popBackStack() })
+		}
+		composable(StakRoutes.LEADERBOARD) {
+			LeaderboardScreen(onBack = { navController.popBackStack() })
 		}
 		composable(StakRoutes.PROFILE) {
 			ProfileScreen(onBack = { navController.popBackStack() })
@@ -301,6 +320,9 @@ private fun MainShell(
 	onOpenStock: () -> Unit,
 	onOpenCollection: () -> Unit,
 	onOpenProfile: () -> Unit,
+	onOpenSimPortfolio: () -> Unit,
+	onOpenSimPick: () -> Unit,
+	onOpenLeaderboard: () -> Unit,
 ) {
 	var tab by rememberSaveable { mutableStateOf(MainTab.Home) }
 	var homeFirstRun by rememberSaveable { mutableStateOf(true) }
@@ -314,6 +336,11 @@ private fun MainShell(
 				)
 				MainTab.News -> NewsScreen(onOpenArticle = onOpenArticle)
 				MainTab.Discover -> DiscoverScreen(onLearnMore = onOpenStock)
+				MainTab.Simulate -> SimulateScreen(
+					onOpenPortfolio = onOpenSimPortfolio,
+					onOpenPick = onOpenSimPick,
+					onOpenLeaderboard = onOpenLeaderboard,
+				)
 				MainTab.MySTAK -> MyStakScreen(
 					onOpenCollection = onOpenCollection,
 					onStartSwiping = { tab = MainTab.Discover },

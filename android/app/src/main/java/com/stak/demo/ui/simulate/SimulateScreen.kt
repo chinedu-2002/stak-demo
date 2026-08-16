@@ -196,14 +196,15 @@ private fun ScoreHero(onOpenLeaderboard: () -> Unit) {
 			.fillMaxWidth()
 			.clip(RoundedCornerShape(18.dp))
 			.background(Sim.CardBg)
-			.padding(20.dp),
+			.padding(vertical = 20.dp),
 	) {
 		Text(
 			text = "PORTFOLIO VALUE",
 			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 10.sp, letterSpacing = 0.9.sp),
 			color = Sim.Faint,
+			modifier = Modifier.padding(horizontal = 20.dp),
 		)
-		Row(verticalAlignment = Alignment.Bottom) {
+		Row(verticalAlignment = Alignment.Bottom, modifier = Modifier.padding(horizontal = 20.dp)) {
 			Text(
 				text = "$10,240",
 				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 44.sp, letterSpacing = (-0.44).sp),
@@ -220,8 +221,9 @@ private fun ScoreHero(onOpenLeaderboard: () -> Unit) {
 			text = "+$240.00 all time on $10,000 paper · 12 picks",
 			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Light, fontSize = 12.sp),
 			color = Sim.Muted,
+			modifier = Modifier.padding(horizontal = 20.dp),
 		)
-		Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+		Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.padding(horizontal = 20.dp)) {
 			Text(
 				text = "Cash available",
 				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 12.sp),
@@ -233,41 +235,40 @@ private fun ScoreHero(onOpenLeaderboard: () -> Unit) {
 				color = Sim.Bright,
 			)
 		}
-		Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-			Text(
-				text = "▲ +$186 (+1.9%) this week",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 12.sp),
-				color = Sim.Green,
-			)
-			Spacer(modifier = Modifier.weight(1f))
-			Box(
-				modifier = Modifier
-					.clip(RoundedCornerShape(13.dp))
-					.background(Sim.TealTint)
-					.clickable(
-						interactionSource = remember { MutableInteractionSource() },
-						indication = null,
-						onClick = onOpenLeaderboard,
-					)
-					.padding(horizontal = 11.dp, vertical = 6.dp),
-			) {
-				Text(
-					text = "#47 this week",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 12.sp),
-					color = Sim.Teal,
+		Text(
+			text = "▲ +$186 (+1.9%) this week",
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 12.sp),
+			color = Sim.Green,
+			modifier = Modifier.padding(horizontal = 20.dp),
+		)
+		Box(
+			modifier = Modifier
+				.padding(horizontal = 20.dp)
+				.clip(RoundedCornerShape(13.dp))
+				.background(Sim.TealTint)
+				.clickable(
+					interactionSource = remember { MutableInteractionSource() },
+					indication = null,
+					onClick = onOpenLeaderboard,
 				)
-			}
+				.padding(horizontal = 11.dp, vertical = 6.dp),
+		) {
+			Text(
+				text = "#47 this week",
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 12.sp),
+				color = Sim.Teal,
+			)
 		}
 		Image(
 			painter = painterResource(R.drawable.sim_chart_line),
 			contentDescription = null,
 			contentScale = ContentScale.Fit,
-			modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 8.dp).size(310.dp, 68.dp),
+			modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 8.dp).size(343.dp, 73.56.dp),
 		)
 		Row(
 			verticalAlignment = Alignment.CenterVertically,
-			horizontalArrangement = Arrangement.spacedBy(30.dp),
-			modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 20.dp),
+			horizontalArrangement = Arrangement.spacedBy(37.dp),
+			modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 40.dp),
 		) {
 			listOf("1D", "1W", "1M", "3M", "YTD", "1Y").forEach { label ->
 				if (label == "3M") {

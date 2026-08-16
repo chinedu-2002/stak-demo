@@ -125,7 +125,7 @@ fun PickDetailScreen(onBack: () -> Unit) {
 				)
 				Row(
 					verticalAlignment = Alignment.CenterVertically,
-					horizontalArrangement = Arrangement.spacedBy(30.dp),
+					horizontalArrangement = Arrangement.spacedBy(37.dp),
 					modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 12.dp),
 				) {
 					listOf("1D", "1W", "1M", "3M", "YTD", "1Y").forEach { label ->

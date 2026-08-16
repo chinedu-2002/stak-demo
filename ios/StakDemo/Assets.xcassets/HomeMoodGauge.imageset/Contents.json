@@ -1,0 +1,12 @@
+{
+  "images": [
+    {
+      "filename": "home_mood_gauge.png",
+      "idiom": "universal"
+    }
+  ],
+  "info": {
+    "author": "xcode",
+    "version": 1
+  }
+}

@@ -144,12 +144,13 @@ struct DiscoverView: View {
 						// Deck — three stacked gradient cards, front one drags down.
 						ZStack(alignment: .topLeading) {
 							let order = [deck[(seen + 2) % 3], deck[(seen + 1) % 3], deck[seen % 3]]
-							BackDeckCard(card: order[0], scale: 251.81 / 350, rotation: 4.03, centerX: 175.29, centerY: 168.33)
-							BackDeckCard(card: order[1], scale: 299.51 / 350, rotation: -2.33, centerX: 174.42, centerY: 200.64)
+							BackDeckCard(card: order[0], scale: 251.81 / 350, rotation: 4.03, offsetX: 0.29, offsetY: -53.85)
+							BackDeckCard(card: order[1], scale: 299.51 / 350, rotation: -2.33, offsetX: -0.58, offsetY: -2.0)
 							DeckCardBody(card: order[2], onSave: { savedToast = true })
 								.frame(width: 350)
 								.frame(maxWidth: .infinity)
 								.offset(y: 54.65 + dragOffset)
+								.onTapGesture(perform: onLearnMore)
 						}
 						.padding(.horizontal, 20)
 						.frame(maxWidth: .infinity)
@@ -258,20 +259,23 @@ struct ProgressRing: View {
 	}
 }
 
-/// One of the two tilted back cards, authored at front size and scaled.
+/// One of the two tilted back cards, authored at the 350x444.4 front
+/// size and scaled; the offsets place the rotated bounds so the card
+/// tops peek exactly as in the frame (GOOGL at deck-y 0, AAPL at 24.2).
 private struct BackDeckCard: View {
 	let card: DeckCard
 	let scale: CGFloat
 	let rotation: Double
-	let centerX: CGFloat
-	let centerY: CGFloat
+	let offsetX: CGFloat
+	let offsetY: CGFloat
 
 	var body: some View {
 		DeckCardBody(card: card, onSave: nil)
-			.frame(width: 350)
+			.frame(width: 350, height: 444.4, alignment: .top)
 			.scaleEffect(scale)
 			.rotationEffect(.degrees(rotation))
-			.position(x: centerX, y: centerY)
+			.offset(x: offsetX, y: offsetY)
+			.frame(maxWidth: .infinity, alignment: .topLeading)
 	}
 }
 
@@ -286,8 +290,9 @@ private struct DeckCardBody: View {
 					.resizable()
 					.frame(width: 340, height: 229)
 					.clipShape(RoundedRectangle(cornerRadius: 18))
-				if onSave != nil && card.art != "DiscCardNVDA" {
-					// NVDA's chip is baked into its art; the others draw it live.
+				if card.art != "DiscCardNVDA" {
+					// NVDA's chip is baked into its art; the others draw it live —
+					// on the back cards as well, as the frame shows.
 					SaveChip()
 						.padding(.top, 6)
 						.padding(.trailing, 10)

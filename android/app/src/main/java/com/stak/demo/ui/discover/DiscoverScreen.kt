@@ -155,6 +155,7 @@ private val DECK = listOf(
  */
 @Composable
 fun DiscoverScreen(onLearnMore: () -> Unit = {}) {
+	// Prototype: tapping the front card itself also opens the Stock Detail.
 	var seen by rememberSaveable { mutableIntStateOf(0) }
 	var showBuy by rememberSaveable { mutableStateOf(false) }
 	var showFilled by rememberSaveable { mutableStateOf(false) }
@@ -238,15 +239,20 @@ fun DiscoverScreen(onLearnMore: () -> Unit = {}) {
 						},
 				) {
 					val order = listOf(DECK[(seen + 2) % 3], DECK[(seen + 1) % 3], DECK[seen % 3])
-					BackDeckCard(order[0], scale = 251.81f / 350f, rotation = 4.03f, centerX = 175.29.dp, centerY = 168.33.dp)
-					BackDeckCard(order[1], scale = 299.51f / 350f, rotation = -2.33f, centerX = 174.42.dp, centerY = 200.64.dp)
+					BackDeckCard(order[0], scale = 251.81f / 350f, rotation = 4.03f, offsetX = 0.29.dp, offsetY = (-53.85).dp)
+					BackDeckCard(order[1], scale = 299.51f / 350f, rotation = -2.33f, offsetX = (-0.58).dp, offsetY = (-2.0).dp)
 					FrontDeckCard(
 						card = order[2],
 						onSave = { savedToast = true },
 						modifier = Modifier
 							.align(Alignment.TopCenter)
 							.offset(y = 54.65.dp)
-							.offset { androidx.compose.ui.unit.IntOffset(0, topOffset.value.roundToInt()) },
+							.offset { androidx.compose.ui.unit.IntOffset(0, topOffset.value.roundToInt()) }
+							.clickable(
+								interactionSource = remember { MutableInteractionSource() },
+								indication = null,
+								onClick = onLearnMore,
+							),
 					)
 				}
 				Spacer(modifier = Modifier.height(10.dp))
@@ -340,14 +346,15 @@ fun DiscoverScreen(onLearnMore: () -> Unit = {}) {
 
 /** One of the two tilted back cards, drawn at its designed scale. */
 @Composable
-private fun BoxScope.BackDeckCard(card: DeckCard, scale: Float, rotation: Float, centerX: Dp, centerY: Dp) {
-	// The card composable is authored at the 350-wide front size and
-	// scaled down, so typography keeps the frame's exact proportions.
+private fun BoxScope.BackDeckCard(card: DeckCard, scale: Float, rotation: Float, offsetX: Dp, offsetY: Dp) {
+	// The card composable is authored at the 350x444.4 front size and
+	// scaled down; the offsets place the rotated bounds so the card tops
+	// peek exactly as in the frame (GOOGL at deck-y 0, AAPL at 24.2).
 	Box(
 		modifier = Modifier
 			.align(Alignment.TopStart)
-			.offset(x = centerX - 175.dp, y = centerY - 168.dp)
-			.size(350.dp, 336.dp)
+			.offset(x = offsetX, y = offsetY)
+			.size(350.dp, 444.4.dp)
 			.graphicsLayer {
 				scaleX = scale
 				scaleY = scale
@@ -389,8 +396,9 @@ private fun DeckCardBody(card: DeckCard, onSave: (() -> Unit)?) {
 				contentScale = ContentScale.FillBounds,
 				modifier = Modifier.size(340.dp, 229.dp),
 			)
-			if (onSave != null && card.artRes != R.drawable.disc_card_nvda) {
-				// NVDA's chip is baked into its art; the others draw it live.
+			if (card.artRes != R.drawable.disc_card_nvda) {
+				// NVDA's chip is baked into its art; the others draw it live —
+				// on the back cards as well, as the frame shows.
 				SaveChip(modifier = Modifier.align(Alignment.TopEnd).padding(top = 6.dp, end = 10.dp))
 			}
 			if (onSave != null) {

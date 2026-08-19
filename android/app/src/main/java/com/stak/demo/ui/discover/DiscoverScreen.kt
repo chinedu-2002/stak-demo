@@ -28,7 +28,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -170,7 +169,6 @@ fun DiscoverScreen(onLearnMore: () -> Unit = {}, onPracticeBuy: () -> Unit = {})
 	var savedToast by remember { mutableStateOf(false) }
 	val topOffset = remember(seen) { Animatable(0f) }
 	val promote = remember(seen) { Animatable(0f) }
-	var releaseY by remember { mutableFloatStateOf(54.65f) }
 	val scope = rememberCoroutineScope()
 	val density = LocalDensity.current
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
@@ -236,11 +234,11 @@ fun DiscoverScreen(onLearnMore: () -> Unit = {}, onPracticeBuy: () -> Unit = {})
 								onDragEnd = {
 									scope.launch {
 										if (topOffset.value > with(density) { (110 * u).dp.toPx() }) {
-											// Card shuffle: the swiped card dives under the deck
-											// and rises into the back of the queue while the
-											// others step forward into the vacated slots.
-											releaseY = 54.65f + topOffset.value / density.density / u
-											promote.animateTo(1f, tween(450, easing = EaseOut))
+											// Single-card deck (user override 2026-08-19): the
+											// swiped card flies off while the next grows in
+											// from behind — no stacked peek cards.
+											launch { topOffset.animateTo(with(density) { (700 * u).dp.toPx() }, tween(300, easing = EaseOut)) }
+											promote.animateTo(1f, tween(300, easing = EaseOut))
 											seen += 1
 										} else {
 											topOffset.animateTo(0f, tween(180))
@@ -259,60 +257,25 @@ fun DiscoverScreen(onLearnMore: () -> Unit = {}, onPracticeBuy: () -> Unit = {})
 				) {
 					val order = listOf(DECK[(seen + 2) % 3], DECK[(seen + 1) % 3], DECK[seen % 3])
 					val p = promote.value
-					fun step(a: Float, b: Float) = a + (b - a) * p
-					// The swiped card's two-segment return flight: dive below
-					// the deck, then rise into the back-top slot (behind).
-					fun seg(a: Float, m: Float, b: Float) =
-						if (p < 0.5f) a + (m - a) * (p / 0.5f) else m + (b - m) * ((p - 0.5f) / 0.5f)
-					val flyScale = seg(1f, 0.86f, 251.81f / 350f)
-					val flyRot = seg(0f, 2.5f, 4.03f)
-					val flyX = seg(0f, 0.15f, 0.29f)
-					val flyY = seg(releaseY, 150f, -53.85f)
-					val flyH = seg(430f, 437f, 444.4f)
-					// The queue always shows the ACTUAL next cards, live —
-					// at rest and through the shuffle (no duplicated designs).
-					if (p >= 0.5f) {
-						// Past halfway the swiped card has tucked under —
-						// drawn deepest, slotting in at the back of the queue.
-						BackDeckCard(order[2], scale = flyScale, rotation = flyRot, offsetX = (flyX * u).dp, offsetY = (flyY * u).dp, u = u, authoredHeight = flyH)
+					// Single-card deck (user override): no stacked peeks. On
+					// swipe the next card grows in behind the flying one.
+					if (p > 0f) {
+						BackDeckCard(order[1], scale = 0.9f + 0.1f * p, rotation = 0f, offsetX = 0.dp, offsetY = (54.65 * u).dp, u = u, authoredHeight = 430f, alpha = p)
 					}
-					BackDeckCard(
-						order[0],
-						scale = step(251.81f / 350f, 299.51f / 350f),
-						rotation = step(4.03f, -2.33f),
-						offsetX = (step(0.29f, -0.58f) * u).dp,
-						offsetY = (step(-53.85f, 1.4f) * u).dp,
+					FrontDeckCard(
+						card = order[2],
+						onSave = { savedToast = true },
 						u = u,
-						authoredHeight = step(444.4f, 398.5f),
+						modifier = Modifier
+							.align(Alignment.TopCenter)
+							.offset(y = (54.65 * u).dp)
+							.offset { androidx.compose.ui.unit.IntOffset(0, topOffset.value.roundToInt()) }
+							.clickable(
+								interactionSource = remember { MutableInteractionSource() },
+								indication = null,
+								onClick = onLearnMore,
+							),
 					)
-					BackDeckCard(
-						order[1],
-						scale = step(299.51f / 350f, 1f),
-						rotation = step(-2.33f, 0f),
-						offsetX = (step(-0.58f, 0f) * u).dp,
-						offsetY = (step(1.4f, 54.65f) * u).dp,
-						u = u,
-						authoredHeight = step(398.5f, 430f),
-					)
-					if (p > 0f && p < 0.5f) {
-						BackDeckCard(order[2], scale = flyScale, rotation = flyRot, offsetX = (flyX * u).dp, offsetY = (flyY * u).dp, u = u, authoredHeight = flyH)
-					}
-					if (p == 0f) {
-						FrontDeckCard(
-							card = order[2],
-							onSave = { savedToast = true },
-							u = u,
-							modifier = Modifier
-								.align(Alignment.TopCenter)
-								.offset(y = (54.65 * u).dp)
-								.offset { androidx.compose.ui.unit.IntOffset(0, topOffset.value.roundToInt()) }
-								.clickable(
-									interactionSource = remember { MutableInteractionSource() },
-									indication = null,
-									onClick = onLearnMore,
-								),
-						)
-					}
 				}
 				Spacer(modifier = Modifier.height((10 * u).dp))
 				Column(

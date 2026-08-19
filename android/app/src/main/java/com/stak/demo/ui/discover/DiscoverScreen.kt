@@ -35,6 +35,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.EaseOut
 import androidx.compose.animation.core.tween
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -160,6 +161,7 @@ fun DiscoverScreen(onLearnMore: () -> Unit = {}, onPracticeBuy: () -> Unit = {})
 	var seen by rememberSaveable { mutableIntStateOf(0) }
 	var savedToast by remember { mutableStateOf(false) }
 	val topOffset = remember(seen) { Animatable(0f) }
+	val promote = remember(seen) { Animatable(0f) }
 	val scope = rememberCoroutineScope()
 	val density = LocalDensity.current
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
@@ -221,8 +223,11 @@ fun DiscoverScreen(onLearnMore: () -> Unit = {}, onPracticeBuy: () -> Unit = {})
 							detectVerticalDragGestures(
 								onDragEnd = {
 									scope.launch {
-										if (topOffset.value > with(density) { 110.dp.toPx() }) {
-											topOffset.animateTo(with(density) { 700.dp.toPx() }, tween(220))
+										if (topOffset.value > with(density) { (110 * u).dp.toPx() }) {
+											// Card shuffle: the swiped card flies off while the
+											// queue steps forward into the vacated slots.
+											launch { topOffset.animateTo(with(density) { (700 * u).dp.toPx() }, tween(300, easing = EaseOut)) }
+											promote.animateTo(1f, tween(300, easing = EaseOut))
 											seen += 1
 										} else {
 											topOffset.animateTo(0f, tween(180))
@@ -231,7 +236,7 @@ fun DiscoverScreen(onLearnMore: () -> Unit = {}, onPracticeBuy: () -> Unit = {})
 								},
 							) { change, dragAmount ->
 								change.consume()
-								if (dragAmount > 0f || topOffset.value > 0f) {
+								if (promote.value == 0f && (dragAmount > 0f || topOffset.value > 0f)) {
 									scope.launch {
 										topOffset.snapTo((topOffset.value + dragAmount).coerceAtLeast(0f))
 									}
@@ -240,8 +245,30 @@ fun DiscoverScreen(onLearnMore: () -> Unit = {}, onPracticeBuy: () -> Unit = {})
 						},
 				) {
 					val order = listOf(DECK[(seen + 2) % 3], DECK[(seen + 1) % 3], DECK[seen % 3])
-					BackDeckCard(order[0], scale = 251.81f / 350f, rotation = 4.03f, offsetX = (0.29 * u).dp, offsetY = (-53.85 * u).dp, u = u, authoredHeight = 444.4f)
-					BackDeckCard(order[1], scale = 299.51f / 350f, rotation = -2.33f, offsetX = (-0.58 * u).dp, offsetY = (1.4 * u).dp, u = u, authoredHeight = 398.5f)
+					val p = promote.value
+					fun step(a: Float, b: Float) = a + (b - a) * p
+					if (p > 0f) {
+						// The cycled card refills the back of the queue.
+						BackDeckCard(DECK[seen % 3], scale = 251.81f / 350f, rotation = 4.03f, offsetX = (0.29 * u).dp, offsetY = (-53.85 * u).dp, u = u, authoredHeight = 444.4f, alpha = p)
+					}
+					BackDeckCard(
+						order[0],
+						scale = step(251.81f / 350f, 299.51f / 350f),
+						rotation = step(4.03f, -2.33f),
+						offsetX = (step(0.29f, -0.58f) * u).dp,
+						offsetY = (step(-53.85f, 1.4f) * u).dp,
+						u = u,
+						authoredHeight = step(444.4f, 398.5f),
+					)
+					BackDeckCard(
+						order[1],
+						scale = step(299.51f / 350f, 1f),
+						rotation = step(-2.33f, 0f),
+						offsetX = (step(-0.58f, 0f) * u).dp,
+						offsetY = (step(1.4f, 54.65f) * u).dp,
+						u = u,
+						authoredHeight = step(398.5f, 430f),
+					)
 					FrontDeckCard(
 						card = order[2],
 						onSave = { savedToast = true },
@@ -268,7 +295,7 @@ fun DiscoverScreen(onLearnMore: () -> Unit = {}, onPracticeBuy: () -> Unit = {})
 					}
 					Text(
 						text = "Swipe down",
-						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (10 * u).sp),
+						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (10 * u).sp, lineHeight = (13 * u).sp),
 						color = Disc.Faint,
 					)
 				}
@@ -339,7 +366,7 @@ fun DiscoverScreen(onLearnMore: () -> Unit = {}, onPracticeBuy: () -> Unit = {})
 
 /** One of the two tilted back cards, drawn at its designed scale. */
 @Composable
-private fun BoxScope.BackDeckCard(card: DeckCard, scale: Float, rotation: Float, offsetX: Dp, offsetY: Dp, u: Float, authoredHeight: Float) {
+private fun BoxScope.BackDeckCard(card: DeckCard, scale: Float, rotation: Float, offsetX: Dp, offsetY: Dp, u: Float, authoredHeight: Float, alpha: Float = 1f) {
 	// The card composable is authored at the 350x444.4 front size and
 	// scaled down; the offsets place the rotated bounds so the card tops
 	// peek exactly as in the frame (GOOGL at deck-y 0, AAPL at 24.2).
@@ -352,6 +379,7 @@ private fun BoxScope.BackDeckCard(card: DeckCard, scale: Float, rotation: Float,
 				scaleX = scale
 				scaleY = scale
 				rotationZ = rotation
+				this.alpha = alpha
 			},
 	) {
 		DeckCardBody(card = card, onSave = null, u = u)
@@ -392,7 +420,7 @@ private fun DeckCardBody(card: DeckCard, onSave: (() -> Unit)?, u: Float) {
 			if (card.artRes != R.drawable.disc_card_nvda) {
 				// NVDA's chip is baked into its art; the others draw it live —
 				// on the back cards as well, as the frame shows.
-				SaveChip(u = u, modifier = Modifier.align(Alignment.TopEnd).padding(top = (5 * u).dp, end = (2.8 * u).dp))
+				SaveChip(u = u, modifier = Modifier.align(Alignment.TopEnd).padding(top = (6 * u).dp, end = (4 * u).dp))
 			}
 			if (onSave != null) {
 				Box(
@@ -415,7 +443,7 @@ private fun DeckCardBody(card: DeckCard, onSave: (() -> Unit)?, u: Float) {
 			Column(verticalArrangement = Arrangement.spacedBy((8 * u).dp)) {
 				Text(
 					text = card.ticker,
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (10 * u).sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (10 * u).sp, lineHeight = (13 * u).sp),
 					color = Disc.Muted,
 				)
 				Text(
@@ -426,12 +454,12 @@ private fun DeckCardBody(card: DeckCard, onSave: (() -> Unit)?, u: Float) {
 				Row(verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy((9 * u).dp)) {
 					Text(
 						text = card.price,
-						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (20 * u).sp),
+						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (20 * u).sp, lineHeight = (25 * u).sp),
 						color = Color.White,
 					)
 					Text(
 						text = card.change,
-						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (11 * u).sp),
+						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (11 * u).sp, lineHeight = (14 * u).sp),
 						color = Disc.Green,
 						modifier = Modifier.padding(bottom = (2 * u).dp),
 					)
@@ -475,7 +503,7 @@ private fun SaveChip(u: Float, modifier: Modifier = Modifier) {
 	) {
 		Text(
 			text = "Save",
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
 			color = Color.White,
 		)
 		Image(painterResource(R.drawable.ic_hero_bookmark), null, modifier = Modifier.size((12 * u).dp))

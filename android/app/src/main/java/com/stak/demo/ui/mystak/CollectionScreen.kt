@@ -71,6 +71,7 @@ private val STOCKS = listOf(
  */
 @Composable
 fun CollectionScreen(onBack: () -> Unit, onOpenStock: () -> Unit) {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Column(modifier = Modifier.fillMaxSize().background(StakColors.Bg)) {
 		Row(
 			verticalAlignment = Alignment.CenterVertically,
@@ -78,62 +79,62 @@ fun CollectionScreen(onBack: () -> Unit, onOpenStock: () -> Unit) {
 				.fillMaxWidth()
 				.background(StakColors.Bg)
 				.statusBarsPadding()
-				.padding(start = 16.dp, end = 18.dp, top = 8.dp, bottom = 8.dp),
+				.padding(start = (16 * u).dp, end = (18 * u).dp, top = (8 * u).dp, bottom = (8 * u).dp),
 		) {
 			AuthBackCircle(onClick = onBack)
 			Spacer(modifier = Modifier.weight(1f))
 			Text(
 				text = "AI & Tech",
-				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 16.sp),
+				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp),
 				color = Color.White,
 			)
 			Spacer(modifier = Modifier.weight(1f))
 			Box(
 				contentAlignment = Alignment.Center,
-				modifier = Modifier.size(40.dp).background(CardBg, CircleShape),
+				modifier = Modifier.size((40 * u).dp).background(CardBg, CircleShape),
 			) {
-				Image(painterResource(R.drawable.ic_more_dots), null, modifier = Modifier.size(24.dp))
+				Image(painterResource(R.drawable.ic_more_dots), null, modifier = Modifier.size((24 * u).dp))
 			}
 		}
 		Column(
-			verticalArrangement = Arrangement.spacedBy(20.dp),
+			verticalArrangement = Arrangement.spacedBy((20 * u).dp),
 			modifier = Modifier
 				.weight(1f)
 				.fillMaxWidth()
 				.verticalScroll(rememberScrollState())
-				.padding(horizontal = 20.dp)
-				.padding(top = 16.dp, bottom = 26.dp),
+				.padding(horizontal = (20 * u).dp)
+				.padding(top = (16 * u).dp, bottom = (26 * u).dp),
 		) {
-			Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+			Column(verticalArrangement = Arrangement.spacedBy((10 * u).dp)) {
 				Image(
 					painter = painterResource(R.drawable.ms_coll_aitech),
 					contentDescription = null,
 					contentScale = ContentScale.Crop,
-					modifier = Modifier.size(60.dp),
+					modifier = Modifier.size((60 * u).dp),
 				)
 				Text(
 					text = "AI & Tech",
-					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 26.sp),
+					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (26 * u).sp),
 					color = Color.White,
 				)
-				Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(7.dp)) {
-					Text("5 stocks", style = TextStyle(fontFamily = Geist, fontSize = 13.sp), color = Muted)
-					Text("·", style = TextStyle(fontFamily = Geist, fontSize = 13.sp), color = Faint)
+				Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy((7 * u).dp)) {
+					Text("5 stocks", style = TextStyle(fontFamily = Geist, fontSize = (13 * u).sp), color = Muted)
+					Text("·", style = TextStyle(fontFamily = Geist, fontSize = (13 * u).sp), color = Faint)
 					Text(
 						"+2.4% this week",
-						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 13.sp),
+						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp),
 						color = Green,
 					)
 				}
 				Text(
 					text = "Your highest-conviction growth and AI names.",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 13.sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (13 * u).sp),
 					color = Color(0xFFC8D2E0),
 				)
 			}
-			Column(verticalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
+			Column(verticalArrangement = Arrangement.spacedBy((10 * u).dp), modifier = Modifier.fillMaxWidth()) {
 				STOCKS.chunked(2).forEachIndexed { rowIndex, row ->
-					Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth().height(androidx.compose.foundation.layout.IntrinsicSize.Min)) {
+					Row(horizontalArrangement = Arrangement.spacedBy((10 * u).dp), modifier = Modifier.fillMaxWidth().height(androidx.compose.foundation.layout.IntrinsicSize.Min)) {
 						row.forEach { stock ->
 							StockTile(
 								stock = stock,
@@ -153,44 +154,45 @@ fun CollectionScreen(onBack: () -> Unit, onOpenStock: () -> Unit) {
 
 @Composable
 private fun StockTile(stock: CollStock, onClick: () -> Unit, modifier: Modifier = Modifier) {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Column(
-		verticalArrangement = Arrangement.spacedBy(10.dp),
+		verticalArrangement = Arrangement.spacedBy((10 * u).dp),
 		modifier = modifier
-			.clip(RoundedCornerShape(16.dp))
+			.clip(RoundedCornerShape((16 * u).dp))
 			.background(CardBg)
 			.clickable(
 				interactionSource = remember { MutableInteractionSource() },
 				indication = null,
 				onClick = onClick,
 			)
-			.padding(14.dp),
+			.padding((14 * u).dp),
 	) {
 		Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-			Box(contentAlignment = Alignment.Center, modifier = Modifier.size(36.dp).background(Color(0xFF242B3D), CircleShape)) {
+			Box(contentAlignment = Alignment.Center, modifier = Modifier.size((36 * u).dp).background(Color(0xFF242B3D), CircleShape)) {
 				Text(
 					stock.badge,
-					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 14.sp),
+					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (14 * u).sp),
 					color = BadgeInk,
 				)
 			}
 			Spacer(modifier = Modifier.weight(1f))
 			Text(
 				stock.change,
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 12.sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp),
 				color = if (stock.up) Green else RedDown,
 			)
 		}
-		Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+		Column(verticalArrangement = Arrangement.spacedBy((2 * u).dp)) {
 			Text(
 				stock.ticker,
-				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 16.sp),
+				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp),
 				color = Color.White,
 			)
-			Text(stock.company, style = TextStyle(fontFamily = Geist, fontSize = 11.sp), color = Muted)
+			Text(stock.company, style = TextStyle(fontFamily = Geist, fontSize = (11 * u).sp), color = Muted)
 		}
 		Text(
 			stock.price,
-			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Medium, fontSize = 15.sp),
+			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Medium, fontSize = (15 * u).sp),
 			color = Color.White,
 		)
 	}
@@ -199,26 +201,29 @@ private fun StockTile(stock: CollStock, onClick: () -> Unit, modifier: Modifier 
 /** Dashed 1.5dp #2a3346 r16 add card. */
 @Composable
 private fun AddStockTile(modifier: Modifier = Modifier) {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Column(
 		horizontalAlignment = Alignment.CenterHorizontally,
-		verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
+		verticalArrangement = Arrangement.spacedBy((8 * u).dp, Alignment.CenterVertically),
 		modifier = modifier
 			.drawBehind {
 				drawRoundRect(
 					color = Color(0xFF2A3346),
-					cornerRadius = CornerRadius(16.dp.toPx()),
+					cornerRadius = CornerRadius((16 * u).dp.toPx()),
 					style = Stroke(
-						width = 1.5.dp.toPx(),
-						pathEffect = PathEffect.dashPathEffect(floatArrayOf(8f, 8f)),
+						width = (1.5 * u).dp.toPx(),
+						pathEffect = PathEffect.dashPathEffect(
+							floatArrayOf((8 * u).dp.toPx(), (8 * u).dp.toPx()),
+						),
 					),
 				)
 			}
-			.padding(14.dp),
+			.padding((14 * u).dp),
 	) {
-		Image(painterResource(R.drawable.ic_plus_circle), null, modifier = Modifier.size(24.dp))
+		Image(painterResource(R.drawable.ic_plus_circle), null, modifier = Modifier.size((24 * u).dp))
 		Text(
 			"Add stock",
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 13.sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp),
 			color = Muted,
 		)
 	}

@@ -52,83 +52,84 @@ private val ChipInk = Color(0xFF7FD4E8)
  */
 @Composable
 fun ProfileScreen(onBack: () -> Unit) {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Column(modifier = Modifier.fillMaxSize().background(StakColors.Bg)) {
 		Box(
 			modifier = Modifier
 				.fillMaxWidth()
 				.background(StakColors.Bg)
 				.statusBarsPadding()
-				.height(56.dp),
+				.height((56 * u).dp),
 		) {
 			AuthBackCircle(
 				onClick = onBack,
-				modifier = Modifier.align(Alignment.CenterStart).padding(start = 20.dp),
+				modifier = Modifier.align(Alignment.CenterStart).padding(start = (20 * u).dp),
 			)
 			Text(
 				text = "Profile",
-				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 16.sp),
+				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp, lineHeight = (20 * u).sp),
 				color = Color.White,
 				modifier = Modifier.align(Alignment.Center),
 			)
 		}
 		Column(
 			horizontalAlignment = Alignment.CenterHorizontally,
-			verticalArrangement = Arrangement.spacedBy(16.dp),
+			verticalArrangement = Arrangement.spacedBy((16 * u).dp),
 			modifier = Modifier
 				.weight(1f)
 				.fillMaxWidth()
 				.verticalScroll(rememberScrollState())
-				.padding(horizontal = 20.dp)
-				.padding(top = 16.dp, bottom = 40.dp),
+				.padding(horizontal = (20 * u).dp)
+				.padding(top = (16 * u).dp, bottom = (40 * u).dp),
 		) {
-			Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+			Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy((8 * u).dp)) {
 				Box(
 					contentAlignment = Alignment.Center,
-					modifier = Modifier.size(64.dp).background(Color(0xFF242B3D), CircleShape),
+					modifier = Modifier.size((64 * u).dp).background(Color(0xFF242B3D), CircleShape),
 				) {
 					Text(
 						text = "H",
-						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 22.sp),
+						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (22 * u).sp, lineHeight = (28 * u).sp),
 						color = Color(0xFF9EADC7),
 					)
 				}
 				Text(
 					text = "Hamza",
-					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 20.sp),
+					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (19 * u).sp, lineHeight = (25 * u).sp),
 					color = Color.White,
 				)
 				Text(
 					text = "Paper investor · joined July 2026",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 12.sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
 					color = Muted,
 				)
 			}
 			// YOUR TASTE card.
 			Column(
-				verticalArrangement = Arrangement.spacedBy(10.dp),
+				verticalArrangement = Arrangement.spacedBy((10 * u).dp),
 				modifier = Modifier
 					.fillMaxWidth()
-					.clip(RoundedCornerShape(16.dp))
+					.clip(RoundedCornerShape((16 * u).dp))
 					.background(CardBg)
-					.padding(14.dp),
+					.padding((14 * u).dp),
 			) {
 				Text(
 					text = "YOUR TASTE",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 11.sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (11 * u).sp, lineHeight = (14 * u).sp),
 					color = Muted,
 				)
-				Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+				Row(horizontalArrangement = Arrangement.spacedBy((8 * u).dp)) {
 					listOf("Tech Curious", "High Growth", "Consumer Brands").forEach { label ->
 						Box(
 							modifier = Modifier
-								.clip(RoundedCornerShape(14.dp))
+								.clip(RoundedCornerShape((14 * u).dp))
 								.background(ChipBg)
-								.border(1.dp, ChipBorder, RoundedCornerShape(14.dp))
-								.padding(horizontal = 12.dp, vertical = 6.dp),
+								.border((1 * u).dp, ChipBorder, RoundedCornerShape((14 * u).dp))
+								.padding(horizontal = (12 * u).dp, vertical = (6 * u).dp),
 						) {
 							Text(
 								text = label,
-								style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 12.sp),
+								style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
 								color = ChipInk,
 							)
 						}
@@ -136,20 +137,20 @@ fun ProfileScreen(onBack: () -> Unit) {
 				}
 				Text(
 					text = "Your taste graph sharpens with every swipe.",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 12.sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
 					color = Body,
 				)
 			}
 			// Paper stats card.
 			Column(
-				verticalArrangement = Arrangement.spacedBy(10.dp),
+				verticalArrangement = Arrangement.spacedBy((10 * u).dp),
 				modifier = Modifier
 					.fillMaxWidth()
-					.clip(RoundedCornerShape(16.dp))
+					.clip(RoundedCornerShape((16 * u).dp))
 					.background(CardBg)
-					.padding(14.dp),
+					.padding((14 * u).dp),
 			) {
-				Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 0.dp)) {
+				Row(modifier = Modifier.fillMaxWidth().height((40 * u).dp).padding(horizontal = 0.dp)) {
 					ProfileStat("$10,240", "Portfolio")
 					Spacer(modifier = Modifier.weight(1f))
 					ProfileStat("$8,800.00", "Cash")
@@ -158,7 +159,7 @@ fun ProfileScreen(onBack: () -> Unit) {
 				}
 				Text(
 					text = "▲ +$240.00 all time on $10,000 paper",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 12.sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
 					color = Green,
 				)
 			}
@@ -166,31 +167,31 @@ fun ProfileScreen(onBack: () -> Unit) {
 			Column(
 				modifier = Modifier
 					.fillMaxWidth()
-					.clip(RoundedCornerShape(16.dp))
+					.clip(RoundedCornerShape((16 * u).dp))
 					.background(CardBg)
-					.padding(vertical = 4.dp),
+					.padding(vertical = (4 * u).dp),
 			) {
 				listOf("Notifications", "Appearance", "Linked accounts", "Help & support").forEach { label ->
 					Row(
 						verticalAlignment = Alignment.CenterVertically,
 						modifier = Modifier
 							.fillMaxWidth()
-							.height(48.dp)
+							.height((48 * u).dp)
 							.clickable(
 								interactionSource = remember { MutableInteractionSource() },
 								indication = null,
 							) { /* Settings screens land in a later phase. */ }
-							.padding(horizontal = 14.dp),
+							.padding(horizontal = (14 * u).dp),
 					) {
 						Text(
 							text = label,
-							style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 13.sp),
+							style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp, lineHeight = (17 * u).sp),
 							color = Color.White,
 						)
 						Spacer(modifier = Modifier.weight(1f))
 						Text(
 							text = "›",
-							style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 14.sp),
+							style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp),
 							color = Muted,
 						)
 					}
@@ -200,8 +201,8 @@ fun ProfileScreen(onBack: () -> Unit) {
 				contentAlignment = Alignment.Center,
 				modifier = Modifier
 					.fillMaxWidth()
-					.height(52.dp)
-					.border(0.36.dp, Color(0x54343B4F), RoundedCornerShape(6.dp))
+					.height((52 * u).dp)
+					.border((0.36 * u).dp, Color(0x54343B4F), RoundedCornerShape((6 * u).dp))
 					.clickable(
 						interactionSource = remember { MutableInteractionSource() },
 						indication = null,
@@ -209,7 +210,7 @@ fun ProfileScreen(onBack: () -> Unit) {
 			) {
 				Text(
 					text = "Log out",
-					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = 14.sp),
+					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp, lineHeight = (18 * u).sp),
 					color = Muted,
 				)
 			}
@@ -219,15 +220,16 @@ fun ProfileScreen(onBack: () -> Unit) {
 
 @Composable
 private fun ProfileStat(value: String, label: String) {
-	Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
+	Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy((4 * u).dp)) {
 		Text(
 			text = value,
-			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 16.sp),
+			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp, lineHeight = (20 * u).sp),
 			color = Bright,
 		)
 		Text(
 			text = label,
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 11.sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp, lineHeight = (14 * u).sp),
 			color = Muted,
 		)
 	}

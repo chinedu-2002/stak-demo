@@ -64,6 +64,7 @@ internal object News {
  */
 @Composable
 fun NewsScreen(onOpenArticle: () -> Unit) {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Column(modifier = Modifier.fillMaxSize().background(StakColors.Bg)) {
 		Row(
 			verticalAlignment = Alignment.CenterVertically,
@@ -71,41 +72,41 @@ fun NewsScreen(onOpenArticle: () -> Unit) {
 				.fillMaxWidth()
 				.background(StakColors.Bg)
 				.statusBarsPadding()
-				.padding(horizontal = 20.dp)
-				.padding(top = 22.dp),
+				.padding(horizontal = (20 * u).dp)
+				.padding(top = (22 * u).dp),
 		) {
-			Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+			Column(verticalArrangement = Arrangement.spacedBy((4 * u).dp)) {
 				Text(
 					text = "News",
-					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 26.sp),
+					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (26 * u).sp, lineHeight = (33 * u).sp),
 					color = Color.White,
 				)
 				Text(
 					text = "Saturday, July 4",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 13.sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (13 * u).sp, lineHeight = (17 * u).sp),
 					color = News.Muted,
 				)
 			}
 			Spacer(modifier = Modifier.weight(1f))
 			Box(
 				contentAlignment = Alignment.Center,
-				modifier = Modifier.size(40.dp).background(News.CardBg, CircleShape),
+				modifier = Modifier.size((40 * u).dp).background(News.CardBg, CircleShape),
 			) {
 				Image(
 					painter = painterResource(R.drawable.ic_news_search),
 					contentDescription = "Search",
-					modifier = Modifier.size(20.dp),
+					modifier = Modifier.size((20 * u).dp),
 				)
 			}
 		}
 		Column(
-			verticalArrangement = Arrangement.spacedBy(22.dp),
+			verticalArrangement = Arrangement.spacedBy((22 * u).dp),
 			modifier = Modifier
 				.weight(1f)
 				.fillMaxWidth()
 				.verticalScroll(rememberScrollState())
-				.padding(horizontal = 20.dp)
-				.padding(top = 22.dp),
+				.padding(horizontal = (20 * u).dp)
+				.padding(top = (22 * u).dp),
 		) {
 			MoodMiniRow()
 			BriefCarousel(onRead = onOpenArticle)
@@ -136,23 +137,24 @@ fun NewsScreen(onOpenArticle: () -> Unit) {
 /** Compact Market Mood row — #171d2c r12 with the small low-volatility gauge. */
 @Composable
 private fun MoodMiniRow() {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Row(
 		verticalAlignment = Alignment.CenterVertically,
 		modifier = Modifier
 			.fillMaxWidth()
-			.clip(RoundedCornerShape(12.dp))
+			.clip(RoundedCornerShape((12 * u).dp))
 			.background(News.MoodBg)
-			.padding(horizontal = 14.dp, vertical = 12.dp),
+			.padding(horizontal = (14 * u).dp, vertical = (12 * u).dp),
 	) {
-		Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+		Column(verticalArrangement = Arrangement.spacedBy((2 * u).dp)) {
 			Text(
 				text = "Market Mood",
-				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 13.sp),
+				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (13 * u).sp, lineHeight = (16 * u).sp),
 				color = Color.White,
 			)
 			Text(
 				text = "Low volatility",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 11.sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp, lineHeight = (14 * u).sp),
 				color = News.Teal,
 			)
 		}
@@ -160,7 +162,7 @@ private fun MoodMiniRow() {
 		Image(
 			painter = painterResource(R.drawable.news_gauge_small),
 			contentDescription = null,
-			modifier = Modifier.size(40.97.dp, 20.76.dp),
+			modifier = Modifier.size((40.97 * u).dp, (20.76 * u).dp),
 		)
 	}
 }
@@ -168,71 +170,72 @@ private fun MoodMiniRow() {
 /** TODAY'S BRIEF — teal r18 feature card + pager dots. */
 @Composable
 private fun BriefCarousel(onRead: () -> Unit) {
-	Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
+	Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy((12 * u).dp)) {
 		Column(
-			verticalArrangement = Arrangement.spacedBy(9.dp),
+			verticalArrangement = Arrangement.spacedBy((9 * u).dp),
 			modifier = Modifier
 				.fillMaxWidth()
-				.clip(RoundedCornerShape(18.dp))
+				.clip(RoundedCornerShape((18 * u).dp))
 				.background(News.Teal)
 				.clickable(
 					interactionSource = remember { MutableInteractionSource() },
 					indication = null,
 					onClick = onRead,
 				)
-				.padding(start = 18.dp, end = 18.dp, top = 18.dp, bottom = 16.dp),
+				.padding(start = (18 * u).dp, end = (18 * u).dp, top = (18 * u).dp, bottom = (16 * u).dp),
 		) {
 			Text(
 				text = "TODAY’S BRIEF",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 10.sp, letterSpacing = 0.6.sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, lineHeight = (13 * u).sp, letterSpacing = (0.6 * u).sp),
 				color = News.Ink,
 			)
 			Text(
 				text = "Dow closes at a record as chips slide",
-				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 19.sp, lineHeight = 25.sp),
+				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (19 * u).sp, lineHeight = (25 * u).sp),
 				color = News.Ink,
 			)
 			Text(
 				text = "Wall Street split into the long weekend. The Dow hit an all time high while a memory chip rout pulled the Nasdaq down, and a soft jobs report eased the pressure on the...",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 12.sp, lineHeight = 17.sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12.5 * u).sp, lineHeight = (17 * u).sp),
 				color = News.Ink,
 			)
 			Row(
 				verticalAlignment = Alignment.CenterVertically,
-				modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
+				modifier = Modifier.fillMaxWidth().height((21 * u).dp),
 			) {
 				Text(
 					text = "Bloomberg · 10h",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 11.sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp, lineHeight = (14 * u).sp),
 					color = News.Ink.copy(alpha = 0.6f),
 				)
 				Spacer(modifier = Modifier.weight(1f))
-				Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+				Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy((4 * u).dp)) {
 					Text(
 						text = "Read",
-						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 12.sp),
+						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp),
 						color = News.Ink,
 					)
 					Text(
 						text = "›",
-						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 13.sp),
+						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp),
 						color = News.Ink,
 					)
 				}
 			}
 		}
 		// Pager dots — 16x6 active pill (#69b3ca) + three #5c6b85 dots.
-		Canvas(modifier = Modifier.size(52.dp, 6.dp)) {
+		Canvas(modifier = Modifier.size((52 * u).dp, (6 * u).dp)) {
 			drawRoundRect(
 				News.Teal,
-				size = androidx.compose.ui.geometry.Size(16.dp.toPx(), 6.dp.toPx()),
-				cornerRadius = androidx.compose.ui.geometry.CornerRadius(3.dp.toPx()),
+				size = androidx.compose.ui.geometry.Size((16 * u).dp.toPx(), (6 * u).dp.toPx()),
+				cornerRadius = androidx.compose.ui.geometry.CornerRadius((3 * u).dp.toPx()),
 			)
 			for (i in 0..2) {
 				drawCircle(
 					Color(0xFF5C6B85),
-					radius = 3.dp.toPx(),
-					center = androidx.compose.ui.geometry.Offset((25 + i * 12).dp.toPx(), 3.dp.toPx()),
+					radius = (3 * u).dp.toPx(),
+					center = androidx.compose.ui.geometry.Offset(((25 + i * 12) * u).dp.toPx(), (3 * u).dp.toPx()),
 				)
 			}
 		}
@@ -242,7 +245,8 @@ private fun BriefCarousel(onRead: () -> Unit) {
 /** The two 128dp story tiles ("Markets" / "Your stocks"). */
 @Composable
 private fun StoryGrid(onOpenArticle: () -> Unit) {
-	Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth().height(128.dp)) {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
+	Row(horizontalArrangement = Arrangement.spacedBy((12 * u).dp), modifier = Modifier.fillMaxWidth().height((128 * u).dp)) {
 		StoryTile(
 			tag = "Markets",
 			headline = "Fed minutes land Wednesday",
@@ -262,29 +266,30 @@ private fun StoryGrid(onOpenArticle: () -> Unit) {
 
 @Composable
 private fun StoryTile(tag: String, headline: String, source: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Column(
-		verticalArrangement = Arrangement.spacedBy(8.dp),
+		verticalArrangement = Arrangement.spacedBy((8 * u).dp),
 		modifier = modifier
-			.height(128.dp)
-			.clip(RoundedCornerShape(12.dp))
+			.height((128 * u).dp)
+			.clip(RoundedCornerShape((12 * u).dp))
 			.background(News.CardBg)
 			.clickable(
 				interactionSource = remember { MutableInteractionSource() },
 				indication = null,
 				onClick = onClick,
 			)
-			.padding(14.dp),
+			.padding((14 * u).dp),
 	) {
-		NewsTag(text = tag, letterSpacing = 0.4.sp)
+		NewsTag(text = tag, letterSpacing = (0.4 * u).sp)
 		Text(
 			text = headline,
-			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Light, fontSize = 12.sp, lineHeight = 20.sp),
+			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Light, fontSize = (14 * u).sp, lineHeight = (20 * u).sp),
 			color = Color.White,
 		)
 		Spacer(modifier = Modifier.weight(1f))
 		Text(
 			text = source,
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 10.sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (10 * u).sp, lineHeight = (13 * u).sp),
 			color = News.Muted,
 		)
 	}
@@ -293,15 +298,16 @@ private fun StoryTile(tag: String, headline: String, source: String, onClick: ()
 /** #242b3d r5 chip — Geist 8 #819abb. */
 @Composable
 internal fun NewsTag(text: String, letterSpacing: androidx.compose.ui.unit.TextUnit = 0.sp) {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Box(
 		modifier = Modifier
-			.clip(RoundedCornerShape(5.dp))
+			.clip(RoundedCornerShape((5 * u).dp))
 			.background(News.ChipBg)
-			.padding(horizontal = 7.dp, vertical = 3.dp),
+			.padding(horizontal = (7 * u).dp, vertical = (3 * u).dp),
 	) {
 		Text(
 			text = text,
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 8.sp, letterSpacing = letterSpacing),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (8 * u).sp, lineHeight = (10 * u).sp, letterSpacing = letterSpacing),
 			color = News.Muted,
 		)
 	}
@@ -314,38 +320,38 @@ private fun NewsSection(
 	rows: List<Triple<Int, String, String>>,
 	onOpenArticle: () -> Unit,
 ) {
-	Column(verticalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
+	Column(verticalArrangement = Arrangement.spacedBy((10 * u).dp), modifier = Modifier.fillMaxWidth()) {
 		Text(
 			text = title,
-			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 16.sp),
+			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp, lineHeight = (22 * u).sp),
 			color = News.HeaderGray,
-			modifier = Modifier.padding(bottom = 2.dp),
 		)
 		rows.forEach { (thumbRes, source, headline) ->
 			Row(
 				verticalAlignment = Alignment.CenterVertically,
-				horizontalArrangement = Arrangement.spacedBy(12.dp),
+				horizontalArrangement = Arrangement.spacedBy((12 * u).dp),
 				modifier = Modifier
 					.fillMaxWidth()
-					.clip(RoundedCornerShape(14.dp))
+					.clip(RoundedCornerShape((14 * u).dp))
 					.background(News.CardBg)
 					.clickable(
 						interactionSource = remember { MutableInteractionSource() },
 						indication = null,
 					) { if ("Apple" in headline) onOpenArticle() }
-					.padding(12.dp),
+					.padding((12 * u).dp),
 			) {
 				Image(
 					painter = painterResource(thumbRes),
 					contentDescription = null,
 					contentScale = ContentScale.Crop,
-					modifier = Modifier.size(60.dp).clip(RoundedCornerShape(10.dp)),
+					modifier = Modifier.size((60 * u).dp).clip(RoundedCornerShape((10 * u).dp)),
 				)
-				Column(verticalArrangement = Arrangement.spacedBy(5.dp), modifier = Modifier.weight(1f)) {
+				Column(verticalArrangement = Arrangement.spacedBy((5 * u).dp), modifier = Modifier.weight(1f)) {
 					Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
 						Text(
 							text = source,
-							style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 11.sp),
+							style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp, lineHeight = (14 * u).sp),
 							color = News.Muted,
 						)
 						Spacer(modifier = Modifier.weight(1f))
@@ -353,7 +359,7 @@ private fun NewsSection(
 					}
 					Text(
 						text = headline,
-						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Light, fontSize = 12.sp, lineHeight = 19.sp),
+						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Light, fontSize = (14 * u).sp, lineHeight = (19 * u).sp),
 						color = Color.White,
 					)
 				}

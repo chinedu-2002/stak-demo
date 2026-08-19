@@ -65,6 +65,7 @@ private val CtaBorder = Color(0xA1659EAD)
  */
 @Composable
 fun NewsDetailScreen(onBack: () -> Unit) {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	var saved by rememberSaveable { mutableStateOf(false) }
 	var showSuccess by rememberSaveable { mutableStateOf(false) }
 
@@ -77,14 +78,14 @@ fun NewsDetailScreen(onBack: () -> Unit) {
 					.fillMaxWidth()
 					.background(StakColors.Bg)
 					.statusBarsPadding()
-					.padding(start = 16.dp, end = 18.dp, top = 10.dp, bottom = 12.dp),
+					.padding(start = (16 * u).dp, end = (18 * u).dp, top = (10 * u).dp, bottom = (12 * u).dp),
 			) {
 				AuthBackCircle(onClick = onBack)
 				Spacer(modifier = Modifier.weight(1f))
 				Image(
 					painter = painterResource(R.drawable.ic_news_share),
 					contentDescription = "Share",
-					modifier = Modifier.size(24.dp),
+					modifier = Modifier.size((24 * u).dp),
 				)
 			}
 			Column(
@@ -96,20 +97,20 @@ fun NewsDetailScreen(onBack: () -> Unit) {
 			) {
 				HeroImage(saved = saved)
 				Column(
-					verticalArrangement = Arrangement.spacedBy(15.dp),
+					verticalArrangement = Arrangement.spacedBy((15 * u).dp),
 					modifier = Modifier
 						.fillMaxWidth()
-						.padding(horizontal = 20.dp)
-						.padding(top = 22.dp, bottom = 28.dp),
+						.padding(horizontal = (20 * u).dp)
+						.padding(top = (22 * u).dp, bottom = (28 * u).dp),
 				) {
 					Text(
 						text = "Apple climbs 5% on foldable iPhone push",
-						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 20.sp, lineHeight = 32.sp),
+						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (20 * u).sp, lineHeight = (32 * u).sp),
 						color = Color.White,
 					)
 					Text(
 						text = "A bigger foldable order and the widest iPhone lineup in years sent Apple toward a record, and to within touching distance of Nvidia’s crown.",
-						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 14.sp, lineHeight = 22.sp),
+						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp, lineHeight = (22 * u).sp),
 						color = News.Muted,
 					)
 					Byline()
@@ -137,7 +138,7 @@ fun NewsDetailScreen(onBack: () -> Unit) {
 					SourceRow()
 					KeyStatsCard()
 					Divider()
-					Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+					Row(horizontalArrangement = Arrangement.spacedBy((8 * u).dp)) {
 						ArticleTag("Apple")
 						if (saved) {
 							ArticleTag("Tech")
@@ -159,12 +160,13 @@ fun NewsDetailScreen(onBack: () -> Unit) {
 /** 360x208 r10 hero — phone art, Tech & Ai toast, play badge, bookmark/saved chip. */
 @Composable
 private fun HeroImage(saved: Boolean) {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Box(
 		modifier = Modifier
-			.padding(horizontal = 15.dp)
+			.padding(horizontal = (15 * u).dp)
 			.fillMaxWidth()
-			.height(208.dp)
-			.clip(RoundedCornerShape(10.dp))
+			.height((208 * u).dp)
+			.clip(RoundedCornerShape((10 * u).dp))
 			.background(Color(0xFFC4C4C4)),
 	) {
 		Image(
@@ -173,51 +175,51 @@ private fun HeroImage(saved: Boolean) {
 			contentScale = ContentScale.Crop,
 			modifier = Modifier
 				.align(Alignment.Center)
-				.offset(x = (-0.5).dp, y = 16.59.dp)
-				.size(407.dp, 271.18.dp),
+				.offset(x = (-0.5 * u).dp, y = (16.59 * u).dp)
+				.size((407 * u).dp, (271.18 * u).dp),
 		)
 		Image(
 			painter = painterResource(R.drawable.ic_hero_play),
 			contentDescription = null,
 			modifier = Modifier
 				.align(Alignment.Center)
-				.offset(x = (-0.5).dp, y = 12.5.dp)
+				.offset(x = (-0.5 * u).dp, y = (12.5 * u).dp)
 				.rotate(90f)
-				.size(59.92.dp, 53.75.dp),
+				.size((59.92 * u).dp, (53.75 * u).dp),
 		)
 		Box(
 			modifier = Modifier
 				.align(Alignment.BottomStart)
-				.padding(start = 9.dp, bottom = 10.dp)
-				.clip(RoundedCornerShape(7.88.dp))
+				.padding(start = (9 * u).dp, bottom = (10 * u).dp)
+				.clip(RoundedCornerShape((7.88 * u).dp))
 				.background(Color(0x40242B3D))
-				.padding(horizontal = 7.dp, vertical = 5.dp),
+				.padding(horizontal = (7 * u).dp, vertical = (5 * u).dp),
 		) {
 			Text(
 				text = "Tech & Ai",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 10.sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp),
 				color = Color.White,
 			)
 		}
 		if (saved) {
 			Row(
 				verticalAlignment = Alignment.CenterVertically,
-				horizontalArrangement = Arrangement.spacedBy(4.dp),
+				horizontalArrangement = Arrangement.spacedBy((4 * u).dp),
 				modifier = Modifier
 					.align(Alignment.TopEnd)
-					.padding(top = 8.dp, end = 7.dp)
-					.clip(RoundedCornerShape(7.88.dp))
+					.padding(top = (8 * u).dp, end = (7 * u).dp)
+					.clip(RoundedCornerShape((7.88 * u).dp))
 					.background(Color(0x40242B3D))
-					.padding(horizontal = 7.dp, vertical = 5.dp),
+					.padding(horizontal = (7 * u).dp, vertical = (5 * u).dp),
 			) {
 				Image(
 					painter = painterResource(R.drawable.ic_saved_bookmark),
 					contentDescription = null,
-					modifier = Modifier.size(11.dp),
+					modifier = Modifier.size((11 * u).dp),
 				)
 				Text(
 					text = "Saved to My STAK",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 10.sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp),
 					color = Color.White,
 				)
 			}
@@ -227,8 +229,8 @@ private fun HeroImage(saved: Boolean) {
 				contentDescription = null,
 				modifier = Modifier
 					.align(Alignment.TopEnd)
-					.padding(top = 8.dp, end = 11.dp)
-					.size(17.79.dp, 18.27.dp),
+					.padding(top = (8 * u).dp, end = (11 * u).dp)
+					.size((17.79 * u).dp, (18.27 * u).dp),
 			)
 		}
 	}
@@ -236,30 +238,31 @@ private fun HeroImage(saved: Boolean) {
 
 @Composable
 private fun Byline() {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Row(
 		verticalAlignment = Alignment.CenterVertically,
-		horizontalArrangement = Arrangement.spacedBy(8.dp),
-		modifier = Modifier.padding(vertical = 2.dp),
+		horizontalArrangement = Arrangement.spacedBy((8 * u).dp),
+		modifier = Modifier.padding(vertical = (2 * u).dp),
 	) {
 		Box(
 			contentAlignment = Alignment.Center,
-			modifier = Modifier.size(24.dp).background(News.ChipBg, CircleShape),
+			modifier = Modifier.size((24 * u).dp).background(News.ChipBg, CircleShape),
 		) {
 			Text(
 				text = "B",
-				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 10.sp),
+				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (10 * u).sp),
 				color = Color(0xFF9EADC7),
 			)
 		}
-		Row(horizontalArrangement = Arrangement.spacedBy(5.dp), verticalAlignment = Alignment.CenterVertically) {
+		Row(horizontalArrangement = Arrangement.spacedBy((5 * u).dp), verticalAlignment = Alignment.CenterVertically) {
 			Text(
 				text = "Bloomberg",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 12.sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp),
 				color = Color.White,
 			)
 			Text(
 				text = "· Jul 2 · 3 min read",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 12.sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp),
 				color = News.Faint,
 			)
 		}
@@ -269,13 +272,14 @@ private fun Byline() {
 /** 150x52 gradient CTA with the plus mark. */
 @Composable
 private fun AddToStakButton(onClick: () -> Unit) {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Row(
 		verticalAlignment = Alignment.CenterVertically,
-		horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+		horizontalArrangement = Arrangement.spacedBy((8 * u).dp, Alignment.CenterHorizontally),
 		modifier = Modifier
-			.size(150.dp, 52.dp)
-			.background(CtaGradient, RoundedCornerShape(6.dp))
-			.border(0.36.dp, CtaBorder, RoundedCornerShape(6.dp))
+			.size((150 * u).dp, (52 * u).dp)
+			.background(CtaGradient, RoundedCornerShape((6 * u).dp))
+			.border((0.36 * u).dp, CtaBorder, RoundedCornerShape((6 * u).dp))
 			.clickable(
 				interactionSource = remember { MutableInteractionSource() },
 				indication = null,
@@ -284,88 +288,90 @@ private fun AddToStakButton(onClick: () -> Unit) {
 	) {
 		Text(
 			text = "Add to STAK",
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 14.sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp),
 			color = Color.White,
 		)
 		Image(
 			painter = painterResource(R.drawable.ic_plus_small),
 			contentDescription = null,
-			modifier = Modifier.size(14.dp),
+			modifier = Modifier.size((14 * u).dp),
 		)
 	}
 }
 
 @Composable
 private fun Divider() {
-	Box(modifier = Modifier.fillMaxWidth().height(1.dp).background(News.Divider))
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
+	Box(modifier = Modifier.fillMaxWidth().height((1 * u).dp).background(News.Divider))
 }
 
 /** AAPL price card — badge, Daily chip, $308.63 + sparkline; saved adds View row. */
 @Composable
 private fun StockCard(saved: Boolean) {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Column(
-		verticalArrangement = Arrangement.spacedBy(13.dp),
+		verticalArrangement = Arrangement.spacedBy((13 * u).dp),
 		modifier = Modifier
 			.fillMaxWidth()
-			.clip(RoundedCornerShape(16.dp))
+			.clip(RoundedCornerShape((16 * u).dp))
 			.background(News.CardBg)
-			.padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 14.dp),
+			.padding(start = (16 * u).dp, end = (16 * u).dp, top = (16 * u).dp, bottom = (14 * u).dp),
 	) {
 		Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
 			Box(
 				contentAlignment = Alignment.Center,
-				modifier = Modifier.size(44.dp).background(News.ChipBg, CircleShape),
+				modifier = Modifier.size((44 * u).dp).background(News.ChipBg, CircleShape),
 			) {
 				Text(
 					text = "A",
-					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 18.sp),
+					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (18 * u).sp),
 					color = Color(0xFF9EADC7),
 				)
 			}
-			Spacer(modifier = Modifier.width(12.dp))
-			Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
+			Spacer(modifier = Modifier.width((12 * u).dp))
+			Column(verticalArrangement = Arrangement.spacedBy((3 * u).dp)) {
 				Text(
 					text = "Apple Inc.",
-					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 15.sp),
+					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp),
 					color = Color.White,
 				)
 				Text(
 					text = "AAPL",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 12.sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp),
 					color = News.Muted,
 				)
 			}
 			Spacer(modifier = Modifier.weight(1f))
 			Row(
 				verticalAlignment = Alignment.CenterVertically,
-				horizontalArrangement = Arrangement.spacedBy(5.dp),
+				horizontalArrangement = Arrangement.spacedBy((5 * u).dp),
 				modifier = Modifier
-					.clip(RoundedCornerShape(6.dp))
+					.clip(RoundedCornerShape((6 * u).dp))
 					.background(Color(0x403E4958))
-					.padding(horizontal = 10.dp, vertical = 4.dp),
+					.padding(horizontal = (10 * u).dp, vertical = (4 * u).dp),
 			) {
 				Text(
 					text = "Daily",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 8.sp, letterSpacing = 0.4.sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (8 * u).sp, letterSpacing = (0.4 * u).sp),
 					color = Color.White,
 				)
 				Image(
 					painter = painterResource(R.drawable.ic_daily_chevron),
 					contentDescription = null,
-					modifier = Modifier.size(6.53.dp, 3.56.dp),
+					modifier = Modifier.size((6.53 * u).dp, (3.56 * u).dp),
 				)
 			}
 		}
 		Row(verticalAlignment = Alignment.Bottom, modifier = Modifier.fillMaxWidth()) {
-			Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
+			Column(verticalArrangement = Arrangement.spacedBy((3 * u).dp)) {
 				Text(
 					text = "$308.63",
-					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 26.sp),
+					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (26 * u).sp),
 					color = Color.White,
 				)
 				Text(
 					text = "+4.84% today",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 13.sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp),
 					color = News.Green,
 				)
 			}
@@ -373,22 +379,22 @@ private fun StockCard(saved: Boolean) {
 			Image(
 				painter = painterResource(R.drawable.news_sparkline),
 				contentDescription = null,
-				modifier = Modifier.size(110.dp, 40.dp),
+				modifier = Modifier.size((110 * u).dp, (40 * u).dp),
 			)
 		}
 		if (saved) {
-			Box(modifier = Modifier.fillMaxWidth().height(1.dp).background(News.Divider))
-			Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().padding(top = 1.dp)) {
+			Box(modifier = Modifier.fillMaxWidth().height((1 * u).dp).background(News.Divider))
+			Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().padding(top = (1 * u).dp)) {
 				Text(
 					text = "View AAPL in My STAK",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 13.sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp),
 					color = News.Teal,
 				)
 				Spacer(modifier = Modifier.weight(1f))
 				Image(
 					painter = painterResource(R.drawable.ic_daily_chevron),
 					contentDescription = null,
-					modifier = Modifier.rotate(-90f).size(6.88.dp, 3.75.dp),
+					modifier = Modifier.rotate(-90f).size((6.88 * u).dp, (3.75 * u).dp),
 				)
 			}
 		}
@@ -398,19 +404,20 @@ private fun StockCard(saved: Boolean) {
 /** "The gist" — sparkle header + three check bullets. */
 @Composable
 private fun GistCard() {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Column(
-		verticalArrangement = Arrangement.spacedBy(12.dp),
+		verticalArrangement = Arrangement.spacedBy((12 * u).dp),
 		modifier = Modifier
 			.fillMaxWidth()
-			.clip(RoundedCornerShape(14.dp))
+			.clip(RoundedCornerShape((14 * u).dp))
 			.background(News.CardBg)
-			.padding(16.dp),
+			.padding((16 * u).dp),
 	) {
-		Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-			Image(painterResource(R.drawable.ic_gist_sparkle), null, modifier = Modifier.size(18.dp))
+		Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy((8 * u).dp)) {
+			Image(painterResource(R.drawable.ic_gist_sparkle), null, modifier = Modifier.size((18 * u).dp))
 			Text(
 				text = "The gist",
-				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 14.sp),
+				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (14 * u).sp),
 				color = Color.White,
 			)
 		}
@@ -422,11 +429,12 @@ private fun GistCard() {
 
 @Composable
 private fun GistBullet(text: String) {
-	Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
-		Image(painterResource(R.drawable.ic_gist_check), null, modifier = Modifier.size(16.dp))
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
+	Row(horizontalArrangement = Arrangement.spacedBy((10 * u).dp), modifier = Modifier.fillMaxWidth()) {
+		Image(painterResource(R.drawable.ic_gist_check), null, modifier = Modifier.size((16 * u).dp))
 		Text(
 			text = text,
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 13.sp, lineHeight = 19.sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (13 * u).sp, lineHeight = (19 * u).sp),
 			color = News.Body,
 			modifier = Modifier.weight(1f),
 		)
@@ -435,28 +443,30 @@ private fun GistBullet(text: String) {
 
 @Composable
 private fun Paragraph(text: String, size: androidx.compose.ui.unit.TextUnit = 14.sp, line: androidx.compose.ui.unit.TextUnit = 23.sp) {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Text(
 		text = text,
-		style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = size, lineHeight = line),
+		style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = size * u, lineHeight = line * u),
 		color = News.Body,
 	)
 }
 
 @Composable
 private fun PullQuote() {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Row(
-		horizontalArrangement = Arrangement.spacedBy(14.dp),
-		modifier = Modifier.fillMaxWidth().padding(start = 2.dp, top = 6.dp, bottom = 6.dp).height(androidx.compose.foundation.layout.IntrinsicSize.Min),
+		horizontalArrangement = Arrangement.spacedBy((14 * u).dp),
+		modifier = Modifier.fillMaxWidth().padding(start = (2 * u).dp, top = (6 * u).dp, bottom = (6 * u).dp).height(androidx.compose.foundation.layout.IntrinsicSize.Min),
 	) {
 		Box(
 			modifier = Modifier
-				.width(3.dp)
+				.width((3 * u).dp)
 				.fillMaxSize()
-				.background(News.Teal, RoundedCornerShape(2.dp)),
+				.background(News.Teal, RoundedCornerShape((2 * u).dp)),
 		)
 		Text(
 			text = "Companies do not quietly double down on a product they expect to flop.",
-			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 16.sp, lineHeight = 26.sp),
+			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp, lineHeight = (26 * u).sp),
 			color = Color(0xFFD3D3DD),
 			modifier = Modifier.weight(1f),
 		)
@@ -465,25 +475,26 @@ private fun PullQuote() {
 
 @Composable
 private fun NewToThisCard() {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Column(
-		verticalArrangement = Arrangement.spacedBy(9.dp),
+		verticalArrangement = Arrangement.spacedBy((9 * u).dp),
 		modifier = Modifier
 			.fillMaxWidth()
-			.clip(RoundedCornerShape(14.dp))
+			.clip(RoundedCornerShape((14 * u).dp))
 			.background(News.CardBg)
-			.padding(16.dp),
+			.padding((16 * u).dp),
 	) {
-		Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-			Image(painterResource(R.drawable.ic_gist_help), null, modifier = Modifier.size(18.dp))
+		Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy((8 * u).dp)) {
+			Image(painterResource(R.drawable.ic_gist_help), null, modifier = Modifier.size((18 * u).dp))
 			Text(
 				text = "New to this?",
-				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 13.sp),
+				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (13 * u).sp),
 				color = News.Teal,
 			)
 		}
 		Text(
 			text = "A foldable phone opens out into a small tablet. For Apple it means a pricier device to sell, and a way to win back buyers who drifted to Samsung, which has offered foldables for years.",
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 13.sp, lineHeight = 20.sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (13 * u).sp, lineHeight = (20 * u).sp),
 			color = News.Body,
 		)
 	}
@@ -491,35 +502,37 @@ private fun NewToThisCard() {
 
 @Composable
 private fun SourceRow() {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Row(
 		verticalAlignment = Alignment.CenterVertically,
-		modifier = Modifier.width(81.dp),
+		modifier = Modifier.width((81 * u).dp),
 	) {
 		Text(
 			text = "Source",
-			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = 13.sp),
+			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = (13 * u).sp),
 			color = Color.White,
 		)
 		Spacer(modifier = Modifier.weight(1f))
-		Image(painterResource(R.drawable.ic_news_external), null, modifier = Modifier.size(19.dp))
+		Image(painterResource(R.drawable.ic_news_external), null, modifier = Modifier.size((19 * u).dp))
 	}
 }
 
 @Composable
 private fun KeyStatsCard() {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Column(
-		verticalArrangement = Arrangement.spacedBy(13.dp),
+		verticalArrangement = Arrangement.spacedBy((13 * u).dp),
 		modifier = Modifier
 			.fillMaxWidth()
-			.clip(RoundedCornerShape(14.dp))
+			.clip(RoundedCornerShape((14 * u).dp))
 			.background(News.CardBg)
-			.padding(16.dp),
+			.padding((16 * u).dp),
 	) {
-		Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-			Image(painterResource(R.drawable.ic_gist_info), null, modifier = Modifier.size(18.dp))
+		Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy((8 * u).dp)) {
+			Image(painterResource(R.drawable.ic_gist_info), null, modifier = Modifier.size((18 * u).dp))
 			Text(
 				text = "Key stats",
-				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 14.sp),
+				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (14 * u).sp),
 				color = Color.White,
 			)
 		}
@@ -531,23 +544,25 @@ private fun KeyStatsCard() {
 
 @Composable
 private fun StatRow(l1: String, v1: String, l2: String, v2: String) {
-	Row(horizontalArrangement = Arrangement.spacedBy(14.dp), modifier = Modifier.fillMaxWidth()) {
-		StatCell(l1, v1, modifier = Modifier.width(212.dp))
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
+	Row(horizontalArrangement = Arrangement.spacedBy((14 * u).dp), modifier = Modifier.fillMaxWidth()) {
+		StatCell(l1, v1, modifier = Modifier.width((212 * u).dp))
 		StatCell(l2, v2)
 	}
 }
 
 @Composable
 private fun StatCell(label: String, value: String, modifier: Modifier = Modifier) {
-	Column(verticalArrangement = Arrangement.spacedBy(3.dp), modifier = modifier) {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
+	Column(verticalArrangement = Arrangement.spacedBy((3 * u).dp), modifier = modifier) {
 		Text(
 			text = label,
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 11.sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp),
 			color = News.Faint,
 		)
 		Text(
 			text = value,
-			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 13.sp),
+			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (13 * u).sp),
 			color = Color.White,
 		)
 	}
@@ -556,15 +571,16 @@ private fun StatCell(label: String, value: String, modifier: Modifier = Modifier
 /** rgba(105,179,202,0.1) r12 tag chip. */
 @Composable
 private fun ArticleTag(text: String) {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Box(
 		modifier = Modifier
-			.clip(RoundedCornerShape(12.dp))
+			.clip(RoundedCornerShape((12 * u).dp))
 			.background(Color(0x1A69B3CA))
-			.padding(horizontal = 11.dp, vertical = 5.dp),
+			.padding(horizontal = (11 * u).dp, vertical = (5 * u).dp),
 	) {
 		Text(
 			text = text,
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 11.sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (11 * u).sp),
 			color = News.Muted,
 		)
 	}
@@ -572,37 +588,38 @@ private fun ArticleTag(text: String) {
 
 @Composable
 private fun ReadNext() {
-	Column(verticalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth().padding(top = 6.dp)) {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
+	Column(verticalArrangement = Arrangement.spacedBy((10 * u).dp), modifier = Modifier.fillMaxWidth().padding(top = (6 * u).dp)) {
 		Text(
 			text = "READ NEXT",
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 10.sp, letterSpacing = 0.5.sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, letterSpacing = (0.5 * u).sp),
 			color = News.Muted,
 		)
 		repeat(2) {
 			Row(
 				verticalAlignment = Alignment.CenterVertically,
-				horizontalArrangement = Arrangement.spacedBy(12.dp),
+				horizontalArrangement = Arrangement.spacedBy((12 * u).dp),
 				modifier = Modifier
 					.fillMaxWidth()
-					.clip(RoundedCornerShape(14.dp))
+					.clip(RoundedCornerShape((14 * u).dp))
 					.background(News.CardBg)
-					.padding(12.dp),
+					.padding((12 * u).dp),
 			) {
 				Image(
 					painter = painterResource(R.drawable.news_thumb_tsla_rn),
 					contentDescription = null,
 					contentScale = ContentScale.Crop,
-					modifier = Modifier.size(60.dp).clip(RoundedCornerShape(10.dp)),
+					modifier = Modifier.size((60 * u).dp).clip(RoundedCornerShape((10 * u).dp)),
 				)
-				Column(verticalArrangement = Arrangement.spacedBy(5.dp), modifier = Modifier.weight(1f)) {
+				Column(verticalArrangement = Arrangement.spacedBy((5 * u).dp), modifier = Modifier.weight(1f)) {
 					Text(
 						text = "CNBC · 2d",
-						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 11.sp),
+						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp),
 						color = News.Muted,
 					)
 					Text(
 						text = "Tesla drops 7% even after beating deliveries",
-						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = 14.sp, lineHeight = 19.sp),
+						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp, lineHeight = (19 * u).sp),
 						color = Color.White,
 					)
 				}
@@ -614,6 +631,7 @@ private fun ReadNext() {
 /** Save success — #0a1020 scrim at ~45% + the r24 #181f30 bottom sheet (101:1169). */
 @Composable
 private fun SaveSuccessOverlay(onViewInMyStak: () -> Unit, onDismiss: () -> Unit) {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Box(modifier = Modifier.fillMaxSize()) {
 		Box(
 			modifier = Modifier
@@ -627,82 +645,82 @@ private fun SaveSuccessOverlay(onViewInMyStak: () -> Unit, onDismiss: () -> Unit
 		)
 		Column(
 			horizontalAlignment = Alignment.CenterHorizontally,
-			verticalArrangement = Arrangement.spacedBy(14.dp),
+			verticalArrangement = Arrangement.spacedBy((14 * u).dp),
 			modifier = Modifier
 				.align(Alignment.BottomCenter)
 				.fillMaxWidth()
-				.clip(RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
+				.clip(RoundedCornerShape(topStart = (24 * u).dp, topEnd = (24 * u).dp))
 				.background(News.CardBg)
-				.padding(horizontal = 20.dp)
-				.padding(top = 10.dp)
+				.padding(horizontal = (20 * u).dp)
+				.padding(top = (10 * u).dp)
 				.navigationBarsPadding()
-				.padding(bottom = 30.dp),
+				.padding(bottom = (30 * u).dp),
 		) {
 			Box(
 				modifier = Modifier
-					.padding(bottom = 4.dp)
-					.size(40.dp, 4.dp)
-					.background(News.Divider, RoundedCornerShape(2.dp)),
+					.padding(bottom = (4 * u).dp)
+					.size((40 * u).dp, (4 * u).dp)
+					.background(News.Divider, RoundedCornerShape((2 * u).dp)),
 			)
-			Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(14.dp)) {
-				Image(painterResource(R.drawable.ic_sheet_check), null, modifier = Modifier.size(47.dp))
+			Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy((14 * u).dp)) {
+				Image(painterResource(R.drawable.ic_sheet_check), null, modifier = Modifier.size((47 * u).dp))
 				Text(
 					text = "Saved to My STAK",
-					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 18.sp),
+					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (18 * u).sp),
 					color = Color.White,
 				)
 			}
 			Row(
 				verticalAlignment = Alignment.CenterVertically,
-				horizontalArrangement = Arrangement.spacedBy(11.dp),
+				horizontalArrangement = Arrangement.spacedBy((11 * u).dp),
 				modifier = Modifier
 					.fillMaxWidth()
-					.clip(RoundedCornerShape(6.dp))
+					.clip(RoundedCornerShape((6 * u).dp))
 					.background(Color(0x1A69B3CA))
-					.padding(horizontal = 14.dp, vertical = 12.dp),
+					.padding(horizontal = (14 * u).dp, vertical = (12 * u).dp),
 			) {
 				Box(
 					contentAlignment = Alignment.Center,
-					modifier = Modifier.size(38.dp).background(News.ChipBg, CircleShape),
+					modifier = Modifier.size((38 * u).dp).background(News.ChipBg, CircleShape),
 				) {
 					Text(
 						text = "A",
-						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 15.sp),
+						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp),
 						color = Color(0xFF9EADC7),
 					)
 				}
-				Column(verticalArrangement = Arrangement.spacedBy(2.dp), modifier = Modifier.weight(1f)) {
+				Column(verticalArrangement = Arrangement.spacedBy((2 * u).dp), modifier = Modifier.weight(1f)) {
 					Text(
 						text = "Apple",
-						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 13.sp),
+						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp),
 						color = Color.White,
 					)
 					Text(
 						text = "$229.35 today",
-						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 10.sp),
+						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (10 * u).sp),
 						color = News.Muted,
 					)
 				}
 				Text(
 					text = "▲ 1.2%",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 12.sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp),
 					color = News.Green,
 				)
 			}
 			Text(
 				text = "Watching from today · no money committed",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 12.sp, lineHeight = 18.sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (18 * u).sp),
 				color = News.Body,
 				modifier = Modifier.fillMaxWidth(),
 			)
-			Column(verticalArrangement = Arrangement.spacedBy(16.dp), modifier = Modifier.fillMaxWidth()) {
+			Column(verticalArrangement = Arrangement.spacedBy((16 * u).dp), modifier = Modifier.fillMaxWidth()) {
 				Box(
 					contentAlignment = Alignment.Center,
 					modifier = Modifier
 						.fillMaxWidth()
-						.height(52.dp)
-						.background(CtaGradient, RoundedCornerShape(6.dp))
-						.border(0.36.dp, CtaBorder, RoundedCornerShape(6.dp))
+						.height((52 * u).dp)
+						.background(CtaGradient, RoundedCornerShape((6 * u).dp))
+						.border((0.36 * u).dp, CtaBorder, RoundedCornerShape((6 * u).dp))
 						.clickable(
 							interactionSource = remember { MutableInteractionSource() },
 							indication = null,
@@ -711,7 +729,7 @@ private fun SaveSuccessOverlay(onViewInMyStak: () -> Unit, onDismiss: () -> Unit
 				) {
 					Text(
 						text = "View in My STAK",
-						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 14.sp),
+						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp),
 						color = Color.White,
 					)
 				}
@@ -719,8 +737,8 @@ private fun SaveSuccessOverlay(onViewInMyStak: () -> Unit, onDismiss: () -> Unit
 					contentAlignment = Alignment.Center,
 					modifier = Modifier
 						.fillMaxWidth()
-						.height(52.dp)
-						.border(0.36.dp, Color(0x54343B4F), RoundedCornerShape(6.dp))
+						.height((52 * u).dp)
+						.border((0.36 * u).dp, Color(0x54343B4F), RoundedCornerShape((6 * u).dp))
 						.clickable(
 							interactionSource = remember { MutableInteractionSource() },
 							indication = null,
@@ -729,7 +747,7 @@ private fun SaveSuccessOverlay(onViewInMyStak: () -> Unit, onDismiss: () -> Unit
 				) {
 					Text(
 						text = "Back",
-						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = 14.sp),
+						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp),
 						color = News.Muted,
 					)
 				}

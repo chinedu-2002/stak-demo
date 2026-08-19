@@ -63,6 +63,7 @@ private val Teal = Color(0xFF69B3CA)
  */
 @Composable
 fun StockDetailScreen(onBack: () -> Unit, fromMyStak: Boolean = false) {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	var saved by rememberSaveable { mutableStateOf(fromMyStak) }
 	var showSuccess by rememberSaveable { mutableStateOf(false) }
 	var showBuy by rememberSaveable { mutableStateOf(false) }
@@ -75,37 +76,37 @@ fun StockDetailScreen(onBack: () -> Unit, fromMyStak: Boolean = false) {
 					.fillMaxWidth()
 					.background(StakColors.Bg)
 					.statusBarsPadding()
-					.padding(horizontal = 18.dp, vertical = 8.dp),
+					.padding(horizontal = (18 * u).dp, vertical = (8 * u).dp),
 			) {
 				AuthBackCircle(onClick = onBack)
 				Spacer(modifier = Modifier.weight(1f))
 				Text(
 					text = "AAPL",
-					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 16.sp),
+					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp),
 					color = Color.White,
 				)
 				Spacer(modifier = Modifier.weight(1f))
 				Box(
 					contentAlignment = Alignment.Center,
-					modifier = Modifier.size(40.dp).background(Card, CircleShape),
+					modifier = Modifier.size((40 * u).dp).background(Card, CircleShape),
 				) {
-					Image(painterResource(R.drawable.ic_news_share), null, modifier = Modifier.size(17.dp))
+					Image(painterResource(R.drawable.ic_news_share), null, modifier = Modifier.size((17 * u).dp))
 				}
 			}
 			Column(modifier = Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState())) {
 				Column(
-					verticalArrangement = Arrangement.spacedBy(4.dp),
-					modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp).padding(top = 10.dp, bottom = 6.dp),
+					verticalArrangement = Arrangement.spacedBy((4 * u).dp),
+					modifier = Modifier.fillMaxWidth().padding(horizontal = (20 * u).dp).padding(top = (10 * u).dp, bottom = (6 * u).dp),
 				) {
-					Text("AAPL · Apple Inc", style = TextStyle(fontFamily = Geist, fontSize = 11.sp), color = Muted)
+					Text("AAPL · Apple Inc", style = TextStyle(fontFamily = Geist, fontSize = (11 * u).sp), color = Muted)
 					Text(
 						"$229.35",
-						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 26.sp),
+						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (26 * u).sp),
 						color = Bright,
 					)
 					Text(
 						"▲ 1.2% today",
-						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 12.sp),
+						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp),
 						color = Green,
 					)
 				}
@@ -113,12 +114,12 @@ fun StockDetailScreen(onBack: () -> Unit, fromMyStak: Boolean = false) {
 					painter = painterResource(R.drawable.sd_chart_line),
 					contentDescription = null,
 					contentScale = ContentScale.Fit,
-					modifier = Modifier.align(Alignment.CenterHorizontally).size(345.dp, 76.dp),
+					modifier = Modifier.align(Alignment.CenterHorizontally).size((345 * u).dp, (76 * u).dp),
 				)
-				Spacer(modifier = Modifier.height(40.dp))
+				Spacer(modifier = Modifier.height((40 * u).dp))
 				Row(
 					verticalAlignment = Alignment.CenterVertically,
-					horizontalArrangement = Arrangement.spacedBy(37.dp),
+					horizontalArrangement = Arrangement.spacedBy((37 * u).dp),
 					modifier = Modifier.align(Alignment.CenterHorizontally),
 				) {
 					listOf("1D", "1W", "1M", "3M", "YTD", "1Y").forEach { label ->
@@ -126,25 +127,25 @@ fun StockDetailScreen(onBack: () -> Unit, fromMyStak: Boolean = false) {
 							Box(
 								contentAlignment = Alignment.Center,
 								modifier = Modifier
-									.size(39.dp, 22.5.dp)
-									.clip(RoundedCornerShape(11.25.dp))
+									.size((39 * u).dp, (22.5 * u).dp)
+									.clip(RoundedCornerShape((11.25 * u).dp))
 									.background(Color(0x292C9DBC))
-									.border(0.75.dp, Color(0x662C9DBC), RoundedCornerShape(11.25.dp)),
+									.border((0.75 * u).dp, Color(0x662C9DBC), RoundedCornerShape((11.25 * u).dp)),
 							) {
 								Text(
 									label,
-									style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 12.sp),
+									style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp),
 									color = Teal,
 								)
 							}
 						} else {
-							Text(label, style = TextStyle(fontFamily = Geist, fontSize = 12.sp), color = Muted)
+							Text(label, style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp), color = Muted)
 						}
 					}
 				}
 				Column(
-					verticalArrangement = Arrangement.spacedBy(14.dp),
-					modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 12.dp),
+					verticalArrangement = Arrangement.spacedBy((14 * u).dp),
+					modifier = Modifier.fillMaxWidth().padding(horizontal = (20 * u).dp, vertical = (12 * u).dp),
 				) {
 					if (fromMyStak) {
 						SinceYouSavedCard()
@@ -155,29 +156,29 @@ fun StockDetailScreen(onBack: () -> Unit, fromMyStak: Boolean = false) {
 					NewsSignalCard()
 					CompareCard()
 					Row(
-						horizontalArrangement = Arrangement.spacedBy(8.dp),
+						horizontalArrangement = Arrangement.spacedBy((8 * u).dp),
 						modifier = Modifier
 							.fillMaxWidth()
-							.clip(RoundedCornerShape(12.dp))
+							.clip(RoundedCornerShape((12 * u).dp))
 							.background(Card)
-							.padding(horizontal = 12.dp, vertical = 10.dp),
+							.padding(horizontal = (12 * u).dp, vertical = (10 * u).dp),
 					) {
 						Text(
 							"TIP",
-							style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 11.sp),
+							style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (11 * u).sp),
 							color = Color(0xFF5BD7E4),
 						)
 						Text(
 							"Steady giants move slower. Stable stocks often do.",
-							style = TextStyle(fontFamily = Geist, fontSize = 11.sp),
+							style = TextStyle(fontFamily = Geist, fontSize = (11 * u).sp),
 							color = Muted,
-							modifier = Modifier.width(260.dp),
+							modifier = Modifier.width((260 * u).dp),
 						)
 					}
 				}
 				Column(
-					verticalArrangement = Arrangement.spacedBy(10.dp),
-					modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp).padding(top = 4.dp, bottom = 16.dp),
+					verticalArrangement = Arrangement.spacedBy((10 * u).dp),
+					modifier = Modifier.fillMaxWidth().padding(horizontal = (20 * u).dp).padding(top = (4 * u).dp, bottom = (16 * u).dp),
 				) {
 					if (fromMyStak) {
 						DetailCta("Practice buy") { showBuy = true }
@@ -187,14 +188,14 @@ fun StockDetailScreen(onBack: () -> Unit, fromMyStak: Boolean = false) {
 							contentAlignment = Alignment.Center,
 							modifier = Modifier
 								.fillMaxWidth()
-								.height(52.dp)
-								.border(0.36.dp, Color(0xA1659EAD), RoundedCornerShape(6.dp)),
+								.height((52 * u).dp)
+								.border((0.36 * u).dp, Color(0xA1659EAD), RoundedCornerShape((6 * u).dp)),
 						) {
-							Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-								Image(painterResource(R.drawable.ic_saved_bookmark), null, modifier = Modifier.size(12.dp))
+							Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy((6 * u).dp)) {
+								Image(painterResource(R.drawable.ic_saved_bookmark), null, modifier = Modifier.size((12 * u).dp))
 								Text(
 									"Saved to My STAK",
-									style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 14.sp),
+									style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp),
 									color = Color.White,
 								)
 							}
@@ -218,45 +219,46 @@ fun StockDetailScreen(onBack: () -> Unit, fromMyStak: Boolean = false) {
 
 @Composable
 private fun RiskFitCard() {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Column(
-		verticalArrangement = Arrangement.spacedBy(12.dp),
-		modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(Card)
-			.padding(horizontal = 16.dp, vertical = 14.dp),
+		verticalArrangement = Arrangement.spacedBy((12 * u).dp),
+		modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape((16 * u).dp)).background(Card)
+			.padding(horizontal = (16 * u).dp, vertical = (14 * u).dp),
 	) {
 		Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
 			Text(
 				"Risk fit",
-				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 15.sp),
+				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp),
 				color = Bright,
 			)
 			Spacer(modifier = Modifier.weight(1f))
 			Box(
 				modifier = Modifier
-					.clip(RoundedCornerShape(999.dp))
+					.clip(RoundedCornerShape((999 * u).dp))
 					.background(Color(0x1F5DA8BF))
-					.padding(horizontal = 10.dp, vertical = 4.dp),
+					.padding(horizontal = (10 * u).dp, vertical = (4 * u).dp),
 			) {
 				Text(
 					"Matches you",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 11.sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (11 * u).sp),
 					color = Color(0xFFA6E4F7),
 				)
 			}
 		}
-		Box(modifier = Modifier.fillMaxWidth().height(8.dp).clip(RoundedCornerShape(4.dp)).background(Color(0xFF10182B))) {
+		Box(modifier = Modifier.fillMaxWidth().height((8 * u).dp).clip(RoundedCornerShape((4 * u).dp)).background(Color(0xFF10182B))) {
 			Image(
 				painterResource(R.drawable.ic_sd_marker), null,
-				modifier = Modifier.offset(x = 88.dp, y = (-3).dp).size(14.dp),
+				modifier = Modifier.offset(x = (88 * u).dp, y = (-3 * u).dp).size((14 * u).dp),
 			)
 		}
 		Row(modifier = Modifier.fillMaxWidth()) {
-			Text("Low", style = TextStyle(fontFamily = Geist, fontSize = 10.sp), color = Muted)
+			Text("Low", style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp), color = Muted)
 			Spacer(modifier = Modifier.weight(1f))
-			Text("High", style = TextStyle(fontFamily = Geist, fontSize = 10.sp), color = Muted)
+			Text("High", style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp), color = Muted)
 		}
 		Text(
 			"Low volatility. Fits the steady side of your profile.",
-			style = TextStyle(fontFamily = Geist, fontSize = 11.sp),
+			style = TextStyle(fontFamily = Geist, fontSize = (11 * u).sp),
 			color = Muted,
 		)
 	}
@@ -264,24 +266,25 @@ private fun RiskFitCard() {
 
 @Composable
 private fun NumbersCard() {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Column(
-		verticalArrangement = Arrangement.spacedBy(12.dp),
-		modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(Card)
-			.padding(horizontal = 16.dp, vertical = 14.dp),
+		verticalArrangement = Arrangement.spacedBy((12 * u).dp),
+		modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape((16 * u).dp)).background(Card)
+			.padding(horizontal = (16 * u).dp, vertical = (14 * u).dp),
 	) {
 		Text(
 			"Numbers that matter",
-			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 15.sp),
+			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp),
 			color = Bright,
 		)
-		Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+		Row(horizontalArrangement = Arrangement.spacedBy((8 * u).dp), modifier = Modifier.fillMaxWidth()) {
 			StatCell("P/E ratio", "31.2", "In line", Muted, Modifier.weight(1f))
 			StatCell("Revenue growth", "6.1%", "Slower", Muted, Modifier.weight(1f))
 			StatCell("Profit margin", "24.3%", "Excellent", Green, Modifier.weight(1f), border = true)
 		}
 		Text(
 			"Tap a stat for sector and peer benchmarks",
-			style = TextStyle(fontFamily = Geist, fontSize = 10.sp),
+			style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp),
 			color = Muted,
 		)
 	}
@@ -289,39 +292,41 @@ private fun NumbersCard() {
 
 @Composable
 private fun StatCell(label: String, value: String, verdict: String, verdictColor: Color, modifier: Modifier, border: Boolean = false) {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Column(
-		verticalArrangement = Arrangement.spacedBy(4.dp),
+		verticalArrangement = Arrangement.spacedBy((4 * u).dp),
 		modifier = modifier
-			.clip(RoundedCornerShape(12.dp))
+			.clip(RoundedCornerShape((12 * u).dp))
 			.background(Card)
-			.then(if (border) Modifier.border(1.dp, Color(0xFF212D4B), RoundedCornerShape(12.dp)) else Modifier)
-			.padding(10.dp),
+			.then(if (border) Modifier.border((1 * u).dp, Color(0xFF212D4B), RoundedCornerShape((12 * u).dp)) else Modifier)
+			.padding((10 * u).dp),
 	) {
-		Text(label, style = TextStyle(fontFamily = Geist, fontSize = 10.sp), color = Muted)
-		Text(value, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 17.sp), color = Bright)
-		Text(verdict, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 10.sp), color = verdictColor)
+		Text(label, style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp), color = Muted)
+		Text(value, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (17 * u).sp), color = Bright)
+		Text(verdict, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp), color = verdictColor)
 	}
 }
 
 @Composable
 private fun CollapsedCard(title: String, sub: String, subColor: Color) {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Column(
-		verticalArrangement = Arrangement.spacedBy(12.dp),
-		modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(Card)
-			.padding(horizontal = 16.dp, vertical = 14.dp),
+		verticalArrangement = Arrangement.spacedBy((12 * u).dp),
+		modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape((16 * u).dp)).background(Card)
+			.padding(horizontal = (16 * u).dp, vertical = (14 * u).dp),
 	) {
 		Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
 			Text(
 				title,
-				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 15.sp),
+				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp),
 				color = Bright,
 			)
 			Spacer(modifier = Modifier.weight(1f))
-			Image(painterResource(R.drawable.ic_sd_caret), null, modifier = Modifier.size(20.dp))
+			Image(painterResource(R.drawable.ic_sd_caret), null, modifier = Modifier.size((20 * u).dp))
 		}
 		Text(
 			sub,
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 11.sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (11 * u).sp),
 			color = subColor,
 		)
 	}
@@ -329,65 +334,66 @@ private fun CollapsedCard(title: String, sub: String, subColor: Color) {
 
 @Composable
 private fun NewsSignalCard() {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Column(
-		verticalArrangement = Arrangement.spacedBy(12.dp),
-		modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(Card)
-			.padding(horizontal = 16.dp, vertical = 14.dp),
+		verticalArrangement = Arrangement.spacedBy((12 * u).dp),
+		modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape((16 * u).dp)).background(Card)
+			.padding(horizontal = (16 * u).dp, vertical = (14 * u).dp),
 	) {
 		Text(
 			"News signal",
-			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 15.sp),
+			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp),
 			color = Bright,
 		)
 		Text(
 			"▲ +0.8% at yesterday’s close",
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 11.sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (11 * u).sp),
 			color = Green,
 		)
 		Text(
 			"Foldable iPhone reports point to a premium fall lineup.",
-			style = TextStyle(fontFamily = Geist, fontSize = 11.sp),
+			style = TextStyle(fontFamily = Geist, fontSize = (11 * u).sp),
 			color = Muted,
 		)
-		Text("Q3 earnings land July 30.", style = TextStyle(fontFamily = Geist, fontSize = 11.sp), color = Muted)
+		Text("Q3 earnings land July 30.", style = TextStyle(fontFamily = Geist, fontSize = (11 * u).sp), color = Muted)
 		Row(
-			horizontalArrangement = Arrangement.spacedBy(12.dp),
+			horizontalArrangement = Arrangement.spacedBy((12 * u).dp),
 			modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
 		) {
 			repeat(2) { i ->
 				Column(
-					verticalArrangement = Arrangement.spacedBy(8.dp),
+					verticalArrangement = Arrangement.spacedBy((8 * u).dp),
 					modifier = Modifier
-						.width(205.dp)
-						.clip(RoundedCornerShape(12.dp))
+						.width((205 * u).dp)
+						.clip(RoundedCornerShape((12 * u).dp))
 						.background(Card)
-						.padding(12.dp),
+						.padding((12 * u).dp),
 				) {
 					Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
 						Text(
 							if (i == 0) "Yahoo · 13h ago" else "CNN · 1h ago",
-							style = TextStyle(fontFamily = Geist, fontSize = 10.sp),
+							style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp),
 							color = Muted,
 						)
 						Spacer(modifier = Modifier.weight(1f))
 						Box(
 							modifier = Modifier
-								.clip(RoundedCornerShape(999.dp))
+								.clip(RoundedCornerShape((999 * u).dp))
 								.background(Color(0x14FFFFFF))
-								.padding(horizontal = 8.dp, vertical = 3.dp),
+								.padding(horizontal = (8 * u).dp, vertical = (3 * u).dp),
 						) {
 							Text(
 								"Neutral",
-								style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 10.sp),
+								style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp),
 								color = Muted,
 							)
 						}
 					}
 					Text(
 						"The rally leaves Apple about 4 percent shy of the market-cap crown",
-						style = TextStyle(fontFamily = Geist, fontSize = 12.sp),
+						style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp),
 						color = Bright,
-						modifier = Modifier.width(173.dp),
+						modifier = Modifier.width((173 * u).dp),
 					)
 				}
 			}
@@ -397,11 +403,12 @@ private fun NewsSignalCard() {
 
 @Composable
 private fun DetailCta(text: String, onClick: () -> Unit) {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Box(
 		contentAlignment = Alignment.Center,
 		modifier = Modifier
 			.fillMaxWidth()
-			.height(52.dp)
+			.height((52 * u).dp)
 			.background(
 				androidx.compose.ui.graphics.Brush.verticalGradient(
 					0.0889f to Color(0xFFA6E4F7),
@@ -409,40 +416,42 @@ private fun DetailCta(text: String, onClick: () -> Unit) {
 					0.7255f to Color(0xFF3C98B4),
 					1f to Color(0xFF3C98B4),
 				),
-				RoundedCornerShape(6.dp),
+				RoundedCornerShape((6 * u).dp),
 			)
-			.border(0.36.dp, Color(0xA1659EAD), RoundedCornerShape(6.dp))
+			.border((0.36 * u).dp, Color(0xA1659EAD), RoundedCornerShape((6 * u).dp))
 			.clickable(
 				interactionSource = remember { MutableInteractionSource() },
 				indication = null,
 				onClick = onClick,
 			),
 	) {
-		Text(text, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 14.sp), color = Color.White)
+		Text(text, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp), color = Color.White)
 	}
 }
 
 @Composable
 private fun DetailSecondary(text: String, onClick: () -> Unit) {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Box(
 		contentAlignment = Alignment.Center,
 		modifier = Modifier
 			.fillMaxWidth()
-			.height(52.dp)
-			.border(0.36.dp, Color(0x54343B4F), RoundedCornerShape(6.dp))
+			.height((52 * u).dp)
+			.border((0.36 * u).dp, Color(0x54343B4F), RoundedCornerShape((6 * u).dp))
 			.clickable(
 				interactionSource = remember { MutableInteractionSource() },
 				indication = null,
 				onClick = onClick,
 			),
 	) {
-		Text(text, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = 13.sp), color = Muted)
+		Text(text, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = (13 * u).sp), color = Muted)
 	}
 }
 
 /** Saved-to-My-STAK sheet over the detail (92:969) — Apple row variant. */
 @Composable
 private fun DetailSavedSheet(onDone: () -> Unit) {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Box(modifier = Modifier.fillMaxSize()) {
 		Box(
 			modifier = Modifier
@@ -456,54 +465,54 @@ private fun DetailSavedSheet(onDone: () -> Unit) {
 		)
 		Column(
 			horizontalAlignment = Alignment.CenterHorizontally,
-			verticalArrangement = Arrangement.spacedBy(14.dp),
+			verticalArrangement = Arrangement.spacedBy((14 * u).dp),
 			modifier = Modifier
 				.align(Alignment.BottomCenter)
 				.fillMaxWidth()
-				.clip(RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
+				.clip(RoundedCornerShape(topStart = (24 * u).dp, topEnd = (24 * u).dp))
 				.background(Card)
-				.padding(horizontal = 20.dp)
-				.padding(top = 10.dp)
+				.padding(horizontal = (20 * u).dp)
+				.padding(top = (10 * u).dp)
 				.navigationBarsPadding()
-				.padding(bottom = 30.dp),
+				.padding(bottom = (30 * u).dp),
 		) {
 			Box(
 				modifier = Modifier
-					.padding(bottom = 4.dp)
-					.size(40.dp, 4.dp)
-					.background(Color(0xFF2A3346), RoundedCornerShape(2.dp)),
+					.padding(bottom = (4 * u).dp)
+					.size((40 * u).dp, (4 * u).dp)
+					.background(Color(0xFF2A3346), RoundedCornerShape((2 * u).dp)),
 			)
-			Image(painterResource(R.drawable.ic_sheet_check), null, modifier = Modifier.size(47.dp))
+			Image(painterResource(R.drawable.ic_sheet_check), null, modifier = Modifier.size((47 * u).dp))
 			Text(
 				"Saved to My STAK",
-				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 18.sp),
+				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (18 * u).sp),
 				color = Color.White,
 			)
 			Row(
 				verticalAlignment = Alignment.CenterVertically,
-				horizontalArrangement = Arrangement.spacedBy(11.dp),
+				horizontalArrangement = Arrangement.spacedBy((11 * u).dp),
 				modifier = Modifier
 					.fillMaxWidth()
-					.clip(RoundedCornerShape(6.dp))
+					.clip(RoundedCornerShape((6 * u).dp))
 					.background(Color(0x1A69B3CA))
-					.padding(horizontal = 14.dp, vertical = 12.dp),
+					.padding(horizontal = (14 * u).dp, vertical = (12 * u).dp),
 			) {
-				Box(contentAlignment = Alignment.Center, modifier = Modifier.size(38.dp).background(Color(0xFF242B3D), CircleShape)) {
-					Text("A", style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 15.sp), color = Color(0xFF9EADC7))
+				Box(contentAlignment = Alignment.Center, modifier = Modifier.size((38 * u).dp).background(Color(0xFF242B3D), CircleShape)) {
+					Text("A", style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp), color = Color(0xFF9EADC7))
 				}
-				Column(verticalArrangement = Arrangement.spacedBy(2.dp), modifier = Modifier.weight(1f)) {
-					Text("Apple", style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 13.sp), color = Color.White)
-					Text("$229.35 today", style = TextStyle(fontFamily = Geist, fontSize = 10.sp), color = Muted)
+				Column(verticalArrangement = Arrangement.spacedBy((2 * u).dp), modifier = Modifier.weight(1f)) {
+					Text("Apple", style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp), color = Color.White)
+					Text("$229.35 today", style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp), color = Muted)
 				}
-				Text("▲ 1.2%", style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 12.sp), color = Green)
+				Text("▲ 1.2%", style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp), color = Green)
 			}
 			Text(
 				"Watching from today · no money committed",
-				style = TextStyle(fontFamily = Geist, fontSize = 12.sp, lineHeight = 18.sp),
+				style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp, lineHeight = (18 * u).sp),
 				color = Color(0xFFC8D2E0),
 				modifier = Modifier.fillMaxWidth(),
 			)
-			Column(verticalArrangement = Arrangement.spacedBy(16.dp), modifier = Modifier.fillMaxWidth()) {
+			Column(verticalArrangement = Arrangement.spacedBy((16 * u).dp), modifier = Modifier.fillMaxWidth()) {
 				DetailCta("View in My STAK", onClick = onDone)
 				DetailSecondary("Keep exploring", onClick = onDone)
 			}
@@ -520,9 +529,10 @@ private fun DetailBuyHost(onClose: () -> Unit) {
 /** Kicker label — Geist Medium 10, tracking 0.8, muted. */
 @Composable
 private fun Kicker(text: String) {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Text(
 		text,
-		style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 10.sp, letterSpacing = 0.8.sp),
+		style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, letterSpacing = (0.8 * u).sp),
 		color = Muted,
 	)
 }
@@ -530,70 +540,71 @@ private fun Kicker(text: String) {
 /** Analyst view (collapsed 1:2454 / open 1:2651) — caret toggles. */
 @Composable
 private fun AnalystCard() {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	var open by rememberSaveable { mutableStateOf(false) }
 	Column(
-		verticalArrangement = Arrangement.spacedBy(12.dp),
-		modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(Card)
+		verticalArrangement = Arrangement.spacedBy((12 * u).dp),
+		modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape((16 * u).dp)).background(Card)
 			.clickable(
 				interactionSource = remember { MutableInteractionSource() },
 				indication = null,
 			) { open = !open }
-			.padding(horizontal = 16.dp, vertical = 14.dp),
+			.padding(horizontal = (16 * u).dp, vertical = (14 * u).dp),
 	) {
 		Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
 			Text(
 				"Analyst view",
-				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 15.sp),
+				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp),
 				color = Bright,
 			)
 			Spacer(modifier = Modifier.weight(1f))
 			if (!open) {
-				Image(painterResource(R.drawable.ic_sd_caret), null, modifier = Modifier.size(20.dp))
+				Image(painterResource(R.drawable.ic_sd_caret), null, modifier = Modifier.size((20 * u).dp))
 			}
 		}
 		if (!open) {
 			Text(
 				"↑ 6.7% upside",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 11.sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (11 * u).sp),
 				color = Green,
 			)
 		} else {
 			Kicker("PRICE TARGET RANGE")
-			Box(modifier = Modifier.fillMaxWidth().height(8.dp).clip(RoundedCornerShape(4.dp)).background(Color(0xFF10182B))) {
-				Box(modifier = Modifier.width(180.dp).height(8.dp).background(Color(0x8C5DA8BF), RoundedCornerShape(4.dp)))
-				Image(painterResource(R.drawable.ic_sd_marker), null, modifier = Modifier.offset(x = 173.dp, y = (-3).dp).size(14.dp))
+			Box(modifier = Modifier.fillMaxWidth().height((8 * u).dp).clip(RoundedCornerShape((4 * u).dp)).background(Color(0xFF10182B))) {
+				Box(modifier = Modifier.width((180 * u).dp).height((8 * u).dp).background(Color(0x8C5DA8BF), RoundedCornerShape((4 * u).dp)))
+				Image(painterResource(R.drawable.ic_sd_marker), null, modifier = Modifier.offset(x = (173 * u).dp, y = (-3 * u).dp).size((14 * u).dp))
 			}
 			Row(modifier = Modifier.fillMaxWidth()) {
-				Column(verticalArrangement = Arrangement.spacedBy(1.dp)) {
-					Text("Low", style = TextStyle(fontFamily = Geist, fontSize = 10.sp), color = Muted)
-					Text("$180", style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 12.sp), color = Bright)
+				Column(verticalArrangement = Arrangement.spacedBy((1 * u).dp)) {
+					Text("Low", style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp), color = Muted)
+					Text("$180", style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp), color = Bright)
 				}
 				Spacer(modifier = Modifier.weight(1f))
-				Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(1.dp)) {
-					Text("Avg", style = TextStyle(fontFamily = Geist, fontSize = 10.sp), color = Muted)
-					Text("$248", style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 12.sp), color = Bright)
+				Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy((1 * u).dp)) {
+					Text("Avg", style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp), color = Muted)
+					Text("$248", style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp), color = Bright)
 				}
 				Spacer(modifier = Modifier.weight(1f))
-				Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(1.dp)) {
-					Text("High", style = TextStyle(fontFamily = Geist, fontSize = 10.sp), color = Muted)
-					Text("$300", style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 12.sp), color = Bright)
+				Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy((1 * u).dp)) {
+					Text("High", style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp), color = Muted)
+					Text("$300", style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp), color = Bright)
 				}
 			}
 			Text(
 				"↑ 6.7% upside",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 11.sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (11 * u).sp),
 				color = Green,
 			)
 			Kicker("WALL ST. CONSENSUS · 42 ANALYSTS")
-			Box(modifier = Modifier.fillMaxWidth().height(8.dp).clip(RoundedCornerShape(4.dp)).background(Color(0xFF10182B))) {
-				Box(modifier = Modifier.width(212.dp).height(8.dp).background(Green, RoundedCornerShape(4.dp)))
+			Box(modifier = Modifier.fillMaxWidth().height((8 * u).dp).clip(RoundedCornerShape((4 * u).dp)).background(Color(0xFF10182B))) {
+				Box(modifier = Modifier.width((212 * u).dp).height((8 * u).dp).background(Green, RoundedCornerShape((4 * u).dp)))
 			}
 			Row(modifier = Modifier.fillMaxWidth()) {
-				Text("● Buy 28", style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 11.sp), color = Green)
+				Text("● Buy 28", style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (11 * u).sp), color = Green)
 				Spacer(modifier = Modifier.weight(1f))
-				Text("Hold 12", style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 11.sp), color = Muted)
+				Text("Hold 12", style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (11 * u).sp), color = Muted)
 				Spacer(modifier = Modifier.weight(1f))
-				Text("Sell 2", style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 11.sp), color = Muted)
+				Text("Sell 2", style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (11 * u).sp), color = Muted)
 			}
 			Kicker("RECENT ACTIONS")
 			listOf(
@@ -607,20 +618,20 @@ private fun AnalystCard() {
 					verticalAlignment = Alignment.CenterVertically,
 					modifier = Modifier
 						.fillMaxWidth()
-						.height(38.dp)
-						.clip(RoundedCornerShape(10.dp))
+						.height((38 * u).dp)
+						.clip(RoundedCornerShape((10 * u).dp))
 						.background(Color(0xFF10182B))
-						.padding(horizontal = 12.dp),
+						.padding(horizontal = (12 * u).dp),
 				) {
-					Text(name, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 12.sp), color = Bright)
+					Text(name, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp), color = Bright)
 					Spacer(modifier = Modifier.weight(1f))
 					Text(
 						action,
-						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 11.sp),
+						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (11 * u).sp),
 						color = if (action == "Buy") Green else Muted,
 					)
-					Spacer(modifier = Modifier.width(10.dp))
-					Text(target, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 12.sp), color = Bright)
+					Spacer(modifier = Modifier.width((10 * u).dp))
+					Text(target, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp), color = Bright)
 				}
 			}
 		}
@@ -630,31 +641,32 @@ private fun AnalystCard() {
 /** Compare and learn (collapsed 1:2526 / open 1:2719) — peer table. */
 @Composable
 private fun CompareCard() {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	var open by rememberSaveable { mutableStateOf(false) }
 	Column(
-		verticalArrangement = Arrangement.spacedBy(if (open) 21.dp else 12.dp),
-		modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(Card)
+		verticalArrangement = Arrangement.spacedBy(if (open) (21 * u).dp else (12 * u).dp),
+		modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape((16 * u).dp)).background(Card)
 			.clickable(
 				interactionSource = remember { MutableInteractionSource() },
 				indication = null,
 			) { open = !open }
-			.padding(horizontal = 16.dp, vertical = 14.dp),
+			.padding(horizontal = (16 * u).dp, vertical = (14 * u).dp),
 	) {
 		Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
 			Text(
 				"Compare and learn",
-				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 15.sp),
+				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp),
 				color = Bright,
 			)
 			Spacer(modifier = Modifier.weight(1f))
 			if (!open) {
-				Image(painterResource(R.drawable.ic_sd_caret), null, modifier = Modifier.size(20.dp))
+				Image(painterResource(R.drawable.ic_sd_caret), null, modifier = Modifier.size((20 * u).dp))
 			}
 		}
 		if (!open) {
 			Text(
 				"vs MSFT · GOOGL",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 11.sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (11 * u).sp),
 				color = Muted,
 			)
 		} else {
@@ -662,11 +674,11 @@ private fun CompareCard() {
 				// AAPL column tint spans the table rows (frame 1:2721).
 				Box(
 					modifier = Modifier
-						.offset(x = 78.dp, y = 0.dp)
-						.size(81.dp, 170.dp)
-						.background(Color(0x125DA8BF), RoundedCornerShape(8.dp)),
+						.offset(x = (78 * u).dp, y = 0.dp)
+						.size((81 * u).dp, (170 * u).dp)
+						.background(Color(0x125DA8BF), RoundedCornerShape((8 * u).dp)),
 				)
-				Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
+				Column(verticalArrangement = Arrangement.spacedBy((12 * u).dp), modifier = Modifier.fillMaxWidth()) {
 					CompareRow("", "AAPL", "MSFT", "GOOGL", header = true)
 					CompareRow("P/E ratio", "31.2", "36x", "24x")
 					CompareRow("Rev growth", "+6.1%", "+15%", "+12%", valueColor = Green)
@@ -676,7 +688,7 @@ private fun CompareCard() {
 			}
 			Text(
 				"Cultural context only, not financial advice.",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 10.sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp),
 				color = Muted,
 			)
 		}
@@ -685,30 +697,31 @@ private fun CompareCard() {
 
 @Composable
 private fun CompareRow(label: String, a: String, m: String, g: String, header: Boolean = false, valueColor: Color? = null) {
-	Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth().height(20.dp)) {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
+	Row(horizontalArrangement = Arrangement.spacedBy((8 * u).dp), modifier = Modifier.fillMaxWidth().height((20 * u).dp)) {
 		Text(
 			label,
-			style = TextStyle(fontFamily = Geist, fontSize = 11.sp),
+			style = TextStyle(fontFamily = Geist, fontSize = (11 * u).sp),
 			color = Muted,
 			modifier = Modifier.weight(1f),
 		)
 		Text(
 			a,
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 11.sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (11 * u).sp),
 			color = valueColor ?: Bright,
 			textAlign = androidx.compose.ui.text.style.TextAlign.Center,
 			modifier = Modifier.weight(1f),
 		)
 		Text(
 			m,
-			style = TextStyle(fontFamily = Geist, fontWeight = if (header) FontWeight.Medium else FontWeight.Normal, fontSize = 11.sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = if (header) FontWeight.Medium else FontWeight.Normal, fontSize = (11 * u).sp),
 			color = valueColor ?: Bright,
 			textAlign = androidx.compose.ui.text.style.TextAlign.Center,
 			modifier = Modifier.weight(1f),
 		)
 		Text(
 			g,
-			style = TextStyle(fontFamily = Geist, fontWeight = if (header) FontWeight.Medium else FontWeight.Normal, fontSize = 11.sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = if (header) FontWeight.Medium else FontWeight.Normal, fontSize = (11 * u).sp),
 			color = valueColor ?: Bright,
 			textAlign = androidx.compose.ui.text.style.TextAlign.Center,
 			modifier = Modifier.weight(1f),
@@ -719,31 +732,32 @@ private fun CompareRow(label: String, a: String, m: String, g: String, header: B
 /** "SINCE YOU SAVED +4.6%" banner (16:1012) for the My STAK entry. */
 @Composable
 private fun SinceYouSavedCard() {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Column(
-		verticalArrangement = Arrangement.spacedBy(12.dp),
+		verticalArrangement = Arrangement.spacedBy((12 * u).dp),
 		modifier = Modifier
 			.fillMaxWidth()
-			.clip(RoundedCornerShape(16.dp))
+			.clip(RoundedCornerShape((16 * u).dp))
 			.background(Card)
-			.padding(16.dp),
+			.padding((16 * u).dp),
 	) {
-		Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-			Image(painterResource(R.drawable.ic_saved_bookmark), null, modifier = Modifier.size(12.dp))
+		Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy((8 * u).dp)) {
+			Image(painterResource(R.drawable.ic_saved_bookmark), null, modifier = Modifier.size((12 * u).dp))
 			Text(
 				"SINCE YOU SAVED",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 10.sp, letterSpacing = 0.8.sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, letterSpacing = (0.8 * u).sp),
 				color = Muted,
 			)
-			Spacer(modifier = Modifier.width(8.dp))
+			Spacer(modifier = Modifier.width((8 * u).dp))
 			Text(
 				"+4.6%",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 12.sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp),
 				color = Green,
 			)
 		}
 		Text(
 			"Saved 5 weeks ago. AAPL is up 4.6% since, moving roughly with the market. Steady giants tend to.",
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 11.sp, lineHeight = 14.sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp, lineHeight = (14 * u).sp),
 			color = Muted,
 		)
 	}

@@ -64,6 +64,7 @@ private val PICKS = listOf(
  */
 @Composable
 fun SimPortfolioScreen(onBack: () -> Unit, onOpenPick: () -> Unit) {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	var showSell by rememberSaveable { mutableStateOf(false) }
 	var showClosed by rememberSaveable { mutableStateOf(false) }
 
@@ -75,45 +76,45 @@ fun SimPortfolioScreen(onBack: () -> Unit, onOpenPick: () -> Unit) {
 					.fillMaxWidth()
 					.background(StakColors.Bg)
 					.statusBarsPadding()
-					.padding(horizontal = 18.dp, vertical = 8.dp),
+					.padding(horizontal = (18 * u).dp, vertical = (8 * u).dp),
 			) {
 				AuthBackCircle(onClick = onBack)
 				Spacer(modifier = Modifier.weight(1f))
 				Text(
 					text = "Your portfolio",
-					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 16.sp),
+					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp),
 					color = Color.White,
 				)
 				Spacer(modifier = Modifier.weight(1f))
 				Box(
 					contentAlignment = Alignment.Center,
-					modifier = Modifier.size(40.dp).background(Sim.CardBg, CircleShape),
+					modifier = Modifier.size((40 * u).dp).background(Sim.CardBg, CircleShape),
 				) {
-					Image(painterResource(R.drawable.ic_news_share), null, modifier = Modifier.size(17.dp))
+					Image(painterResource(R.drawable.ic_news_share), null, modifier = Modifier.size((17 * u).dp))
 				}
 			}
 			Column(
-				verticalArrangement = Arrangement.spacedBy(10.dp),
+				verticalArrangement = Arrangement.spacedBy((10 * u).dp),
 				modifier = Modifier
 					.weight(1f)
 					.fillMaxWidth()
 					.verticalScroll(rememberScrollState())
-					.padding(horizontal = 20.dp)
-					.padding(top = 10.dp, bottom = 20.dp),
+					.padding(horizontal = (20 * u).dp)
+					.padding(top = (10 * u).dp, bottom = (20 * u).dp),
 			) {
 				Row(verticalAlignment = Alignment.Bottom, modifier = Modifier.fillMaxWidth()) {
-					Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-						Text("Portfolio value", style = TextStyle(fontFamily = Geist, fontSize = 11.sp), color = Sim.Faint)
+					Column(verticalArrangement = Arrangement.spacedBy((4 * u).dp)) {
+						Text("Portfolio value", style = TextStyle(fontFamily = Geist, fontSize = (11 * u).sp), color = Sim.Faint)
 						Text(
 							"12 picks · +$240.00 all time",
-							style = TextStyle(fontFamily = Geist, fontSize = 10.sp),
+							style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp),
 							color = Sim.Muted,
 						)
-						Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-							Text("Cash available", style = TextStyle(fontFamily = Geist, fontSize = 12.sp), color = Sim.Muted)
+						Row(horizontalArrangement = Arrangement.spacedBy((6 * u).dp)) {
+							Text("Cash available", style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp), color = Sim.Muted)
 							Text(
 								"$8,800.00",
-								style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 12.sp),
+								style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp),
 								color = Sim.Bright,
 							)
 						}
@@ -121,11 +122,11 @@ fun SimPortfolioScreen(onBack: () -> Unit, onOpenPick: () -> Unit) {
 					Spacer(modifier = Modifier.weight(1f))
 					Text(
 						"$10,240.00",
-						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 22.sp),
+						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (22 * u).sp),
 						color = Color.White,
 					)
 				}
-				Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(top = 4.dp)) {
+				Row(horizontalArrangement = Arrangement.spacedBy((8 * u).dp), modifier = Modifier.padding(top = (4 * u).dp)) {
 					FilterChip("Top gainers", selected = true)
 					FilterChip("Newest", selected = false)
 					FilterChip("Worst", selected = false)
@@ -140,17 +141,17 @@ fun SimPortfolioScreen(onBack: () -> Unit, onOpenPick: () -> Unit) {
 				}
 				Text(
 					text = "SOLD · REALIZED",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 10.sp, letterSpacing = 0.9.sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, letterSpacing = (0.9 * u).sp),
 					color = Sim.Faint,
-					modifier = Modifier.padding(top = 8.dp, start = 2.dp),
+					modifier = Modifier.padding(top = (8 * u).dp, start = (2 * u).dp),
 				)
 				RealizedRow("S", "SHOP", "Sold May 30 · profit banked", "+$12.00", true)
 				RealizedRow("C", "COIN", "Sold Jun 15 · loss realized", "-$8.00", false)
 				Text(
 					text = "Sell a pick and the cash returns to your balance, gain or loss.",
-					style = TextStyle(fontFamily = Geist, fontSize = 10.sp),
+					style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp),
 					color = Sim.Faint,
-					modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 8.dp),
+					modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = (8 * u).dp),
 				)
 			}
 		}
@@ -171,16 +172,17 @@ fun SimPortfolioScreen(onBack: () -> Unit, onOpenPick: () -> Unit) {
 
 @Composable
 private fun FilterChip(label: String, selected: Boolean) {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Box(
 		modifier = Modifier
-			.clip(RoundedCornerShape(14.dp))
+			.clip(RoundedCornerShape((14 * u).dp))
 			.background(if (selected) Sim.TealTint else Sim.CardBg)
-			.then(if (selected) Modifier.border(0.75.dp, Color(0x662C9DBC), RoundedCornerShape(14.dp)) else Modifier)
-			.padding(horizontal = 12.dp, vertical = 6.dp),
+			.then(if (selected) Modifier.border((0.75 * u).dp, Color(0x662C9DBC), RoundedCornerShape((14 * u).dp)) else Modifier)
+			.padding(horizontal = (12 * u).dp, vertical = (6 * u).dp),
 	) {
 		Text(
 			text = label,
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 12.sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp),
 			color = if (selected) Sim.Teal else Sim.Muted,
 		)
 	}
@@ -188,25 +190,26 @@ private fun FilterChip(label: String, selected: Boolean) {
 
 @Composable
 private fun RealizedRow(badge: String, ticker: String, sub: String, amount: String, up: Boolean) {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Row(
 		verticalAlignment = Alignment.CenterVertically,
-		horizontalArrangement = Arrangement.spacedBy(12.dp),
+		horizontalArrangement = Arrangement.spacedBy((12 * u).dp),
 		modifier = Modifier
 			.fillMaxWidth()
-			.clip(RoundedCornerShape(12.dp))
+			.clip(RoundedCornerShape((12 * u).dp))
 			.background(Sim.CardBg)
-			.padding(horizontal = 14.dp, vertical = 11.dp),
+			.padding(horizontal = (14 * u).dp, vertical = (11 * u).dp),
 	) {
-		Box(contentAlignment = Alignment.Center, modifier = Modifier.size(36.dp).background(Sim.ChipBg, CircleShape)) {
-			Text(badge, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 14.sp), color = Sim.BadgeInk)
+		Box(contentAlignment = Alignment.Center, modifier = Modifier.size((36 * u).dp).background(Sim.ChipBg, CircleShape)) {
+			Text(badge, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (14 * u).sp), color = Sim.BadgeInk)
 		}
-		Column(verticalArrangement = Arrangement.spacedBy(3.dp), modifier = Modifier.weight(1f)) {
-			Text(ticker, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Medium, fontSize = 12.sp), color = Color.White)
-			Text(sub, style = TextStyle(fontFamily = Geist, fontSize = 10.sp), color = Sim.Muted)
+		Column(verticalArrangement = Arrangement.spacedBy((3 * u).dp), modifier = Modifier.weight(1f)) {
+			Text(ticker, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp), color = Color.White)
+			Text(sub, style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp), color = Sim.Muted)
 		}
 		Text(
 			amount,
-			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 13.sp),
+			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (13 * u).sp),
 			color = if (up) Sim.Green else Sim.Red,
 		)
 	}
@@ -215,6 +218,7 @@ private fun RealizedRow(badge: String, ticker: String, sub: String, amount: Stri
 /** Shared sheet scaffold for the sell flow. */
 @Composable
 private fun SimSheet(onDismiss: () -> Unit, content: @Composable () -> Unit) {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Box(modifier = Modifier.fillMaxSize()) {
 		Box(
 			modifier = Modifier
@@ -230,19 +234,19 @@ private fun SimSheet(onDismiss: () -> Unit, content: @Composable () -> Unit) {
 			modifier = Modifier
 				.align(Alignment.BottomCenter)
 				.fillMaxWidth()
-				.clip(RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
+				.clip(RoundedCornerShape(topStart = (24 * u).dp, topEnd = (24 * u).dp))
 				.background(Sim.CardBg)
-				.padding(horizontal = 20.dp)
-				.padding(top = 10.dp)
+				.padding(horizontal = (20 * u).dp)
+				.padding(top = (10 * u).dp)
 				.navigationBarsPadding()
-				.padding(bottom = 30.dp),
+				.padding(bottom = (30 * u).dp),
 		) {
 			Box(
 				modifier = Modifier
 					.align(Alignment.CenterHorizontally)
-					.padding(bottom = 4.dp)
-					.size(40.dp, 4.dp)
-					.background(Sim.Track, RoundedCornerShape(2.dp)),
+					.padding(bottom = (4 * u).dp)
+					.size((40 * u).dp, (4 * u).dp)
+					.background(Sim.Track, RoundedCornerShape((2 * u).dp)),
 			)
 			content()
 		}
@@ -251,101 +255,103 @@ private fun SimSheet(onDismiss: () -> Unit, content: @Composable () -> Unit) {
 
 @Composable
 private fun NvdaSellRow() {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Row(
 		verticalAlignment = Alignment.CenterVertically,
-		horizontalArrangement = Arrangement.spacedBy(11.dp),
+		horizontalArrangement = Arrangement.spacedBy((11 * u).dp),
 		modifier = Modifier
 			.fillMaxWidth()
-			.clip(RoundedCornerShape(6.dp))
+			.clip(RoundedCornerShape((6 * u).dp))
 			.background(Sim.TealTint)
-			.padding(horizontal = 14.dp, vertical = 12.dp),
+			.padding(horizontal = (14 * u).dp, vertical = (12 * u).dp),
 	) {
-		Box(contentAlignment = Alignment.Center, modifier = Modifier.size(38.dp).background(Sim.ChipBg, CircleShape)) {
-			Text("N", style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 15.sp), color = Sim.BadgeInk)
+		Box(contentAlignment = Alignment.Center, modifier = Modifier.size((38 * u).dp).background(Sim.ChipBg, CircleShape)) {
+			Text("N", style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp), color = Sim.BadgeInk)
 		}
-		Column(verticalArrangement = Arrangement.spacedBy(2.dp), modifier = Modifier.weight(1f)) {
-			Text("NVIDIA Corp", style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 13.sp), color = Color.White)
-			Text("$122.10 today", style = TextStyle(fontFamily = Geist, fontSize = 10.sp), color = Sim.Muted)
+		Column(verticalArrangement = Arrangement.spacedBy((2 * u).dp), modifier = Modifier.weight(1f)) {
+			Text("NVIDIA Corp", style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp), color = Color.White)
+			Text("$122.10 today", style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp), color = Sim.Muted)
 		}
-		Text("▲ 2.4%", style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 12.sp), color = Sim.Green)
+		Text("▲ 2.4%", style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp), color = Sim.Green)
 	}
 }
 
 /** "Sell NVDA?" confirm sheet (1:4698). */
 @Composable
 private fun SellConfirmSheet(onConfirm: () -> Unit, onDismiss: () -> Unit) {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	var mode by rememberSaveable { mutableIntStateOf(0) }
 	SimSheet(onDismiss = onDismiss) {
-		Column(verticalArrangement = Arrangement.spacedBy(14.dp), modifier = Modifier.fillMaxWidth()) {
+		Column(verticalArrangement = Arrangement.spacedBy((14 * u).dp), modifier = Modifier.fillMaxWidth()) {
 			Text(
 				"Sell NVDA?",
-				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 18.sp),
+				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (18 * u).sp),
 				color = Color.White,
 			)
 			NvdaSellRow()
-			Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+			Row(horizontalArrangement = Arrangement.spacedBy((6 * u).dp)) {
 				Text(
 					"You hold 1.0152 shares from your $100 stake.",
-					style = TextStyle(fontFamily = Geist, fontSize = 12.sp, lineHeight = 18.sp),
+					style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp, lineHeight = (18 * u).sp),
 					color = Sim.Body,
 				)
 			}
-			Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-				Text("Position value", style = TextStyle(fontFamily = Geist, fontSize = 12.sp), color = Sim.Muted)
+			Row(horizontalArrangement = Arrangement.spacedBy((6 * u).dp)) {
+				Text("Position value", style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp), color = Sim.Muted)
 				Text(
 					"$124.00",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 12.sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp),
 					color = Sim.Bright,
 				)
 			}
-			Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+			Row(horizontalArrangement = Arrangement.spacedBy((8 * u).dp), modifier = Modifier.fillMaxWidth()) {
 				listOf("All", "Half", "Custom").forEachIndexed { i, label ->
 					val sel = i == mode
 					Box(
 						contentAlignment = Alignment.Center,
 						modifier = Modifier
 							.weight(1f)
-							.clip(RoundedCornerShape(10.dp))
+							.clip(RoundedCornerShape((10 * u).dp))
 							.background(if (sel) Color(0xFF0F2A38) else Color(0xFF0B1430))
 							.border(
-								if (sel) 0.5.dp else 1.dp,
+								if (sel) (0.5 * u).dp else (1 * u).dp,
 								if (sel) Color(0xFF5DA8BF) else Color(0x1FFFFFFF),
-								RoundedCornerShape(10.dp),
+								RoundedCornerShape((10 * u).dp),
 							)
 							.clickable(
 								interactionSource = remember { MutableInteractionSource() },
 								indication = null,
 							) { mode = i }
-							.padding(vertical = 8.dp),
+							.padding(vertical = (8 * u).dp),
 					) {
 						Text(
 							label,
-							style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 12.sp),
+							style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp),
 							color = if (sel) Color(0xFFA6E4F7) else Color(0xFFDCE7F7),
 						)
 					}
 				}
 			}
 			Row(
-				horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally),
+				horizontalArrangement = Arrangement.spacedBy((6 * u).dp, Alignment.CenterHorizontally),
 				modifier = Modifier.fillMaxWidth(),
 			) {
-				Text("Returning", style = TextStyle(fontFamily = Geist, fontSize = 12.sp), color = Sim.Muted)
+				Text("Returning", style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp), color = Sim.Muted)
 				Text(
 					"$124.00",
-					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 15.sp),
+					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp),
 					color = Sim.Bright,
 				)
-				Text("to your cash", style = TextStyle(fontFamily = Geist, fontSize = 12.sp), color = Sim.Muted)
+				Text("to your cash", style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp), color = Sim.Muted)
 			}
-			Column(verticalArrangement = Arrangement.spacedBy(16.dp), modifier = Modifier.fillMaxWidth()) {
+			Column(verticalArrangement = Arrangement.spacedBy((16 * u).dp), modifier = Modifier.fillMaxWidth()) {
 				// Dark navy confirm — #12203e per the frame.
 				Box(
 					contentAlignment = Alignment.Center,
 					modifier = Modifier
 						.fillMaxWidth()
-						.height(52.dp)
-						.background(Sim.DarkCta, RoundedCornerShape(6.dp))
+						.height((52 * u).dp)
+						.background(Sim.DarkCta, RoundedCornerShape((6 * u).dp))
 						.clickable(
 							interactionSource = remember { MutableInteractionSource() },
 							indication = null,
@@ -354,7 +360,7 @@ private fun SellConfirmSheet(onConfirm: () -> Unit, onDismiss: () -> Unit) {
 				) {
 					Text(
 						"Confirm sell",
-						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 14.sp),
+						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp),
 						color = Color.White,
 					)
 				}
@@ -362,15 +368,15 @@ private fun SellConfirmSheet(onConfirm: () -> Unit, onDismiss: () -> Unit) {
 					contentAlignment = Alignment.Center,
 					modifier = Modifier
 						.fillMaxWidth()
-						.height(52.dp)
-						.border(0.36.dp, Color(0x54343B4F), RoundedCornerShape(6.dp))
+						.height((52 * u).dp)
+						.border((0.36 * u).dp, Color(0x54343B4F), RoundedCornerShape((6 * u).dp))
 						.clickable(
 							interactionSource = remember { MutableInteractionSource() },
 							indication = null,
 							onClick = onDismiss,
 						),
 				) {
-					Text("Back", style = TextStyle(fontFamily = Sora, fontSize = 14.sp), color = Sim.Muted)
+					Text("Back", style = TextStyle(fontFamily = Sora, fontSize = (14 * u).sp), color = Sim.Muted)
 				}
 			}
 		}
@@ -380,48 +386,49 @@ private fun SellConfirmSheet(onConfirm: () -> Unit, onDismiss: () -> Unit) {
 /** "Position closed" success sheet (73:855). */
 @Composable
 private fun PositionClosedSheet(onBackToSimulate: () -> Unit, onViewPortfolio: () -> Unit) {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	SimSheet(onDismiss = onViewPortfolio) {
 		Column(
 			horizontalAlignment = Alignment.CenterHorizontally,
-			verticalArrangement = Arrangement.spacedBy(14.dp),
+			verticalArrangement = Arrangement.spacedBy((14 * u).dp),
 			modifier = Modifier.fillMaxWidth(),
 		) {
-			Image(painterResource(R.drawable.ic_sheet_check), null, modifier = Modifier.size(47.dp))
+			Image(painterResource(R.drawable.ic_sheet_check), null, modifier = Modifier.size((47 * u).dp))
 			Text(
 				"Position closed",
-				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 18.sp),
+				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (18 * u).sp),
 				color = Color.White,
 			)
 			NvdaSellRow()
 			Text(
 				"Sold 1.0152 shares from your $100 stake.",
-				style = TextStyle(fontFamily = Geist, fontSize = 12.sp, lineHeight = 18.sp),
+				style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp, lineHeight = (18 * u).sp),
 				color = Sim.Body,
 				modifier = Modifier.fillMaxWidth(),
 			)
-			Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth()) {
-				Text("Proceeds", style = TextStyle(fontFamily = Geist, fontSize = 12.sp), color = Sim.Muted)
+			Row(horizontalArrangement = Arrangement.spacedBy((6 * u).dp), modifier = Modifier.fillMaxWidth()) {
+				Text("Proceeds", style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp), color = Sim.Muted)
 				Text(
 					"$124.00",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 12.sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp),
 					color = Sim.Bright,
 				)
 			}
-			Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth()) {
-				Text("Returned", style = TextStyle(fontFamily = Geist, fontSize = 12.sp), color = Sim.Muted)
+			Row(horizontalArrangement = Arrangement.spacedBy((6 * u).dp), modifier = Modifier.fillMaxWidth()) {
+				Text("Returned", style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp), color = Sim.Muted)
 				Text(
 					"$124.00",
-					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 15.sp),
+					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp),
 					color = Sim.Bright,
 				)
-				Text("to your cash (+$24.00)", style = TextStyle(fontFamily = Geist, fontSize = 12.sp), color = Sim.Muted)
+				Text("to your cash (+$24.00)", style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp), color = Sim.Muted)
 			}
-			Column(verticalArrangement = Arrangement.spacedBy(16.dp), modifier = Modifier.fillMaxWidth()) {
+			Column(verticalArrangement = Arrangement.spacedBy((16 * u).dp), modifier = Modifier.fillMaxWidth()) {
 				Box(
 					contentAlignment = Alignment.Center,
 					modifier = Modifier
 						.fillMaxWidth()
-						.height(52.dp)
+						.height((52 * u).dp)
 						.background(
 							androidx.compose.ui.graphics.Brush.verticalGradient(
 								0.0889f to Color(0xFFA6E4F7),
@@ -429,9 +436,9 @@ private fun PositionClosedSheet(onBackToSimulate: () -> Unit, onViewPortfolio: (
 								0.7255f to Color(0xFF3C98B4),
 								1f to Color(0xFF3C98B4),
 							),
-							RoundedCornerShape(6.dp),
+							RoundedCornerShape((6 * u).dp),
 						)
-						.border(0.36.dp, Sim.CtaBorder, RoundedCornerShape(6.dp))
+						.border((0.36 * u).dp, Sim.CtaBorder, RoundedCornerShape((6 * u).dp))
 						.clickable(
 							interactionSource = remember { MutableInteractionSource() },
 							indication = null,
@@ -440,7 +447,7 @@ private fun PositionClosedSheet(onBackToSimulate: () -> Unit, onViewPortfolio: (
 				) {
 					Text(
 						"Back to Simulate",
-						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 14.sp),
+						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp),
 						color = Color.White,
 					)
 				}
@@ -448,15 +455,15 @@ private fun PositionClosedSheet(onBackToSimulate: () -> Unit, onViewPortfolio: (
 					contentAlignment = Alignment.Center,
 					modifier = Modifier
 						.fillMaxWidth()
-						.height(52.dp)
-						.border(0.36.dp, Color(0x54343B4F), RoundedCornerShape(6.dp))
+						.height((52 * u).dp)
+						.border((0.36 * u).dp, Color(0x54343B4F), RoundedCornerShape((6 * u).dp))
 						.clickable(
 							interactionSource = remember { MutableInteractionSource() },
 							indication = null,
 							onClick = onViewPortfolio,
 						),
 				) {
-					Text("View portfolio", style = TextStyle(fontFamily = Sora, fontSize = 14.sp), color = Sim.Muted)
+					Text("View portfolio", style = TextStyle(fontFamily = Sora, fontSize = (14 * u).sp), color = Sim.Muted)
 				}
 			}
 		}

@@ -58,6 +58,7 @@ private val NEAR = listOf(
  */
 @Composable
 fun LeaderboardScreen(onBack: () -> Unit) {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Column(modifier = Modifier.fillMaxSize().background(StakColors.Bg)) {
 		Row(
 			verticalAlignment = Alignment.CenterVertically,
@@ -65,82 +66,82 @@ fun LeaderboardScreen(onBack: () -> Unit) {
 				.fillMaxWidth()
 				.background(StakColors.Bg)
 				.statusBarsPadding()
-				.padding(horizontal = 18.dp, vertical = 8.dp),
+				.padding(horizontal = (18 * u).dp, vertical = (8 * u).dp),
 		) {
 			AuthBackCircle(onClick = onBack)
 			Spacer(modifier = Modifier.weight(1f))
 			Text(
 				text = "Leaderboard",
-				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 16.sp),
+				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp),
 				color = Color.White,
 			)
 			Spacer(modifier = Modifier.weight(1f))
 			Box(
 				contentAlignment = Alignment.Center,
-				modifier = Modifier.size(40.dp).background(Sim.CardBg, CircleShape),
+				modifier = Modifier.size((40 * u).dp).background(Sim.CardBg, CircleShape),
 			) {
-				Image(painterResource(R.drawable.ic_news_share), null, modifier = Modifier.size(17.dp))
+				Image(painterResource(R.drawable.ic_news_share), null, modifier = Modifier.size((17 * u).dp))
 			}
 		}
 		Column(
-			verticalArrangement = Arrangement.spacedBy(10.dp),
+			verticalArrangement = Arrangement.spacedBy((10 * u).dp),
 			modifier = Modifier
 				.weight(1f)
 				.fillMaxWidth()
 				.verticalScroll(rememberScrollState())
-				.padding(horizontal = 20.dp)
-				.padding(top = 10.dp, bottom = 24.dp),
+				.padding(horizontal = (20 * u).dp)
+				.padding(top = (10 * u).dp, bottom = (24 * u).dp),
 		) {
-			Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+			Row(horizontalArrangement = Arrangement.spacedBy((8 * u).dp)) {
 				PeriodChip("This week", selected = true)
 				PeriodChip("All time", selected = false)
 			}
-			Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().padding(top = 4.dp)) {
+			Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().padding(top = (4 * u).dp)) {
 				Text(
 					text = "RANKED BY RETURN",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 10.sp, letterSpacing = 0.9.sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, letterSpacing = (0.9 * u).sp),
 					color = Sim.Faint,
 				)
 				Spacer(modifier = Modifier.weight(1f))
-				Text("Trailing 7 days", style = TextStyle(fontFamily = Geist, fontSize = 10.sp), color = Sim.Faint)
+				Text("Trailing 7 days", style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp), color = Sim.Faint)
 			}
 			// You — highlighted with the ▲ spots delta.
 			Row(
 				verticalAlignment = Alignment.CenterVertically,
-				horizontalArrangement = Arrangement.spacedBy(10.dp),
+				horizontalArrangement = Arrangement.spacedBy((10 * u).dp),
 				modifier = Modifier
 					.fillMaxWidth()
-					.clip(RoundedCornerShape(12.dp))
+					.clip(RoundedCornerShape((12 * u).dp))
 					.background(Sim.TealTint)
-					.border(0.75.dp, Color(0x662C9DBC), RoundedCornerShape(12.dp))
-					.padding(horizontal = 12.dp, vertical = 10.dp),
+					.border((0.75 * u).dp, Color(0x662C9DBC), RoundedCornerShape((12 * u).dp))
+					.padding(horizontal = (12 * u).dp, vertical = (10 * u).dp),
 			) {
-				Text("47", style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 12.sp), color = Sim.Teal)
-				Box(contentAlignment = Alignment.Center, modifier = Modifier.size(32.dp).background(Sim.ChipBg, CircleShape)) {
-					Text("E", style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 13.sp), color = Sim.BadgeInk)
+				Text("47", style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (12 * u).sp), color = Sim.Teal)
+				Box(contentAlignment = Alignment.Center, modifier = Modifier.size((32 * u).dp).background(Sim.ChipBg, CircleShape)) {
+					Text("E", style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (13 * u).sp), color = Sim.BadgeInk)
 				}
-				Column(verticalArrangement = Arrangement.spacedBy(2.dp), modifier = Modifier.weight(1f)) {
-					Text("You", style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.SemiBold, fontSize = 13.sp), color = Color.White)
-					Text("12 picks this week", style = TextStyle(fontFamily = Geist, fontSize = 10.sp), color = Sim.Muted)
+				Column(verticalArrangement = Arrangement.spacedBy((2 * u).dp), modifier = Modifier.weight(1f)) {
+					Text("You", style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.SemiBold, fontSize = (13 * u).sp), color = Color.White)
+					Text("12 picks this week", style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp), color = Sim.Muted)
 				}
-				Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(2.dp)) {
-					Text("+4.2%", style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 13.sp), color = Sim.Teal)
-					Text("▲ 12 spots", style = TextStyle(fontFamily = Geist, fontSize = 10.sp), color = Sim.Green)
+				Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy((2 * u).dp)) {
+					Text("+4.2%", style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (13 * u).sp), color = Sim.Teal)
+					Text("▲ 12 spots", style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp), color = Sim.Green)
 				}
 			}
 			TOP.forEach { LeaderRow(it) }
 			Text(
 				text = "· · ·",
-				style = TextStyle(fontFamily = Geist, fontSize = 12.sp),
+				style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp),
 				color = Sim.Faint,
 				modifier = Modifier.align(Alignment.CenterHorizontally),
 			)
 			NEAR.forEach { LeaderRow(it) }
 			Text(
 				text = "Percentage return, not dollar size, so everyone competes on the same scale. This week ranks are trailing 7 days.",
-				style = TextStyle(fontFamily = Geist, fontSize = 10.sp, lineHeight = 15.sp),
+				style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp, lineHeight = (15 * u).sp),
 				color = Sim.Faint,
-				modifier = Modifier.padding(top = 8.dp),
+				modifier = Modifier.padding(top = (8 * u).dp),
 			)
 		}
 	}
@@ -148,16 +149,17 @@ fun LeaderboardScreen(onBack: () -> Unit) {
 
 @Composable
 private fun PeriodChip(label: String, selected: Boolean) {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Box(
 		modifier = Modifier
-			.clip(RoundedCornerShape(14.dp))
+			.clip(RoundedCornerShape((14 * u).dp))
 			.background(if (selected) Sim.TealTint else Sim.CardBg)
-			.then(if (selected) Modifier.border(0.75.dp, Color(0x662C9DBC), RoundedCornerShape(14.dp)) else Modifier)
-			.padding(horizontal = 12.dp, vertical = 6.dp),
+			.then(if (selected) Modifier.border((0.75 * u).dp, Color(0x662C9DBC), RoundedCornerShape((14 * u).dp)) else Modifier)
+			.padding(horizontal = (12 * u).dp, vertical = (6 * u).dp),
 	) {
 		Text(
 			text = label,
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 12.sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp),
 			color = if (selected) Sim.Teal else Sim.Muted,
 		)
 	}
@@ -165,23 +167,24 @@ private fun PeriodChip(label: String, selected: Boolean) {
 
 @Composable
 private fun LeaderRow(r: Rank) {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Row(
 		verticalAlignment = Alignment.CenterVertically,
-		horizontalArrangement = Arrangement.spacedBy(10.dp),
+		horizontalArrangement = Arrangement.spacedBy((10 * u).dp),
 		modifier = Modifier
 			.fillMaxWidth()
-			.clip(RoundedCornerShape(12.dp))
+			.clip(RoundedCornerShape((12 * u).dp))
 			.background(Sim.CardBg)
-			.padding(horizontal = 12.dp, vertical = 10.dp),
+			.padding(horizontal = (12 * u).dp, vertical = (10 * u).dp),
 	) {
-		Text(r.rank, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 12.sp), color = Sim.Faint)
-		Box(contentAlignment = Alignment.Center, modifier = Modifier.size(32.dp).background(Sim.ChipBg, CircleShape)) {
-			Text(r.initial, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 13.sp), color = Sim.BadgeInk)
+		Text(r.rank, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (12 * u).sp), color = Sim.Faint)
+		Box(contentAlignment = Alignment.Center, modifier = Modifier.size((32 * u).dp).background(Sim.ChipBg, CircleShape)) {
+			Text(r.initial, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (13 * u).sp), color = Sim.BadgeInk)
 		}
-		Column(verticalArrangement = Arrangement.spacedBy(2.dp), modifier = Modifier.weight(1f)) {
-			Text(r.name, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 13.sp), color = Color.White)
-			Text(r.picks, style = TextStyle(fontFamily = Geist, fontSize = 10.sp), color = Sim.Muted)
+		Column(verticalArrangement = Arrangement.spacedBy((2 * u).dp), modifier = Modifier.weight(1f)) {
+			Text(r.name, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp), color = Color.White)
+			Text(r.picks, style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp), color = Sim.Muted)
 		}
-		Text(r.pct, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 12.sp), color = Sim.HeaderGray)
+		Text(r.pct, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (12 * u).sp), color = Sim.HeaderGray)
 	}
 }

@@ -154,11 +154,10 @@ private val DECK = listOf(
  * paper order.
  */
 @Composable
-fun DiscoverScreen(onLearnMore: () -> Unit = {}) {
+fun DiscoverScreen(onLearnMore: () -> Unit = {}, onPracticeBuy: () -> Unit = {}) {
 	// Prototype: tapping the front card itself also opens the Stock Detail.
+	// The buy ticket itself is raised by the shell (over the tab bar).
 	var seen by rememberSaveable { mutableIntStateOf(0) }
-	var showBuy by rememberSaveable { mutableStateOf(false) }
-	var showFilled by rememberSaveable { mutableStateOf(false) }
 	var savedToast by remember { mutableStateOf(false) }
 	val topOffset = remember(seen) { Animatable(0f) }
 	val scope = rememberCoroutineScope()
@@ -206,7 +205,7 @@ fun DiscoverScreen(onLearnMore: () -> Unit = {}) {
 			Spacer(modifier = Modifier.height((27 * u).dp))
 			if (seen >= 12) {
 				EndOfDeck(
-					onPracticeBuySaves = { showBuy = true },
+					onPracticeBuySaves = onPracticeBuy,
 					onSwipeAgain = { seen = 0 },
 				)
 			} else {
@@ -284,7 +283,7 @@ fun DiscoverScreen(onLearnMore: () -> Unit = {}) {
 							.clickable(
 								interactionSource = remember { MutableInteractionSource() },
 								indication = null,
-							) { showBuy = true },
+							) { onPracticeBuy() },
 					) {
 						Text(
 							text = "Practice buy",
@@ -334,15 +333,6 @@ fun DiscoverScreen(onLearnMore: () -> Unit = {}) {
 					color = Color.White,
 				)
 			}
-		}
-		if (showBuy) {
-			PracticeBuySheet(
-				onConfirm = { showBuy = false; showFilled = true },
-				onDismiss = { showBuy = false },
-			)
-		}
-		if (showFilled) {
-			OrderFilledSheet(onDismiss = { showFilled = false })
 		}
 	}
 }
@@ -508,6 +498,7 @@ private fun GestureChevron(u: Float) {
 /** Shared sheet scaffold — #0a1020 scrim at 45% + r24 #181f30 sheet. */
 @Composable
 private fun SheetScaffold(onDismiss: () -> Unit, content: @Composable () -> Unit) {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Box(modifier = Modifier.fillMaxSize()) {
 		Box(
 			modifier = Modifier
@@ -523,19 +514,21 @@ private fun SheetScaffold(onDismiss: () -> Unit, content: @Composable () -> Unit
 			modifier = Modifier
 				.align(Alignment.BottomCenter)
 				.fillMaxWidth()
-				.clip(RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
+				.clip(RoundedCornerShape(topStart = (24 * u).dp, topEnd = (24 * u).dp))
 				.background(Disc.SheetBg)
-				.padding(horizontal = 20.dp)
-				.padding(top = 10.dp)
+				.padding(horizontal = (20 * u).dp)
+				.padding(top = (10 * u).dp)
 				.navigationBarsPadding()
-				.padding(bottom = 30.dp),
+				.padding(bottom = (30 * u).dp),
 		) {
 			Box(
 				modifier = Modifier
 					.align(Alignment.CenterHorizontally)
-					.padding(bottom = 4.dp)
-					.size(40.dp, 4.dp)
-					.background(Disc.Divider, RoundedCornerShape(2.dp)),
+					// Authored (1:2159): handle at y12–16, title at y32 — so 2
+					// above the rect and 16 below it after the 10 top padding.
+					.padding(top = (2 * u).dp, bottom = (16 * u).dp)
+					.size((40 * u).dp, (4 * u).dp)
+					.background(Disc.Divider, RoundedCornerShape((2 * u).dp)),
 			)
 			content()
 		}
@@ -545,37 +538,38 @@ private fun SheetScaffold(onDismiss: () -> Unit, content: @Composable () -> Unit
 /** NVDA row used by both sheets — teal-tinted, badge + price + change. */
 @Composable
 private fun NvdaStockRow(spec: BuySpec = NVDA_BUY) {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Row(
 		verticalAlignment = Alignment.CenterVertically,
-		horizontalArrangement = Arrangement.spacedBy(12.dp),
+		horizontalArrangement = Arrangement.spacedBy((12 * u).dp),
 		modifier = Modifier
 			.fillMaxWidth()
-			.clip(RoundedCornerShape(6.dp))
+			.clip(RoundedCornerShape((6 * u).dp))
 			.background(Disc.TipBg)
-			.padding(horizontal = 14.dp, vertical = 12.dp),
+			.padding(horizontal = (14 * u).dp, vertical = (12 * u).dp),
 	) {
-		Box(contentAlignment = Alignment.Center, modifier = Modifier.size(38.dp).background(Disc.ChipBg, CircleShape)) {
+		Box(contentAlignment = Alignment.Center, modifier = Modifier.size((38 * u).dp).background(Disc.ChipBg, CircleShape)) {
 			Text(
 				text = spec.badge,
-				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 15.sp),
+				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp),
 				color = Disc.BadgeInk,
 			)
 		}
-		Column(verticalArrangement = Arrangement.spacedBy(2.dp), modifier = Modifier.weight(1f)) {
+		Column(verticalArrangement = Arrangement.spacedBy((2 * u).dp), modifier = Modifier.weight(1f)) {
 			Text(
 				text = spec.name,
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 13.sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp, lineHeight = (17 * u).sp),
 				color = Color.White,
 			)
 			Text(
 				text = spec.priceLine,
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 10.sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (10 * u).sp, lineHeight = (13 * u).sp),
 				color = Disc.Muted,
 			)
 		}
 		Text(
 			text = spec.change,
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 12.sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
 			color = Disc.Green,
 		)
 	}
@@ -583,13 +577,14 @@ private fun NvdaStockRow(spec: BuySpec = NVDA_BUY) {
 
 @Composable
 private fun SheetCta(text: String, onClick: () -> Unit) {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Box(
 		contentAlignment = Alignment.Center,
 		modifier = Modifier
 			.fillMaxWidth()
-			.height(52.dp)
-			.background(CtaGradient, RoundedCornerShape(6.dp))
-			.border(0.36.dp, CtaBorder, RoundedCornerShape(6.dp))
+			.height((52 * u).dp)
+			.background(CtaGradient, RoundedCornerShape((6 * u).dp))
+			.border((0.36 * u).dp, CtaBorder, RoundedCornerShape((6 * u).dp))
 			.clickable(
 				interactionSource = remember { MutableInteractionSource() },
 				indication = null,
@@ -598,7 +593,7 @@ private fun SheetCta(text: String, onClick: () -> Unit) {
 	) {
 		Text(
 			text = text,
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 14.sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp),
 			color = Color.White,
 		)
 	}
@@ -606,12 +601,13 @@ private fun SheetCta(text: String, onClick: () -> Unit) {
 
 @Composable
 private fun SheetSecondary(text: String, onClick: () -> Unit) {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Box(
 		contentAlignment = Alignment.Center,
 		modifier = Modifier
 			.fillMaxWidth()
-			.height(52.dp)
-			.border(0.36.dp, Color(0x54343B4F), RoundedCornerShape(6.dp))
+			.height((52 * u).dp)
+			.border((0.36 * u).dp, Color(0x54343B4F), RoundedCornerShape((6 * u).dp))
 			.clickable(
 				interactionSource = remember { MutableInteractionSource() },
 				indication = null,
@@ -620,7 +616,7 @@ private fun SheetSecondary(text: String, onClick: () -> Unit) {
 	) {
 		Text(
 			text = text,
-			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = 14.sp),
+			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp),
 			color = Disc.Muted,
 		)
 	}
@@ -630,84 +626,85 @@ private fun SheetSecondary(text: String, onClick: () -> Unit) {
 @Composable
 private fun PracticeBuySheet(onConfirm: () -> Unit, onDismiss: () -> Unit, spec: BuySpec = NVDA_BUY) {
 	var selected by rememberSaveable { mutableIntStateOf(1) }
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	SheetScaffold(onDismiss = onDismiss) {
-		Column(verticalArrangement = Arrangement.spacedBy(14.dp), modifier = Modifier.fillMaxWidth()) {
+		Column(verticalArrangement = Arrangement.spacedBy((14 * u).dp), modifier = Modifier.fillMaxWidth()) {
 			Text(
 				text = spec.title,
-				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 18.sp),
+				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (18 * u).sp, lineHeight = (23 * u).sp),
 				color = Color.White,
 			)
 			NvdaStockRow(spec)
 			Text(
 				text = "Your paper stake starts at today’s price and tracks the real move live, in either direction.",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 12.sp, lineHeight = 18.sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (18 * u).sp),
 				color = Disc.Body,
 			)
-			Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-				Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+			Column(verticalArrangement = Arrangement.spacedBy((12 * u).dp), modifier = Modifier.fillMaxWidth()) {
+				Row(horizontalArrangement = Arrangement.spacedBy((6 * u).dp)) {
 					Text(
 						text = "Cash available",
-						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 12.sp),
+						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
 						color = Disc.Muted,
 					)
 					Text(
 						text = spec.cashBefore,
-						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 12.sp),
+						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
 						color = Disc.BrightInk,
 					)
 				}
-				Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+				Row(horizontalArrangement = Arrangement.spacedBy((8 * u).dp), modifier = Modifier.fillMaxWidth()) {
 					listOf("$10", "$25", "$50", "$100", "Custom").forEachIndexed { i, label ->
 						val sel = i == selected
 						Box(
 							contentAlignment = Alignment.Center,
 							modifier = Modifier
 								.weight(1f)
-								.clip(RoundedCornerShape(10.dp))
+								.clip(RoundedCornerShape((10 * u).dp))
 								.background(if (sel) Disc.AmountSelBg else Disc.AmountBg)
 								.border(
-									if (sel) 0.5.dp else 1.dp,
+									if (sel) (0.5 * u).dp else (1 * u).dp,
 									if (sel) Disc.AmountSelBorder else Disc.AmountBorder,
-									RoundedCornerShape(10.dp),
+									RoundedCornerShape((10 * u).dp),
 								)
 								.clickable(
 									interactionSource = remember { MutableInteractionSource() },
 									indication = null,
 								) { selected = i }
-								.padding(vertical = 8.dp),
+								.padding(vertical = (8 * u).dp),
 						) {
 							Text(
 								text = label,
-								style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 12.sp),
+								style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
 								color = if (sel) Disc.AmountSelInk else Disc.AmountInk,
 							)
 						}
 					}
 				}
 			}
-			Spacer(modifier = Modifier.height(10.dp))
 			Row(
-				horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally),
+				horizontalArrangement = Arrangement.spacedBy((6 * u).dp, Alignment.CenterHorizontally),
 				verticalAlignment = Alignment.Bottom,
-				modifier = Modifier.fillMaxWidth(),
+				// Authored: chips → shares line is a 24 gap (14 + 10).
+				modifier = Modifier.fillMaxWidth().padding(top = (10 * u).dp),
 			) {
 				Text(
 					text = "You get",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 12.sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
 					color = Disc.Muted,
 				)
 				Text(
 					text = spec.shares,
-					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 15.sp),
+					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp, lineHeight = (19 * u).sp),
 					color = Disc.BrightInk,
 				)
 				Text(
 					text = "shares of ${spec.symbol}",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 12.sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
 					color = Disc.Muted,
 				)
 			}
-			Column(verticalArrangement = Arrangement.spacedBy(16.dp), modifier = Modifier.fillMaxWidth()) {
+			Column(verticalArrangement = Arrangement.spacedBy((16 * u).dp), modifier = Modifier.fillMaxWidth()) {
 				SheetCta(text = "Confirm practice buy", onClick = onConfirm)
 				SheetSecondary(text = "Not yet", onClick = onDismiss)
 			}
@@ -718,53 +715,54 @@ private fun PracticeBuySheet(onConfirm: () -> Unit, onDismiss: () -> Unit, spec:
 /** "Order filled" sheet (frame 85:1205, sheet 85:1394). */
 @Composable
 private fun OrderFilledSheet(onDismiss: () -> Unit, spec: BuySpec = NVDA_BUY) {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	SheetScaffold(onDismiss = onDismiss) {
 		Column(
 			horizontalAlignment = Alignment.CenterHorizontally,
-			verticalArrangement = Arrangement.spacedBy(14.dp),
+			verticalArrangement = Arrangement.spacedBy((14 * u).dp),
 			modifier = Modifier.fillMaxWidth(),
 		) {
-			Image(painterResource(R.drawable.ic_sheet_check), null, modifier = Modifier.size(47.dp))
+			Image(painterResource(R.drawable.ic_sheet_check), null, modifier = Modifier.size((47 * u).dp))
 			Text(
 				text = "Order filled",
-				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 18.sp),
+				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (18 * u).sp, lineHeight = (23 * u).sp),
 				color = Color.White,
 			)
 			NvdaStockRow(spec)
-			Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth()) {
+			Row(horizontalArrangement = Arrangement.spacedBy((6 * u).dp), modifier = Modifier.fillMaxWidth()) {
 				Text(
 					text = "Cash available",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 12.sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
 					color = Disc.Muted,
 				)
 				Text(
 					text = spec.cashAfter,
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 12.sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
 					color = Disc.BrightInk,
 				)
 			}
 			Row(
-				horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally),
+				horizontalArrangement = Arrangement.spacedBy((6 * u).dp, Alignment.CenterHorizontally),
 				verticalAlignment = Alignment.Bottom,
 				modifier = Modifier.fillMaxWidth(),
 			) {
 				Text(
 					text = "You now hold",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 12.sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
 					color = Disc.Muted,
 				)
 				Text(
 					text = spec.shares,
-					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 15.sp),
+					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp, lineHeight = (19 * u).sp),
 					color = Disc.BrightInk,
 				)
 				Text(
 					text = "shares of ${spec.symbol}",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 12.sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
 					color = Disc.Muted,
 				)
 			}
-			Column(verticalArrangement = Arrangement.spacedBy(16.dp), modifier = Modifier.fillMaxWidth()) {
+			Column(verticalArrangement = Arrangement.spacedBy((16 * u).dp), modifier = Modifier.fillMaxWidth()) {
 				SheetCta(text = "View in My STAK", onClick = onDismiss)
 				SheetSecondary(text = "Keep exploring", onClick = onDismiss)
 			}
@@ -797,56 +795,57 @@ private fun ProgressRing(progress: Float, u: Float) {
 /** Discover · End of deck (CHINEDU 1:2330) — receipt stats + CTAs. */
 @Composable
 private fun EndOfDeck(onPracticeBuySaves: () -> Unit, onSwipeAgain: () -> Unit) {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Column(
 		horizontalAlignment = Alignment.CenterHorizontally,
-		modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
+		modifier = Modifier.fillMaxWidth().padding(horizontal = (20 * u).dp),
 	) {
-		Spacer(modifier = Modifier.height(47.dp))
+		Spacer(modifier = Modifier.height((47 * u).dp))
 		Text(
 			text = "Deck complete",
-			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 22.sp),
+			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (22 * u).sp),
 			color = Disc.BrightInk,
 		)
-		Spacer(modifier = Modifier.height(14.dp))
+		Spacer(modifier = Modifier.height((14 * u).dp))
 		Text(
 			text = "Twelve cards, twelve signals. Your taste graph got smarter.",
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 12.sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp),
 			color = Disc.Muted,
 		)
-		Spacer(modifier = Modifier.height(33.dp))
-		Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+		Spacer(modifier = Modifier.height((33 * u).dp))
+		Row(horizontalArrangement = Arrangement.spacedBy((10 * u).dp)) {
 			listOf("Seen" to "12", "Saved" to "7", "Bought" to "2").forEach { (label, value) ->
 				Column(
 					horizontalAlignment = Alignment.CenterHorizontally,
-					verticalArrangement = Arrangement.spacedBy(4.dp),
+					verticalArrangement = Arrangement.spacedBy((4 * u).dp),
 					modifier = Modifier
-						.width(110.dp)
-						.clip(RoundedCornerShape(12.dp))
+						.width((110 * u).dp)
+						.clip(RoundedCornerShape((12 * u).dp))
 						.background(Disc.SheetBg)
-						.padding(horizontal = 10.dp, vertical = 14.dp),
+						.padding(horizontal = (10 * u).dp, vertical = (14 * u).dp),
 				) {
 					Text(
 						text = label,
-						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 10.sp),
+						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (10 * u).sp),
 						color = Disc.Muted,
 					)
 					Text(
 						text = value,
-						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 20.sp),
+						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (20 * u).sp),
 						color = Disc.BrightInk,
 					)
 				}
 			}
 		}
-		Spacer(modifier = Modifier.height(56.dp))
+		Spacer(modifier = Modifier.height((56 * u).dp))
 		SheetCta(text = "Practice buy your saves", onClick = onPracticeBuySaves)
-		Spacer(modifier = Modifier.height(9.dp))
+		Spacer(modifier = Modifier.height((9 * u).dp))
 		Box(
 			contentAlignment = Alignment.Center,
 			modifier = Modifier
 				.fillMaxWidth()
-				.height(52.dp)
-				.border(0.36.dp, Color(0x54343B4F), RoundedCornerShape(6.dp))
+				.height((52 * u).dp)
+				.border((0.36 * u).dp, Color(0x54343B4F), RoundedCornerShape((6 * u).dp))
 				.clickable(
 					interactionSource = remember { MutableInteractionSource() },
 					indication = null,
@@ -854,23 +853,23 @@ private fun EndOfDeck(onPracticeBuySaves: () -> Unit, onSwipeAgain: () -> Unit) 
 		) {
 			Text(
 				text = "Review saves in My STAK",
-				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = 13.sp),
+				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = (13 * u).sp),
 				color = Disc.Muted,
 			)
 		}
-		Spacer(modifier = Modifier.height(14.dp))
+		Spacer(modifier = Modifier.height((14 * u).dp))
 		Text(
 			text = "A new deck lands tomorrow with your morning brief.",
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 10.sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (10 * u).sp),
 			color = Disc.Muted,
 		)
-		Spacer(modifier = Modifier.height(22.dp))
+		Spacer(modifier = Modifier.height((22 * u).dp))
 		Box(
 			contentAlignment = Alignment.Center,
 			modifier = Modifier
 				.fillMaxWidth()
-				.height(32.dp)
-				.clip(RoundedCornerShape(14.dp))
+				.height((32 * u).dp)
+				.clip(RoundedCornerShape((14 * u).dp))
 				.clickable(
 					interactionSource = remember { MutableInteractionSource() },
 					indication = null,
@@ -879,7 +878,7 @@ private fun EndOfDeck(onPracticeBuySaves: () -> Unit, onSwipeAgain: () -> Unit) 
 		) {
 			Text(
 				text = "Swipe today’s deck again",
-				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = 13.sp),
+				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = (13 * u).sp),
 				color = Disc.Muted,
 			)
 		}

@@ -255,36 +255,42 @@ fun DiscoverScreen(onLearnMore: () -> Unit = {}, onPracticeBuy: () -> Unit = {})
 							}
 						},
 				) {
-					// The authored deck (1:1627): front card full size, the
-					// next cards organised behind at their designed poses.
-					// On swipe the queue steps forward; the swiped card fades
-					// off and its design re-enters at the back of the queue.
-					val order = listOf(DECK[(seen + 2) % 3], DECK[(seen + 1) % 3], DECK[seen % 3])
+					// The authored deck (1:1627): the queued cards behind are
+					// the DESIGNED ILLUSION — the exact authored slabs, always
+					// (the user's spec: they give the illusion of a queue).
 					val p = promote.value
 					fun step(a: Float, b: Float) = a + (b - a) * p
+					Image(
+						painter = painterResource(R.drawable.disc_peek_top),
+						contentDescription = null,
+						modifier = Modifier
+							.align(Alignment.TopStart)
+							.offset(x = (39 * u).dp, y = 0.dp)
+							.size((273.66 * u).dp, (336.66 * u).dp),
+					)
+					Image(
+						painter = painterResource(R.drawable.disc_peek_mid),
+						contentDescription = null,
+						modifier = Modifier
+							.align(Alignment.TopStart)
+							.offset(x = (18 * u).dp, y = (24 * u).dp)
+							.size((313.14 * u).dp, (352.87 * u).dp),
+					)
 					if (p > 0f) {
-						BackDeckCard(DECK[seen % 3], scale = 251.81f / 350f, rotation = 4.03f, offsetX = (0.29 * u).dp, offsetY = (-53.85 * u).dp, u = u, authoredHeight = 444.4f, alpha = p)
+						// The next card lifts out of the stack and grows into
+						// the front slot — the queue illusion coming true.
+						BackDeckCard(
+							DECK[(seen + 1) % 3],
+							scale = step(299.51f / 350f, 1f),
+							rotation = step(-2.33f, 0f),
+							offsetX = (step(-0.58f, 0f) * u).dp,
+							offsetY = (step(1.4f, 54.65f) * u).dp,
+							u = u,
+							authoredHeight = step(398.5f, 430f),
+						)
 					}
-					BackDeckCard(
-						order[0],
-						scale = step(251.81f / 350f, 299.51f / 350f),
-						rotation = step(4.03f, -2.33f),
-						offsetX = (step(0.29f, -0.58f) * u).dp,
-						offsetY = (step(-53.85f, 1.4f) * u).dp,
-						u = u,
-						authoredHeight = step(444.4f, 398.5f),
-					)
-					BackDeckCard(
-						order[1],
-						scale = step(299.51f / 350f, 1f),
-						rotation = step(-2.33f, 0f),
-						offsetX = (step(-0.58f, 0f) * u).dp,
-						offsetY = (step(1.4f, 54.65f) * u).dp,
-						u = u,
-						authoredHeight = step(398.5f, 430f),
-					)
 					FrontDeckCard(
-						card = order[2],
+						card = DECK[seen % 3],
 						onSave = { savedToast = true },
 						u = u,
 						modifier = Modifier

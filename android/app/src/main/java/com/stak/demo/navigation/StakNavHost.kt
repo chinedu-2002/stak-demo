@@ -23,6 +23,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.stak.demo.ui.components.MainTab
 import com.stak.demo.ui.components.MainTabBar
+import com.stak.demo.ui.discover.DiscoverBuyFlow
 import com.stak.demo.ui.discover.DiscoverScreen
 import com.stak.demo.ui.discover.StockDetailScreen
 import com.stak.demo.ui.home.HomeScreen
@@ -326,30 +327,42 @@ private fun MainShell(
 ) {
 	var tab by rememberSaveable { mutableStateOf(MainTab.Home) }
 	var homeFirstRun by rememberSaveable { mutableStateOf(true) }
-	Column(modifier = Modifier.fillMaxSize()) {
-		Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
-			when (tab) {
-				MainTab.Home -> HomeScreen(
-					firstRun = homeFirstRun,
-					onSeeTodaysPick = { homeFirstRun = false },
-					onProfile = onOpenProfile,
-				)
-				MainTab.News -> NewsScreen(onOpenArticle = onOpenArticle)
-				MainTab.Discover -> DiscoverScreen(onLearnMore = onOpenStock)
-				MainTab.Simulate -> SimulateScreen(
-					onOpenPortfolio = onOpenSimPortfolio,
-					onOpenPick = onOpenSimPick,
-					onOpenLeaderboard = onOpenLeaderboard,
-				)
-				MainTab.MySTAK -> MyStakScreen(
-					onOpenCollection = onOpenCollection,
-					onStartSwiping = { tab = MainTab.Discover },
-				)
-				else -> HomeScreen(firstRun = false, onSeeTodaysPick = {})
+	var discoverBuy by rememberSaveable { mutableStateOf(false) }
+	Box(modifier = Modifier.fillMaxSize()) {
+		Column(modifier = Modifier.fillMaxSize()) {
+			Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
+				when (tab) {
+					MainTab.Home -> HomeScreen(
+						firstRun = homeFirstRun,
+						onSeeTodaysPick = { homeFirstRun = false },
+						onProfile = onOpenProfile,
+					)
+					MainTab.News -> NewsScreen(onOpenArticle = onOpenArticle)
+					MainTab.Discover -> DiscoverScreen(
+						onLearnMore = onOpenStock,
+						onPracticeBuy = { discoverBuy = true },
+					)
+					MainTab.Simulate -> SimulateScreen(
+						onOpenPortfolio = onOpenSimPortfolio,
+						onOpenPick = onOpenSimPick,
+						onOpenLeaderboard = onOpenLeaderboard,
+					)
+					MainTab.MySTAK -> MyStakScreen(
+						onOpenCollection = onOpenCollection,
+						onStartSwiping = { tab = MainTab.Discover },
+					)
+					else -> HomeScreen(firstRun = false, onSeeTodaysPick = {})
+				}
+			}
+			if (!(tab == MainTab.Home && homeFirstRun)) {
+				MainTabBar(selected = tab, onSelect = { tab = it })
 			}
 		}
-		if (!(tab == MainTab.Home && homeFirstRun)) {
-			MainTabBar(selected = tab, onSelect = { tab = it })
+		// Practice-buy flow overlays the whole shell — in frame 1:1970 the
+		// ticket's scrim covers the tab bar and the sheet meets the screen
+		// bottom, so it cannot live inside the tab content area.
+		if (discoverBuy) {
+			DiscoverBuyFlow(onClose = { discoverBuy = false })
 		}
 	}
 }

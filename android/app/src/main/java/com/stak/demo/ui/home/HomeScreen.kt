@@ -79,6 +79,7 @@ private object Home {
  */
 @Composable
 fun HomeScreen(firstRun: Boolean, onSeeTodaysPick: () -> Unit, onProfile: () -> Unit = {}) {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	BoxWithConstraints(modifier = Modifier.fillMaxSize().background(StakColors.Bg)) {
 		val statusPad = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
 		Column(modifier = Modifier.fillMaxSize()) {
@@ -89,15 +90,15 @@ fun HomeScreen(firstRun: Boolean, onSeeTodaysPick: () -> Unit, onProfile: () -> 
 					.weight(1f)
 					.fillMaxWidth()
 					.verticalScroll(rememberScrollState())
-					.padding(horizontal = 20.dp),
+					.padding(horizontal = (20 * u).dp),
 			) {
-				Spacer(modifier = Modifier.height(21.dp))
+				Spacer(modifier = Modifier.height((21 * u).dp))
 				MarketMoodCard()
-				Spacer(modifier = Modifier.height(10.dp))
+				Spacer(modifier = Modifier.height((10 * u).dp))
 				WhyThisMattersCard()
-				Spacer(modifier = Modifier.height(20.dp))
+				Spacer(modifier = Modifier.height((20 * u).dp))
 				DeckBanner()
-				Spacer(modifier = Modifier.height(if (firstRun) 140.dp else 20.dp))
+				Spacer(modifier = Modifier.height(if (firstRun) (140 * u).dp else (20 * u).dp))
 			}
 		}
 		if (firstRun) {
@@ -109,7 +110,7 @@ fun HomeScreen(firstRun: Boolean, onSeeTodaysPick: () -> Unit, onProfile: () -> 
 				onSeeTodaysPick = onSeeTodaysPick,
 				modifier = Modifier
 					.align(Alignment.BottomCenter)
-					.height(this@BoxWithConstraints.maxHeight - statusPad - 585.dp),
+					.height(this@BoxWithConstraints.maxHeight - statusPad - (585 * u).dp),
 			)
 		}
 	}
@@ -118,37 +119,38 @@ fun HomeScreen(firstRun: Boolean, onSeeTodaysPick: () -> Unit, onProfile: () -> 
 /** Fixed top nav — logo row with bell/profile circles + greeting (Figma 131px block). */
 @Composable
 private fun TopNav(onProfile: () -> Unit) {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Column(
 		modifier = Modifier
 			.fillMaxWidth()
 			.background(StakColors.Bg)
 			.statusBarsPadding()
-			.padding(horizontal = 17.dp)
-			.padding(top = 22.dp),
+			.padding(horizontal = (17 * u).dp)
+			.padding(top = (22 * u).dp),
 	) {
-		Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().height(35.dp)) {
+		Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().height((35 * u).dp)) {
 			Image(
 				painter = painterResource(R.drawable.ic_stak_logo_mark),
 				contentDescription = null,
-				modifier = Modifier.size(26.48.dp),
+				modifier = Modifier.size((26.48 * u).dp),
 			)
-			Spacer(modifier = Modifier.width(4.49.dp))
+			Spacer(modifier = Modifier.width((4.49 * u).dp))
 			Image(
 				painter = painterResource(R.drawable.ic_stak_wordmark),
 				contentDescription = "STAK",
-				modifier = Modifier.size(78.16.dp, 14.98.dp),
+				modifier = Modifier.size((78.16 * u).dp, (14.98 * u).dp),
 			)
 			Spacer(modifier = Modifier.weight(1f))
 			Image(
 				painter = painterResource(R.drawable.ic_nav_bell),
 				contentDescription = "Notifications",
-				modifier = Modifier.size(35.dp),
+				modifier = Modifier.size((35 * u).dp),
 			)
-			Spacer(modifier = Modifier.width(4.dp))
+			Spacer(modifier = Modifier.width((4 * u).dp))
 			Box(
 				contentAlignment = Alignment.Center,
 				modifier = Modifier
-					.size(35.dp)
+					.size((35 * u).dp)
 					.background(Home.NavCircle, CircleShape)
 					.clickable(
 						interactionSource = remember { MutableInteractionSource() },
@@ -159,14 +161,14 @@ private fun TopNav(onProfile: () -> Unit) {
 				Image(
 					painter = painterResource(R.drawable.ic_nav_person),
 					contentDescription = "Profile",
-					modifier = Modifier.size(12.99.dp, 13.64.dp),
+					modifier = Modifier.size((12.99 * u).dp, (13.64 * u).dp),
 				)
 			}
 		}
-		Spacer(modifier = Modifier.height(10.dp))
+		Spacer(modifier = Modifier.height((10 * u).dp))
 		Text(
 			text = "Good Morning, Hamza",
-			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 16.sp),
+			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp, lineHeight = (20 * u).sp),
 			color = Color.White,
 		)
 	}
@@ -175,11 +177,12 @@ private fun TopNav(onProfile: () -> Unit) {
 /** Market Mood — 350x397 #171d2c card with the clipped news-deck stack. */
 @Composable
 private fun MarketMoodCard() {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Box(
 		modifier = Modifier
 			.fillMaxWidth()
-			.height(397.dp)
-			.clip(RoundedCornerShape(8.dp))
+			.height((397 * u).dp)
+			.clip(RoundedCornerShape((8 * u).dp))
 			.background(Home.CardBg),
 	) {
 		Box(modifier = Modifier.matchParentSize()) { NewsDeck() }
@@ -189,28 +192,28 @@ private fun MarketMoodCard() {
 			modifier = Modifier
 				.align(Alignment.BottomCenter)
 				.fillMaxWidth()
-				.height(30.dp)
+				.height((30 * u).dp)
 				.clipToBounds(),
 		) {
 			// An oversized child gets centered in the 30dp band; shift it up
 			// by (397-30)/2 so the stack's bottom edge lines up with the band.
 			Box(
 				modifier = Modifier
-					.offset(y = (-183.5).dp)
+					.offset(y = (-183.5 * u).dp)
 					.fillMaxWidth()
-					.requiredHeight(397.dp)
-					.blur(4.dp),
+					.requiredHeight((397 * u).dp)
+					.blur((4 * u).dp),
 			) { NewsDeck() }
 		}
 		Row(
 			verticalAlignment = Alignment.CenterVertically,
 			horizontalArrangement = Arrangement.Center,
-			modifier = Modifier.fillMaxWidth().padding(top = 25.dp),
+			modifier = Modifier.fillMaxWidth().padding(top = (25 * u).dp),
 		) {
-			Column(verticalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.width(180.dp)) {
+			Column(verticalArrangement = Arrangement.spacedBy((4 * u).dp), modifier = Modifier.width((180 * u).dp)) {
 				Text(
 					text = "Market Mood",
-					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Medium, fontSize = 20.sp),
+					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Medium, fontSize = (20 * u).sp, lineHeight = (25 * u).sp),
 					color = Color.White,
 				)
 				Text(
@@ -218,15 +221,15 @@ private fun MarketMoodCard() {
 						withStyle(SpanStyle(color = Home.Teal)) { append("High volatility") }
 						append(", you should consider being cautious.")
 					},
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 12.sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
 					color = Color.White,
 				)
 			}
-			Spacer(modifier = Modifier.width(46.dp))
+			Spacer(modifier = Modifier.width((46 * u).dp))
 			Image(
 				painter = painterResource(R.drawable.home_mood_gauge),
 				contentDescription = null,
-				modifier = Modifier.size(56.9.dp, 28.84.dp),
+				modifier = Modifier.size((56.9 * u).dp, (28.84 * u).dp),
 			)
 		}
 	}
@@ -238,15 +241,16 @@ private fun MarketMoodCard() {
  */
 @Composable
 private fun BoxScope.NewsDeck() {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	NewsDeckCard(
 		bg = Home.PaperWhite,
 		title = "Wall Street's fear gauge reads 32",
 		body = "The Fear & Greed Index is firmly in Fear territory. Money is rotating out of the ....",
 		bodyWeight = FontWeight.Light,
-		bodySize = 12.sp,
-		titleBodyGap = 12.dp,
-		offsetX = 6.2.dp,
-		offsetY = 59.73.dp,
+		bodySize = (12 * u).sp,
+		titleBodyGap = (12 * u).dp,
+		offsetX = (6.2 * u).dp,
+		offsetY = (59.73 * u).dp,
 		rotation = 0f,
 	)
 	NewsDeckCard(
@@ -254,10 +258,10 @@ private fun BoxScope.NewsDeck() {
 		title = "Fed meeting notes drop Wednesday",
 		body = "Minutes from the last Fed meeting land July 8. A market this tense moves on every word....",
 		bodyWeight = FontWeight.Normal,
-		bodySize = 11.89.sp,
-		titleBodyGap = 17.dp,
-		offsetX = 8.33.dp,
-		offsetY = 189.44.dp,
+		bodySize = (11.89 * u).sp,
+		titleBodyGap = (17 * u).dp,
+		offsetX = (8.33 * u).dp,
+		offsetY = (189.44 * u).dp,
 		rotation = -3.72f,
 	)
 	NewsDeckCard(
@@ -265,10 +269,10 @@ private fun BoxScope.NewsDeck() {
 		title = "The OpenAI IPO is reportedly delayed",
 		body = "The year's most anticipated listing just slipped. Markets riding a wave of IPO excitement...",
 		bodyWeight = FontWeight.Light,
-		bodySize = 12.sp,
-		titleBodyGap = 12.dp,
-		offsetX = (-0.02).dp,
-		offsetY = 264.57.dp,
+		bodySize = (12 * u).sp,
+		titleBodyGap = (12 * u).dp,
+		offsetX = (-0.02 * u).dp,
+		offsetY = (264.57 * u).dp,
 		rotation = -7.68f,
 	)
 }
@@ -286,28 +290,29 @@ private fun BoxScope.NewsDeckCard(
 	offsetY: Dp,
 	rotation: Float,
 ) {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Column(
 		verticalArrangement = Arrangement.spacedBy(titleBodyGap),
 		modifier = Modifier
 			.align(Alignment.Center)
 			.offset(x = offsetX, y = offsetY)
 			.graphicsLayer { rotationZ = rotation }
-			.size(236.86.dp, 278.45.dp)
-			.clip(RoundedCornerShape(6.79.dp))
+			.size((236.86 * u).dp, (278.45 * u).dp)
+			.clip(RoundedCornerShape((6.79 * u).dp))
 			.background(bg)
-			.padding(start = 14.43.dp, top = 23.77.dp),
+			.padding(start = (14.43 * u).dp, top = (23.77 * u).dp),
 	) {
 		Text(
 			text = title,
-			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Medium, fontSize = 16.sp),
+			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Medium, fontSize = (16 * u).sp),
 			color = Home.CardInk,
-			modifier = Modifier.width(202.9.dp),
+			modifier = Modifier.width((202.9 * u).dp),
 		)
 		Text(
 			text = body,
 			style = TextStyle(fontFamily = Geist, fontWeight = bodyWeight, fontSize = bodySize),
 			color = Home.CardInk,
-			modifier = Modifier.width(189.31.dp),
+			modifier = Modifier.width((189.31 * u).dp),
 		)
 	}
 }
@@ -315,32 +320,34 @@ private fun BoxScope.NewsDeckCard(
 /** "Why this matters to you" — 350x91 card with the glass caution ball art. */
 @Composable
 private fun WhyThisMattersCard() {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Box(
 		modifier = Modifier
 			.fillMaxWidth()
-			.height(91.dp)
-			.clip(RoundedCornerShape(8.dp))
-			.background(Home.CardBg),
+			.height((91 * u).dp)
+			// Shaped background, no clip — the glass ball overflows the card
+			// top by 7 in the frame and must stay visible.
+			.background(Home.CardBg, RoundedCornerShape((8 * u).dp)),
 	) {
 		Image(
 			painter = painterResource(R.drawable.home_caution_ball),
 			contentDescription = null,
-			modifier = Modifier.offset(x = 3.dp, y = (-7).dp).size(105.dp),
+			modifier = Modifier.offset(x = (3 * u).dp, y = (-7 * u).dp).size((105 * u).dp),
 		)
 		Column(
-			verticalArrangement = Arrangement.spacedBy(6.dp),
-			modifier = Modifier.align(Alignment.CenterStart).padding(start = 127.dp),
+			verticalArrangement = Arrangement.spacedBy((6 * u).dp),
+			modifier = Modifier.align(Alignment.CenterStart).padding(start = (127 * u).dp),
 		) {
 			Text(
 				text = "Why this matters to you",
-				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = 14.sp, lineHeight = 15.sp),
+				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (13 * u).sp, lineHeight = (15 * u).sp),
 				color = Color.White,
 			)
 			Text(
 				text = "Your STAK collections houses 80% of stocks from effected industries.",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Light, fontSize = 12.sp, lineHeight = 15.sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Light, fontSize = (12 * u).sp, lineHeight = (15 * u).sp),
 				color = Color.White,
-				modifier = Modifier.width(198.dp),
+				modifier = Modifier.width((198 * u).dp),
 			)
 		}
 	}
@@ -349,11 +356,12 @@ private fun WhyThisMattersCard() {
 /** Teal deck banner — 350x116 with the box-and-coins art and Go to Deck chip. */
 @Composable
 private fun DeckBanner() {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Box(
 		modifier = Modifier
 			.fillMaxWidth()
-			.height(116.dp)
-			.clip(RoundedCornerShape(8.dp))
+			.height((116 * u).dp)
+			.clip(RoundedCornerShape((8 * u).dp))
 			.background(Home.Teal),
 	) {
 		// The illustration zone of the frame (box + coins + shadow), cropped
@@ -363,41 +371,41 @@ private fun DeckBanner() {
 			painter = painterResource(R.drawable.home_banner_illustration),
 			contentDescription = null,
 			contentScale = ContentScale.Fit,
-			modifier = Modifier.align(Alignment.CenterStart).size(172.dp, 116.dp),
+			modifier = Modifier.align(Alignment.CenterStart).size((172 * u).dp, (116 * u).dp),
 		)
 		Column(
-			verticalArrangement = Arrangement.spacedBy(10.dp),
+			verticalArrangement = Arrangement.spacedBy((10 * u).dp),
 			modifier = Modifier
 				.align(Alignment.CenterStart)
-				.padding(start = 184.dp)
-				.offset(y = 0.5.dp)
-				.width(156.dp),
+				.padding(start = (184 * u).dp)
+				.offset(y = (0.5 * u).dp)
+				.width((156 * u).dp),
 		) {
 			Text(
 				text = "Take your first deck to build your taste",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Light, fontSize = 12.sp, lineHeight = 15.sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Light, fontSize = (12 * u).sp, lineHeight = (15 * u).sp),
 				color = Color.Black,
 			)
 			Box(
 				contentAlignment = Alignment.Center,
 				modifier = Modifier
-					.size(123.dp, 32.dp)
-					.background(StakColors.Bg, RoundedCornerShape(15.dp))
+					.size((123 * u).dp, (32 * u).dp)
+					.background(StakColors.Bg, RoundedCornerShape((15 * u).dp))
 					.clickable(
 						interactionSource = remember { MutableInteractionSource() },
 						indication = null,
 					) { /* Deck screen lands in a later phase. */ },
 			) {
-				Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(3.dp)) {
+				Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy((3 * u).dp)) {
 					Text(
 						text = "Go to Deck",
-						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 11.49.sp),
+						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (11.49 * u).sp, lineHeight = (15 * u).sp),
 						color = Color.White,
 					)
 					Image(
 						painter = painterResource(R.drawable.ic_arrow_right_small),
 						contentDescription = null,
-						modifier = Modifier.size(16.dp),
+						modifier = Modifier.size((16 * u).dp),
 					)
 				}
 			}
@@ -412,12 +420,13 @@ private fun DeckBanner() {
  */
 @Composable
 private fun FirstRunOverlay(onSeeTodaysPick: () -> Unit, modifier: Modifier = Modifier) {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Box(modifier = modifier.fillMaxWidth()) {
 		Column(modifier = Modifier.matchParentSize()) {
 			Box(
 				modifier = Modifier
 					.fillMaxWidth()
-					.height(98.7.dp)
+					.height((98.7 * u).dp)
 					.background(Brush.verticalGradient(0f to Color(0x000A1020), 1f to StakColors.Bg)),
 			)
 			Box(modifier = Modifier.fillMaxWidth().weight(1f).background(StakColors.Bg))
@@ -426,11 +435,11 @@ private fun FirstRunOverlay(onSeeTodaysPick: () -> Unit, modifier: Modifier = Mo
 			contentAlignment = Alignment.Center,
 			modifier = Modifier
 				.align(Alignment.BottomCenter)
-				.padding(bottom = 70.dp)
-				.size(136.dp, 51.dp)
+				.padding(bottom = (70 * u).dp)
+				.size((136 * u).dp, (51 * u).dp)
 				.clip(RoundedCornerShape(50))
 				.background(Color(0x0FFFFFFF))
-				.border(0.94.dp, Color(0x66FFFFFF), RoundedCornerShape(50))
+				.border((0.94 * u).dp, Color(0x66FFFFFF), RoundedCornerShape(50))
 				.clickable(
 					interactionSource = remember { MutableInteractionSource() },
 					indication = null,
@@ -439,7 +448,7 @@ private fun FirstRunOverlay(onSeeTodaysPick: () -> Unit, modifier: Modifier = Mo
 		) {
 			Text(
 				text = "See Todays Pick",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 12.sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp),
 				color = Color.White,
 			)
 		}

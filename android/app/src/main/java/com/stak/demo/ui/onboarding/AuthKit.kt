@@ -84,9 +84,10 @@ internal fun BoxScope.AuthWatermark() {
 /** 40dp #192238 circle with the #AEAEAE back chevron. */
 @Composable
 internal fun AuthBackCircle(onClick: () -> Unit, modifier: Modifier = Modifier) {
+	val u = figmaUnit()
 	Box(
 		modifier = modifier
-			.size(40.dp)
+			.size((40 * u).dp)
 			.background(Auth.NavCircle, CircleShape)
 			.clickable(
 				interactionSource = remember { MutableInteractionSource() },
@@ -98,7 +99,7 @@ internal fun AuthBackCircle(onClick: () -> Unit, modifier: Modifier = Modifier) 
 		Image(
 			painter = painterResource(R.drawable.ic_back_chevron),
 			contentDescription = "Back",
-			modifier = Modifier.size(22.dp),
+			modifier = Modifier.size((22 * u).dp),
 		)
 	}
 }

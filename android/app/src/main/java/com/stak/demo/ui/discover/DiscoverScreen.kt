@@ -42,7 +42,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
@@ -381,7 +384,32 @@ fun DiscoverScreen(onLearnMore: () -> Unit = {}, onPracticeBuy: () -> Unit = {})
 /** The full-size front card (350 wide) with its live Save chip. */
 @Composable
 private fun FrontDeckCard(card: DeckCard, onSave: () -> Unit, u: Float, modifier: Modifier = Modifier) {
-	Box(modifier = modifier.width((350 * u).dp)) {
+	Box(
+		modifier = modifier
+			.width((350 * u).dp)
+			// The deck's layer structure: every boundary in the frame is a
+			// brightness step plus a thin dark rim (the authored exports
+			// carry it). NVDA's dark chrome makes its own step; light-topped
+			// cards need the rim — a tight dark seam hugging the edge — so
+			// the card reads as its own layer over the queue in EVERY state.
+			.drawBehind {
+				val corner = (22 * u).dp.toPx()
+				val reach = (6 * u).dp.toPx()
+				val step = 1.dp.toPx()
+				var d = 0f
+				while (d < reach) {
+					val t = d / reach
+					drawRoundRect(
+						color = Color(0xFF060B16).copy(alpha = 0.5f * (1f - t) * (1f - t)),
+						topLeft = Offset(-d, -d),
+						size = Size(size.width + 2 * d, size.height + 2 * d),
+						cornerRadius = CornerRadius(corner + d),
+						style = Stroke(width = step),
+					)
+					d += step
+				}
+			},
+	) {
 		DeckCardBody(card = card, onSave = onSave, u = u)
 	}
 }

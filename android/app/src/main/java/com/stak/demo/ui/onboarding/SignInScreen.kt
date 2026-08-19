@@ -47,6 +47,7 @@ fun SignInScreen(
 	onSignIn: () -> Unit,
 	onCreateAccount: () -> Unit,
 ) {
+	val u = figmaUnit()
 	var email by rememberSaveable { mutableStateOf("") }
 	var password by rememberSaveable { mutableStateOf("") }
 	var showPassword by rememberSaveable { mutableStateOf(false) }
@@ -55,32 +56,32 @@ fun SignInScreen(
 		AuthWatermark()
 
 		Column(modifier = Modifier.fillMaxSize().systemBarsPadding()) {
-			Row(modifier = Modifier.fillMaxWidth().padding(start = 20.dp, top = 10.dp, bottom = 4.dp)) {
+			Row(modifier = Modifier.fillMaxWidth().padding(start = (20 * u).dp, top = (10 * u).dp, bottom = (4 * u).dp)) {
 				AuthBackCircle(onClick = onBack)
 			}
 
 			Column(
-				verticalArrangement = Arrangement.spacedBy(14.dp),
+				verticalArrangement = Arrangement.spacedBy((14 * u).dp),
 				modifier = Modifier
 					.weight(1f)
 					.fillMaxWidth()
 					.verticalScroll(rememberScrollState())
-					.padding(horizontal = 24.dp)
-					.padding(top = 14.dp),
+					.padding(horizontal = (24 * u).dp)
+					.padding(top = (14 * u).dp),
 			) {
-				Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+				Column(verticalArrangement = Arrangement.spacedBy((12 * u).dp)) {
 					Text(
 						text = "Welcome back",
-						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 26.sp),
+						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (26 * u).sp),
 						color = StakColors.TextPrimary,
 					)
 					Text(
 						text = "Your deck kept learning while you were away.",
-						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 12.sp),
+						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp),
 						color = Auth.SubtitleGray,
 					)
 				}
-				Spacer(modifier = Modifier.height(4.dp))
+				Spacer(modifier = Modifier.height((4 * u).dp))
 
 				SocialPill(text = "Continue with Google", iconRes = R.drawable.ic_google_g, onClick = onSignIn)
 				SocialPill(text = "Continue with Apple", iconRes = R.drawable.ic_apple_logo, onClick = onSignIn)
@@ -98,7 +99,7 @@ fun SignInScreen(
 				)
 				Text(
 					text = "Forgot password?",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 12.sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp),
 					color = Auth.LinkTeal,
 					modifier = Modifier.clickable(
 						interactionSource = remember { MutableInteractionSource() },
@@ -109,8 +110,8 @@ fun SignInScreen(
 
 			Column(
 				horizontalAlignment = Alignment.CenterHorizontally,
-				verticalArrangement = Arrangement.spacedBy(12.dp),
-				modifier = Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 26.dp),
+				verticalArrangement = Arrangement.spacedBy((12 * u).dp),
+				modifier = Modifier.fillMaxWidth().padding(top = (8 * u).dp, bottom = (26 * u).dp),
 			) {
 				AuthCta(text = "Sign in", onClick = onSignIn)
 				AuthSwitchRow(prefix = "New to STAK?", link = "Create account", onClick = onCreateAccount)

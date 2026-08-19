@@ -71,46 +71,46 @@ fun SwipeTutorialScreen(onBack: () -> Unit, onContinue: () -> Unit) {
 	val topOffset = remember(swiped) { Animatable(0f) }
 	val scope = rememberCoroutineScope()
 	val density = LocalDensity.current
+	val u = figmaUnit()
 
 	Column(modifier = Modifier.fillMaxSize().background(StakColors.Bg).systemBarsPadding()) {
 		Row(
 			verticalAlignment = Alignment.CenterVertically,
-			modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp).padding(top = 10.dp, bottom = 4.dp),
+			modifier = Modifier.fillMaxWidth().padding(horizontal = (20 * u).dp).padding(top = (10 * u).dp, bottom = (4 * u).dp),
 		) {
 			AuthBackCircle(onClick = onBack)
 			Spacer(modifier = Modifier.weight(1f))
 			Text(
 				text = "STEP 3 OF 6",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 10.sp, letterSpacing = 0.9.sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, letterSpacing = (0.9 * u).sp),
 				color = Auth.FaintText,
 			)
 		}
 
 		Column(
-			verticalArrangement = Arrangement.spacedBy(18.dp),
+			verticalArrangement = Arrangement.spacedBy((18 * u).dp),
 			modifier = Modifier
 				.weight(1f)
 				.fillMaxWidth()
-				.padding(horizontal = 24.dp)
-				.padding(top = 14.dp),
+				.padding(horizontal = (24 * u).dp)
+				.padding(top = (14 * u).dp),
 		) {
-			Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+			Column(verticalArrangement = Arrangement.spacedBy((12 * u).dp)) {
 				Text(
 					text = "Now try a few swipes.",
-					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 24.sp, lineHeight = 31.sp),
+					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (24 * u).sp, lineHeight = (31 * u).sp),
 					color = StakColors.TextPrimary,
 				)
 				Text(
 					text = "Swipe down for the next card. Save what you like.",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 12.sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp),
 					color = Auth.SubtitleGray,
 				)
 			}
 
-			val u = figmaUnit()
 			Column(
 				horizontalAlignment = Alignment.CenterHorizontally,
-				modifier = Modifier.weight(1f).fillMaxWidth().padding(top = 10.dp),
+				modifier = Modifier.weight(1f).fillMaxWidth().padding(top = (10 * u).dp),
 			) {
 				// The deck — cards keep their designed poses scaled to the
 				// artboard unit; the front one drags down.
@@ -121,8 +121,8 @@ fun SwipeTutorialScreen(onBack: () -> Unit, onContinue: () -> Unit) {
 							detectVerticalDragGestures(
 								onDragEnd = {
 									scope.launch {
-										if (topOffset.value > with(density) { 110.dp.toPx() }) {
-											topOffset.animateTo(with(density) { 700.dp.toPx() }, tween(220))
+										if (topOffset.value > with(density) { (110 * u).dp.toPx() }) {
+											topOffset.animateTo(with(density) { (700 * u).dp.toPx() }, tween(220))
 											swiped = (swiped + 1) % (CARDS.size + 1) // 3 swipes, then reset
 										} else {
 											topOffset.animateTo(0f, tween(180))
@@ -177,8 +177,8 @@ fun SwipeTutorialScreen(onBack: () -> Unit, onContinue: () -> Unit) {
 		}
 
 		Column(
-			verticalArrangement = Arrangement.spacedBy(10.dp),
-			modifier = Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 26.dp),
+			verticalArrangement = Arrangement.spacedBy((10 * u).dp),
+			modifier = Modifier.fillMaxWidth().padding(top = (8 * u).dp, bottom = (26 * u).dp),
 		) {
 			AuthCta(text = "Continue", onClick = onContinue)
 			AuthSecondaryButton(text = "Back", onClick = onBack)
@@ -198,7 +198,7 @@ private fun ChevronDown(u: Float) {
 		drawPath(
 			p,
 			StakColors.Muted,
-			style = Stroke(width = 1.6.dp.toPx(), cap = StrokeCap.Round, join = StrokeJoin.Round),
+			style = Stroke(width = (1.6 * u).dp.toPx(), cap = StrokeCap.Round, join = StrokeJoin.Round),
 		)
 	}
 }

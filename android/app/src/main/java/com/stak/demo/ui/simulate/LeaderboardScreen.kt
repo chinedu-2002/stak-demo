@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -72,7 +73,7 @@ fun LeaderboardScreen(onBack: () -> Unit) {
 			Spacer(modifier = Modifier.weight(1f))
 			Text(
 				text = "Leaderboard",
-				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp),
+				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp, lineHeight = (20 * u).sp),
 				color = Color.White,
 			)
 			Spacer(modifier = Modifier.weight(1f))
@@ -84,64 +85,65 @@ fun LeaderboardScreen(onBack: () -> Unit) {
 			}
 		}
 		Column(
-			verticalArrangement = Arrangement.spacedBy((10 * u).dp),
+			verticalArrangement = Arrangement.spacedBy((16 * u).dp),
 			modifier = Modifier
 				.weight(1f)
 				.fillMaxWidth()
 				.verticalScroll(rememberScrollState())
 				.padding(horizontal = (20 * u).dp)
-				.padding(top = (10 * u).dp, bottom = (24 * u).dp),
+				.padding(top = (6 * u).dp, bottom = (24 * u).dp),
 		) {
 			Row(horizontalArrangement = Arrangement.spacedBy((8 * u).dp)) {
 				PeriodChip("This week", selected = true)
 				PeriodChip("All time", selected = false)
 			}
-			Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().padding(top = (4 * u).dp)) {
+			Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
 				Text(
 					text = "RANKED BY RETURN",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, letterSpacing = (0.9 * u).sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, lineHeight = (13 * u).sp, letterSpacing = (0.9 * u).sp),
 					color = Sim.Faint,
+					modifier = Modifier.padding(start = (2 * u).dp),
 				)
 				Spacer(modifier = Modifier.weight(1f))
-				Text("Trailing 7 days", style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp), color = Sim.Faint)
+				Text("Trailing 7 days", style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp, lineHeight = (13 * u).sp), color = Sim.Faint)
 			}
 			// You — highlighted with the ▲ spots delta.
 			Row(
 				verticalAlignment = Alignment.CenterVertically,
-				horizontalArrangement = Arrangement.spacedBy((10 * u).dp),
+				horizontalArrangement = Arrangement.spacedBy((11 * u).dp),
 				modifier = Modifier
 					.fillMaxWidth()
 					.clip(RoundedCornerShape((12 * u).dp))
 					.background(Sim.TealTint)
-					.border((0.75 * u).dp, Color(0x662C9DBC), RoundedCornerShape((12 * u).dp))
-					.padding(horizontal = (12 * u).dp, vertical = (10 * u).dp),
+					.padding(horizontal = (16 * u).dp, vertical = (14 * u).dp),
 			) {
-				Text("47", style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (12 * u).sp), color = Sim.Teal)
-				Box(contentAlignment = Alignment.Center, modifier = Modifier.size((32 * u).dp).background(Sim.ChipBg, CircleShape)) {
-					Text("E", style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (13 * u).sp), color = Sim.BadgeInk)
+				Box(modifier = Modifier.width((28 * u).dp)) {
+					Text("47", style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp, lineHeight = (20 * u).sp), color = Sim.Teal)
+				}
+				Box(contentAlignment = Alignment.Center, modifier = Modifier.size((36 * u).dp).background(Sim.ChipBg, CircleShape)) {
+					Text("E", style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (13 * u).sp, lineHeight = (18 * u).sp), color = Sim.BadgeInk)
 				}
 				Column(verticalArrangement = Arrangement.spacedBy((2 * u).dp), modifier = Modifier.weight(1f)) {
-					Text("You", style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.SemiBold, fontSize = (13 * u).sp), color = Color.White)
-					Text("12 picks this week", style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp), color = Sim.Muted)
+					Text("You", style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.SemiBold, fontSize = (12 * u).sp, lineHeight = (15 * u).sp), color = Color.White)
+					Text("12 picks this week", style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp, lineHeight = (13 * u).sp), color = Sim.Muted)
 				}
 				Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy((2 * u).dp)) {
-					Text("+4.2%", style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (13 * u).sp), color = Sim.Teal)
-					Text("▲ 12 spots", style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp), color = Sim.Green)
+					Text("+4.2%", style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (13 * u).sp, lineHeight = (16 * u).sp), color = Sim.Teal)
+					Text("▲ 12 spots", style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp, lineHeight = (13 * u).sp), color = Sim.Green)
 				}
 			}
 			TOP.forEach { LeaderRow(it) }
 			Text(
 				text = "· · ·",
-				style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp),
+				style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp, lineHeight = (17 * u).sp),
 				color = Sim.Faint,
 				modifier = Modifier.align(Alignment.CenterHorizontally),
 			)
 			NEAR.forEach { LeaderRow(it) }
 			Text(
-				text = "Percentage return, not dollar size, so everyone competes on the same scale. This week ranks are trailing 7 days.",
-				style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp, lineHeight = (15 * u).sp),
+				text = "Percentage return, not dollar size, so everyone competes on the same scale. This week ranks the trailing 7 days.",
+				style = TextStyle(fontFamily = Geist, fontSize = (11 * u).sp, lineHeight = (16 * u).sp),
 				color = Sim.Faint,
-				modifier = Modifier.padding(top = (8 * u).dp),
 			)
 		}
 	}
@@ -155,11 +157,11 @@ private fun PeriodChip(label: String, selected: Boolean) {
 			.clip(RoundedCornerShape((14 * u).dp))
 			.background(if (selected) Sim.TealTint else Sim.CardBg)
 			.then(if (selected) Modifier.border((0.75 * u).dp, Color(0x662C9DBC), RoundedCornerShape((14 * u).dp)) else Modifier)
-			.padding(horizontal = (12 * u).dp, vertical = (6 * u).dp),
+			.padding(horizontal = (13 * u).dp, vertical = (7 * u).dp),
 	) {
 		Text(
 			text = label,
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
 			color = if (selected) Sim.Teal else Sim.Muted,
 		)
 	}
@@ -170,21 +172,23 @@ private fun LeaderRow(r: Rank) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Row(
 		verticalAlignment = Alignment.CenterVertically,
-		horizontalArrangement = Arrangement.spacedBy((10 * u).dp),
+		horizontalArrangement = Arrangement.spacedBy((11 * u).dp),
 		modifier = Modifier
 			.fillMaxWidth()
 			.clip(RoundedCornerShape((12 * u).dp))
 			.background(Sim.CardBg)
-			.padding(horizontal = (12 * u).dp, vertical = (10 * u).dp),
+			.padding(horizontal = (14 * u).dp, vertical = (11 * u).dp),
 	) {
-		Text(r.rank, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (12 * u).sp), color = Sim.Faint)
+		Box(modifier = Modifier.width((24 * u).dp)) {
+			Text(r.rank, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (12 * u).sp, lineHeight = (15 * u).sp), color = Sim.Faint)
+		}
 		Box(contentAlignment = Alignment.Center, modifier = Modifier.size((32 * u).dp).background(Sim.ChipBg, CircleShape)) {
-			Text(r.initial, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (13 * u).sp), color = Sim.BadgeInk)
+			Text(r.initial, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (13 * u).sp, lineHeight = (16 * u).sp), color = Sim.BadgeInk)
 		}
 		Column(verticalArrangement = Arrangement.spacedBy((2 * u).dp), modifier = Modifier.weight(1f)) {
-			Text(r.name, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp), color = Color.White)
-			Text(r.picks, style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp), color = Sim.Muted)
+			Text(r.name, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (15 * u).sp), color = Color.White)
+			Text(r.picks, style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp, lineHeight = (13 * u).sp), color = Sim.Muted)
 		}
-		Text(r.pct, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (12 * u).sp), color = Sim.HeaderGray)
+		Text(r.pct, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (12 * u).sp, lineHeight = (15 * u).sp), color = Sim.HeaderGray)
 	}
 }

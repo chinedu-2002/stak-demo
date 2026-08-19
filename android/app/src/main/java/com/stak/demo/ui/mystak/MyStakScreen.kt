@@ -33,6 +33,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -264,6 +265,10 @@ private fun CollectionChip(
 				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (13 * u).sp, lineHeight = (16 * u).sp),
 				color = Color.White,
 				maxLines = 1,
+				softWrap = false,
+				// Authored: "Green Energy" (box 90) overflows its 84 column —
+				// the frame draws it past the column, so don't clip it.
+				overflow = TextOverflow.Visible,
 			)
 			Text(
 				text = count,

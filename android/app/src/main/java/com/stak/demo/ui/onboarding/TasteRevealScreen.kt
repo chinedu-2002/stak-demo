@@ -58,57 +58,58 @@ private val BARS = listOf(
  */
 @Composable
 fun TasteRevealScreen(onBack: () -> Unit, onLetsGo: () -> Unit) {
+	val u = figmaUnit()
 	var revealed by remember { mutableStateOf(false) }
 	LaunchedEffect(Unit) { revealed = true }
 
 	Column(modifier = Modifier.fillMaxSize().background(StakColors.Bg).systemBarsPadding()) {
 		Row(
 			verticalAlignment = Alignment.CenterVertically,
-			modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp).padding(top = 10.dp, bottom = 4.dp),
+			modifier = Modifier.fillMaxWidth().padding(horizontal = (20 * u).dp).padding(top = (10 * u).dp, bottom = (4 * u).dp),
 		) {
 			AuthBackCircle(onClick = onBack)
 			Spacer(modifier = Modifier.weight(1f))
 			Text(
 				text = "STEP 6 OF 6",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 10.sp, letterSpacing = 0.9.sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, letterSpacing = (0.9 * u).sp),
 				color = Auth.FaintText,
 			)
 		}
 
 		Column(
-			verticalArrangement = Arrangement.spacedBy(16.dp),
+			verticalArrangement = Arrangement.spacedBy((16 * u).dp),
 			modifier = Modifier
 				.weight(1f)
 				.fillMaxWidth()
 				.verticalScroll(rememberScrollState())
-				.padding(horizontal = 24.dp)
-				.padding(top = 14.dp),
+				.padding(horizontal = (24 * u).dp)
+				.padding(top = (14 * u).dp),
 		) {
 			Text(
 				text = "YOUR STARTING STAK TASTE",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 10.sp, letterSpacing = 0.9.sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, letterSpacing = (0.9 * u).sp),
 				color = Auth.LinkTeal,
 			)
-			Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+			Column(verticalArrangement = Arrangement.spacedBy((12 * u).dp)) {
 				Text(
 					text = "Here’s what you’re into.",
-					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 26.sp, lineHeight = 33.sp),
+					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (26 * u).sp, lineHeight = (33 * u).sp),
 					color = StakColors.TextPrimary,
 				)
 				Text(
 					text = "Built from your picks. It gets smarter with every swipe.",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 12.sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp),
 					color = Auth.SubtitleGray,
 				)
 			}
 
 			// Taste card — four strength bars.
 			Column(
-				verticalArrangement = Arrangement.spacedBy(14.dp),
+				verticalArrangement = Arrangement.spacedBy((14 * u).dp),
 				modifier = Modifier
 					.fillMaxWidth()
-					.background(Auth.InputBg, RoundedCornerShape(16.dp))
-					.padding(16.dp),
+					.background(Auth.InputBg, RoundedCornerShape((16 * u).dp))
+					.padding((16 * u).dp),
 			) {
 				BARS.forEachIndexed { index, bar ->
 					val fill by animateFloatAsState(
@@ -116,31 +117,31 @@ fun TasteRevealScreen(onBack: () -> Unit, onLetsGo: () -> Unit) {
 						animationSpec = tween(durationMillis = 550, delayMillis = 120 * index),
 						label = "tasteFill$index",
 					)
-					Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+					Column(verticalArrangement = Arrangement.spacedBy((6 * u).dp)) {
 						Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
 							Text(
 								text = bar.label,
-								style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 12.sp),
+								style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp),
 								color = StakColors.TextPrimary,
 								modifier = Modifier.weight(1f),
 							)
 							Text(
 								text = bar.strength,
-								style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 10.sp),
+								style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp),
 								color = bar.strengthColor,
 							)
 						}
 						Box(
 							modifier = Modifier
 								.fillMaxWidth()
-								.height(5.dp)
-								.background(Auth.DividerLine, RoundedCornerShape(2.5.dp)),
+								.height((5 * u).dp)
+								.background(Auth.DividerLine, RoundedCornerShape((2.5 * u).dp)),
 						) {
 							Box(
 								modifier = Modifier
 									.fillMaxWidth(fill)
-									.height(5.dp)
-									.background(Auth.LinkTeal, RoundedCornerShape(2.5.dp)),
+									.height((5 * u).dp)
+									.background(Auth.LinkTeal, RoundedCornerShape((2.5 * u).dp)),
 							)
 						}
 					}
@@ -150,46 +151,46 @@ fun TasteRevealScreen(onBack: () -> Unit, onLetsGo: () -> Unit) {
 			// Risk style chip.
 			Row(
 				verticalAlignment = Alignment.CenterVertically,
-				horizontalArrangement = Arrangement.spacedBy(10.dp),
+				horizontalArrangement = Arrangement.spacedBy((10 * u).dp),
 				modifier = Modifier
 					.fillMaxWidth()
-					.background(Auth.InputBg, RoundedCornerShape(14.dp))
+					.background(Auth.InputBg, RoundedCornerShape((14 * u).dp))
 					.clickable(
 						interactionSource = remember { MutableInteractionSource() },
 						indication = null,
 					) { /* risk detail not designed yet */ }
-					.padding(start = 16.dp, end = 14.dp, top = 13.dp, bottom = 13.dp),
+					.padding(start = (16 * u).dp, end = (14 * u).dp, top = (13 * u).dp, bottom = (13 * u).dp),
 			) {
-				Column(verticalArrangement = Arrangement.spacedBy(2.dp), modifier = Modifier.weight(1f)) {
+				Column(verticalArrangement = Arrangement.spacedBy((2 * u).dp), modifier = Modifier.weight(1f)) {
 					Text(
 						text = "Risk style",
-						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 11.sp),
+						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp),
 						color = StakColors.Muted,
 					)
 					Text(
 						text = "Growth-Oriented",
-						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 14.sp),
+						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp),
 						color = StakColors.TextPrimary,
 					)
 				}
 				Text(
 					text = "›",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 15.sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (15 * u).sp),
 					color = Auth.LinkTeal,
 				)
 			}
 
 			Text(
 				text = "Your deck adjusts as you swipe.",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 11.sp, textAlign = TextAlign.Center),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp, textAlign = TextAlign.Center),
 				color = Auth.FaintText,
 				modifier = Modifier.fillMaxWidth(),
 			)
 		}
 
 		Column(
-			verticalArrangement = Arrangement.spacedBy(10.dp),
-			modifier = Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 26.dp),
+			verticalArrangement = Arrangement.spacedBy((10 * u).dp),
+			modifier = Modifier.fillMaxWidth().padding(top = (8 * u).dp, bottom = (26 * u).dp),
 		) {
 			AuthCta(text = "Lets go!", onClick = onLetsGo)
 			AuthSecondaryButton(text = "Back", onClick = onBack)

@@ -35,32 +35,32 @@ import com.stak.demo.ui.theme.StakColors
  */
 @Composable
 fun IntroScreen(onGetStarted: () -> Unit) {
+	val u = figmaUnit()
 	Column(modifier = Modifier.fillMaxSize().background(StakColors.Bg).systemBarsPadding()) {
 		Column(
-			verticalArrangement = Arrangement.spacedBy(16.dp),
+			verticalArrangement = Arrangement.spacedBy((16 * u).dp),
 			modifier = Modifier
 				.weight(1f)
 				.fillMaxWidth()
-				.padding(horizontal = 24.dp)
-				.padding(top = 24.dp),
+				.padding(horizontal = (24 * u).dp)
+				.padding(top = (24 * u).dp),
 		) {
-			Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+			Column(verticalArrangement = Arrangement.spacedBy((12 * u).dp)) {
 				Text(
 					text = "Find stocks you actually understand.",
-					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 26.sp, lineHeight = 31.sp),
+					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (26 * u).sp, lineHeight = (31 * u).sp),
 					color = StakColors.TextPrimary,
 				)
 				Text(
 					text = "STAK turns brands you already know into simple, clear stock ideas, so you can invest with confidence.",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 14.sp, lineHeight = 21.sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp, lineHeight = (21 * u).sp),
 					color = Auth.SubtitleGray,
 				)
 			}
 			// Hero — flattened Figma group (render bounds 342x488 at 1x),
 			// scaled to the artboard unit so proportions hold on wide devices.
-			val u = figmaUnit()
 			Box(
-				modifier = Modifier.weight(1f).fillMaxWidth().padding(top = 10.dp),
+				modifier = Modifier.weight(1f).fillMaxWidth().padding(top = (10 * u).dp),
 				contentAlignment = Alignment.Center,
 			) {
 				Image(
@@ -73,13 +73,13 @@ fun IntroScreen(onGetStarted: () -> Unit) {
 		}
 		Column(
 			horizontalAlignment = Alignment.CenterHorizontally,
-			verticalArrangement = Arrangement.spacedBy(10.dp),
-			modifier = Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 26.dp),
+			verticalArrangement = Arrangement.spacedBy((10 * u).dp),
+			modifier = Modifier.fillMaxWidth().padding(top = (8 * u).dp, bottom = (26 * u).dp),
 		) {
 			AuthCta(text = "Get started", onClick = onGetStarted)
 			Text(
 				text = "Takes about a minute",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 11.sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp),
 				color = Auth.FaintText,
 			)
 		}

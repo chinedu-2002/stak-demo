@@ -82,7 +82,7 @@ fun SimPortfolioScreen(onBack: () -> Unit, onOpenPick: () -> Unit) {
 				Spacer(modifier = Modifier.weight(1f))
 				Text(
 					text = "Your portfolio",
-					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp),
+					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp, lineHeight = (20 * u).sp),
 					color = Color.White,
 				)
 				Spacer(modifier = Modifier.weight(1f))
@@ -94,39 +94,28 @@ fun SimPortfolioScreen(onBack: () -> Unit, onOpenPick: () -> Unit) {
 				}
 			}
 			Column(
-				verticalArrangement = Arrangement.spacedBy((10 * u).dp),
+				verticalArrangement = Arrangement.spacedBy((16 * u).dp),
 				modifier = Modifier
 					.weight(1f)
 					.fillMaxWidth()
 					.verticalScroll(rememberScrollState())
 					.padding(horizontal = (20 * u).dp)
-					.padding(top = (10 * u).dp, bottom = (20 * u).dp),
+					.padding(top = (6 * u).dp, bottom = (20 * u).dp),
 			) {
-				Row(verticalAlignment = Alignment.Bottom, modifier = Modifier.fillMaxWidth()) {
-					Column(verticalArrangement = Arrangement.spacedBy((4 * u).dp)) {
-						Text("Portfolio value", style = TextStyle(fontFamily = Geist, fontSize = (11 * u).sp), color = Sim.Faint)
-						Text(
-							"12 picks · +$240.00 all time",
-							style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp),
-							color = Sim.Muted,
-						)
-						Row(horizontalArrangement = Arrangement.spacedBy((6 * u).dp)) {
-							Text("Cash available", style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp), color = Sim.Muted)
-							Text(
-								"$8,800.00",
-								style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp),
-								color = Sim.Bright,
-							)
-						}
-					}
-					Spacer(modifier = Modifier.weight(1f))
+				Box(
+					contentAlignment = Alignment.Center,
+					modifier = Modifier
+						.align(Alignment.CenterHorizontally)
+						.size((158 * u).dp, (32 * u).dp)
+						.border((0.36 * u).dp, Color(0x54343B4F), RoundedCornerShape((16 * u).dp)),
+				) {
 					Text(
-						"$10,240.00",
-						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (22 * u).sp),
-						color = Color.White,
+						"12 picks · +$240.00 all time",
+						style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp, lineHeight = (13 * u).sp),
+						color = Sim.Muted,
 					)
 				}
-				Row(horizontalArrangement = Arrangement.spacedBy((8 * u).dp), modifier = Modifier.padding(top = (4 * u).dp)) {
+				Row(horizontalArrangement = Arrangement.spacedBy((8 * u).dp)) {
 					FilterChip("Top gainers", selected = true)
 					FilterChip("Newest", selected = false)
 					FilterChip("Worst", selected = false)
@@ -136,22 +125,26 @@ fun SimPortfolioScreen(onBack: () -> Unit, onOpenPick: () -> Unit) {
 						badge = p.badge, ticker = p.ticker, sub = p.sub,
 						amount = p.amount, pct = p.pct, up = p.up,
 						onClick = onOpenPick,
-						trailing = { BuyPill(text = "Sell", onClick = { showSell = true }) },
+						trailing = { SellPill(onClick = { showSell = true }) },
 					)
 				}
-				Text(
-					text = "SOLD · REALIZED",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, letterSpacing = (0.9 * u).sp),
-					color = Sim.Faint,
-					modifier = Modifier.padding(top = (8 * u).dp, start = (2 * u).dp),
-				)
+				Box(
+					contentAlignment = Alignment.CenterStart,
+					modifier = Modifier.fillMaxWidth().height((17 * u).dp).padding(start = (2 * u).dp),
+				) {
+					Text(
+						text = "SOLD · REALIZED",
+						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, lineHeight = (13 * u).sp, letterSpacing = (0.9 * u).sp),
+						color = Sim.Faint,
+					)
+				}
 				RealizedRow("S", "SHOP", "Sold May 30 · profit banked", "+$12.00", true)
 				RealizedRow("C", "COIN", "Sold Jun 15 · loss realized", "-$8.00", false)
 				Text(
 					text = "Sell a pick and the cash returns to your balance, gain or loss.",
-					style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp),
+					style = TextStyle(fontFamily = Geist, fontSize = (11 * u).sp, lineHeight = (14 * u).sp),
 					color = Sim.Faint,
-					modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = (8 * u).dp),
+					modifier = Modifier.align(Alignment.CenterHorizontally),
 				)
 			}
 		}
@@ -182,8 +175,31 @@ private fun FilterChip(label: String, selected: Boolean) {
 	) {
 		Text(
 			text = label,
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
 			color = if (selected) Sim.Teal else Sim.Muted,
+		)
+	}
+}
+
+/** 60x30 outlined Sell pill — transparent bg with the app's secondary hairline. */
+@Composable
+private fun SellPill(onClick: () -> Unit) {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
+	Box(
+		contentAlignment = Alignment.Center,
+		modifier = Modifier
+			.size((60 * u).dp, (30 * u).dp)
+			.border((0.36 * u).dp, Color(0x54343B4F), RoundedCornerShape((6 * u).dp))
+			.clickable(
+				interactionSource = remember { MutableInteractionSource() },
+				indication = null,
+				onClick = onClick,
+			),
+	) {
+		Text(
+			"Sell",
+			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (15 * u).sp),
+			color = Color(0xFFDCE7F7),
 		)
 	}
 }
@@ -198,18 +214,18 @@ private fun RealizedRow(badge: String, ticker: String, sub: String, amount: Stri
 			.fillMaxWidth()
 			.clip(RoundedCornerShape((12 * u).dp))
 			.background(Sim.CardBg)
-			.padding(horizontal = (14 * u).dp, vertical = (11 * u).dp),
+			.padding(horizontal = (14 * u).dp, vertical = (12 * u).dp),
 	) {
 		Box(contentAlignment = Alignment.Center, modifier = Modifier.size((36 * u).dp).background(Sim.ChipBg, CircleShape)) {
-			Text(badge, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (14 * u).sp), color = Sim.BadgeInk)
+			Text(badge, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (14 * u).sp, lineHeight = (18 * u).sp), color = Sim.BadgeInk)
 		}
-		Column(verticalArrangement = Arrangement.spacedBy((3 * u).dp), modifier = Modifier.weight(1f)) {
-			Text(ticker, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp), color = Color.White)
-			Text(sub, style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp), color = Sim.Muted)
+		Column(verticalArrangement = Arrangement.spacedBy((2 * u).dp), modifier = Modifier.weight(1f)) {
+			Text(ticker, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (15 * u).sp), color = Color.White)
+			Text(sub, style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp, lineHeight = (13 * u).sp), color = Sim.Muted)
 		}
 		Text(
 			amount,
-			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (13 * u).sp),
+			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (13 * u).sp, lineHeight = (18 * u).sp),
 			color = if (up) Sim.Green else Sim.Red,
 		)
 	}

@@ -47,34 +47,35 @@ import com.stak.demo.ui.theme.StakColors
  */
 @Composable
 fun PermissionsScreen(onBack: () -> Unit, onContinue: () -> Unit) {
+	val u = figmaUnit()
 	var notifications by rememberSaveable { mutableStateOf(true) }
 	var accountSecurity by rememberSaveable { mutableStateOf(true) }
 
 	Column(modifier = Modifier.fillMaxSize().background(StakColors.Bg).systemBarsPadding()) {
-		Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp).padding(top = 10.dp, bottom = 4.dp)) {
+		Row(modifier = Modifier.fillMaxWidth().padding(horizontal = (20 * u).dp).padding(top = (10 * u).dp, bottom = (4 * u).dp)) {
 			AuthBackCircle(onClick = onBack)
 		}
 		OnboardingKicker(text = "STEP · ALMOST THERE")
 
 		Column(
-			verticalArrangement = Arrangement.spacedBy(18.dp),
+			verticalArrangement = Arrangement.spacedBy((18 * u).dp),
 			modifier = Modifier
 				.weight(1f)
 				.fillMaxWidth()
-				.padding(horizontal = 24.dp)
-				.padding(top = 14.dp),
+				.padding(horizontal = (24 * u).dp)
+				.padding(top = (14 * u).dp),
 		) {
-			Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+			Column(verticalArrangement = Arrangement.spacedBy((12 * u).dp)) {
 				Text(
 					text = "Stay in the loop",
-					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 26.sp),
+					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (26 * u).sp),
 					color = StakColors.TextPrimary,
 				)
 				Text(
 					text = "Two quick permissions so STAK can alert you and keep your account secure.",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 12.sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp),
 					color = Auth.SubtitleGray,
-					modifier = Modifier.width(276.dp),
+					modifier = Modifier.width((276 * u).dp),
 				)
 			}
 
@@ -93,14 +94,14 @@ fun PermissionsScreen(onBack: () -> Unit, onContinue: () -> Unit) {
 
 			Text(
 				text = "You can change these anytime in Settings.",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 11.sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp),
 				color = Auth.FaintText,
 			)
 		}
 
 		Column(
-			verticalArrangement = Arrangement.spacedBy(10.dp),
-			modifier = Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 26.dp),
+			verticalArrangement = Arrangement.spacedBy((10 * u).dp),
+			modifier = Modifier.fillMaxWidth().padding(top = (8 * u).dp, bottom = (26 * u).dp),
 		) {
 			AuthCta(text = "Allow and continue", onClick = onContinue)
 			AuthSecondaryButton(text = "Not now", onClick = onContinue)
@@ -111,34 +112,36 @@ fun PermissionsScreen(onBack: () -> Unit, onContinue: () -> Unit) {
 /** The "STEP · …" kicker row — Geist Medium 10, 1.2 tracking, #5c6b85. */
 @Composable
 internal fun OnboardingKicker(text: String) {
+	val u = figmaUnit()
 	Text(
 		text = text,
-		style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 10.sp, letterSpacing = 1.2.sp),
+		style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, letterSpacing = (1.2 * u).sp),
 		color = Auth.FaintText,
-		modifier = Modifier.padding(horizontal = 20.dp).padding(top = 6.dp),
+		modifier = Modifier.padding(horizontal = (20 * u).dp).padding(top = (6 * u).dp),
 	)
 }
 
 /** One permission row — #181f30 r14 card, copy column + the 42x24 toggle. */
 @Composable
 private fun PermissionCard(title: String, description: String, checked: Boolean, onToggle: () -> Unit) {
+	val u = figmaUnit()
 	Row(
-		horizontalArrangement = Arrangement.spacedBy(12.dp),
+		horizontalArrangement = Arrangement.spacedBy((12 * u).dp),
 		verticalAlignment = Alignment.CenterVertically,
 		modifier = Modifier
 			.fillMaxWidth()
-			.background(Auth.InputBg, RoundedCornerShape(14.dp))
-			.padding(16.dp),
+			.background(Auth.InputBg, RoundedCornerShape((14 * u).dp))
+			.padding((16 * u).dp),
 	) {
-		Column(verticalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.weight(1f)) {
+		Column(verticalArrangement = Arrangement.spacedBy((4 * u).dp), modifier = Modifier.weight(1f)) {
 			Text(
 				text = title,
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 14.sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp),
 				color = StakColors.TextPrimary,
 			)
 			Text(
 				text = description,
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 11.sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp),
 				color = Auth.SubtitleGray,
 			)
 		}
@@ -149,12 +152,13 @@ private fun PermissionCard(title: String, description: String, checked: Boolean,
 /** 42x24 Figma toggle — #2c9dbc track when on, white 18dp thumb 3dp from the edge. */
 @Composable
 private fun StakToggle(checked: Boolean, onToggle: () -> Unit) {
+	val u = figmaUnit()
 	val track by animateColorAsState(if (checked) Color(0xFF2C9DBC) else Color(0xFF242B3D), label = "track")
-	val thumbOffset by animateDpAsState(if (checked) 21.dp else 3.dp, label = "thumb")
+	val thumbOffset by animateDpAsState(if (checked) (21 * u).dp else (3 * u).dp, label = "thumb")
 	Box(
 		modifier = Modifier
-			.size(42.dp, 24.dp)
-			.background(track, RoundedCornerShape(12.dp))
+			.size((42 * u).dp, (24 * u).dp)
+			.background(track, RoundedCornerShape((12 * u).dp))
 			.clickable(
 				interactionSource = remember { MutableInteractionSource() },
 				indication = null,
@@ -165,7 +169,7 @@ private fun StakToggle(checked: Boolean, onToggle: () -> Unit) {
 			modifier = Modifier
 				.align(Alignment.CenterStart)
 				.offset(x = thumbOffset)
-				.size(18.dp)
+				.size((18 * u).dp)
 				.background(Color.White, CircleShape),
 		)
 	}

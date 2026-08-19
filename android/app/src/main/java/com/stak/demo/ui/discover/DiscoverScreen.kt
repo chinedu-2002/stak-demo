@@ -41,6 +41,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
@@ -227,6 +228,9 @@ fun DiscoverScreen(onLearnMore: () -> Unit = {}, onPracticeBuy: () -> Unit = {})
 						.padding(horizontal = (20 * u).dp)
 						.fillMaxWidth()
 						.height((484.65 * u).dp)
+						// The shuffle lives inside the deck bounds — the
+						// diving card must never cover the gesture/CTA zone.
+						.clipToBounds()
 						.pointerInput(seen) {
 							detectVerticalDragGestures(
 								onDragEnd = {
@@ -263,7 +267,7 @@ fun DiscoverScreen(onLearnMore: () -> Unit = {}, onPracticeBuy: () -> Unit = {})
 					val flyScale = seg(1f, 0.86f, 251.81f / 350f)
 					val flyRot = seg(0f, 2.5f, 4.03f)
 					val flyX = seg(0f, 0.15f, 0.29f)
-					val flyY = seg(releaseY, 200f, -53.85f)
+					val flyY = seg(releaseY, 150f, -53.85f)
 					val flyH = seg(430f, 437f, 444.4f)
 					if (p == 0f) {
 						// At rest the queue shows the AUTHORED peek cards —

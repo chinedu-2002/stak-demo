@@ -355,7 +355,7 @@ private fun MainShell(
 				}
 			}
 			if (!(tab == MainTab.Home && homeFirstRun)) {
-				MainTabBar(selected = tab, onSelect = { tab = it })
+				MainTabBar(selected = tab, onSelect = { tab = it }, compact = tab == MainTab.Discover)
 			}
 		}
 		// Practice-buy flow overlays the whole shell — in frame 1:1970 the

@@ -168,14 +168,11 @@ fun DiscoverScreen(onLearnMore: () -> Unit = {}, onPracticeBuy: () -> Unit = {})
 	var seen by rememberSaveable { mutableIntStateOf(0) }
 	var savedToast by remember { mutableStateOf(false) }
 	val topOffset = remember(seen) { Animatable(0f) }
-	val enter = remember(seen) { Animatable(if (seen == 0) 1f else 0f) }
+	val promote = remember(seen) { Animatable(0f) }
 	val scope = rememberCoroutineScope()
 	val density = LocalDensity.current
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 
-	LaunchedEffect(seen) {
-		if (enter.value < 1f) enter.animateTo(1f, tween(220, easing = EaseOut))
-	}
 	LaunchedEffect(savedToast) {
 		if (savedToast) {
 			delay(2200)
@@ -237,10 +234,11 @@ fun DiscoverScreen(onLearnMore: () -> Unit = {}, onPracticeBuy: () -> Unit = {})
 								onDragEnd = {
 									scope.launch {
 										if (topOffset.value > with(density) { (110 * u).dp.toPx() }) {
-											// Single-card deck (user override 2026-08-19): the
-											// swiped card flies fully off FIRST, then the next
-											// card enters — only one card is ever on screen.
-											topOffset.animateTo(with(density) { (700 * u).dp.toPx() }, tween(300, easing = EaseOut))
+											// The frame's card shuffle: the swiped card flies
+											// off fading while the queue steps forward and the
+											// cycled card fades in at the back (1:1627).
+											launch { topOffset.animateTo(with(density) { (500 * u).dp.toPx() }, tween(280, easing = EaseOut)) }
+											promote.animateTo(1f, tween(300, easing = EaseOut))
 											seen += 1
 										} else {
 											topOffset.animateTo(0f, tween(180))
@@ -249,7 +247,7 @@ fun DiscoverScreen(onLearnMore: () -> Unit = {}, onPracticeBuy: () -> Unit = {})
 								},
 							) { change, dragAmount ->
 								change.consume()
-								if (enter.value == 1f && (dragAmount > 0f || topOffset.value > 0f)) {
+								if (promote.value == 0f && (dragAmount > 0f || topOffset.value > 0f)) {
 									scope.launch {
 										topOffset.snapTo((topOffset.value + dragAmount).coerceAtLeast(0f))
 									}
@@ -257,23 +255,43 @@ fun DiscoverScreen(onLearnMore: () -> Unit = {}, onPracticeBuy: () -> Unit = {})
 							}
 						},
 				) {
-					// Single-card deck (user override): exactly one card on
-					// screen — it enters with a soft scale/fade after the
-					// previous one has fully flown off.
+					// The authored deck (1:1627): front card full size, the
+					// next cards organised behind at their designed poses.
+					// On swipe the queue steps forward; the swiped card fades
+					// off and its design re-enters at the back of the queue.
+					val order = listOf(DECK[(seen + 2) % 3], DECK[(seen + 1) % 3], DECK[seen % 3])
+					val p = promote.value
+					fun step(a: Float, b: Float) = a + (b - a) * p
+					if (p > 0f) {
+						BackDeckCard(DECK[seen % 3], scale = 251.81f / 350f, rotation = 4.03f, offsetX = (0.29 * u).dp, offsetY = (-53.85 * u).dp, u = u, authoredHeight = 444.4f, alpha = p)
+					}
+					BackDeckCard(
+						order[0],
+						scale = step(251.81f / 350f, 299.51f / 350f),
+						rotation = step(4.03f, -2.33f),
+						offsetX = (step(0.29f, -0.58f) * u).dp,
+						offsetY = (step(-53.85f, 1.4f) * u).dp,
+						u = u,
+						authoredHeight = step(444.4f, 398.5f),
+					)
+					BackDeckCard(
+						order[1],
+						scale = step(299.51f / 350f, 1f),
+						rotation = step(-2.33f, 0f),
+						offsetX = (step(-0.58f, 0f) * u).dp,
+						offsetY = (step(1.4f, 54.65f) * u).dp,
+						u = u,
+						authoredHeight = step(398.5f, 430f),
+					)
 					FrontDeckCard(
-						card = DECK[seen % 3],
+						card = order[2],
 						onSave = { savedToast = true },
 						u = u,
 						modifier = Modifier
 							.align(Alignment.TopCenter)
 							.offset(y = (54.65 * u).dp)
 							.offset { androidx.compose.ui.unit.IntOffset(0, topOffset.value.roundToInt()) }
-							.graphicsLayer {
-								val e = enter.value
-								scaleX = 0.94f + 0.06f * e
-								scaleY = 0.94f + 0.06f * e
-								alpha = e
-							}
+							.graphicsLayer { alpha = 1f - p }
 							.clickable(
 								interactionSource = remember { MutableInteractionSource() },
 								indication = null,

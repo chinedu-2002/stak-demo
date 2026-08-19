@@ -169,6 +169,8 @@ fun DiscoverScreen(onLearnMore: () -> Unit = {}, onPracticeBuy: () -> Unit = {})
 	var savedToast by remember { mutableStateOf(false) }
 	val topOffset = remember(seen) { Animatable(0f) }
 	val promote = remember(seen) { Animatable(0f) }
+	val enter = remember(seen) { Animatable(if (seen == 0) 1f else 0f) }
+	LaunchedEffect(seen) { if (enter.value < 1f) enter.animateTo(1f, tween(200, easing = EaseOut)) }
 	val scope = rememberCoroutineScope()
 	val density = LocalDensity.current
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
@@ -247,7 +249,7 @@ fun DiscoverScreen(onLearnMore: () -> Unit = {}, onPracticeBuy: () -> Unit = {})
 								},
 							) { change, dragAmount ->
 								change.consume()
-								if (promote.value == 0f && (dragAmount > 0f || topOffset.value > 0f)) {
+								if (promote.value == 0f && enter.value == 1f && (dragAmount > 0f || topOffset.value > 0f)) {
 									scope.launch {
 										topOffset.snapTo((topOffset.value + dragAmount).coerceAtLeast(0f))
 									}
@@ -259,7 +261,6 @@ fun DiscoverScreen(onLearnMore: () -> Unit = {}, onPracticeBuy: () -> Unit = {})
 					// the DESIGNED ILLUSION — the exact authored slabs, always
 					// (the user's spec: they give the illusion of a queue).
 					val p = promote.value
-					fun step(a: Float, b: Float) = a + (b - a) * p
 					Image(
 						painter = painterResource(R.drawable.disc_peek_top),
 						contentDescription = null,
@@ -276,19 +277,6 @@ fun DiscoverScreen(onLearnMore: () -> Unit = {}, onPracticeBuy: () -> Unit = {})
 							.offset(x = (18 * u).dp, y = (24 * u).dp)
 							.size((313.14 * u).dp, (352.87 * u).dp),
 					)
-					if (p > 0f) {
-						// The next card lifts out of the stack and grows into
-						// the front slot — the queue illusion coming true.
-						BackDeckCard(
-							DECK[(seen + 1) % 3],
-							scale = step(299.51f / 350f, 1f),
-							rotation = step(-2.33f, 0f),
-							offsetX = (step(-0.58f, 0f) * u).dp,
-							offsetY = (step(1.4f, 54.65f) * u).dp,
-							u = u,
-							authoredHeight = step(398.5f, 430f),
-						)
-					}
 					FrontDeckCard(
 						card = DECK[seen % 3],
 						onSave = { savedToast = true },
@@ -297,7 +285,12 @@ fun DiscoverScreen(onLearnMore: () -> Unit = {}, onPracticeBuy: () -> Unit = {})
 							.align(Alignment.TopCenter)
 							.offset(y = (54.65 * u).dp)
 							.offset { androidx.compose.ui.unit.IntOffset(0, topOffset.value.roundToInt()) }
-							.graphicsLayer { alpha = 1f - p }
+							.graphicsLayer {
+								alpha = (1f - p) * enter.value
+								val s = 0.97f + 0.03f * enter.value
+								scaleX = s
+								scaleY = s
+							}
 							.clickable(
 								interactionSource = remember { MutableInteractionSource() },
 								indication = null,
@@ -382,28 +375,6 @@ fun DiscoverScreen(onLearnMore: () -> Unit = {}, onPracticeBuy: () -> Unit = {})
 				)
 			}
 		}
-	}
-}
-
-/** One of the two tilted back cards, drawn at its designed scale. */
-@Composable
-private fun BoxScope.BackDeckCard(card: DeckCard, scale: Float, rotation: Float, offsetX: Dp, offsetY: Dp, u: Float, authoredHeight: Float, alpha: Float = 1f) {
-	// The card composable is authored at the 350x444.4 front size and
-	// scaled down; the offsets place the rotated bounds so the card tops
-	// peek exactly as in the frame (GOOGL at deck-y 0, AAPL at 24.2).
-	Box(
-		modifier = Modifier
-			.align(Alignment.TopStart)
-			.offset(x = offsetX, y = offsetY)
-			.size((350 * u).dp, (authoredHeight * u).dp)
-			.graphicsLayer {
-				scaleX = scale
-				scaleY = scale
-				rotationZ = rotation
-				this.alpha = alpha
-			},
-	) {
-		DeckCardBody(card = card, onSave = null, u = u)
 	}
 }
 

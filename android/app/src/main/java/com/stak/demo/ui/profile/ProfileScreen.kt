@@ -95,7 +95,7 @@ fun ProfileScreen(onBack: () -> Unit) {
 				}
 				Text(
 					text = "Hamza",
-					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (19 * u).sp, lineHeight = (25 * u).sp),
+					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (20 * u).sp, lineHeight = (25 * u).sp),
 					color = Color.White,
 				)
 				Text(
@@ -119,23 +119,28 @@ fun ProfileScreen(onBack: () -> Unit) {
 					color = Muted,
 				)
 				Row(horizontalArrangement = Arrangement.spacedBy((8 * u).dp)) {
-					listOf("Tech Curious", "High Growth", "Consumer Brands").forEach { label ->
-						Box(
-							modifier = Modifier
-								.clip(RoundedCornerShape((14 * u).dp))
-								.background(ChipBg)
-								.border((1 * u).dp, ChipBorder, RoundedCornerShape((14 * u).dp))
-								.padding(horizontal = (12 * u).dp, vertical = (6 * u).dp),
-						) {
-							Text(
-								text = label,
-								style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
-								color = ChipInk,
-							)
-						}
+				// Authored chip widths (171:1004): 97 / 94 / 125 — pinned so the
+				// row fills the 332 content width and the labels never wrap.
+				listOf("Tech Curious" to 97, "High Growth" to 94, "Consumer Brands" to 125).forEach { (label, w) ->
+					Box(
+						contentAlignment = Alignment.Center,
+						modifier = Modifier
+							.size((w * u).dp, (28 * u).dp)
+							.clip(RoundedCornerShape((14 * u).dp))
+							.background(ChipBg)
+							.border((1 * u).dp, ChipBorder, RoundedCornerShape((14 * u).dp)),
+					) {
+						Text(
+							text = label,
+							style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
+							color = ChipInk,
+							maxLines = 1,
+							softWrap = false,
+						)
 					}
 				}
-				Text(
+			}
+			Text(
 					text = "Your taste graph sharpens with every swipe.",
 					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
 					color = Body,

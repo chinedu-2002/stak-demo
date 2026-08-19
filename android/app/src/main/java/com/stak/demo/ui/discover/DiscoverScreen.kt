@@ -269,54 +269,33 @@ fun DiscoverScreen(onLearnMore: () -> Unit = {}, onPracticeBuy: () -> Unit = {})
 					val flyX = seg(0f, 0.15f, 0.29f)
 					val flyY = seg(releaseY, 150f, -53.85f)
 					val flyH = seg(430f, 437f, 444.4f)
-					if (p == 0f) {
-						// At rest the queue shows the AUTHORED peek cards —
-						// baked renders of nodes 1:1660/1:1701 at their
-						// authored bounds (the designed slabs are their own
-						// artwork, not shrunken copies of the front card).
-						Image(
-							painter = painterResource(R.drawable.disc_peek_top),
-							contentDescription = null,
-							modifier = Modifier
-								.align(Alignment.TopStart)
-								.offset(x = (39 * u).dp, y = 0.dp)
-								.size((273.66 * u).dp, (336.66 * u).dp),
-						)
-						Image(
-							painter = painterResource(R.drawable.disc_peek_mid),
-							contentDescription = null,
-							modifier = Modifier
-								.align(Alignment.TopStart)
-								.offset(x = (18 * u).dp, y = (24 * u).dp)
-								.size((313.14 * u).dp, (352.87 * u).dp),
-						)
-					} else {
-						if (p >= 0.5f) {
-							// Past halfway the card has tucked under — draw it
-							// deepest so it slots in at the back of the queue.
-							BackDeckCard(order[2], scale = flyScale, rotation = flyRot, offsetX = (flyX * u).dp, offsetY = (flyY * u).dp, u = u, authoredHeight = flyH)
-						}
-						BackDeckCard(
-							order[0],
-							scale = step(251.81f / 350f, 299.51f / 350f),
-							rotation = step(4.03f, -2.33f),
-							offsetX = (step(0.29f, -0.58f) * u).dp,
-							offsetY = (step(-53.85f, 1.4f) * u).dp,
-							u = u,
-							authoredHeight = step(444.4f, 398.5f),
-						)
-						BackDeckCard(
-							order[1],
-							scale = step(299.51f / 350f, 1f),
-							rotation = step(-2.33f, 0f),
-							offsetX = (step(-0.58f, 0f) * u).dp,
-							offsetY = (step(1.4f, 54.65f) * u).dp,
-							u = u,
-							authoredHeight = step(398.5f, 430f),
-						)
-						if (p < 0.5f) {
-							BackDeckCard(order[2], scale = flyScale, rotation = flyRot, offsetX = (flyX * u).dp, offsetY = (flyY * u).dp, u = u, authoredHeight = flyH)
-						}
+					// The queue always shows the ACTUAL next cards, live —
+					// at rest and through the shuffle (no duplicated designs).
+					if (p >= 0.5f) {
+						// Past halfway the swiped card has tucked under —
+						// drawn deepest, slotting in at the back of the queue.
+						BackDeckCard(order[2], scale = flyScale, rotation = flyRot, offsetX = (flyX * u).dp, offsetY = (flyY * u).dp, u = u, authoredHeight = flyH)
+					}
+					BackDeckCard(
+						order[0],
+						scale = step(251.81f / 350f, 299.51f / 350f),
+						rotation = step(4.03f, -2.33f),
+						offsetX = (step(0.29f, -0.58f) * u).dp,
+						offsetY = (step(-53.85f, 1.4f) * u).dp,
+						u = u,
+						authoredHeight = step(444.4f, 398.5f),
+					)
+					BackDeckCard(
+						order[1],
+						scale = step(299.51f / 350f, 1f),
+						rotation = step(-2.33f, 0f),
+						offsetX = (step(-0.58f, 0f) * u).dp,
+						offsetY = (step(1.4f, 54.65f) * u).dp,
+						u = u,
+						authoredHeight = step(398.5f, 430f),
+					)
+					if (p > 0f && p < 0.5f) {
+						BackDeckCard(order[2], scale = flyScale, rotation = flyRot, offsetX = (flyX * u).dp, offsetY = (flyY * u).dp, u = u, authoredHeight = flyH)
 					}
 					if (p == 0f) {
 						FrontDeckCard(

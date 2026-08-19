@@ -28,6 +28,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -162,6 +163,7 @@ fun DiscoverScreen(onLearnMore: () -> Unit = {}, onPracticeBuy: () -> Unit = {})
 	var savedToast by remember { mutableStateOf(false) }
 	val topOffset = remember(seen) { Animatable(0f) }
 	val promote = remember(seen) { Animatable(0f) }
+	var releaseY by remember { mutableFloatStateOf(54.65f) }
 	val scope = rememberCoroutineScope()
 	val density = LocalDensity.current
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
@@ -192,7 +194,7 @@ fun DiscoverScreen(onLearnMore: () -> Unit = {}, onPracticeBuy: () -> Unit = {})
 						ProgressRing(progress = count / 12f, u = u)
 						Text(
 							text = "$count/12",
-							style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp),
+							style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp, lineHeight = (14 * u).sp),
 							color = Color.White,
 						)
 					}
@@ -224,10 +226,11 @@ fun DiscoverScreen(onLearnMore: () -> Unit = {}, onPracticeBuy: () -> Unit = {})
 								onDragEnd = {
 									scope.launch {
 										if (topOffset.value > with(density) { (110 * u).dp.toPx() }) {
-											// Card shuffle: the swiped card flies off while the
-											// queue steps forward into the vacated slots.
-											launch { topOffset.animateTo(with(density) { (700 * u).dp.toPx() }, tween(300, easing = EaseOut)) }
-											promote.animateTo(1f, tween(300, easing = EaseOut))
+											// Card shuffle: the swiped card dives under the deck
+											// and rises into the back of the queue while the
+											// others step forward into the vacated slots.
+											releaseY = 54.65f + topOffset.value / density.density / u
+											promote.animateTo(1f, tween(450, easing = EaseOut))
 											seen += 1
 										} else {
 											topOffset.animateTo(0f, tween(180))
@@ -247,9 +250,19 @@ fun DiscoverScreen(onLearnMore: () -> Unit = {}, onPracticeBuy: () -> Unit = {})
 					val order = listOf(DECK[(seen + 2) % 3], DECK[(seen + 1) % 3], DECK[seen % 3])
 					val p = promote.value
 					fun step(a: Float, b: Float) = a + (b - a) * p
-					if (p > 0f) {
-						// The cycled card refills the back of the queue.
-						BackDeckCard(DECK[seen % 3], scale = 251.81f / 350f, rotation = 4.03f, offsetX = (0.29 * u).dp, offsetY = (-53.85 * u).dp, u = u, authoredHeight = 444.4f, alpha = p)
+					// The swiped card's two-segment return flight: dive below
+					// the deck, then rise into the back-top slot (behind).
+					fun seg(a: Float, m: Float, b: Float) =
+						if (p < 0.5f) a + (m - a) * (p / 0.5f) else m + (b - m) * ((p - 0.5f) / 0.5f)
+					val flyScale = seg(1f, 0.86f, 251.81f / 350f)
+					val flyRot = seg(0f, 2.5f, 4.03f)
+					val flyX = seg(0f, 0.15f, 0.29f)
+					val flyY = seg(releaseY, 200f, -53.85f)
+					val flyH = seg(430f, 437f, 444.4f)
+					if (p >= 0.5f) {
+						// Past halfway the card has tucked under — draw it
+						// deepest so it slots in at the back of the queue.
+						BackDeckCard(order[2], scale = flyScale, rotation = flyRot, offsetX = (flyX * u).dp, offsetY = (flyY * u).dp, u = u, authoredHeight = flyH)
 					}
 					BackDeckCard(
 						order[0],
@@ -269,20 +282,25 @@ fun DiscoverScreen(onLearnMore: () -> Unit = {}, onPracticeBuy: () -> Unit = {})
 						u = u,
 						authoredHeight = step(398.5f, 430f),
 					)
-					FrontDeckCard(
-						card = order[2],
-						onSave = { savedToast = true },
-					u = u,
-						modifier = Modifier
-							.align(Alignment.TopCenter)
-							.offset(y = (54.65 * u).dp)
-							.offset { androidx.compose.ui.unit.IntOffset(0, topOffset.value.roundToInt()) }
-							.clickable(
-								interactionSource = remember { MutableInteractionSource() },
-								indication = null,
-								onClick = onLearnMore,
-							),
-					)
+					if (p > 0f && p < 0.5f) {
+						BackDeckCard(order[2], scale = flyScale, rotation = flyRot, offsetX = (flyX * u).dp, offsetY = (flyY * u).dp, u = u, authoredHeight = flyH)
+					}
+					if (p == 0f) {
+						FrontDeckCard(
+							card = order[2],
+							onSave = { savedToast = true },
+							u = u,
+							modifier = Modifier
+								.align(Alignment.TopCenter)
+								.offset(y = (54.65 * u).dp)
+								.offset { androidx.compose.ui.unit.IntOffset(0, topOffset.value.roundToInt()) }
+								.clickable(
+									interactionSource = remember { MutableInteractionSource() },
+									indication = null,
+									onClick = onLearnMore,
+								),
+						)
+					}
 				}
 				Spacer(modifier = Modifier.height((10 * u).dp))
 				Column(
@@ -802,8 +820,8 @@ private fun OrderFilledSheet(onDismiss: () -> Unit, spec: BuySpec = NVDA_BUY) {
 @Composable
 private fun ProgressRing(progress: Float, u: Float) {
 	Canvas(modifier = Modifier.size((44 * u).dp)) {
-		val stroke = (3 * u).dp.toPx()
-		val inset = stroke / 2f + (4 * u).dp.toPx()
+		val stroke = (4 * u).dp.toPx()
+		val inset = (4 * u).dp.toPx()
 		val arcSize = androidx.compose.ui.geometry.Size(size.width - inset * 2f, size.height - inset * 2f)
 		drawArc(
 			color = Color(0xFF2A3346),

@@ -168,11 +168,14 @@ fun DiscoverScreen(onLearnMore: () -> Unit = {}, onPracticeBuy: () -> Unit = {})
 	var seen by rememberSaveable { mutableIntStateOf(0) }
 	var savedToast by remember { mutableStateOf(false) }
 	val topOffset = remember(seen) { Animatable(0f) }
-	val promote = remember(seen) { Animatable(0f) }
+	val enter = remember(seen) { Animatable(if (seen == 0) 1f else 0f) }
 	val scope = rememberCoroutineScope()
 	val density = LocalDensity.current
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 
+	LaunchedEffect(seen) {
+		if (enter.value < 1f) enter.animateTo(1f, tween(220, easing = EaseOut))
+	}
 	LaunchedEffect(savedToast) {
 		if (savedToast) {
 			delay(2200)
@@ -235,10 +238,9 @@ fun DiscoverScreen(onLearnMore: () -> Unit = {}, onPracticeBuy: () -> Unit = {})
 									scope.launch {
 										if (topOffset.value > with(density) { (110 * u).dp.toPx() }) {
 											// Single-card deck (user override 2026-08-19): the
-											// swiped card flies off while the next grows in
-											// from behind — no stacked peek cards.
-											launch { topOffset.animateTo(with(density) { (700 * u).dp.toPx() }, tween(300, easing = EaseOut)) }
-											promote.animateTo(1f, tween(300, easing = EaseOut))
+											// swiped card flies fully off FIRST, then the next
+											// card enters — only one card is ever on screen.
+											topOffset.animateTo(with(density) { (700 * u).dp.toPx() }, tween(300, easing = EaseOut))
 											seen += 1
 										} else {
 											topOffset.animateTo(0f, tween(180))
@@ -247,7 +249,7 @@ fun DiscoverScreen(onLearnMore: () -> Unit = {}, onPracticeBuy: () -> Unit = {})
 								},
 							) { change, dragAmount ->
 								change.consume()
-								if (promote.value == 0f && (dragAmount > 0f || topOffset.value > 0f)) {
+								if (enter.value == 1f && (dragAmount > 0f || topOffset.value > 0f)) {
 									scope.launch {
 										topOffset.snapTo((topOffset.value + dragAmount).coerceAtLeast(0f))
 									}
@@ -255,21 +257,23 @@ fun DiscoverScreen(onLearnMore: () -> Unit = {}, onPracticeBuy: () -> Unit = {})
 							}
 						},
 				) {
-					val order = listOf(DECK[(seen + 2) % 3], DECK[(seen + 1) % 3], DECK[seen % 3])
-					val p = promote.value
-					// Single-card deck (user override): no stacked peeks. On
-					// swipe the next card grows in behind the flying one.
-					if (p > 0f) {
-						BackDeckCard(order[1], scale = 0.9f + 0.1f * p, rotation = 0f, offsetX = 0.dp, offsetY = (54.65 * u).dp, u = u, authoredHeight = 430f, alpha = p)
-					}
+					// Single-card deck (user override): exactly one card on
+					// screen — it enters with a soft scale/fade after the
+					// previous one has fully flown off.
 					FrontDeckCard(
-						card = order[2],
+						card = DECK[seen % 3],
 						onSave = { savedToast = true },
 						u = u,
 						modifier = Modifier
 							.align(Alignment.TopCenter)
 							.offset(y = (54.65 * u).dp)
 							.offset { androidx.compose.ui.unit.IntOffset(0, topOffset.value.roundToInt()) }
+							.graphicsLayer {
+								val e = enter.value
+								scaleX = 0.94f + 0.06f * e
+								scaleY = 0.94f + 0.06f * e
+								alpha = e
+							}
 							.clickable(
 								interactionSource = remember { MutableInteractionSource() },
 								indication = null,

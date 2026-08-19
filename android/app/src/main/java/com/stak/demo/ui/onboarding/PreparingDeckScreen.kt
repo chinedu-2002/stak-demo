@@ -50,20 +50,20 @@ import kotlinx.coroutines.delay
  */
 @Composable
 fun PreparingDeckScreen(onDone: () -> Unit) {
+	val u = figmaUnit()
 	LaunchedEffect(Unit) {
 		delay(1800) // prototype: "After delay 1800ms" → 07 Taste reveal
 		onDone()
 	}
 	Column(
 		horizontalAlignment = Alignment.CenterHorizontally,
-		verticalArrangement = Arrangement.spacedBy(18.dp, Alignment.CenterVertically),
+		verticalArrangement = Arrangement.spacedBy((18 * u).dp, Alignment.CenterVertically),
 		modifier = Modifier
 			.fillMaxSize()
 			.background(StakColors.Bg)
 			.systemBarsPadding()
-			.padding(horizontal = 24.dp),
+			.padding(horizontal = (24 * u).dp),
 	) {
-		val u = figmaUnit()
 		Image(
 			painter = painterResource(R.drawable.intro_hero_box),
 			contentDescription = null,
@@ -72,18 +72,18 @@ fun PreparingDeckScreen(onDone: () -> Unit) {
 		)
 		Text(
 			text = "Building your first deck...",
-			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 22.sp, textAlign = TextAlign.Center),
+			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (22 * u).sp, textAlign = TextAlign.Center),
 			color = StakColors.TextPrimary,
 			modifier = Modifier.fillMaxWidth(),
 		)
 		Row(
 			verticalAlignment = Alignment.CenterVertically,
-			horizontalArrangement = Arrangement.spacedBy(5.dp),
+			horizontalArrangement = Arrangement.spacedBy((5 * u).dp),
 		) {
 			Spinner()
 			Text(
 				text = "Reading your brand picks",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 12.sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp),
 				color = Auth.FaintText,
 			)
 		}
@@ -93,6 +93,7 @@ fun PreparingDeckScreen(onDone: () -> Unit) {
 /** 14dp rotating three-quarter arc in the caption gray. */
 @Composable
 private fun Spinner() {
+	val u = figmaUnit()
 	val transition = rememberInfiniteTransition(label = "spinner")
 	val angle by transition.animateFloat(
 		initialValue = 0f,
@@ -100,8 +101,8 @@ private fun Spinner() {
 		animationSpec = infiniteRepeatable(tween(900, easing = LinearEasing)),
 		label = "spinnerAngle",
 	)
-	Canvas(modifier = Modifier.size(14.dp).rotate(angle)) {
-		val stroke = 1.6.dp.toPx()
+	Canvas(modifier = Modifier.size((14 * u).dp).rotate(angle)) {
+		val stroke = (1.6 * u).dp.toPx()
 		drawArc(
 			color = Auth.FaintText,
 			startAngle = 0f,

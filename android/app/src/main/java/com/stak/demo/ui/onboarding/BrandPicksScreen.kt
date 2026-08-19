@@ -65,52 +65,53 @@ private val BRANDS = listOf(
  */
 @Composable
 fun BrandPicksScreen(onBack: () -> Unit, onContinue: () -> Unit) {
+	val u = figmaUnit()
 	var picked by rememberSaveable { mutableStateOf(setOf<String>()) }
 
 	Column(modifier = Modifier.fillMaxSize().background(StakColors.Bg).systemBarsPadding()) {
 		// Nav row — back circle + step label.
 		Row(
 			verticalAlignment = Alignment.CenterVertically,
-			modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp).padding(top = 10.dp, bottom = 4.dp),
+			modifier = Modifier.fillMaxWidth().padding(horizontal = (20 * u).dp).padding(top = (10 * u).dp, bottom = (4 * u).dp),
 		) {
 			AuthBackCircle(onClick = onBack)
 			androidx.compose.foundation.layout.Spacer(modifier = Modifier.weight(1f))
 			Text(
 				text = "STEP 2 OF 6",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 10.sp, letterSpacing = 0.9.sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, letterSpacing = (0.9 * u).sp),
 				color = Auth.FaintText,
 			)
 		}
 
 		Column(
-			verticalArrangement = Arrangement.spacedBy(18.dp),
+			verticalArrangement = Arrangement.spacedBy((18 * u).dp),
 			modifier = Modifier
 				.weight(1f)
 				.fillMaxWidth()
 				.verticalScroll(rememberScrollState())
-				.padding(horizontal = 24.dp)
-				.padding(top = 14.dp),
+				.padding(horizontal = (24 * u).dp)
+				.padding(top = (14 * u).dp),
 		) {
-			Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+			Column(verticalArrangement = Arrangement.spacedBy((12 * u).dp)) {
 				Text(
 					text = "Which brands do you know or use?",
-					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 24.sp, lineHeight = 31.sp),
+					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (24 * u).sp, lineHeight = (31 * u).sp),
 					color = StakColors.TextPrimary,
 				)
 				Text(
 					text = "Pick a few. STAK uses this to learn what feels familiar to you.",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 12.sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp),
 					color = Auth.SubtitleGray,
 				)
 			}
 
 			// 3-wide tile grid, 10dp gaps.
 			Column(
-				verticalArrangement = Arrangement.spacedBy(10.dp),
-				modifier = Modifier.fillMaxWidth().padding(top = 6.dp),
+				verticalArrangement = Arrangement.spacedBy((10 * u).dp),
+				modifier = Modifier.fillMaxWidth().padding(top = (6 * u).dp),
 			) {
 				BRANDS.chunked(3).forEach { row ->
-					Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
+					Row(horizontalArrangement = Arrangement.spacedBy((10 * u).dp), modifier = Modifier.fillMaxWidth()) {
 						row.forEach { brand ->
 							val selected = brand.name in picked
 							BrandTile(
@@ -129,8 +130,8 @@ fun BrandPicksScreen(onBack: () -> Unit, onContinue: () -> Unit) {
 
 		Column(
 			horizontalAlignment = Alignment.CenterHorizontally,
-			verticalArrangement = Arrangement.spacedBy(10.dp),
-			modifier = Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 26.dp),
+			verticalArrangement = Arrangement.spacedBy((10 * u).dp),
+			modifier = Modifier.fillMaxWidth().padding(top = (8 * u).dp, bottom = (26 * u).dp),
 		) {
 			AuthCta(
 				text = if (picked.isEmpty()) "Continue" else "Continue · ${picked.size} picked",
@@ -139,7 +140,7 @@ fun BrandPicksScreen(onBack: () -> Unit, onContinue: () -> Unit) {
 			AuthSecondaryButton(text = "Back", onClick = onBack)
 			Text(
 				text = "You can change this later",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 11.sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp),
 				color = Auth.FaintText,
 			)
 		}
@@ -154,30 +155,31 @@ private fun BrandTile(
 	onClick: () -> Unit,
 	modifier: Modifier = Modifier,
 ) {
-	val shape = RoundedCornerShape(14.dp)
+	val u = figmaUnit()
+	val shape = RoundedCornerShape((14 * u).dp)
 	Column(
 		horizontalAlignment = Alignment.CenterHorizontally,
-		verticalArrangement = Arrangement.spacedBy(7.dp),
+		verticalArrangement = Arrangement.spacedBy((7 * u).dp),
 		modifier = modifier
 			.background(Auth.InputBg, shape)
 			.then(
-				if (selected) Modifier.border(1.5.dp, Color(0x8069B3CA), shape) else Modifier,
+				if (selected) Modifier.border((1.5 * u).dp, Color(0x8069B3CA), shape) else Modifier,
 			)
 			.clickable(
 				interactionSource = remember { MutableInteractionSource() },
 				indication = null,
 				onClick = onClick,
 			)
-			.padding(top = 13.dp, bottom = 11.dp, start = 4.dp, end = 4.dp),
+			.padding(top = (13 * u).dp, bottom = (11 * u).dp, start = (4 * u).dp, end = (4 * u).dp),
 	) {
 		Image(
 			painter = painterResource(brand.iconRes),
 			contentDescription = brand.name,
-			modifier = Modifier.size(34.dp),
+			modifier = Modifier.size((34 * u).dp),
 		)
 		Text(
 			text = brand.name,
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 11.sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp),
 			color = if (selected) StakColors.TextPrimary else StakColors.Muted,
 		)
 	}

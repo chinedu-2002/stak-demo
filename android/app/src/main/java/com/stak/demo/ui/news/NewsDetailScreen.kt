@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
@@ -105,7 +106,7 @@ fun NewsDetailScreen(onBack: () -> Unit) {
 				) {
 					Text(
 						text = "Apple climbs 5% on foldable iPhone push",
-						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (20 * u).sp, lineHeight = (32 * u).sp),
+						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (24 * u).sp, lineHeight = (32 * u).sp),
 						color = Color.White,
 					)
 					Text(
@@ -157,7 +158,7 @@ fun NewsDetailScreen(onBack: () -> Unit) {
 	}
 }
 
-/** 360x208 r10 hero — phone art, Tech & Ai toast, play badge, bookmark/saved chip. */
+/** 360x208 r24 hero — phone art, Tech & Ai toast, play badge, bookmark/saved chip. */
 @Composable
 private fun HeroImage(saved: Boolean) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
@@ -166,9 +167,12 @@ private fun HeroImage(saved: Boolean) {
 			.padding(horizontal = (15 * u).dp)
 			.fillMaxWidth()
 			.height((208 * u).dp)
-			.clip(RoundedCornerShape((10 * u).dp))
+			.clip(RoundedCornerShape((24 * u).dp))
 			.background(Color(0xFFC4C4C4)),
 	) {
+		// The authored image is oversized (407x271.18 in the 360x208 card,
+		// top-left at -24,-15) — requiredSize so the card's constraints
+		// don't shrink it back to 360x208 and letterbox the art.
 		Image(
 			painter = painterResource(R.drawable.news_hero_phone),
 			contentDescription = null,
@@ -176,7 +180,7 @@ private fun HeroImage(saved: Boolean) {
 			modifier = Modifier
 				.align(Alignment.Center)
 				.offset(x = (-0.5 * u).dp, y = (16.59 * u).dp)
-				.size((407 * u).dp, (271.18 * u).dp),
+				.requiredSize((407 * u).dp, (271.18 * u).dp),
 		)
 		Image(
 			painter = painterResource(R.drawable.ic_hero_play),
@@ -197,7 +201,7 @@ private fun HeroImage(saved: Boolean) {
 		) {
 			Text(
 				text = "Tech & Ai",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, lineHeight = (13 * u).sp),
 				color = Color.White,
 			)
 		}
@@ -250,19 +254,19 @@ private fun Byline() {
 		) {
 			Text(
 				text = "B",
-				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (10 * u).sp),
+				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (10 * u).sp, lineHeight = (13 * u).sp),
 				color = Color(0xFF9EADC7),
 			)
 		}
 		Row(horizontalArrangement = Arrangement.spacedBy((5 * u).dp), verticalAlignment = Alignment.CenterVertically) {
 			Text(
 				text = "Bloomberg",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
 				color = Color.White,
 			)
 			Text(
 				text = "· Jul 2 · 3 min read",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
 				color = News.Faint,
 			)
 		}
@@ -288,7 +292,7 @@ private fun AddToStakButton(onClick: () -> Unit) {
 	) {
 		Text(
 			text = "Add to STAK",
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp, lineHeight = (21 * u).sp),
 			color = Color.White,
 		)
 		Image(
@@ -324,7 +328,7 @@ private fun StockCard(saved: Boolean) {
 			) {
 				Text(
 					text = "A",
-					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (18 * u).sp),
+					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (18 * u).sp, lineHeight = (23 * u).sp),
 					color = Color(0xFF9EADC7),
 				)
 			}
@@ -332,12 +336,12 @@ private fun StockCard(saved: Boolean) {
 			Column(verticalArrangement = Arrangement.spacedBy((3 * u).dp)) {
 				Text(
 					text = "Apple Inc.",
-					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp),
+					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp, lineHeight = (19 * u).sp),
 					color = Color.White,
 				)
 				Text(
 					text = "AAPL",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
 					color = News.Muted,
 				)
 			}
@@ -352,7 +356,7 @@ private fun StockCard(saved: Boolean) {
 			) {
 				Text(
 					text = "Daily",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (8 * u).sp, letterSpacing = (0.4 * u).sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (8 * u).sp, lineHeight = (10 * u).sp, letterSpacing = (0.4 * u).sp),
 					color = Color.White,
 				)
 				Image(
@@ -366,12 +370,12 @@ private fun StockCard(saved: Boolean) {
 			Column(verticalArrangement = Arrangement.spacedBy((3 * u).dp)) {
 				Text(
 					text = "$308.63",
-					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (26 * u).sp),
+					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (26 * u).sp, lineHeight = (33 * u).sp),
 					color = Color.White,
 				)
 				Text(
 					text = "+4.84% today",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp, lineHeight = (17 * u).sp),
 					color = News.Green,
 				)
 			}
@@ -417,7 +421,7 @@ private fun GistCard() {
 			Image(painterResource(R.drawable.ic_gist_sparkle), null, modifier = Modifier.size((18 * u).dp))
 			Text(
 				text = "The gist",
-				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (14 * u).sp),
+				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (14 * u).sp, lineHeight = (18 * u).sp),
 				color = Color.White,
 			)
 		}
@@ -488,7 +492,7 @@ private fun NewToThisCard() {
 			Image(painterResource(R.drawable.ic_gist_help), null, modifier = Modifier.size((18 * u).dp))
 			Text(
 				text = "New to this?",
-				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (13 * u).sp),
+				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (13 * u).sp, lineHeight = (18 * u).sp),
 				color = News.Teal,
 			)
 		}
@@ -532,7 +536,7 @@ private fun KeyStatsCard() {
 			Image(painterResource(R.drawable.ic_gist_info), null, modifier = Modifier.size((18 * u).dp))
 			Text(
 				text = "Key stats",
-				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (14 * u).sp),
+				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (14 * u).sp, lineHeight = (18 * u).sp),
 				color = Color.White,
 			)
 		}
@@ -557,12 +561,12 @@ private fun StatCell(label: String, value: String, modifier: Modifier = Modifier
 	Column(verticalArrangement = Arrangement.spacedBy((3 * u).dp), modifier = modifier) {
 		Text(
 			text = label,
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp, lineHeight = (14 * u).sp),
 			color = News.Faint,
 		)
 		Text(
 			text = value,
-			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (13 * u).sp),
+			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (13 * u).sp, lineHeight = (16 * u).sp),
 			color = Color.White,
 		)
 	}
@@ -580,7 +584,7 @@ private fun ArticleTag(text: String) {
 	) {
 		Text(
 			text = text,
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (11 * u).sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (11 * u).sp, lineHeight = (14 * u).sp),
 			color = News.Muted,
 		)
 	}
@@ -592,7 +596,7 @@ private fun ReadNext() {
 	Column(verticalArrangement = Arrangement.spacedBy((10 * u).dp), modifier = Modifier.fillMaxWidth().padding(top = (6 * u).dp)) {
 		Text(
 			text = "READ NEXT",
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, letterSpacing = (0.5 * u).sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, lineHeight = (13 * u).sp, letterSpacing = (0.5 * u).sp),
 			color = News.Muted,
 		)
 		repeat(2) {
@@ -614,7 +618,7 @@ private fun ReadNext() {
 				Column(verticalArrangement = Arrangement.spacedBy((5 * u).dp), modifier = Modifier.weight(1f)) {
 					Text(
 						text = "CNBC · 2d",
-						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp),
+						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp, lineHeight = (14 * u).sp),
 						color = News.Muted,
 					)
 					Text(

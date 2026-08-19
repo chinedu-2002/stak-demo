@@ -68,47 +68,48 @@ internal fun MatrixQuizScreen(
 	onBack: () -> Unit,
 	onContinue: () -> Unit,
 ) {
+	val u = figmaUnit()
 	var selected by rememberSaveable { mutableIntStateOf(-1) }
 
 	Column(modifier = Modifier.fillMaxSize().background(StakColors.Bg).systemBarsPadding()) {
 		Row(
 			verticalAlignment = Alignment.CenterVertically,
-			modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp).padding(top = 10.dp, bottom = 4.dp),
+			modifier = Modifier.fillMaxWidth().padding(horizontal = (20 * u).dp).padding(top = (10 * u).dp, bottom = (4 * u).dp),
 		) {
 			AuthBackCircle(onClick = onBack)
 			Spacer(modifier = Modifier.weight(1f))
 			Text(
 				text = stepLabel,
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 10.sp, letterSpacing = 0.9.sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, letterSpacing = (0.9 * u).sp),
 				color = Auth.FaintText,
 			)
 		}
 
 		Column(
-			verticalArrangement = Arrangement.spacedBy(16.dp),
+			verticalArrangement = Arrangement.spacedBy((16 * u).dp),
 			modifier = Modifier
 				.weight(1f)
 				.fillMaxWidth()
 				.verticalScroll(rememberScrollState())
-				.padding(horizontal = 24.dp)
-				.padding(top = 14.dp),
+				.padding(horizontal = (24 * u).dp)
+				.padding(top = (14 * u).dp),
 		) {
-			Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+			Column(verticalArrangement = Arrangement.spacedBy((12 * u).dp)) {
 				Text(
 					text = headline,
-					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 24.sp, lineHeight = 31.sp),
+					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (24 * u).sp, lineHeight = (31 * u).sp),
 					color = StakColors.TextPrimary,
 				)
 				Text(
 					text = subtitle,
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 12.sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp),
 					color = Auth.SubtitleGray,
 				)
 			}
 
-			Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.padding(top = 4.dp)) {
+			Column(verticalArrangement = Arrangement.spacedBy((12 * u).dp), modifier = Modifier.padding(top = (4 * u).dp)) {
 				options.chunked(2).forEachIndexed { rowIndex, row ->
-					Row(horizontalArrangement = Arrangement.spacedBy(12.63.dp)) {
+					Row(horizontalArrangement = Arrangement.spacedBy((12.63 * u).dp)) {
 						row.forEachIndexed { colIndex, option ->
 							val index = rowIndex * 2 + colIndex
 							MatrixCard(
@@ -123,8 +124,8 @@ internal fun MatrixQuizScreen(
 		}
 
 		Column(
-			verticalArrangement = Arrangement.spacedBy(10.dp),
-			modifier = Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 26.dp),
+			verticalArrangement = Arrangement.spacedBy((10 * u).dp),
+			modifier = Modifier.fillMaxWidth().padding(top = (8 * u).dp, bottom = (26 * u).dp),
 		) {
 			AuthCta(text = "Continue", onClick = { if (selected >= 0) onContinue() })
 			AuthSecondaryButton(text = "Back", onClick = onBack)
@@ -134,42 +135,43 @@ internal fun MatrixQuizScreen(
 
 @Composable
 private fun MatrixCard(option: MatrixOption, selected: Boolean, onClick: () -> Unit) {
-	val shape = RoundedCornerShape(16.85.dp)
+	val u = figmaUnit()
+	val shape = RoundedCornerShape((16.85 * u).dp)
 	Column(
-		verticalArrangement = Arrangement.spacedBy(21.06.dp, Alignment.CenterVertically),
+		verticalArrangement = Arrangement.spacedBy((21.06 * u).dp, Alignment.CenterVertically),
 		modifier = Modifier
-			.size(163.18.dp, 155.81.dp)
+			.size((163.18 * u).dp, (155.81 * u).dp)
 			.background(Auth.InputBg, shape)
-			.then(if (selected) Modifier.border(0.53.dp, Auth.LinkTeal, shape) else Modifier)
+			.then(if (selected) Modifier.border((0.53 * u).dp, Auth.LinkTeal, shape) else Modifier)
 			.clickable(
 				interactionSource = remember { MutableInteractionSource() },
 				indication = null,
 				onClick = onClick,
 			)
-			.padding(horizontal = 14.74.dp),
+			.padding(horizontal = (14.74 * u).dp),
 	) {
 		Box(
-			modifier = Modifier.size(option.circleSize).background(Color(0xFF242B3D), CircleShape),
+			modifier = Modifier.size(option.circleSize * u).background(Color(0xFF242B3D), CircleShape),
 			contentAlignment = Alignment.Center,
 		) {
 			Image(
 				painter = painterResource(option.iconRes),
 				contentDescription = null,
-				modifier = Modifier.size(option.iconSize),
+				modifier = Modifier.size(option.iconSize * u),
 			)
 		}
-		Column(verticalArrangement = Arrangement.spacedBy(5.26.dp), modifier = Modifier.height(66.33.dp)) {
+		Column(verticalArrangement = Arrangement.spacedBy((5.26 * u).dp), modifier = Modifier.height((66.33 * u).dp)) {
 			Text(
 				text = option.title,
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 12.sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp),
 				color = StakColors.TextPrimary,
-				modifier = Modifier.width(142.13.dp),
+				modifier = Modifier.width((142.13 * u).dp),
 			)
 			Text(
 				text = option.subtitle,
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 10.sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (10 * u).sp),
 				color = Auth.FaintText,
-				modifier = Modifier.width(121.07.dp),
+				modifier = Modifier.width((121.07 * u).dp),
 			)
 		}
 	}

@@ -49,58 +49,59 @@ private const val NAME_MAX = 20
  */
 @Composable
 fun ProfileSetupScreen(onBack: () -> Unit, onProceed: () -> Unit) {
+	val u = figmaUnit()
 	var name by rememberSaveable { mutableStateOf("") }
 
 	Column(modifier = Modifier.fillMaxSize().background(StakColors.Bg).systemBarsPadding()) {
-		Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp).padding(top = 10.dp, bottom = 4.dp)) {
+		Row(modifier = Modifier.fillMaxWidth().padding(horizontal = (20 * u).dp).padding(top = (10 * u).dp, bottom = (4 * u).dp)) {
 			AuthBackCircle(onClick = onBack)
 		}
 		OnboardingKicker(text = "STEP · LAST ONE")
 
 		Column(
-			verticalArrangement = Arrangement.spacedBy(18.dp),
+			verticalArrangement = Arrangement.spacedBy((18 * u).dp),
 			modifier = Modifier
 				.weight(1f)
 				.fillMaxWidth()
-				.padding(horizontal = 24.dp)
-				.padding(top = 14.dp),
+				.padding(horizontal = (24 * u).dp)
+				.padding(top = (14 * u).dp),
 		) {
-			Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+			Column(verticalArrangement = Arrangement.spacedBy((12 * u).dp)) {
 				Text(
 					text = "Make it yours",
-					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 26.sp),
+					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (26 * u).sp),
 					color = StakColors.TextPrimary,
 				)
 				Text(
 					text = "Pick a name and photo. This is how you’ll show up on leaderboards.",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 12.sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp),
 					color = Auth.SubtitleGray,
-					modifier = Modifier.width(276.dp),
+					modifier = Modifier.width((276 * u).dp),
 				)
 			}
 
 			// Avatar — 96dp #242b3d circle, 2dp teal ring, Sora 36 initial.
 			Column(
 				horizontalAlignment = Alignment.CenterHorizontally,
-				verticalArrangement = Arrangement.spacedBy(10.dp),
-				modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp),
+				verticalArrangement = Arrangement.spacedBy((10 * u).dp),
+				modifier = Modifier.fillMaxWidth().padding(vertical = (6 * u).dp),
 			) {
 				Box(
 					modifier = Modifier
-						.size(96.dp)
+						.size((96 * u).dp)
 						.background(Color(0xFF242B3D), CircleShape)
-						.border(2.dp, Auth.LinkTeal, CircleShape),
+						.border((2 * u).dp, Auth.LinkTeal, CircleShape),
 					contentAlignment = Alignment.Center,
 				) {
 					Text(
 						text = name.firstOrNull()?.uppercase() ?: "",
-						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 36.sp),
+						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (36 * u).sp),
 						color = Color(0xFF9EADC7),
 					)
 				}
 				Text(
 					text = "Add a photo",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 12.sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp),
 					color = Auth.LinkTeal,
 					modifier = Modifier.clickable(
 						interactionSource = remember { MutableInteractionSource() },
@@ -112,7 +113,7 @@ fun ProfileSetupScreen(onBack: () -> Unit, onProceed: () -> Unit) {
 
 			Text(
 				text = "DISPLAY NAME",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 10.sp, letterSpacing = 1.2.sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, letterSpacing = (1.2 * u).sp),
 				color = Auth.FaintText,
 			)
 
@@ -121,32 +122,32 @@ fun ProfileSetupScreen(onBack: () -> Unit, onProceed: () -> Unit) {
 				verticalAlignment = Alignment.CenterVertically,
 				modifier = Modifier
 					.fillMaxWidth()
-					.background(Auth.InputBg, RoundedCornerShape(14.dp))
-					.padding(16.dp),
+					.background(Auth.InputBg, RoundedCornerShape((14 * u).dp))
+					.padding((16 * u).dp),
 			) {
 				BasicTextField(
 					value = name,
 					onValueChange = { name = it.take(NAME_MAX) },
-					textStyle = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 14.sp, color = StakColors.TextPrimary),
+					textStyle = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp, color = StakColors.TextPrimary),
 					singleLine = true,
 					cursorBrush = SolidColor(StakColors.Accent),
 					modifier = Modifier.weight(1f),
 				)
 				Text(
 					text = "${name.length} / $NAME_MAX",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 11.sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp),
 					color = Auth.FaintText,
 				)
 			}
 
 			Text(
 				text = "You can change this anytime in Profile.",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 11.sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp),
 				color = Auth.FaintText,
 			)
 		}
 
-		Column(modifier = Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 26.dp)) {
+		Column(modifier = Modifier.fillMaxWidth().padding(top = (8 * u).dp, bottom = (26 * u).dp)) {
 			AuthCta(text = "Proceed to home", onClick = onProceed)
 		}
 	}

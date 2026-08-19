@@ -69,13 +69,14 @@ internal fun figmaUnit(): Float =
 /** 10%-alpha glass ball rotated 174.3°, centered 10dp left / 159.8dp below screen center. */
 @Composable
 internal fun BoxScope.AuthWatermark() {
+	val u = figmaUnit()
 	Image(
 		painter = painterResource(R.drawable.splash_glass_ball),
 		contentDescription = null,
 		modifier = Modifier
-			.size(332.65.dp)
+			.size((332.65 * u).dp)
 			.align(Alignment.Center)
-			.offset(x = (-10).dp, y = 159.78.dp)
+			.offset(x = (-10 * u).dp, y = (159.78 * u).dp)
 			.rotate(174.3f)
 			.alpha(0.1f),
 	)
@@ -107,19 +108,20 @@ internal fun AuthBackCircle(onClick: () -> Unit, modifier: Modifier = Modifier) 
 /** White social pill — radius 24, 13dp vertical padding, 18dp brand mark. */
 @Composable
 internal fun SocialPill(text: String, iconRes: Int, onClick: () -> Unit) {
+	val u = figmaUnit()
 	Row(
-		horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
+		horizontalArrangement = Arrangement.spacedBy((10 * u).dp, Alignment.CenterHorizontally),
 		verticalAlignment = Alignment.CenterVertically,
 		modifier = Modifier
 			.fillMaxWidth()
-			.background(Color.White, RoundedCornerShape(24.dp))
+			.background(Color.White, RoundedCornerShape((24 * u).dp))
 			.clickable(onClick = onClick)
-			.padding(vertical = 13.dp),
+			.padding(vertical = (13 * u).dp),
 	) {
-		Image(painter = painterResource(iconRes), contentDescription = null, modifier = Modifier.size(18.dp))
+		Image(painter = painterResource(iconRes), contentDescription = null, modifier = Modifier.size((18 * u).dp))
 		Text(
 			text = text,
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 14.sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp),
 			color = Auth.DarkOnWhite,
 		)
 	}
@@ -128,14 +130,15 @@ internal fun SocialPill(text: String, iconRes: Int, onClick: () -> Unit) {
 /** The 1px #2a3346 "or" divider row. */
 @Composable
 internal fun AuthOrDivider() {
-	Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-		Box(modifier = Modifier.weight(1f).height(1.dp).background(Auth.DividerLine))
+	val u = figmaUnit()
+	Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy((10 * u).dp)) {
+		Box(modifier = Modifier.weight(1f).height((1 * u).dp).background(Auth.DividerLine))
 		Text(
 			text = "or",
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 11.sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp),
 			color = Auth.FaintText,
 		)
-		Box(modifier = Modifier.weight(1f).height(1.dp).background(Auth.DividerLine))
+		Box(modifier = Modifier.weight(1f).height((1 * u).dp).background(Auth.DividerLine))
 	}
 }
 
@@ -149,13 +152,14 @@ internal fun AuthInput(
 	hidden: Boolean = false,
 	trailing: (@Composable () -> Unit)? = null,
 ) {
-	val textStyle = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 13.sp, color = StakColors.TextPrimary)
+	val u = figmaUnit()
+	val textStyle = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (13 * u).sp, color = StakColors.TextPrimary)
 	Row(
 		verticalAlignment = Alignment.CenterVertically,
 		modifier = Modifier
 			.fillMaxWidth()
-			.background(Auth.InputBg, RoundedCornerShape(14.dp))
-			.padding(16.dp),
+			.background(Auth.InputBg, RoundedCornerShape((14 * u).dp))
+			.padding((16 * u).dp),
 	) {
 		Box(modifier = Modifier.weight(1f)) {
 			if (value.isEmpty()) {
@@ -181,9 +185,10 @@ internal fun AuthInput(
 /** The teal Show/Hide toggle used inside password inputs. */
 @Composable
 internal fun ShowHideToggle(shown: Boolean, onToggle: () -> Unit) {
+	val u = figmaUnit()
 	Text(
 		text = if (shown) "Hide" else "Show",
-		style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 11.sp),
+		style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (11 * u).sp),
 		color = Auth.LinkTeal,
 		modifier = Modifier.clickable(
 			interactionSource = remember { MutableInteractionSource() },
@@ -196,11 +201,12 @@ internal fun ShowHideToggle(shown: Boolean, onToggle: () -> Unit) {
 /** Sharp-cornered 52dp CTA — 3-stop a6e4f7/5da8bf/3c98b4 gradient, white Geist Medium 14 (CHINEDU 1:873). */
 @Composable
 internal fun AuthCta(text: String, onClick: () -> Unit) {
+	val u = figmaUnit()
 	Box(
 		modifier = Modifier
 			.fillMaxWidth()
-			.padding(horizontal = 20.dp)
-			.height(52.dp)
+			.padding(horizontal = (20 * u).dp)
+			.height((52 * u).dp)
 			.background(
 				Brush.verticalGradient(
 					0.0889f to Color(0xFFA6E4F7),
@@ -208,15 +214,15 @@ internal fun AuthCta(text: String, onClick: () -> Unit) {
 					0.7255f to Color(0xFF3C98B4),
 					1f to Color(0xFF3C98B4),
 				),
-				RoundedCornerShape(6.dp),
+				RoundedCornerShape((6 * u).dp),
 			)
-			.border(0.36.dp, StakColors.CtaBorder, RoundedCornerShape(6.dp))
+			.border((0.36 * u).dp, StakColors.CtaBorder, RoundedCornerShape((6 * u).dp))
 			.clickable(onClick = onClick),
 		contentAlignment = Alignment.Center,
 	) {
 		Text(
 			text = text,
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 14.sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp),
 			color = StakColors.TextPrimary,
 		)
 	}
@@ -225,18 +231,19 @@ internal fun AuthCta(text: String, onClick: () -> Unit) {
 /** Secondary flow button — h52, r6, rgba(52,59,79,0.33) hairline, Sora 14 muted (CHINEDU 1:791). */
 @Composable
 internal fun AuthSecondaryButton(text: String, onClick: () -> Unit) {
+	val u = figmaUnit()
 	Box(
 		modifier = Modifier
 			.fillMaxWidth()
-			.padding(horizontal = 20.dp)
-			.height(52.dp)
-			.border(0.36.dp, Color(0x54343B4F), RoundedCornerShape(6.dp))
+			.padding(horizontal = (20 * u).dp)
+			.height((52 * u).dp)
+			.border((0.36 * u).dp, Color(0x54343B4F), RoundedCornerShape((6 * u).dp))
 			.clickable(onClick = onClick),
 		contentAlignment = Alignment.Center,
 	) {
 		Text(
 			text = text,
-			style = TextStyle(fontFamily = com.stak.demo.ui.theme.Sora, fontWeight = FontWeight.Normal, fontSize = 14.sp),
+			style = TextStyle(fontFamily = com.stak.demo.ui.theme.Sora, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp),
 			color = StakColors.Muted,
 		)
 	}
@@ -245,15 +252,16 @@ internal fun AuthSecondaryButton(text: String, onClick: () -> Unit) {
 /** "Already have an account? Sign in" / "New to STAK? Create account" row. */
 @Composable
 internal fun AuthSwitchRow(prefix: String, link: String, onClick: () -> Unit) {
-	Row(horizontalArrangement = Arrangement.spacedBy(5.dp), verticalAlignment = Alignment.CenterVertically) {
+	val u = figmaUnit()
+	Row(horizontalArrangement = Arrangement.spacedBy((5 * u).dp), verticalAlignment = Alignment.CenterVertically) {
 		Text(
 			text = prefix,
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = 12.sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp),
 			color = StakColors.Muted,
 		)
 		Text(
 			text = link,
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = 12.sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp),
 			color = Auth.LinkTeal,
 			modifier = Modifier.clickable(
 				interactionSource = remember { MutableInteractionSource() },

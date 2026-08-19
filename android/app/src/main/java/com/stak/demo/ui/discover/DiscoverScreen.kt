@@ -127,12 +127,6 @@ private data class DeckCard(
 	val tip: String,
 	val cardTop: Color,
 	val artBg: Color,
-	// Authored art frame at front scale — each card frames its art
-	// differently (NVDA inset 340x229; AAPL/GOOGL full-bleed, taller).
-	val artW: Float,
-	val artH: Float,
-	val artY: Float,
-	val artRadius: Float,
 )
 
 private val DECK = listOf(
@@ -140,19 +134,19 @@ private val DECK = listOf(
 		R.drawable.disc_card_nvda, "NVDA · NVIDIA Corp",
 		"Chip demand is outrunning supply, and NVIDIA sets the prices.",
 		"$122.10", "▲ 2.4% today", "Chip stocks swing hard. Small stakes, long views.",
-		Color(0xFF152A47), Color(0xFF142844), 340f, 229f, 4f, 18f,
+		Color(0xFF152A47), Color(0xFF142844),
 	),
 	DeckCard(
 		R.drawable.disc_card_aapl, "AAPL · Apple Inc",
 		"Two billion devices, and every one of them keeps paying Apple.",
 		"$229.35", "▲ 1.2% today", "Steady giants move slower. Stable stocks often do.",
-		Color(0xFF283E5D), Color(0xFF253A59), 350f, 243f, 3.5f, 22f,
+		Color(0xFF283E5D), Color(0xFF253A59),
 	),
 	DeckCard(
 		R.drawable.disc_card_googl, "GOOGL · Alphabet Inc",
 		"Search pays for everything, and nine billion-user products ride behind it.",
 		"$178.90", "▲ 0.8% today", "Ad money moves with the economy, so some quarters just drift.",
-		Color(0xFF263D5D), Color(0xFF2F486E), 350f, 248.6f, 5.6f, 22f,
+		Color(0xFF263D5D), Color(0xFF2F486E),
 	),
 )
 
@@ -418,31 +412,31 @@ private fun FrontDeckCard(card: DeckCard, onSave: () -> Unit, u: Float, modifier
 private fun DeckCardBody(card: DeckCard, onSave: (() -> Unit)?, u: Float) {
 	Column(
 		horizontalAlignment = Alignment.CenterHorizontally,
-		// The overlay sits at the authored 258 for every card, whatever
-		// its art height: gap = 258 - artY - artH (NVDA: 25).
-		verticalArrangement = Arrangement.spacedBy(((258f - card.artY - card.artH) * u).dp),
+		// The authored card template (1:1740, shared by all three designs):
+		// art 340x229 at y4, overlay at 258 -> gap 25.
+		verticalArrangement = Arrangement.spacedBy((25 * u).dp),
 		modifier = Modifier
 			.fillMaxWidth()
 			.clip(RoundedCornerShape((22 * u).dp))
 			.background(Brush.verticalGradient(0f to card.cardTop, 1f to Color(0xFF0C1526)))
-			.padding(top = (card.artY * u).dp, bottom = (4 * u).dp),
+			.padding(top = (4 * u).dp, bottom = (4 * u).dp),
 	) {
 		Box(
 			modifier = Modifier
-				.size((card.artW * u).dp, (card.artH * u).dp)
-				.clip(RoundedCornerShape((card.artRadius * u).dp))
+				.size((340 * u).dp, (229 * u).dp)
+				.clip(RoundedCornerShape((18 * u).dp))
 				.background(card.artBg),
 		) {
 			Image(
 				painter = painterResource(card.artRes),
 				contentDescription = null,
 				contentScale = ContentScale.Crop,
-				modifier = Modifier.size((card.artW * u).dp, (card.artH * u).dp),
+				modifier = Modifier.size((340 * u).dp, (229 * u).dp),
 			)
 			if (card.artRes != R.drawable.disc_card_nvda) {
-				// NVDA's chip is baked into its art; the others draw it live —
-				// card-relative (top 10, end 9) like the baked one.
-				SaveChip(u = u, modifier = Modifier.align(Alignment.TopEnd).padding(top = ((10f - card.artY) * u).dp, end = (9 * u).dp))
+				// NVDA's chip is baked into its art; the others draw it live
+				// at the template's authored spot (art x264 y6, 340-264-72=4).
+				SaveChip(u = u, modifier = Modifier.align(Alignment.TopEnd).padding(top = (6 * u).dp, end = (4 * u).dp))
 			}
 			if (onSave != null) {
 				Box(

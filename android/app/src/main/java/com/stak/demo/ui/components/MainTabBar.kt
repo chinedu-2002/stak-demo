@@ -42,13 +42,14 @@ enum class MainTab(val label: String, val activeIcon: Int, val inactiveIcon: Int
  * "Swap overlay · Instant".
  */
 @Composable
-fun MainTabBar(selected: MainTab, onSelect: (MainTab) -> Unit) {
+fun MainTabBar(selected: MainTab, onSelect: (MainTab) -> Unit, compact: Boolean = false) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Box(modifier = Modifier.fillMaxWidth().background(Color(0xFF060C1D)).navigationBarsPadding()) {
 		Row(
-			horizontalArrangement = Arrangement.spacedBy((28 * u).dp),
+			horizontalArrangement = Arrangement.spacedBy((30 * u).dp),
 			verticalAlignment = Alignment.CenterVertically,
-			modifier = Modifier.align(Alignment.Center).height((86 * u).dp),
+			modifier = Modifier.align(Alignment.Center)// Discover's frame (1:1627) authors a 75-tall bar; the other four author 86.
+				.height(((if (compact) 75 else 86) * u).dp),
 		) {
 			MainTab.entries.forEach { tab ->
 				Column(

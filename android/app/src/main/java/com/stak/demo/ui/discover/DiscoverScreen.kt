@@ -80,7 +80,7 @@ private object Disc {
 	val Divider = Color(0xFF2A3346)
 	val BadgeInk = Color(0xFF9EADC7)
 	val TipBg = Color(0x1A69B3CA)
-	val SaveChipBg = Color(0x17FFFFFF)
+	val SaveChipBg = Color(0x26FFFFFF)
 	val AmountBg = Color(0xFF0B1430)
 	val AmountBorder = Color(0x1FFFFFFF)
 	val AmountInk = Color(0xFFDCE7F7)
@@ -455,7 +455,7 @@ private fun DeckCardBody(card: DeckCard, onSave: (() -> Unit)?, u: Float) {
 			Image(
 				painter = painterResource(card.artRes),
 				contentDescription = null,
-				contentScale = ContentScale.FillBounds,
+				contentScale = ContentScale.Crop,
 				modifier = Modifier.size((340 * u).dp, (229 * u).dp),
 			)
 			if (card.artRes != R.drawable.disc_card_nvda) {

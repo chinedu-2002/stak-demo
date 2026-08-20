@@ -17,8 +17,8 @@ fun GoalScreen(onBack: () -> Unit, onContinue: () -> Unit) {
 		options = listOf(
 			MatrixOption("Learn how investing works", "Start from the basics, no shame", R.drawable.ic_goal_learn),
 			MatrixOption("Grow my money long-term", "Slow and steady wealth", R.drawable.ic_goal_grow),
-			MatrixOption("Find my first stocks", "I want to understand what to watch", R.drawable.ic_goal_search, iconSize = 26.49.dp),
-			MatrixOption("Just exploring", "Curious, no plan yet", R.drawable.ic_goal_explore),
+			MatrixOption("Find my first stocks", "I want to understand what to watch", R.drawable.ic_goal_search, iconSize = 26.49.dp, iconDy = 9f),
+			MatrixOption("Just exploring", "Curious, no plan yet", R.drawable.ic_goal_explore, iconDy = 9f),
 		),
 		onBack = onBack,
 		onContinue = onContinue,

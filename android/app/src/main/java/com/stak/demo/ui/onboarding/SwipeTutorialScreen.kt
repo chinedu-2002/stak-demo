@@ -51,9 +51,10 @@ import kotlinx.coroutines.launch
 private data class TutorialCard(val res: Int, val x: Float, val y: Float, val w: Float, val h: Float)
 
 private val CARDS = listOf(
-	TutorialCard(R.drawable.tutorial_card_nvda, 0f, 47.71f, 305.53f, 376.9f),
-	TutorialCard(R.drawable.tutorial_card_aapl, 15.59f, 21.13f, 273.41f, 309.46f),
-	TutorialCard(R.drawable.tutorial_card_googl, 33.57f, 0f, 238.66f, 290.59f),
+	// CHINEDU 1:344 exports, template-matched to the frame render.
+	TutorialCard(R.drawable.tutorial_card_nvda, 0f, 47.5f, 305.75f, 377f),
+	TutorialCard(R.drawable.tutorial_card_aapl, 15.5f, 21f, 273.5f, 309.5f),
+	TutorialCard(R.drawable.tutorial_card_googl, 33.5f, 0f, 238.75f, 290.75f),
 )
 
 /**

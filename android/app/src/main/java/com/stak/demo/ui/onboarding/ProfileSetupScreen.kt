@@ -1,5 +1,11 @@
 package com.stak.demo.ui.onboarding
 
+import android.graphics.BitmapFactory
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -16,6 +22,10 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -51,6 +61,27 @@ private const val NAME_MAX = 20
 fun ProfileSetupScreen(onBack: () -> Unit, onProceed: () -> Unit) {
 	val u = figmaUnit()
 	var name by rememberSaveable { mutableStateOf("") }
+	// User's motion (2026-08-21): Add a photo opens the system gallery and
+	// the chosen image becomes the avatar. The photo picker carries its own
+	// permission flow, so no runtime permission is requested by the app.
+	var photoUri by rememberSaveable { mutableStateOf<String?>(null) }
+	val context = LocalContext.current
+	val avatar = remember(photoUri) {
+		photoUri?.let { stored ->
+			runCatching {
+				val uri = Uri.parse(stored)
+				val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+				context.contentResolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, bounds) }
+				val opts = BitmapFactory.Options().apply {
+					inSampleSize = maxOf(1, minOf(bounds.outWidth, bounds.outHeight) / 512)
+				}
+				context.contentResolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, opts) }
+			}.getOrNull()
+		}
+	}
+	val pickPhoto = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+		if (uri != null) photoUri = uri.toString()
+	}
 
 	Column(modifier = Modifier.fillMaxSize().background(StakColors.Bg).systemBarsPadding()) {
 		Row(modifier = Modifier.fillMaxWidth().padding(horizontal = (20 * u).dp).padding(top = (10 * u).dp, bottom = (4 * u).dp)) {
@@ -90,14 +121,30 @@ fun ProfileSetupScreen(onBack: () -> Unit, onProceed: () -> Unit) {
 					modifier = Modifier
 						.size((96 * u).dp)
 						.background(Color(0xFF242B3D), CircleShape)
-						.border((2 * u).dp, Auth.LinkTeal, CircleShape),
+						.border((2 * u).dp, Auth.LinkTeal, CircleShape)
+						.clip(CircleShape)
+						.clickable(
+							interactionSource = remember { MutableInteractionSource() },
+							indication = null,
+							onClick = { pickPhoto.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
+						),
 					contentAlignment = Alignment.Center,
 				) {
-					Text(
-						text = name.firstOrNull()?.uppercase() ?: "",
-						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (36 * u).sp),
-						color = Color(0xFF9EADC7),
-					)
+					val bmp = avatar
+					if (bmp != null) {
+						Image(
+							bitmap = bmp.asImageBitmap(),
+							contentDescription = "Profile photo",
+							contentScale = ContentScale.Crop,
+							modifier = Modifier.size((96 * u).dp),
+						)
+					} else {
+						Text(
+							text = name.firstOrNull()?.uppercase() ?: "",
+							style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (36 * u).sp),
+							color = Color(0xFF9EADC7),
+						)
+					}
 				}
 				Text(
 					text = "Add a photo",
@@ -106,7 +153,7 @@ fun ProfileSetupScreen(onBack: () -> Unit, onProceed: () -> Unit) {
 					modifier = Modifier.clickable(
 						interactionSource = remember { MutableInteractionSource() },
 						indication = null,
-						onClick = {},
+						onClick = { pickPhoto.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
 					),
 				)
 			}

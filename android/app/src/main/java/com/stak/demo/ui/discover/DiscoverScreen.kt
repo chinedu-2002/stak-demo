@@ -118,7 +118,7 @@ internal val NVDA_BUY = BuySpec("Buy NVDA?", "N", "NVIDIA Corp", "$122.10 today"
 internal val AAPL_BUY = BuySpec("Buy AAPL?", "A", "Apple", "$229.35 today", "\u25b2 1.2%", "$8,800.00", "$8,775.00", "0.1090", "AAPL")
 
 /** One deck card's designed content (art + copy at the front-card scale). */
-private data class DeckCard(
+internal data class DeckCard(
 	val artRes: Int,
 	val ticker: String,
 	val headline: String,
@@ -129,7 +129,7 @@ private data class DeckCard(
 	val artBg: Color,
 )
 
-private val DECK = listOf(
+internal val DECK = listOf(
 	DeckCard(
 		R.drawable.disc_card_nvda, "NVDA · NVIDIA Corp",
 		"Chip demand is outrunning supply, and NVIDIA sets the prices.",
@@ -377,7 +377,7 @@ fun DiscoverScreen(onLearnMore: () -> Unit = {}, onPracticeBuy: () -> Unit = {})
 
 /** The full-size front card (350 wide) with its live Save chip. */
 @Composable
-private fun FrontDeckCard(card: DeckCard, onSave: () -> Unit, u: Float, modifier: Modifier = Modifier) {
+internal fun FrontDeckCard(card: DeckCard, onSave: () -> Unit, u: Float, modifier: Modifier = Modifier) {
 	Box(
 		modifier = modifier
 			.width((350 * u).dp)

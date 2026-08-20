@@ -138,7 +138,8 @@ fun BrandPicksScreen(onBack: () -> Unit, onContinue: () -> Unit) {
 		) {
 			AuthCta(
 				text = if (picked.isEmpty()) "Continue" else "Continue · ${picked.size} picked",
-				onClick = { if (picked.isNotEmpty()) onContinue() },
+				// User's call (2026-08-21): Continue unlocks at three picks.
+				onClick = { if (picked.size >= 3) onContinue() },
 			)
 			AuthSecondaryButton(text = "Back", onClick = onBack)
 			Text(

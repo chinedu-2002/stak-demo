@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -100,8 +101,10 @@ fun BrandPicksScreen(onBack: () -> Unit, onContinue: () -> Unit) {
 				)
 				Text(
 					text = "Pick a few. STAK uses this to learn what feels familiar to you.",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp),
+					// Authored box (1:255): 303 wide -> the designed two-line wrap.
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
 					color = Auth.SubtitleGray,
+					modifier = Modifier.width((303 * u).dp),
 				)
 			}
 
@@ -179,7 +182,7 @@ private fun BrandTile(
 		)
 		Text(
 			text = brand.name,
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp, lineHeight = (14 * u).sp),
 			color = if (selected) StakColors.TextPrimary else StakColors.Muted,
 		)
 	}

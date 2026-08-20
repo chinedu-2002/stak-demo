@@ -50,6 +50,8 @@ internal data class MatrixOption(
 	val iconRes: Int,
 	val iconSize: Dp = 21.06.dp,
 	val circleSize: Dp = 37.9.dp,
+	// Authored icon-frame y within the card content (row 2 icons sit lower).
+	val iconDy: Float = 0f,
 )
 
 /**
@@ -102,14 +104,14 @@ internal fun MatrixQuizScreen(
 				)
 				Text(
 					text = subtitle,
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
 					color = Auth.SubtitleGray,
 				)
 			}
 
 			Column(verticalArrangement = Arrangement.spacedBy((12 * u).dp), modifier = Modifier.padding(top = (4 * u).dp)) {
 				options.chunked(2).forEachIndexed { rowIndex, row ->
-					Row(horizontalArrangement = Arrangement.spacedBy((12.63 * u).dp)) {
+					Row(horizontalArrangement = Arrangement.spacedBy((13 * u).dp)) {
 						row.forEachIndexed { colIndex, option ->
 							val index = rowIndex * 2 + colIndex
 							MatrixCard(
@@ -138,7 +140,9 @@ private fun MatrixCard(option: MatrixOption, selected: Boolean, onClick: () -> U
 	val u = figmaUnit()
 	val shape = RoundedCornerShape((16.85 * u).dp)
 	Column(
-		verticalArrangement = Arrangement.spacedBy((21.06 * u).dp, Alignment.CenterVertically),
+		// Authored interior (1:597): content top-anchored at 15.27; the icon
+		// at its per-option dy; the text block 21 below the icon. Never
+		// vertically centered - row 2 reads lower by design.
 		modifier = Modifier
 			.size((163.18 * u).dp, (155.81 * u).dp)
 			.background(Auth.InputBg, shape)
@@ -148,8 +152,9 @@ private fun MatrixCard(option: MatrixOption, selected: Boolean, onClick: () -> U
 				indication = null,
 				onClick = onClick,
 			)
-			.padding(horizontal = (14.74 * u).dp),
+			.padding(horizontal = (14.74 * u).dp, vertical = (15.27 * u).dp),
 	) {
+		Spacer(modifier = Modifier.height((option.iconDy * u).dp))
 		Box(
 			modifier = Modifier.size(option.circleSize * u).background(Color(0xFF242B3D), CircleShape),
 			contentAlignment = Alignment.Center,
@@ -160,16 +165,17 @@ private fun MatrixCard(option: MatrixOption, selected: Boolean, onClick: () -> U
 				modifier = Modifier.size(option.iconSize * u),
 			)
 		}
-		Column(verticalArrangement = Arrangement.spacedBy((5.26 * u).dp), modifier = Modifier.height((66.33 * u).dp)) {
+		Spacer(modifier = Modifier.height((21 * u).dp))
+		Column(verticalArrangement = Arrangement.spacedBy((5 * u).dp)) {
 			Text(
 				text = option.title,
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16.85 * u).sp),
 				color = StakColors.TextPrimary,
 				modifier = Modifier.width((142.13 * u).dp),
 			)
 			Text(
 				text = option.subtitle,
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (10 * u).sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (10 * u).sp, lineHeight = (13.69 * u).sp),
 				color = Auth.FaintText,
 				modifier = Modifier.width((121.07 * u).dp),
 			)

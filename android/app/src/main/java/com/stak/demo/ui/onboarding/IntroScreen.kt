@@ -53,21 +53,26 @@ fun IntroScreen(onGetStarted: () -> Unit) {
 				)
 				Text(
 					text = "STAK turns brands you already know into simple, clear stock ideas, so you can invest with confidence.",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp, lineHeight = (21 * u).sp),
+					// Wrap-true 14x0.95: Compose shapes Geist ~5% wider, and the
+					// authored break is "...into simple, clear / stock ideas...".
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (13.3 * u).sp, lineHeight = (21 * u).sp),
 					color = Auth.SubtitleGray,
 				)
 			}
 			// Hero — flattened Figma group (render bounds 342x488 at 1x),
 			// scaled to the artboard unit so proportions hold on wide devices.
 			Box(
-				modifier = Modifier.weight(1f).fillMaxWidth().padding(top = (10 * u).dp),
-				contentAlignment = Alignment.Center,
+				// The hero art render sits at authored y235 (template-matched
+				// against 1:179); this box tops out at 200, so offset 35 —
+				// plus 3.25 measured on-device so text and art shift as one.
+				modifier = Modifier.weight(1f).fillMaxWidth(),
+				contentAlignment = Alignment.TopCenter,
 			) {
 				Image(
 					painter = painterResource(R.drawable.intro_hero_box),
 					contentDescription = null,
 					contentScale = ContentScale.Fit,
-					modifier = Modifier.size((342 * u).dp, (488 * u).dp),
+					modifier = Modifier.padding(top = (38.25 * u).dp).size((342 * u).dp, (488 * u).dp),
 				)
 			}
 		}

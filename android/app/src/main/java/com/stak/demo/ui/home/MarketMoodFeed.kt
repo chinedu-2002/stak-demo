@@ -18,6 +18,14 @@ import org.json.JSONObject
  * failure the gauge rests at the authored demo pose.
  */
 object MarketMoodFeed {
+	/**
+	 * The user's call (2026-08-21): the gauge shows the DESIGN DEFAULT in
+	 * this build phase so it always matches the Figma. Flip this on for
+	 * the production build - then the needle measures the worldwide
+	 * market in current time on the user's phone.
+	 */
+	const val LIVE = false
+
 	var score by mutableStateOf<Float?>(null)
 		private set
 	private var attempted = false
@@ -28,6 +36,7 @@ object MarketMoodFeed {
 	fun angleFor(score: Float): Float = (score.coerceIn(0f, 100f) / 100f) * 180f
 
 	suspend fun refresh() {
+		if (!LIVE) return
 		if (attempted && score != null) return
 		attempted = true
 		score = withContext(Dispatchers.IO) {

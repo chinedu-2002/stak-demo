@@ -23,8 +23,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
@@ -70,17 +70,16 @@ internal fun figmaUnit(): Float =
 @Composable
 internal fun BoxScope.AuthWatermark() {
 	val u = figmaUnit()
-	// Pose fitted against the 1:830 render (center 184.9/581.4, 185.7deg);
-	// anchored to the top so taller devices don't sink it.
+	// The authored node render (1:831): the tilt AND the 10% opacity are
+	// baked into the asset. Fitted pose: 364u square, center 185.6/582.2,
+	// no rotation. Top-anchored so taller devices don't sink it.
 	Image(
-		painter = painterResource(R.drawable.splash_glass_ball),
+		painter = painterResource(R.drawable.auth_watermark),
 		contentDescription = null,
 		modifier = Modifier
-			.size((332.65 * u).dp)
+			.size((364 * u).dp)
 			.align(Alignment.TopCenter)
-			.offset(x = (-10.1 * u).dp, y = (415.11 * u).dp)
-			.rotate(185.7f)
-			.alpha(0.1f),
+			.offset(x = (-9.37 * u).dp, y = (400.16 * u).dp),
 	)
 }
 
@@ -209,6 +208,21 @@ internal fun AuthCta(text: String, onClick: () -> Unit) {
 			.fillMaxWidth()
 			.padding(horizontal = (20 * u).dp)
 			.height((52 * u).dp)
+			// Authored glow (1:873): teal drop shadows cast downward — the
+			// soft wash behind the rows under the button.
+			.drawBehind {
+				val r = (6 * u).dp.toPx()
+				val fw = drawContext.canvas.nativeCanvas
+				val paint = android.graphics.Paint().apply { isAntiAlias = true }
+				for ((dy, blur, a) in listOf(
+					Triple(28.18f, 8.31f, 0.03f),
+					Triple(49.86f, 9.76f, 0.01f),
+				)) {
+					paint.color = android.graphics.Color.argb((a * 255).toInt(), 82, 170, 199)
+					paint.maskFilter = android.graphics.BlurMaskFilter((blur * u).dp.toPx(), android.graphics.BlurMaskFilter.Blur.NORMAL)
+					fw.drawRoundRect(0f, (dy * u).dp.toPx(), size.width, (dy * u).dp.toPx() + size.height, r, r, paint)
+				}
+			}
 			.background(
 				Brush.verticalGradient(
 					0.0889f to Color(0xFFA6E4F7),

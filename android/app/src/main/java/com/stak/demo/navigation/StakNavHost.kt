@@ -304,7 +304,17 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
 		composable(StakRoutes.PROFILE) {
 			ProfileScreen(onBack = { navController.popBackStack() })
 		}
-		composable(StakRoutes.NEWS_DETAIL) {
+		composable(
+			StakRoutes.NEWS_DETAIL,
+			// Authored (1:1228 Motion): Story tile -> News detail unsaved is
+			// INSTANT, not the house push. The article's own back/share motion
+			// is not yet authored - the pop mirrors the instant entry until
+			// its panel says otherwise.
+			enterTransition = { androidx.compose.animation.EnterTransition.None },
+			exitTransition = { androidx.compose.animation.ExitTransition.None },
+			popEnterTransition = { androidx.compose.animation.EnterTransition.None },
+			popExitTransition = { androidx.compose.animation.ExitTransition.None },
+		) {
 			NewsDetailScreen(onBack = { navController.popBackStack() })
 		}
 	}

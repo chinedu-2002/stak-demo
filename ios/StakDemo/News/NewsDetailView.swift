@@ -162,7 +162,8 @@ private struct HeroImage: View {
 						.foregroundStyle(StakColors.textPrimary)
 				}
 				.padding(.horizontal, 7 * u)
-				.padding(.vertical, 5 * u)
+				// Authored toast is 21 tall (1:1386): 13 text + 4/4 pads.
+				.padding(.vertical, 4 * u)
 				.background(Color(argb: 0x40242B3D), in: RoundedRectangle(cornerRadius: 7.88 * u))
 				.padding(.top, 8 * u)
 				.padding(.trailing, 7 * u)
@@ -311,7 +312,6 @@ private struct StockCard: View {
 						.frame(width: 6.88 * u, height: 3.75 * u)
 						.rotationEffect(.degrees(-90))
 				}
-				.padding(.top, 1 * u)
 			}
 		}
 		.frame(maxWidth: .infinity, alignment: .leading)

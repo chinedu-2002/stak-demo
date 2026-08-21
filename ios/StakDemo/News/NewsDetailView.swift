@@ -45,7 +45,9 @@ struct NewsDetailView: View {
 
 				ScrollView {
 					VStack(spacing: 0) {
-						HeroImage(saved: saved)
+						// Authored motion (1:1495): the hero bookmark -> News detail
+						// page saved, Instant - a direct save that skips the sheet.
+						HeroImage(saved: saved, onBookmark: { saved = true })
 						VStack(alignment: .leading, spacing: 15 * u) {
 							Text("Apple climbs 5% on foldable iPhone push")
 								// RENDER-measured 20sp (the metadata's 24 lied); lh32 box stands.
@@ -108,13 +110,14 @@ struct NewsDetailView: View {
 	}
 }
 
-/// 360x208 r24 hero — phone art, Tech & Ai toast, play badge, bookmark/saved
+/// 360x208 r10 hero — phone art, Tech & Ai toast, play badge, bookmark/saved
 /// chip. The authored image is oversized (407x271.18 in the 360x208 card,
 /// top-left at -24,-15) — it keeps its exact authored frame (the Compose
 /// requiredSize + Crop becomes .scaledToFill + explicit .frame + .clipped)
 /// and the card's rounded clip crops the overflow.
 private struct HeroImage: View {
 	let saved: Bool
+	let onBookmark: () -> Void
 
 	var body: some View {
 		let u = figmaUnit
@@ -156,17 +159,21 @@ private struct HeroImage: View {
 				.padding(.trailing, 7 * u)
 				.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
 			} else {
-				Image("IcHeroBookmark")
-					.resizable()
-					.frame(width: 17.79 * u, height: 18.27 * u)
-					.padding(.top, 8 * u)
-					.padding(.trailing, 11 * u)
-					.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
+				Button(action: onBookmark) {
+					Image("IcHeroBookmark")
+						.resizable()
+						.frame(width: 17.79 * u, height: 18.27 * u)
+				}
+				.buttonStyle(.plain)
+				.padding(.top, 8 * u)
+				.padding(.trailing, 11 * u)
+				.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
 			}
 		}
 		.frame(maxWidth: .infinity)
 		.frame(height: 208 * u)
-		.clipShape(RoundedRectangle(cornerRadius: 24 * u))
+		// Authored radius 10 (1:1517 Inspect) - the earlier 24 was wrong.
+		.clipShape(RoundedRectangle(cornerRadius: 10 * u))
 		.padding(.horizontal, 15 * u)
 	}
 }

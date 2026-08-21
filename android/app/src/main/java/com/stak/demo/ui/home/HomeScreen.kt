@@ -85,22 +85,28 @@ fun HomeScreen(firstRun: Boolean, onSeeTodaysPick: () -> Unit, onProfile: () -> 
 	BoxWithConstraints(modifier = Modifier.fillMaxSize().background(StakColors.Bg)) {
 		val statusPad = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
 		Column(modifier = Modifier.fillMaxSize()) {
-			TopNav(onProfile = onProfile)
+			// Dev-ready Home Main (118:1633): the top nav SCROLLS with the
+			// content - the greeting block lives inside Scroll content.
 			Column(
 				horizontalAlignment = Alignment.CenterHorizontally,
 				modifier = Modifier
 					.weight(1f)
 					.fillMaxWidth()
-					.verticalScroll(rememberScrollState())
-					.padding(horizontal = (20 * u).dp),
+					.verticalScroll(rememberScrollState()),
 			) {
+				TopNav(onProfile = onProfile, modifier = Modifier.fillMaxWidth().padding(horizontal = (17 * u).dp))
 				Spacer(modifier = Modifier.height((21 * u).dp))
-				MarketMoodCard(onOpenNews = onOpenNews)
-				Spacer(modifier = Modifier.height((10 * u).dp))
-				WhyThisMattersCard(onOpenMyStak = onOpenMyStak)
-				Spacer(modifier = Modifier.height((20 * u).dp))
-				DeckBanner(onOpenDeck = onOpenDeck)
-				Spacer(modifier = Modifier.height(if (firstRun) (140 * u).dp else (20 * u).dp))
+				Column(
+					horizontalAlignment = Alignment.CenterHorizontally,
+					modifier = Modifier.fillMaxWidth().padding(horizontal = (20 * u).dp),
+				) {
+					MarketMoodCard(onOpenNews = onOpenNews)
+					Spacer(modifier = Modifier.height((10 * u).dp))
+					WhyThisMattersCard(onOpenMyStak = onOpenMyStak)
+					Spacer(modifier = Modifier.height((20 * u).dp))
+					DeckBanner(onOpenDeck = onOpenDeck)
+					Spacer(modifier = Modifier.height(if (firstRun) (140 * u).dp else (20 * u).dp))
+				}
 			}
 		}
 		if (firstRun) {
@@ -120,14 +126,13 @@ fun HomeScreen(firstRun: Boolean, onSeeTodaysPick: () -> Unit, onProfile: () -> 
 
 /** Fixed top nav — logo row with bell/profile circles + greeting (Figma 131px block). */
 @Composable
-private fun TopNav(onProfile: () -> Unit) {
+private fun TopNav(onProfile: () -> Unit, modifier: Modifier = Modifier) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Column(
-		modifier = Modifier
-			.fillMaxWidth()
+		// Scrolls with the content (118:1633); authored side inset 17.
+		modifier = modifier
 			.background(StakColors.Bg)
 			.statusBarsPadding()
-			.padding(horizontal = (17 * u).dp)
 			.padding(top = (22 * u).dp),
 	) {
 		Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().height((35 * u).dp)) {

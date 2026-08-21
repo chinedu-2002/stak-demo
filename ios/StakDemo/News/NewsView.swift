@@ -73,7 +73,9 @@ struct NewsView: View {
 			ScrollView {
 				VStack(spacing: 22 * u) {
 					MoodMiniRow()
-					BriefCarousel(onRead: onOpenArticle)
+					// Authored motion (1:1228): only the Story tile navigates - the
+					// brief card and the For You / Markets rows have no connection.
+					BriefCarousel(onRead: {})
 					StoryGrid(onOpenArticle: onOpenArticle)
 					NewsSectionView(title: "For You", rows: forYouRows, onOpenArticle: onOpenArticle)
 					NewsSectionView(title: "Markets", rows: marketsRows, onOpenArticle: onOpenArticle)
@@ -262,9 +264,7 @@ private struct NewsSectionView: View {
 				.foregroundStyle(News.headerGray)
 			ForEach(rows) { row in
 				Button {
-					// Only the Apple story routes to the article page,
-					// same as the Android build.
-					if row.headline.contains("Apple") { onOpenArticle() }
+					// Authored motion (1:1228): the rows have no connection.
 				} label: {
 					HStack(spacing: 12 * u) {
 						Image(row.thumb)

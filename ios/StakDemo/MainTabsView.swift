@@ -56,7 +56,8 @@ struct MainTabsView: View {
 							onOpenDeck: { homeFirstRun = false; tab = .discover }
 						)
 					case .news:
-						NewsView(onOpenArticle: { push(.newsDetail) })
+						// Authored (1:1228): Story tile -> News detail unsaved, Instant.
+						NewsView(onOpenArticle: { pushInstant(.newsDetail) })
 					case .discover:
 						DiscoverView(
 							onLearnMore: { push(.stockDetail(fromMyStak: false)) },
@@ -102,7 +103,9 @@ struct MainTabsView: View {
 	private func pageView(_ page: PushedPage) -> some View {
 		switch page {
 		case .newsDetail:
-			NewsDetailView(onBack: { pop() })
+			// The article's back motion is not yet authored - it mirrors the
+			// instant entry until its panel says otherwise.
+			NewsDetailView(onBack: { popInstant() })
 		case .stockDetail(let fromMyStak):
 			StockDetailView(onBack: { pop() }, fromMyStak: fromMyStak)
 		case .collection:
@@ -130,5 +133,14 @@ struct MainTabsView: View {
 
 	private func pop() {
 		withAnimation(FlowAnim.pushLeft.animation) { _ = pushed.popLast() }
+	}
+
+	/// Appends/removes with no animation - the prototype's "Instant".
+	private func pushInstant(_ page: PushedPage) {
+		pushed.append(page)
+	}
+
+	private func popInstant() {
+		_ = pushed.popLast()
 	}
 }

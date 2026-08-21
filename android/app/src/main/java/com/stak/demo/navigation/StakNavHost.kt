@@ -336,6 +336,8 @@ private fun MainShell(
 						firstRun = homeFirstRun,
 						onSeeTodaysPick = { homeFirstRun = false },
 						onProfile = onOpenProfile,
+						// Authored (1:958 Motion): Deck promo -> 03 News, Instant.
+						onOpenNews = { tab = MainTab.News },
 					)
 					MainTab.News -> NewsScreen(onOpenArticle = onOpenArticle)
 					MainTab.Discover -> DiscoverScreen(

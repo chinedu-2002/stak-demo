@@ -10,7 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -44,13 +44,20 @@ enum class MainTab(val label: String, val activeIcon: Int, val inactiveIcon: Int
 @Composable
 fun MainTabBar(selected: MainTab, onSelect: (MainTab) -> Unit, compact: Boolean = false) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
-	Box(modifier = Modifier.fillMaxWidth().background(Color(0xFF060C1D)).navigationBarsPadding()) {
+	// The authored bar (86, compact 75) INCLUDES the home-indicator zone -
+	// the tab row sits at its authored top inset and the system gesture
+	// area overlays the bar's lower band, exactly like the frame.
+	Box(
+		modifier = Modifier
+			.fillMaxWidth()
+			.background(Color(0xFF060C1D))
+			.height(((if (compact) 75 else 86) * u).dp),
+	) {
 		Row(
 			// Authored gaps: 28 on the 86 bar (1:1221), 30 on the compact 75 bar (1:1788).
 			horizontalArrangement = Arrangement.spacedBy(((if (compact) 30 else 28) * u).dp),
-			verticalAlignment = Alignment.CenterVertically,
-			modifier = Modifier.align(Alignment.Center)// Discover's frame (1:1627) authors a 75-tall bar; the other four author 86.
-				.height(((if (compact) 75 else 86) * u).dp),
+			verticalAlignment = Alignment.Top,
+			modifier = Modifier.align(Alignment.TopCenter).padding(top = ((if (compact) 13 else 18) * u).dp),
 		) {
 			MainTab.entries.forEach { tab ->
 				Column(

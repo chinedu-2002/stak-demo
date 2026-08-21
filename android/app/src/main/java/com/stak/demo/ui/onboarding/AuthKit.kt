@@ -70,14 +70,16 @@ internal fun figmaUnit(): Float =
 @Composable
 internal fun BoxScope.AuthWatermark() {
 	val u = figmaUnit()
+	// Pose fitted against the 1:830 render (center 184.9/581.4, 185.7deg);
+	// anchored to the top so taller devices don't sink it.
 	Image(
 		painter = painterResource(R.drawable.splash_glass_ball),
 		contentDescription = null,
 		modifier = Modifier
 			.size((332.65 * u).dp)
-			.align(Alignment.Center)
-			.offset(x = (-10 * u).dp, y = (159.78 * u).dp)
-			.rotate(174.3f)
+			.align(Alignment.TopCenter)
+			.offset(x = (-10.1 * u).dp, y = (415.11 * u).dp)
+			.rotate(185.7f)
 			.alpha(0.1f),
 	)
 }

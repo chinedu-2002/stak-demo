@@ -35,79 +35,84 @@ private let stockRows: [[CollStock]] = stride(from: 0, to: stocks.count, by: 2).
 /// The AI & Tech collection: hero (glass art, title, meta, blurb) and
 /// the stock-tile grid with the dashed Add-stock card. Tapping AAPL
 /// opens the saved Stock Detail.
+/// Every metric is scaled by the 390pt artboard unit (`figmaUnit`),
+/// exactly like the Android build's `u` scaling.
 /// Ported from android/ ui/mystak/CollectionScreen.kt.
 struct CollectionView: View {
 	let onBack: () -> Void
 	let onOpenStock: () -> Void
 
 	var body: some View {
+		let u = figmaUnit
 		VStack(spacing: 0) {
 			HStack {
 				AuthBackCircle(action: onBack)
 				Spacer()
 				Text("AI & Tech")
-					.font(StakFont.sora(16, .semiBold))
+					.font(StakFont.sora(16 * u, .semiBold))
 					.foregroundStyle(StakColors.textPrimary)
 				Spacer()
 				ZStack {
 					Circle().fill(cardBg)
 					Image("IcMoreDots")
 						.resizable()
-						.frame(width: 24, height: 24)
+						.frame(width: 24 * u, height: 24 * u)
 				}
-				.frame(width: 40, height: 40)
+				.frame(width: 40 * u, height: 40 * u)
 			}
-			.padding(.leading, 16)
-			.padding(.trailing, 18)
-			.padding(.vertical, 8)
+			.padding(.leading, 16 * u)
+			.padding(.trailing, 18 * u)
+			.padding(.vertical, 8 * u)
 
 			ScrollView {
-				VStack(spacing: 20) {
+				VStack(spacing: 20 * u) {
 					hero
 					grid
 				}
-				.padding(.horizontal, 20)
-				.padding(.top, 16)
-				.padding(.bottom, 26)
+				.padding(.horizontal, 20 * u)
+				.padding(.top, 16 * u)
+				.padding(.bottom, 26 * u)
 			}
 		}
 		.background(StakColors.bg.ignoresSafeArea())
 	}
 
 	private var hero: some View {
-		VStack(alignment: .leading, spacing: 10) {
+		let u = figmaUnit
+		return VStack(alignment: .leading, spacing: 10 * u) {
 			Image("MsCollAITech")
 				.resizable()
 				.scaledToFill()
-				.frame(width: 60, height: 60)
+				.frame(width: 60 * u, height: 60 * u)
 				.clipped()
 			Text("AI & Tech")
-				.font(StakFont.sora(26, .semiBold))
+				.font(StakFont.sora(26 * u, .semiBold))
 				.foregroundStyle(StakColors.textPrimary)
-			HStack(spacing: 7) {
+			HStack(spacing: 7 * u) {
 				Text("5 stocks")
-					.font(StakFont.geist(13))
+					.font(StakFont.geist(13 * u))
 					.foregroundStyle(muted)
 				Text("·")
-					.font(StakFont.geist(13))
+					.font(StakFont.geist(13 * u))
 					.foregroundStyle(faint)
 				Text("+2.4% this week")
-					.font(StakFont.geist(13, .medium))
+					.font(StakFont.geist(13 * u, .medium))
 					.foregroundStyle(green)
 			}
 			Text("Your highest-conviction growth and AI names.")
-				.font(StakFont.geist(13))
+				.font(StakFont.geist(13 * u))
 				.foregroundStyle(Color(argb: 0xFFC8D2E0))
 		}
 		.frame(maxWidth: .infinity, alignment: .leading)
 	}
 
 	private var grid: some View {
-		VStack(spacing: 10) {
+		let u = figmaUnit
+		return VStack(spacing: 10 * u) {
 			ForEach(Array(stockRows.enumerated()), id: \.offset) { _, row in
 				// `.fixedSize(vertical: true)` = Compose IntrinsicSize.Min: tiles in a
 				// row share the tallest tile's height, so the Add card stretches to match.
-				HStack(spacing: 10) {
+				HStack(spacing: 10 * u) {
 					ForEach(row) { stock in
 						StockTile(stock: stock) {
 							if stock.ticker == "AAPL" { onOpenStock() }
@@ -129,57 +134,59 @@ private struct StockTile: View {
 	let action: () -> Void
 
 	var body: some View {
+		let u = figmaUnit
 		Button(action: action) {
-			VStack(alignment: .leading, spacing: 10) {
+			VStack(alignment: .leading, spacing: 10 * u) {
 				HStack {
 					ZStack {
 						Circle().fill(Color(argb: 0xFF242B3D))
 						Text(stock.badge)
-							.font(StakFont.sora(14, .semiBold))
+							.font(StakFont.sora(14 * u, .semiBold))
 							.foregroundStyle(badgeInk)
 					}
-					.frame(width: 36, height: 36)
+					.frame(width: 36 * u, height: 36 * u)
 					Spacer(minLength: 0)
 					Text(stock.change)
-						.font(StakFont.geist(12, .medium))
+						.font(StakFont.geist(12 * u, .medium))
 						.foregroundStyle(stock.up ? green : redDown)
 				}
-				VStack(alignment: .leading, spacing: 2) {
+				VStack(alignment: .leading, spacing: 2 * u) {
 					Text(stock.ticker)
-						.font(StakFont.sora(16, .semiBold))
+						.font(StakFont.sora(16 * u, .semiBold))
 						.foregroundStyle(StakColors.textPrimary)
 					Text(stock.company)
-						.font(StakFont.geist(11))
+						.font(StakFont.geist(11 * u))
 						.foregroundStyle(muted)
 				}
 				Text(stock.price)
-					.font(StakFont.sora(15, .medium))
+					.font(StakFont.sora(15 * u, .medium))
 					.foregroundStyle(StakColors.textPrimary)
 			}
-			.padding(14)
+			.padding(14 * u)
 			.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-			.background(cardBg, in: RoundedRectangle(cornerRadius: 16))
+			.background(cardBg, in: RoundedRectangle(cornerRadius: 16 * u))
 		}
 		.buttonStyle(.plain)
 	}
 }
 
-/// Dashed 1.5pt #2a3346 r16 add card.
+/// Dashed 1.5u #2a3346 r16 add card.
 private struct AddStockTile: View {
 	var body: some View {
-		VStack(spacing: 8) {
+		let u = figmaUnit
+		VStack(spacing: 8 * u) {
 			Image("IcPlusCircle")
 				.resizable()
-				.frame(width: 24, height: 24)
+				.frame(width: 24 * u, height: 24 * u)
 			Text("Add stock")
-				.font(StakFont.geist(13, .medium))
+				.font(StakFont.geist(13 * u, .medium))
 				.foregroundStyle(muted)
 		}
-		.padding(14)
+		.padding(14 * u)
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
 		.overlay(
-			RoundedRectangle(cornerRadius: 16)
-				.stroke(Color(argb: 0xFF2A3346), style: StrokeStyle(lineWidth: 1.5, dash: [8, 8]))
+			RoundedRectangle(cornerRadius: 16 * u)
+				.stroke(Color(argb: 0xFF2A3346), style: StrokeStyle(lineWidth: 1.5 * u, dash: [8 * u, 8 * u]))
 		)
 	}
 }

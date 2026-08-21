@@ -12,6 +12,7 @@ private enum Home {
 
 /// One 236.86x278.45 news card of the deck in its frame pose — offsets are
 /// from the parent card's center (350x397), rotation about its own center.
+/// All values are artboard units, multiplied by `figmaUnit` at use.
 private struct DeckCard {
 	let bg: Color
 	let title: String
@@ -61,38 +62,53 @@ private let deckCards: [DeckCard] = [
 	)
 ]
 
-/// 02 · Home — CHINEDU "Home first run" (1:958) and "Home Main" (1:1097).
+/// 02 · Home — CHINEDU "Home first run" (1:958) and "Home Main" (1:1097),
+/// dev-ready geometry from "Home Main" (118:1633).
 /// Ported from android/ ui/home/HomeScreen.kt.
 ///
-/// Both frames share the whole content stack: fixed top nav (STAK logo,
-/// bell + profile circles, "Good Morning, Hamza"), the Market Mood card
-/// with its clipped news-deck stack, the "Why this matters" row and the
-/// teal deck banner. First run replaces the tab bar with a bottom scrim
-/// and the frosted "See Todays Pick" pill; tapping it reveals Home Main
-/// (prototype: Swap overlay · Instant). The tab bar itself lives in
-/// MainTabsView so the other tabs share it.
+/// Both frames share the whole content stack: the top nav (STAK logo,
+/// bell + profile circles, "Good Morning, Hamza") — which SCROLLS with the
+/// content per 118:1633 — the Market Mood card with its clipped news-deck
+/// stack, the "Why this matters" row and the teal deck banner. First run
+/// replaces the tab bar with a bottom scrim and the frosted "See Todays
+/// Pick" pill; tapping it reveals Home Main (prototype: Swap overlay ·
+/// Instant). The tab bar itself lives in MainTabsView so the other tabs
+/// share it.
 struct HomeView: View {
 	let firstRun: Bool
 	let onSeeTodaysPick: () -> Void
 	var onProfile: () -> Void = {}
+	var onOpenNews: () -> Void = {}
+	var onOpenMyStak: () -> Void = {}
+	var onOpenDeck: () -> Void = {}
 
 	var body: some View {
+		let u = figmaUnit
 		GeometryReader { geo in
 			ZStack(alignment: .bottom) {
-				VStack(spacing: 0) {
-					TopNav(onProfile: onProfile)
-					ScrollView {
+				// Dev-ready Home Main (118:1633): the top nav SCROLLS with the
+				// content — the greeting block lives inside scroll content.
+				ScrollView {
+					VStack(spacing: 0) {
+						TopNav(onProfile: onProfile)
+							.padding(.horizontal, 17 * u)
+						Spacer().frame(height: 21 * u)
 						VStack(spacing: 0) {
-							Spacer().frame(height: 21)
-							MarketMoodCard()
-							Spacer().frame(height: 10)
-							WhyThisMattersCard()
-							Spacer().frame(height: 20)
-							DeckBanner()
-							Spacer().frame(height: firstRun ? 140 : 20)
+							MarketMoodCard(onOpenNews: onOpenNews)
+							Spacer().frame(height: 10 * u)
+							WhyThisMattersCard(onOpenMyStak: onOpenMyStak)
+							Spacer().frame(height: 20 * u)
+							DeckBanner(onOpenDeck: onOpenDeck)
+							// Authored scroll content (118:1634) ends exactly at the
+							// banner's bottom edge — no trailing gap. First run keeps
+							// room for the scrim pill.
+							if firstRun {
+								Spacer().frame(height: 140 * u)
+							}
 						}
-						.padding(.horizontal, 20)
+						.padding(.horizontal, 20 * u)
 					}
+					.frame(maxWidth: .infinity)
 				}
 				if firstRun {
 					// The frame pins the scrim 41px above the deck banner (Tab bar
@@ -100,7 +116,7 @@ struct HomeView: View {
 					// banner top = status inset + 626, so the scrim starts 585 below
 					// the inset and runs to the physical bottom of the screen.
 					FirstRunOverlay(onSeeTodaysPick: onSeeTodaysPick)
-						.frame(height: geo.size.height + geo.safeAreaInsets.bottom - 585)
+						.frame(height: geo.size.height + geo.safeAreaInsets.bottom - 585 * u)
 						.offset(y: geo.safeAreaInsets.bottom)
 				}
 			}
@@ -110,47 +126,50 @@ struct HomeView: View {
 	}
 }
 
-/// Fixed top nav — logo row with bell/profile circles + greeting (Figma 131px block).
+/// Top nav — logo row with bell/profile circles + greeting (Figma 131px
+/// block). Scrolls with the content (118:1633); authored side inset 17.
 private struct TopNav: View {
 	let onProfile: () -> Void
+	@ObservedObject var profile = UserProfile.shared
 
 	var body: some View {
+		let u = figmaUnit
 		VStack(alignment: .leading, spacing: 0) {
 			HStack(spacing: 0) {
 				Image("StakLogoMark")
 					.resizable()
-					.frame(width: 26.48, height: 26.48)
-				Spacer().frame(width: 4.49)
+					.frame(width: 26.48 * u, height: 26.48 * u)
+				Spacer().frame(width: 4.49 * u)
 				Image("IcStakWordmark")
 					.resizable()
-					.frame(width: 78.16, height: 14.98)
+					.frame(width: 78.16 * u, height: 14.98 * u)
 					.accessibilityLabel("STAK")
 				Spacer()
 				Image("IcNavBell")
 					.resizable()
-					.frame(width: 35, height: 35)
+					.frame(width: 35 * u, height: 35 * u)
 					.accessibilityLabel("Notifications")
-				Spacer().frame(width: 4)
+				Spacer().frame(width: 4 * u)
 				Button(action: onProfile) {
 					ZStack {
 						Circle().fill(Home.navCircle)
 						Image("IcNavPerson")
 							.resizable()
-							.frame(width: 12.99, height: 13.64)
+							.frame(width: 12.99 * u, height: 13.64 * u)
 					}
-					.frame(width: 35, height: 35)
+					.frame(width: 35 * u, height: 35 * u)
 				}
 				.buttonStyle(.plain)
 				.accessibilityLabel("Profile")
 			}
-			.frame(height: 35)
-			Spacer().frame(height: 10)
-			Text("Good Morning, Hamza")
-				.font(StakFont.sora(16, .semiBold))
+			.frame(height: 35 * u)
+			Spacer().frame(height: 10 * u)
+			Text("Good Morning, \(profile.greetingName)")
+				.font(StakFont.sora(16 * u, .semiBold))
+				.lineSpacing((20 - 16) * u)
 				.foregroundStyle(Color.white)
 		}
-		.padding(.horizontal, 17)
-		.padding(.top, 22)
+		.padding(.top, 22 * u)
 		.frame(maxWidth: .infinity, alignment: .leading)
 		.background(StakColors.bg)
 	}
@@ -158,46 +177,51 @@ private struct TopNav: View {
 
 /// Market Mood — 350x397 #171d2c card with the clipped news-deck stack.
 private struct MarketMoodCard: View {
+	let onOpenNews: () -> Void
+
 	var body: some View {
+		let u = figmaUnit
 		ZStack {
 			NewsDeck()
 			// The frame's bottom strip (1:1175, 30px) backdrop-blurs the stack —
-			// redraw the same deck blurred, clipped to the card's last 30pt.
-			// An oversized child gets centered in the 30pt band; shift it up
+			// redraw the same deck blurred, clipped to the card's last 30 units.
+			// An oversized child gets centered in the 30-unit band; shift it up
 			// by (397-30)/2 so the stack's bottom edge lines up with the band.
 			NewsDeck()
 				.frame(maxWidth: .infinity)
-				.frame(height: 397)
-				.blur(radius: 4)
-				.offset(y: -183.5)
-				.frame(height: 30)
+				.frame(height: 397 * u)
+				.blur(radius: 4 * u)
+				.offset(y: -183.5 * u)
+				.frame(height: 30 * u)
 				.frame(maxWidth: .infinity)
 				.clipped()
 				.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
 			HStack(spacing: 0) {
-				VStack(alignment: .leading, spacing: 4) {
+				VStack(alignment: .leading, spacing: 4 * u) {
 					Text("Market Mood")
-						.font(StakFont.sora(20, .medium))
+						.font(StakFont.sora(20 * u, .medium))
+						.lineSpacing((25 - 20) * u)
 						.foregroundStyle(Color.white)
 					(
 						Text("High volatility").foregroundColor(Home.teal)
 							+ Text(", you should consider being cautious.").foregroundColor(Color.white)
 					)
-					.font(StakFont.geist(12))
+					.font(StakFont.geist(12 * u))
+					.lineSpacing((16 - 12) * u)
 				}
-				.frame(width: 180, alignment: .leading)
-				Spacer().frame(width: 46)
-				Image("HomeMoodGauge")
-					.resizable()
-					.frame(width: 56.9, height: 28.84)
+				.frame(width: 180 * u, alignment: .leading)
+				Spacer().frame(width: 46 * u)
+				MarketMoodGauge()
 			}
-			.padding(.top, 25)
+			.padding(.top, 25 * u)
 			.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
 		}
 		.frame(maxWidth: .infinity)
-		.frame(height: 397)
+		.frame(height: 397 * u)
 		.background(Home.cardBg)
-		.clipShape(RoundedRectangle(cornerRadius: 8))
+		.clipShape(RoundedRectangle(cornerRadius: 8 * u))
+		.contentShape(Rectangle())
+		.onTapGesture(perform: onOpenNews)
 	}
 }
 
@@ -218,97 +242,117 @@ private struct NewsDeckCard: View {
 	let card: DeckCard
 
 	var body: some View {
-		VStack(alignment: .leading, spacing: card.titleBodyGap) {
+		let u = figmaUnit
+		VStack(alignment: .leading, spacing: card.titleBodyGap * u) {
 			Text(card.title)
-				.font(StakFont.sora(16, .medium))
+				.font(StakFont.sora(16 * u, .medium))
 				.foregroundStyle(Home.cardInk)
-				.frame(width: 202.9, alignment: .leading)
+				.frame(width: 202.9 * u, alignment: .leading)
 			Text(card.bodyText)
-				.font(StakFont.geist(card.bodySize, card.bodyWeight))
+				.font(StakFont.geist(card.bodySize * u, card.bodyWeight))
 				.foregroundStyle(Home.cardInk)
-				.frame(width: 189.31, alignment: .leading)
+				.frame(width: 189.31 * u, alignment: .leading)
 		}
-		.padding(.leading, 14.43)
-		.padding(.top, 23.77)
-		.frame(width: 236.86, height: 278.45, alignment: .topLeading)
-		.background(card.bg, in: RoundedRectangle(cornerRadius: 6.79))
+		.padding(.leading, 14.43 * u)
+		.padding(.top, 23.77 * u)
+		.frame(width: 236.86 * u, height: 278.45 * u, alignment: .topLeading)
+		.background(card.bg, in: RoundedRectangle(cornerRadius: 6.79 * u))
 		.rotationEffect(.degrees(card.rotation))
-		.offset(x: card.offsetX, y: card.offsetY)
+		.offset(x: card.offsetX * u, y: card.offsetY * u)
 	}
 }
 
-/// "Why this matters to you" — 350x91 card with the glass caution ball art.
+/// "Why this matters to you" — 350x91 card (1:1037) with the glass caution
+/// ball art. Shaped background, no clip — the visible ball never reaches
+/// the card edges, only transparent padding overhangs.
 private struct WhyThisMattersCard: View {
+	let onOpenMyStak: () -> Void
+
 	var body: some View {
+		let u = figmaUnit
 		ZStack {
-			Image("HomeCautionBall")
+			// Authored (1:1043/1:1044): the 105x105 image box sits at (3, -7)
+			// with the source mapped 1:1 (no crop) — the ball itself stays
+			// inside the card; only the box's transparent padding overhangs.
+			Image("HomeCautionGlass")
 				.resizable()
-				.frame(width: 105, height: 105)
-				.offset(x: 3, y: -7)
+				.frame(width: 105 * u, height: 105 * u)
+				.offset(x: 3 * u, y: -7 * u)
 				.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-			VStack(alignment: .leading, spacing: 6) {
+			VStack(alignment: .leading, spacing: 6 * u) {
 				Text("Why this matters to you")
-					.font(StakFont.sora(14))
-					.lineSpacing(15 - 14)
+					// Authored (1:1040): Sora Regular 14 / lh15.
+					.font(StakFont.sora(14 * u))
+					.lineSpacing((15 - 14) * u)
 					.foregroundStyle(Color.white)
 				Text("Your STAK collections houses 80% of stocks from effected industries.")
-					.font(StakFont.geist(12, .light))
-					.lineSpacing(15 - 12)
+					.font(StakFont.geist(12 * u, .light))
+					.lineSpacing((15 - 12) * u)
 					.foregroundStyle(Color.white)
-					.frame(width: 198, alignment: .leading)
+					.frame(width: 198 * u, alignment: .leading)
 			}
-			.padding(.leading, 127)
+			.padding(.leading, 127 * u)
 			.frame(maxWidth: .infinity, alignment: .leading)
 		}
 		.frame(maxWidth: .infinity)
-		.frame(height: 91)
-		.background(Home.cardBg)
-		.clipShape(RoundedRectangle(cornerRadius: 8))
+		.frame(height: 91 * u)
+		.background(Home.cardBg, in: RoundedRectangle(cornerRadius: 8 * u))
+		.contentShape(Rectangle())
+		.onTapGesture(perform: onOpenMyStak)
 	}
 }
 
-/// Teal deck banner — 350x116 with the box-and-coins art and Go to Deck chip.
+/// Teal deck banner — 350x116 (118:1720) with the box-and-coins art and
+/// Go to Deck chip; the whole banner opens the deck.
 private struct DeckBanner: View {
+	let onOpenDeck: () -> Void
+
 	var body: some View {
+		let u = figmaUnit
 		ZStack {
 			// The illustration zone of the frame (box + coins + shadow), cropped
 			// from the banner render so its pose is exact; the teal it carries is
-			// the same banner fill it sits on.
+			// the same banner fill it sits on. The 1:1191 node's in-banner slice
+			// (121.5x116 at x13), baked from the 2x frame render.
 			Image("HomeBannerIllustration")
 				.resizable()
 				.scaledToFit()
-				.frame(width: 172, height: 116)
-				.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
-			VStack(alignment: .leading, spacing: 10) {
+				.frame(width: 121.5 * u, height: 116 * u)
+				.offset(x: 13 * u)
+				.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+			VStack(alignment: .leading, spacing: 10 * u) {
 				Text("Take your first deck to build your taste")
-					.font(StakFont.geist(12, .light))
-					.lineSpacing(15 - 12)
+					.font(StakFont.geist(12 * u, .light))
+					.lineSpacing((15 - 12) * u)
 					.foregroundStyle(Color.black)
 				Button {
 					// Deck screen lands in a later phase.
 				} label: {
-					HStack(spacing: 3) {
+					HStack(spacing: 3 * u) {
 						Text("Go to Deck")
-							.font(StakFont.geist(11.49, .medium))
+							.font(StakFont.geist(11.49 * u, .medium))
+							.lineSpacing((15 - 11.49) * u)
 							.foregroundStyle(Color.white)
 						Image("IcArrowRightSmall")
 							.resizable()
-							.frame(width: 16, height: 16)
+							.frame(width: 16 * u, height: 16 * u)
 					}
-					.frame(width: 123, height: 32)
-					.background(StakColors.bg, in: RoundedRectangle(cornerRadius: 15))
+					.frame(width: 123 * u, height: 32 * u)
+					.background(StakColors.bg, in: RoundedRectangle(cornerRadius: 15 * u))
 				}
 				.buttonStyle(.plain)
 			}
-			.frame(width: 156, alignment: .leading)
-			.offset(y: 0.5)
-			.padding(.leading, 184)
+			.frame(width: 156 * u, alignment: .leading)
+			.offset(y: 0.5 * u)
+			.padding(.leading, 184 * u)
 			.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
 		}
 		.frame(maxWidth: .infinity)
-		.frame(height: 116)
+		.frame(height: 116 * u)
 		.background(Home.teal)
-		.clipShape(RoundedRectangle(cornerRadius: 8))
+		.clipShape(RoundedRectangle(cornerRadius: 8 * u))
+		.contentShape(Rectangle())
+		.onTapGesture(perform: onOpenDeck)
 	}
 }
 
@@ -319,6 +363,7 @@ private struct FirstRunOverlay: View {
 	let onSeeTodaysPick: () -> Void
 
 	var body: some View {
+		let u = figmaUnit
 		ZStack(alignment: .bottom) {
 			VStack(spacing: 0) {
 				LinearGradient(
@@ -329,20 +374,122 @@ private struct FirstRunOverlay: View {
 					startPoint: .top,
 					endPoint: .bottom
 				)
-				.frame(height: 98.7)
+				.frame(height: 98.7 * u)
 				StakColors.bg
 			}
 			Button(action: onSeeTodaysPick) {
 				Text("See Todays Pick")
-					.font(StakFont.geist(12, .medium))
+					.font(StakFont.geist(12 * u, .medium))
 					.foregroundStyle(Color.white)
-					.frame(width: 136, height: 51)
+					.frame(width: 136 * u, height: 51 * u)
 					.background(Color(argb: 0x0FFFFFFF), in: Capsule())
-					.overlay(Capsule().strokeBorder(Color(argb: 0x66FFFFFF), lineWidth: 0.94))
+					.overlay(Capsule().strokeBorder(Color(argb: 0x66FFFFFF), lineWidth: 0.94 * u))
 			}
 			.buttonStyle(.plain)
-			.padding(.bottom, 70)
+			.padding(.bottom, 70 * u)
 		}
 		.frame(maxWidth: .infinity)
+	}
+}
+
+/// The Market Mood gauge, drawn live from the authored geometry (1:1158):
+/// three 60-degree segments (green 0x61A57F, neutral 0xD8CFCF, red
+/// 0xDE4E71), centerline r25.6, stroke 6.75, white tapered needle. The
+/// needle RESTS at the authored design default (33.4 — the build must
+/// always match the frame in this phase, per the 2026-08-21 ruling) and
+/// breathes gently; when the production feed is on it animates to the
+/// live worldwide reading (0..100 mapped onto 180..0 degrees).
+private struct MarketMoodGauge: View {
+	/// Needle pose in math degrees CCW from +x — rests at the authored
+	/// default; no entry sweep (the frame's pose is the rest state).
+	@State private var sweepDeg: Double = MarketMoodFeed.demoAngleDeg
+	/// Breathe offset in math degrees, -0.8...0.8 autoreversing over 2.4s.
+	@State private var wobbleDeg: Double = -0.8
+
+	var body: some View {
+		let u = figmaUnit
+		ZStack {
+			GaugeArc(startDeg: 180)
+				.stroke(Color(argb: 0xFF61A57F), style: StrokeStyle(lineWidth: 6.75 * u, lineCap: .butt))
+			GaugeArc(startDeg: 240)
+				.stroke(Color(argb: 0xFFD8CFCF), style: StrokeStyle(lineWidth: 6.75 * u, lineCap: .butt))
+			GaugeArc(startDeg: 300)
+				.stroke(Color(argb: 0xFFDE4E71), style: StrokeStyle(lineWidth: 6.75 * u, lineCap: .butt))
+			GaugeNeedle(angleDeg: sweepDeg)
+				.fill(Color.white)
+				// Math degrees run CCW; rotationEffect runs CW on screen — flip
+				// the sign. Anchor (0.5, 1) is the needle pivot (bottom-center).
+				.rotationEffect(.degrees(-wobbleDeg), anchor: UnitPoint(x: 0.5, y: 1))
+		}
+		.frame(width: 56.9 * u, height: 28.84 * u)
+		.onAppear {
+			// Idle breathe, tween 2400 EaseInOutSine reversing (cubic-bezier
+			// 0.37, 0, 0.63, 1 is the sine ease-in-out curve).
+			withAnimation(.timingCurve(0.37, 0, 0.63, 1, duration: 2.4).repeatForever(autoreverses: true)) {
+				wobbleDeg = 0.8
+			}
+			// Moves to the live worldwide reading once it arrives (user's
+			// call, 2026-08-21); no-op while MarketMoodFeed.live is false.
+			MarketMoodFeed.refresh { angle in
+				withAnimation(.easeOut(duration: 0.9)) { sweepDeg = angle }
+			}
+		}
+	}
+}
+
+/// One 60-degree gauge segment on the centerline radius 25.6, pivot at the
+/// gauge's bottom-center. Screen angles: 180 = left (green end), sweeping
+/// clockwise over the top to 360 = right (red end).
+private struct GaugeArc: Shape {
+	let startDeg: Double
+
+	func path(in rect: CGRect) -> Path {
+		let u = figmaUnit
+		var path = Path()
+		path.addArc(
+			center: CGPoint(x: rect.midX, y: rect.maxY),
+			radius: 25.6 * u,
+			startAngle: .degrees(startDeg),
+			endAngle: .degrees(startDeg + 60),
+			// In SwiftUI's y-down space `clockwise: false` sweeps with
+			// increasing screen angle — visually clockwise, like Compose's
+			// positive sweepAngle.
+			clockwise: false
+		)
+		return path
+	}
+}
+
+/// The white needle (1:1159) — round blob at the pivot tapering to a fine
+/// point. `angleDeg` is math degrees CCW from +x; pivot at bottom-center.
+private struct GaugeNeedle: Shape {
+	var angleDeg: Double
+
+	var animatableData: Double {
+		get { angleDeg }
+		set { angleDeg = newValue }
+	}
+
+	func path(in rect: CGRect) -> Path {
+		let u = figmaUnit
+		let cx = rect.midX
+		let cy = rect.maxY
+		let a = angleDeg * .pi / 180
+		let len = 19.8 * u
+		let tipX = cx + len * cos(a)
+		let tipY = cy - len * sin(a)
+		let px = sin(a)   // unit perpendicular
+		let py = cos(a)
+		let wBase = 1.6 * u
+		let wTip = 0.35 * u
+		var path = Path()
+		path.move(to: CGPoint(x: cx + px * wBase, y: cy + py * wBase))
+		path.addLine(to: CGPoint(x: tipX + px * wTip, y: tipY + py * wTip))
+		path.addLine(to: CGPoint(x: tipX - px * wTip, y: tipY - py * wTip))
+		path.addLine(to: CGPoint(x: cx - px * wBase, y: cy - py * wBase))
+		path.closeSubpath()
+		let pivotR = 2.2 * u
+		path.addEllipse(in: CGRect(x: cx - pivotR, y: cy - pivotR, width: pivotR * 2, height: pivotR * 2))
+		return path
 	}
 }

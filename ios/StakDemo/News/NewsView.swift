@@ -40,18 +40,21 @@ private let marketsRows: [NewsRowModel] = [
 /// then the scrolling stack: the compact Market Mood row, the teal
 /// TODAY'S BRIEF carousel card with pager dots, the two-tile story grid,
 /// and the For You / Markets card lists. The tab bar comes from MainTabsView.
+/// Every metric is scaled by the 390pt artboard unit (`figmaUnit`), exactly
+/// like the Android build's `u` scaling.
 struct NewsView: View {
 	let onOpenArticle: () -> Void
 
 	var body: some View {
+		let u = figmaUnit
 		VStack(spacing: 0) {
 			HStack {
-				VStack(alignment: .leading, spacing: 4) {
+				VStack(alignment: .leading, spacing: 4 * u) {
 					Text("News")
-						.font(StakFont.sora(26, .semiBold))
+						.font(StakFont.sora(26 * u, .semiBold))
 						.foregroundStyle(StakColors.textPrimary)
 					Text("Saturday, July 4")
-						.font(StakFont.geist(13))
+						.font(StakFont.geist(13 * u))
 						.foregroundStyle(News.muted)
 				}
 				Spacer()
@@ -59,53 +62,55 @@ struct NewsView: View {
 					Circle().fill(News.cardBg)
 					Image("IcNewsSearch")
 						.resizable()
-						.frame(width: 20, height: 20)
+						.frame(width: 20 * u, height: 20 * u)
 				}
-				.frame(width: 40, height: 40)
+				.frame(width: 40 * u, height: 40 * u)
 				.accessibilityLabel("Search")
 			}
-			.padding(.horizontal, 20)
-			.padding(.top, 22)
+			.padding(.horizontal, 20 * u)
+			.padding(.top, 22 * u)
 
 			ScrollView {
-				VStack(spacing: 22) {
+				VStack(spacing: 22 * u) {
 					MoodMiniRow()
 					BriefCarousel(onRead: onOpenArticle)
 					StoryGrid(onOpenArticle: onOpenArticle)
 					NewsSectionView(title: "For You", rows: forYouRows, onOpenArticle: onOpenArticle)
 					NewsSectionView(title: "Markets", rows: marketsRows, onOpenArticle: onOpenArticle)
 				}
-				.padding(.horizontal, 20)
-				.padding(.top, 22)
+				.padding(.horizontal, 20 * u)
+				.padding(.top, 22 * u)
 				// The Android column ends on a 0dp spacer, which its 22dp
 				// item spacing turns into a 22dp bottom inset.
-				.padding(.bottom, 22)
+				.padding(.bottom, 22 * u)
 			}
 		}
 		.background(StakColors.bg.ignoresSafeArea())
 	}
 }
 
-/// Compact Market Mood row — #171d2c r12 with the small low-volatility gauge.
+/// Compact Market Mood row — #171d2c r12 with the small low-volatility gauge
+/// (the baked NewsGaugeSmall asset).
 private struct MoodMiniRow: View {
 	var body: some View {
+		let u = figmaUnit
 		HStack {
-			VStack(alignment: .leading, spacing: 2) {
+			VStack(alignment: .leading, spacing: 2 * u) {
 				Text("Market Mood")
-					.font(StakFont.sora(13, .semiBold))
+					.font(StakFont.sora(13 * u, .semiBold))
 					.foregroundStyle(StakColors.textPrimary)
 				Text("Low volatility")
-					.font(StakFont.geist(11))
+					.font(StakFont.geist(11 * u))
 					.foregroundStyle(News.teal)
 			}
 			Spacer()
 			Image("NewsGaugeSmall")
 				.resizable()
-				.frame(width: 40.97, height: 20.76)
+				.frame(width: 40.97 * u, height: 20.76 * u)
 		}
-		.padding(.horizontal, 14)
-		.padding(.vertical, 12)
-		.background(News.moodBg, in: RoundedRectangle(cornerRadius: 12))
+		.padding(.horizontal, 14 * u)
+		.padding(.vertical, 12 * u)
+		.background(News.moodBg, in: RoundedRectangle(cornerRadius: 12 * u))
 	}
 }
 
@@ -114,68 +119,70 @@ private struct BriefCarousel: View {
 	let onRead: () -> Void
 
 	var body: some View {
-		VStack(spacing: 12) {
+		let u = figmaUnit
+		VStack(spacing: 12 * u) {
 			Button(action: onRead) {
-				VStack(alignment: .leading, spacing: 9) {
+				VStack(alignment: .leading, spacing: 9 * u) {
 					Text("TODAY’S BRIEF")
-						.font(StakFont.geist(10, .medium))
-						.tracking(0.6)
+						.font(StakFont.geist(10 * u, .medium))
+						.tracking(0.6 * u)
 						.foregroundStyle(News.ink)
 					Text("Dow closes at a record as chips slide")
-						.font(StakFont.sora(19, .semiBold))
-						.lineSpacing(25 - 19)
+						.font(StakFont.sora(19 * u, .semiBold))
+						.lineSpacing((25 - 19) * u)
 						.foregroundStyle(News.ink)
 					Text("Wall Street split into the long weekend. The Dow hit an all time high while a memory chip rout pulled the Nasdaq down, and a soft jobs report eased the pressure on the...")
-						.font(StakFont.geist(12))
-						.lineSpacing(17 - 12)
+						.font(StakFont.geist(12.5 * u))
+						.lineSpacing((17 - 12.5) * u)
 						.foregroundStyle(News.ink)
 					HStack {
 						Text("Bloomberg · 10h")
-							.font(StakFont.geist(11))
+							.font(StakFont.geist(11 * u))
 							.foregroundStyle(News.ink.opacity(0.6))
 						Spacer()
-						HStack(spacing: 4) {
+						HStack(spacing: 4 * u) {
 							Text("Read")
-								.font(StakFont.geist(12, .medium))
+								.font(StakFont.geist(12 * u, .medium))
 								.foregroundStyle(News.ink)
 							Text("›")
-								.font(StakFont.geist(13, .medium))
+								.font(StakFont.geist(13 * u, .medium))
 								.foregroundStyle(News.ink)
 						}
 					}
-					.padding(.top, 4)
+					.frame(height: 21 * u)
 				}
 				.frame(maxWidth: .infinity, alignment: .leading)
-				.padding(.top, 18)
-				.padding(.horizontal, 18)
-				.padding(.bottom, 16)
-				.background(News.teal, in: RoundedRectangle(cornerRadius: 18))
+				.padding(.top, 18 * u)
+				.padding(.horizontal, 18 * u)
+				.padding(.bottom, 16 * u)
+				.background(News.teal, in: RoundedRectangle(cornerRadius: 18 * u))
 			}
 			.buttonStyle(.plain)
 
 			// Pager dots — 16x6 active pill (#69b3ca) + three #5c6b85 dots,
 			// 6pt gaps: the same 52x6 strip the Android Canvas draws.
-			HStack(spacing: 6) {
-				RoundedRectangle(cornerRadius: 3)
+			HStack(spacing: 6 * u) {
+				RoundedRectangle(cornerRadius: 3 * u)
 					.fill(News.teal)
-					.frame(width: 16, height: 6)
+					.frame(width: 16 * u, height: 6 * u)
 				ForEach(0..<3, id: \.self) { _ in
 					Circle()
 						.fill(News.faint)
-						.frame(width: 6, height: 6)
+						.frame(width: 6 * u, height: 6 * u)
 				}
 			}
-			.frame(width: 52, height: 6)
+			.frame(width: 52 * u, height: 6 * u)
 		}
 	}
 }
 
-/// The two 128pt story tiles ("Markets" / "Your stocks").
+/// The two 128-unit story tiles ("Markets" / "Your stocks").
 private struct StoryGrid: View {
 	let onOpenArticle: () -> Void
 
 	var body: some View {
-		HStack(spacing: 12) {
+		let u = figmaUnit
+		HStack(spacing: 12 * u) {
 			StoryTile(
 				tag: "Markets",
 				headline: "Fed minutes land Wednesday",
@@ -189,6 +196,7 @@ private struct StoryGrid: View {
 				onTap: onOpenArticle
 			)
 		}
+		.frame(height: 128 * u)
 	}
 }
 
@@ -199,22 +207,23 @@ private struct StoryTile: View {
 	let onTap: () -> Void
 
 	var body: some View {
+		let u = figmaUnit
 		Button(action: onTap) {
-			VStack(alignment: .leading, spacing: 8) {
-				NewsTag(text: tag, tracking: 0.4)
+			VStack(alignment: .leading, spacing: 8 * u) {
+				NewsTag(text: tag, tracking: 0.4 * u)
 				Text(headline)
-					.font(StakFont.sora(12, .light))
-					.lineSpacing(20 - 12)
+					.font(StakFont.sora(14 * u, .light))
+					.lineSpacing((20 - 14) * u)
 					.foregroundStyle(StakColors.textPrimary)
 				Spacer(minLength: 0)
 				Text(source)
-					.font(StakFont.geist(10))
+					.font(StakFont.geist(10 * u))
 					.foregroundStyle(News.muted)
 			}
 			.frame(maxWidth: .infinity, alignment: .leading)
-			.padding(14)
-			.frame(height: 128)
-			.background(News.cardBg, in: RoundedRectangle(cornerRadius: 12))
+			.padding(14 * u)
+			.frame(height: 128 * u)
+			.background(News.cardBg, in: RoundedRectangle(cornerRadius: 12 * u))
 		}
 		.buttonStyle(.plain)
 	}
@@ -226,57 +235,59 @@ struct NewsTag: View {
 	var tracking: CGFloat = 0
 
 	var body: some View {
+		let u = figmaUnit
 		Text(text)
-			.font(StakFont.geist(8, .medium))
+			.font(StakFont.geist(8 * u, .medium))
 			.tracking(tracking)
 			.foregroundStyle(News.muted)
-			.padding(.horizontal, 7)
-			.padding(.vertical, 3)
-			.background(News.chipBg, in: RoundedRectangle(cornerRadius: 5))
+			.padding(.horizontal, 7 * u)
+			.padding(.vertical, 3 * u)
+			.background(News.chipBg, in: RoundedRectangle(cornerRadius: 5 * u))
 	}
 }
 
-/// "For You" / "Markets" — Sora 16 #d3d3d3 header + 60pt-thumb cards.
+/// "For You" / "Markets" — Sora 16 #d3d3d3 header + 60-unit-thumb cards
+/// (84-unit rows: 60 thumb + 12 padding each side, 10-unit gaps).
 private struct NewsSectionView: View {
 	let title: String
 	let rows: [NewsRowModel]
 	let onOpenArticle: () -> Void
 
 	var body: some View {
-		VStack(alignment: .leading, spacing: 10) {
+		let u = figmaUnit
+		VStack(alignment: .leading, spacing: 10 * u) {
 			Text(title)
-				.font(StakFont.sora(16, .semiBold))
+				.font(StakFont.sora(16 * u, .semiBold))
 				.foregroundStyle(News.headerGray)
-				.padding(.bottom, 2)
 			ForEach(rows) { row in
 				Button {
 					// Only the Apple story routes to the article page,
 					// same as the Android build.
 					if row.headline.contains("Apple") { onOpenArticle() }
 				} label: {
-					HStack(spacing: 12) {
+					HStack(spacing: 12 * u) {
 						Image(row.thumb)
 							.resizable()
 							.scaledToFill()
-							.frame(width: 60, height: 60)
-							.clipShape(RoundedRectangle(cornerRadius: 10))
-						VStack(alignment: .leading, spacing: 5) {
+							.frame(width: 60 * u, height: 60 * u)
+							.clipShape(RoundedRectangle(cornerRadius: 10 * u))
+						VStack(alignment: .leading, spacing: 5 * u) {
 							HStack {
 								Text(row.source)
-									.font(StakFont.geist(11))
+									.font(StakFont.geist(11 * u))
 									.foregroundStyle(News.muted)
 								Spacer()
 								NewsTag(text: "In your STAK")
 							}
 							Text(row.headline)
-								.font(StakFont.sora(12, .light))
-								.lineSpacing(19 - 12)
+								.font(StakFont.sora(14 * u, .light))
+								.lineSpacing((19 - 14) * u)
 								.foregroundStyle(StakColors.textPrimary)
 								.frame(maxWidth: .infinity, alignment: .leading)
 						}
 					}
-					.padding(12)
-					.background(News.cardBg, in: RoundedRectangle(cornerRadius: 14))
+					.padding(12 * u)
+					.background(News.cardBg, in: RoundedRectangle(cornerRadius: 14 * u))
 				}
 				.buttonStyle(.plain)
 			}

@@ -2,7 +2,9 @@ import SwiftUI
 
 /// 07 · Simulate — "Simulate home · paper" (CHINEDU 1:3898) with the
 /// Buy-PLTR ticket (1:4232) and Order filled (85:895). Ported from
-/// android/ ui/simulate/SimulateScreen.kt.
+/// android/ ui/simulate/SimulateScreen.kt. Every metric is scaled by
+/// the 390pt artboard unit (`figmaUnit`), exactly like the Android
+/// build's `u` scaling.
 enum Sim {
 	static let cardBg = Color(argb: 0xFF181F30)
 	static let muted = Color(argb: 0xFF819ABB)
@@ -34,15 +36,16 @@ struct SimulateView: View {
 	@State private var showBuy = false
 
 	var body: some View {
+		let u = figmaUnit
 		ZStack {
 			VStack(spacing: 0) {
 				HStack {
-					VStack(alignment: .leading, spacing: 3) {
+					VStack(alignment: .leading, spacing: 3 * u) {
 						Text("Simulate")
-							.font(StakFont.sora(26, .semiBold))
+							.font(StakFont.sora(26 * u, .semiBold))
 							.foregroundStyle(Color.white)
 						Text("Pick from your saves. Paper money does the talking.")
-							.font(StakFont.geist(12))
+							.font(StakFont.geist(12 * u))
 							.foregroundStyle(Sim.muted)
 					}
 					Spacer()
@@ -50,22 +53,23 @@ struct SimulateView: View {
 						Circle().fill(Sim.cardBg)
 						Image("IcSimClock")
 							.resizable()
-							.frame(width: 18, height: 18)
+							.frame(width: 18 * u, height: 18 * u)
 					}
-					.frame(width: 40, height: 40)
+					.frame(width: 40 * u, height: 40 * u)
 				}
-				.padding(.horizontal, 20)
-				.padding(.vertical, 8)
+				.padding(.horizontal, 20 * u)
+				.padding(.top, 8 * u)
+				.padding(.bottom, 8 * u)
 
 				ScrollView(showsIndicators: false) {
-					VStack(spacing: 18) {
+					VStack(spacing: 18 * u) {
 						ScoreHero(onOpenLeaderboard: onOpenLeaderboard)
 						sectionHeader("Saved staks")
 						SavedStakRow(badge: "P", ticker: "PLTR", sub: "Saved Jun 30 · not in portfolio yet", onBuy: { showBuy = true })
 						SavedStakRow(badge: "C", ticker: "COST", sub: "Saved Jul 2 · not in portfolio yet", onBuy: { showBuy = true })
 						CenterLink(text: "All saved staks", action: {})
 						InsightCard()
-						HStack(spacing: 10) {
+						HStack(spacing: 10 * u) {
 							PickDuo(kicker: "BEST PICK", pct: "+24.0%", pctColor: Sim.green, badge: "N", ticker: "NVDA", sub: "+$24 on $100", action: onOpenPick)
 							PickDuo(kicker: "WORST PICK", pct: "-3.0%", pctColor: Sim.red, badge: "M", ticker: "MSFT", sub: "-$3 on $100", action: onOpenPick)
 						}
@@ -77,16 +81,16 @@ struct SimulateView: View {
 						CenterLink(text: "See all 12 picks", action: onOpenPortfolio)
 						HStack {
 							Text("Portfolio breakdown")
-								.font(StakFont.sora(16, .semiBold))
+								.font(StakFont.sora(16 * u, .semiBold))
 								.foregroundStyle(Sim.headerGray)
 							Spacer()
 							Button(action: onOpenPortfolio) {
-								HStack(spacing: 5) {
+								HStack(spacing: 5 * u) {
 									Text("Portfolio")
-										.font(StakFont.geist(14))
+										.font(StakFont.geist(14 * u))
 										.foregroundStyle(Color.white)
 									Text("›")
-										.font(StakFont.geist(14))
+										.font(StakFont.geist(14 * u))
 										.foregroundStyle(Sim.muted)
 								}
 							}
@@ -95,9 +99,9 @@ struct SimulateView: View {
 						SimAllocationCard()
 						BoardCard(onOpenLeaderboard: onOpenLeaderboard)
 					}
-					.padding(.horizontal, 20)
-					.padding(.top, 18)
-					.padding(.bottom, 26)
+					.padding(.horizontal, 20 * u)
+					.padding(.top, 18 * u)
+					.padding(.bottom, 26 * u)
 				}
 			}
 			if showBuy {
@@ -109,7 +113,7 @@ struct SimulateView: View {
 
 	private func sectionHeader(_ title: String) -> some View {
 		Text(title)
-			.font(StakFont.sora(16, .semiBold))
+			.font(StakFont.sora(16 * figmaUnit, .semiBold))
 			.foregroundStyle(Sim.headerGray)
 			.frame(maxWidth: .infinity, alignment: .leading)
 	}
@@ -120,82 +124,91 @@ private struct ScoreHero: View {
 	let onOpenLeaderboard: () -> Void
 
 	var body: some View {
-		VStack(alignment: .leading, spacing: 11) {
+		let u = figmaUnit
+		VStack(alignment: .leading, spacing: 11 * u) {
 			Group {
 				Text("PORTFOLIO VALUE")
-					.font(StakFont.geist(10, .medium))
-					.tracking(0.9)
+					.font(StakFont.geist(10 * u, .medium))
+					.tracking(0.9 * u)
 					.foregroundStyle(Sim.faint)
 				HStack(alignment: .bottom, spacing: 0) {
 					Text("$10,240")
-						.font(StakFont.sora(44, .semiBold))
-						.tracking(-0.44)
+						.font(StakFont.sora(44 * u, .semiBold))
+						.tracking(-0.44 * u)
+						// Authored box (1:3924) is 55 tall — pin it so the stack sums.
+						.frame(height: 55 * u)
 						.foregroundStyle(Color.white)
 					Text(".00")
-						.font(StakFont.sora(18, .semiBold))
+						.font(StakFont.sora(18 * u, .semiBold))
 						.foregroundStyle(Sim.muted)
-						.padding(.bottom, 6)
+						// Authored (1:3923): ".00" starts 8 after the figure and its
+						// box bottom sits 8 above the figure's (55 vs y24+h23).
+						.padding(.leading, 8 * u)
+						.padding(.bottom, 8 * u)
 				}
 				Text("+$240.00 all time on $10,000 paper · 12 picks")
-					.font(StakFont.geist(12, .light))
+					.font(StakFont.geist(12 * u, .light))
 					.foregroundStyle(Sim.muted)
-				HStack(spacing: 6) {
+				HStack(spacing: 6 * u) {
 					Text("Cash available")
-						.font(StakFont.geist(12))
+						.font(StakFont.geist(12 * u))
 						.foregroundStyle(Sim.muted)
 					Text("$8,800.00")
-						.font(StakFont.geist(12, .medium))
+						.font(StakFont.geist(12 * u, .medium))
 						.foregroundStyle(Sim.bright)
 				}
 				Text("▲ +$186 (+1.9%) this week")
-					.font(StakFont.geist(12, .medium))
+					.font(StakFont.geist(12 * u, .medium))
 					.foregroundStyle(Sim.green)
+				// The "#47 this week" chip sits on its own row of the column.
 				Button(action: onOpenLeaderboard) {
 					Text("#47 this week")
-						.font(StakFont.geist(12, .medium))
+						.font(StakFont.geist(12 * u, .medium))
 						.foregroundStyle(Sim.teal)
-						.padding(.horizontal, 11)
-						.padding(.vertical, 6)
-						.background(Sim.tealTint, in: RoundedRectangle(cornerRadius: 13))
+						.padding(.horizontal, 11 * u)
+						.padding(.vertical, 6 * u)
+						.background(Sim.tealTint, in: RoundedRectangle(cornerRadius: 13 * u))
 				}
 				.buttonStyle(.plain)
 			}
-			.padding(.horizontal, 20)
+			.padding(.horizontal, 20 * u)
 
+			// Authored: ranks→chart gap is exactly the column's 11 (1:3935);
+			// the chart bleeds outside the 20u text padding.
 			Image("SimChartLine")
 				.resizable()
 				.scaledToFit()
-				.frame(width: 343, height: 73.56)
+				.frame(width: 343 * u, height: 73.56 * u)
 				.frame(maxWidth: .infinity)
-				.padding(.top, 8)
-			HStack(spacing: 37) {
+			HStack(spacing: 37 * u) {
 				ForEach(["1D", "1W", "1M", "3M", "YTD", "1Y"], id: \.self) { label in
 					if label == "3M" {
 						Text(label)
-							.font(StakFont.geist(12, .medium))
+							.font(StakFont.geist(12 * u, .medium))
 							.foregroundStyle(Sim.teal)
-							.frame(width: 39, height: 22.5)
-							.background(Color(argb: 0x292C9DBC), in: RoundedRectangle(cornerRadius: 11.25))
+							.frame(width: 39 * u, height: 22.5 * u)
+							.background(Color(argb: 0x292C9DBC), in: RoundedRectangle(cornerRadius: 11.25 * u))
 							.overlay(
-								RoundedRectangle(cornerRadius: 11.25)
-									.strokeBorder(Color(argb: 0x662C9DBC), lineWidth: 0.75)
+								RoundedRectangle(cornerRadius: 11.25 * u)
+									.strokeBorder(Color(argb: 0x662C9DBC), lineWidth: 0.75 * u)
 							)
 					} else {
 						Text(label)
-							.font(StakFont.geist(12))
+							.font(StakFont.geist(12 * u))
 							.foregroundStyle(Sim.muted)
 					}
 				}
 			}
 			.frame(maxWidth: .infinity)
-			.padding(.top, 40)
+			// Authored chart→pills gap 40; the column gap contributes 11.
+			.padding(.top, 29 * u)
 		}
-		.padding(.vertical, 20)
-		.background(Sim.cardBg, in: RoundedRectangle(cornerRadius: 18))
+		.padding(.vertical, 20 * u)
+		.background(Sim.cardBg, in: RoundedRectangle(cornerRadius: 18 * u))
 	}
 }
 
-/// Saved stak row — badge, ticker + saved line, gradient Buy pill.
+/// Saved stak row — badge, ticker + saved line, teal Buy pill (60x30).
 private struct SavedStakRow: View {
 	let badge: String
 	let ticker: String
@@ -203,44 +216,46 @@ private struct SavedStakRow: View {
 	let onBuy: () -> Void
 
 	var body: some View {
-		HStack(spacing: 12) {
+		let u = figmaUnit
+		HStack(spacing: 12 * u) {
 			ZStack {
 				Circle().fill(Sim.chipBg)
 				Text(badge)
-					.font(StakFont.sora(15, .semiBold))
+					.font(StakFont.sora(15 * u, .semiBold))
 					.foregroundStyle(Sim.badgeInk)
 			}
-			.frame(width: 38, height: 38)
-			VStack(alignment: .leading, spacing: 3) {
+			.frame(width: 38 * u, height: 38 * u)
+			VStack(alignment: .leading, spacing: 3 * u) {
 				Text(ticker)
-					.font(StakFont.sora(12, .medium))
+					.font(StakFont.sora(12 * u, .medium))
 					.foregroundStyle(Color.white)
 				Text(sub)
-					.font(StakFont.geist(10))
+					.font(StakFont.geist(10 * u))
 					.foregroundStyle(Sim.muted)
 			}
 			.frame(maxWidth: .infinity, alignment: .leading)
 			BuyPill(text: "Buy", action: onBuy)
 		}
-		.padding(.horizontal, 14)
-		.padding(.vertical, 11)
-		.background(Sim.cardBg, in: RoundedRectangle(cornerRadius: 12))
+		.padding(.horizontal, 14 * u)
+		.padding(.vertical, 11 * u)
+		.background(Sim.cardBg, in: RoundedRectangle(cornerRadius: 12 * u))
 	}
 }
 
-/// 60x30 gradient Buy/Sell pill with the CTA hairline.
+/// 60x30 gradient Buy pill with the CTA hairline.
 struct BuyPill: View {
 	let text: String
 	let action: () -> Void
 
 	var body: some View {
+		let u = figmaUnit
 		Button(action: action) {
 			Text(text)
-				.font(StakFont.sora(12))
+				.font(StakFont.sora(12 * u))
 				.foregroundStyle(Color.white)
-				.frame(width: 60, height: 30)
-				.background(discCtaGradient, in: RoundedRectangle(cornerRadius: 6))
-				.overlay(RoundedRectangle(cornerRadius: 6).strokeBorder(Sim.ctaBorder, lineWidth: 0.36))
+				.frame(width: 60 * u, height: 30 * u)
+				.background(discCtaGradient, in: RoundedRectangle(cornerRadius: 6 * u))
+				.overlay(RoundedRectangle(cornerRadius: 6 * u).strokeBorder(Sim.ctaBorder, lineWidth: 0.36 * u))
 		}
 		.buttonStyle(.plain)
 	}
@@ -251,13 +266,14 @@ struct CenterLink: View {
 	let action: () -> Void
 
 	var body: some View {
+		let u = figmaUnit
 		Button(action: action) {
-			HStack(spacing: 6) {
+			HStack(spacing: 6 * u) {
 				Text(text)
-					.font(StakFont.geist(13))
+					.font(StakFont.geist(13 * u))
 					.foregroundStyle(Color.white)
 				Text("›")
-					.font(StakFont.geist(14))
+					.font(StakFont.geist(14 * u))
 					.foregroundStyle(Sim.muted)
 			}
 			.frame(maxWidth: .infinity)
@@ -268,25 +284,26 @@ struct CenterLink: View {
 
 private struct InsightCard: View {
 	var body: some View {
-		VStack(alignment: .leading, spacing: 8) {
-			HStack(spacing: 7) {
+		let u = figmaUnit
+		VStack(alignment: .leading, spacing: 8 * u) {
+			HStack(spacing: 7 * u) {
 				Image("IcGistSparkle")
 					.resizable()
-					.frame(width: 16, height: 16)
+					.frame(width: 16 * u, height: 16 * u)
 				Text("INSIGHT")
-					.font(StakFont.geist(10, .medium))
-					.tracking(0.9)
+					.font(StakFont.geist(10 * u, .medium))
+					.tracking(0.9 * u)
 					.foregroundStyle(Sim.faint)
 			}
 			Text("Three chip stocks drove 70% of your gains this month. Your taste has a type.")
-				.font(StakFont.geist(12))
-				.lineSpacing(20 - 12)
+				.font(StakFont.geist(12 * u))
+				.lineSpacing((20 - 12) * u)
 				.foregroundStyle(Sim.body)
 		}
-		.padding(.horizontal, 16)
-		.padding(.vertical, 15)
+		.padding(.horizontal, 16 * u)
+		.padding(.vertical, 15 * u)
 		.frame(maxWidth: .infinity, alignment: .leading)
-		.background(Sim.cardBg, in: RoundedRectangle(cornerRadius: 16))
+		.background(Sim.cardBg, in: RoundedRectangle(cornerRadius: 16 * u))
 	}
 }
 
@@ -300,39 +317,40 @@ private struct PickDuo: View {
 	let action: () -> Void
 
 	var body: some View {
+		let u = figmaUnit
 		Button(action: action) {
-			VStack(alignment: .leading, spacing: 7) {
+			VStack(alignment: .leading, spacing: 7 * u) {
 				HStack {
 					Text(kicker)
-						.font(StakFont.geist(10, .medium))
-						.tracking(0.9)
+						.font(StakFont.geist(10 * u, .medium))
+						.tracking(0.9 * u)
 						.foregroundStyle(Sim.faint)
 					Spacer()
 					Text(pct)
-						.font(StakFont.geist(12))
+						.font(StakFont.geist(12 * u))
 						.foregroundStyle(pctColor)
 				}
-				HStack(spacing: 9) {
+				HStack(spacing: 9 * u) {
 					ZStack {
 						Circle().fill(Sim.chipBg)
 						Text(badge)
-							.font(StakFont.sora(14, .semiBold))
+							.font(StakFont.sora(14 * u, .semiBold))
 							.foregroundStyle(Sim.badgeInk)
 					}
-					.frame(width: 34, height: 34)
-					VStack(alignment: .leading, spacing: 2) {
+					.frame(width: 34 * u, height: 34 * u)
+					VStack(alignment: .leading, spacing: 2 * u) {
 						Text(ticker)
-							.font(StakFont.sora(12, .medium))
+							.font(StakFont.sora(12 * u, .medium))
 							.foregroundStyle(Color.white)
 						Text(sub)
-							.font(StakFont.geist(11))
+							.font(StakFont.geist(11 * u))
 							.foregroundStyle(Sim.faint)
 					}
 				}
 			}
-			.padding(14)
+			.padding(14 * u)
 			.frame(maxWidth: .infinity, alignment: .leading)
-			.background(Sim.cardBg, in: RoundedRectangle(cornerRadius: 16))
+			.background(Sim.cardBg, in: RoundedRectangle(cornerRadius: 16 * u))
 		}
 		.buttonStyle(.plain)
 	}
@@ -346,36 +364,37 @@ private struct HowItWorksCard: View {
 	]
 
 	var body: some View {
-		VStack(alignment: .leading, spacing: 10) {
+		let u = figmaUnit
+		VStack(alignment: .leading, spacing: 10 * u) {
 			Text("HOW PAPER TRADING WORKS")
-				.font(StakFont.geist(10, .medium))
-				.tracking(0.9)
+				.font(StakFont.geist(10 * u, .medium))
+				.tracking(0.9 * u)
 				.foregroundStyle(Sim.faint)
 			ForEach(rules, id: \.0) { n, rule in
-				HStack(spacing: 10) {
+				HStack(spacing: 10 * u) {
 					ZStack {
-						RoundedRectangle(cornerRadius: 10).fill(Sim.tealTint)
+						RoundedRectangle(cornerRadius: 10 * u).fill(Sim.tealTint)
 						Text(n)
-							.font(StakFont.sora(11, .semiBold))
+							.font(StakFont.sora(11 * u, .semiBold))
 							.foregroundStyle(Sim.teal)
 					}
-					.frame(width: 20, height: 20)
+					.frame(width: 20 * u, height: 20 * u)
 					Text(rule)
-						.font(StakFont.geist(12))
-						.lineSpacing(18 - 12)
+						.font(StakFont.geist(12 * u))
+						.lineSpacing((18 - 12) * u)
 						.foregroundStyle(Sim.body)
 				}
 			}
 		}
-		.padding(.horizontal, 16)
-		.padding(.vertical, 15)
+		.padding(.horizontal, 16 * u)
+		.padding(.vertical, 15 * u)
 		.frame(maxWidth: .infinity, alignment: .leading)
-		.background(Sim.cardBg, in: RoundedRectangle(cornerRadius: 16))
+		.background(Sim.cardBg, in: RoundedRectangle(cornerRadius: 16 * u))
 	}
 }
 
 /// One portfolio pick row (badge 40, ticker + picked line, P&L right).
-struct PortfolioRow: View {
+struct PortfolioRow<Trailing: View>: View {
 	let badge: String
 	let ticker: String
 	let sub: String
@@ -383,58 +402,88 @@ struct PortfolioRow: View {
 	let pct: String
 	let up: Bool
 	var action: () -> Void = {}
-	var trailing: (() -> BuyPill)? = nil
+	var trailing: Trailing
+
+	init(
+		badge: String, ticker: String, sub: String,
+		amount: String, pct: String, up: Bool,
+		action: @escaping () -> Void = {},
+		@ViewBuilder trailing: () -> Trailing
+	) {
+		self.badge = badge
+		self.ticker = ticker
+		self.sub = sub
+		self.amount = amount
+		self.pct = pct
+		self.up = up
+		self.action = action
+		self.trailing = trailing()
+	}
 
 	var body: some View {
+		let u = figmaUnit
 		Button(action: action) {
-			HStack(spacing: 12) {
+			HStack(spacing: 12 * u) {
 				ZStack {
 					Circle().fill(Sim.chipBg)
 					Text(badge)
-						.font(StakFont.sora(16, .semiBold))
+						.font(StakFont.sora(16 * u, .semiBold))
 						.foregroundStyle(Sim.badgeInk)
 				}
-				.frame(width: 40, height: 40)
-				VStack(alignment: .leading, spacing: 3) {
+				.frame(width: 40 * u, height: 40 * u)
+				VStack(alignment: .leading, spacing: 3 * u) {
 					Text(ticker)
-						.font(StakFont.sora(12, .medium))
+						.font(StakFont.sora(12 * u, .medium))
 						.foregroundStyle(Color.white)
 					Text(sub)
-						.font(StakFont.geist(10))
+						.font(StakFont.geist(10 * u))
 						.foregroundStyle(Sim.muted)
 				}
 				.frame(maxWidth: .infinity, alignment: .leading)
-				VStack(alignment: .trailing, spacing: 2) {
+				VStack(alignment: .trailing, spacing: 2 * u) {
 					Text(amount)
-						.font(StakFont.geist(12, .medium))
+						.font(StakFont.geist(12 * u, .medium))
 						.foregroundStyle(up ? Sim.green : Sim.red)
 					Text(pct)
-						.font(StakFont.geist(10))
+						.font(StakFont.geist(10 * u))
 						.foregroundStyle(Sim.faint)
 				}
-				if let trailing {
-					trailing()
-				}
+				trailing
 			}
-			.padding(.horizontal, 14)
-			.padding(.vertical, 12)
-			.background(Sim.cardBg, in: RoundedRectangle(cornerRadius: 12))
+			.padding(.horizontal, 14 * u)
+			.padding(.vertical, 12 * u)
+			.background(Sim.cardBg, in: RoundedRectangle(cornerRadius: 12 * u))
 		}
 		.buttonStyle(.plain)
+	}
+}
+
+extension PortfolioRow where Trailing == EmptyView {
+	init(
+		badge: String, ticker: String, sub: String,
+		amount: String, pct: String, up: Bool,
+		action: @escaping () -> Void = {}
+	) {
+		self.init(
+			badge: badge, ticker: ticker, sub: sub,
+			amount: amount, pct: pct, up: up,
+			action: action, trailing: { EmptyView() }
+		)
 	}
 }
 
 /// Allocation — Simulate's donut + the 42/25/17/8/8 sector bars.
 private struct SimAllocationCard: View {
 	var body: some View {
-		VStack(spacing: 16) {
+		let u = figmaUnit
+		VStack(spacing: 16 * u) {
 			Text("Allocation")
-				.font(StakFont.sora(15, .semiBold))
+				.font(StakFont.sora(15 * u, .semiBold))
 				.foregroundStyle(Color.white)
 			Image("SimDonut")
 				.resizable()
-				.frame(width: 150, height: 150)
-			VStack(spacing: 12) {
+				.frame(width: 150 * u, height: 150 * u)
+			VStack(spacing: 12 * u) {
 				SimSector(name: "Tech & AI", share: "42% · 5 stocks", color: Sim.teal, fill: 132)
 				SimSector(name: "Finance", share: "25% · 3 stocks", color: Color(argb: 0xFF7AB3F0), fill: 66)
 				SimSector(name: "Green Energy", share: "17% · 2 stocks", color: Sim.green, fill: 63)
@@ -442,9 +491,9 @@ private struct SimAllocationCard: View {
 				SimSector(name: "Other", share: "8% · 1 stock", color: Sim.faint, fill: 16)
 			}
 		}
-		.padding(18)
+		.padding(18 * u)
 		.frame(maxWidth: .infinity)
-		.background(Sim.cardBg, in: RoundedRectangle(cornerRadius: 16))
+		.background(Sim.cardBg, in: RoundedRectangle(cornerRadius: 16 * u))
 	}
 }
 
@@ -455,21 +504,22 @@ private struct SimSector: View {
 	let fill: CGFloat
 
 	var body: some View {
-		VStack(spacing: 6) {
+		let u = figmaUnit
+		VStack(spacing: 6 * u) {
 			HStack {
-				Circle().fill(color).frame(width: 9, height: 9)
-				Spacer().frame(width: 8)
+				Circle().fill(color).frame(width: 9 * u, height: 9 * u)
+				Spacer().frame(width: 8 * u)
 				Text(name)
-					.font(StakFont.geist(13))
+					.font(StakFont.geist(13 * u))
 					.foregroundStyle(Color.white)
 				Spacer()
 				Text(share)
-					.font(StakFont.geist(12))
+					.font(StakFont.geist(12 * u))
 					.foregroundStyle(Sim.muted)
 			}
 			ZStack(alignment: .leading) {
-				RoundedRectangle(cornerRadius: 4).fill(Sim.track).frame(height: 7)
-				RoundedRectangle(cornerRadius: 4).fill(color).frame(width: fill, height: 7)
+				RoundedRectangle(cornerRadius: 4 * u).fill(Sim.track).frame(height: 7 * u)
+				RoundedRectangle(cornerRadius: 4 * u).fill(color).frame(width: fill * u, height: 7 * u)
 			}
 		}
 	}
@@ -480,15 +530,16 @@ private struct BoardCard: View {
 	let onOpenLeaderboard: () -> Void
 
 	var body: some View {
-		VStack(alignment: .leading, spacing: 10) {
+		let u = figmaUnit
+		VStack(alignment: .leading, spacing: 10 * u) {
 			HStack {
 				Text("THIS WEEK’S BOARD")
-					.font(StakFont.geist(10, .medium))
-					.tracking(0.9)
+					.font(StakFont.geist(10 * u, .medium))
+					.tracking(0.9 * u)
 					.foregroundStyle(Sim.faint)
 				Spacer()
 				Text("Trailing 7 days")
-					.font(StakFont.geist(10))
+					.font(StakFont.geist(10 * u))
 					.foregroundStyle(Sim.faint)
 			}
 			boardRow(rank: "1", name: "Maya A.", pct: "+9.4%", you: false)
@@ -496,26 +547,27 @@ private struct BoardCard: View {
 			boardRow(rank: "47", name: "You", pct: "+4.2%", you: true)
 			CenterLink(text: "Full leaderboard", action: onOpenLeaderboard)
 		}
-		.padding(16)
+		.padding(16 * u)
 		.frame(maxWidth: .infinity, alignment: .leading)
-		.background(Sim.cardBg, in: RoundedRectangle(cornerRadius: 16))
+		.background(Sim.cardBg, in: RoundedRectangle(cornerRadius: 16 * u))
 	}
 
 	private func boardRow(rank: String, name: String, pct: String, you: Bool) -> some View {
-		HStack(spacing: 10) {
+		let u = figmaUnit
+		return HStack(spacing: 10 * u) {
 			Text(rank)
-				.font(StakFont.sora(12, .semiBold))
+				.font(StakFont.sora(12 * u, .semiBold))
 				.foregroundStyle(you ? Sim.teal : Sim.faint)
 			Text(name)
-				.font(StakFont.geist(13, you ? .semiBold : .medium))
+				.font(StakFont.geist(13 * u, you ? .semiBold : .medium))
 				.foregroundStyle(Color.white)
 				.frame(maxWidth: .infinity, alignment: .leading)
 			Text(pct)
-				.font(StakFont.sora(you ? 13 : 12, .semiBold))
+				.font(StakFont.sora((you ? 13 : 12) * u, .semiBold))
 				.foregroundStyle(you ? Sim.teal : Sim.headerGray)
 		}
-		.padding(.horizontal, 10)
-		.padding(.vertical, 7)
-		.background(you ? Sim.tealTint : Color.clear, in: RoundedRectangle(cornerRadius: 10))
+		.padding(.horizontal, 10 * u)
+		.padding(.vertical, 7 * u)
+		.background(you ? Sim.tealTint : Color.clear, in: RoundedRectangle(cornerRadius: 10 * u))
 	}
 }

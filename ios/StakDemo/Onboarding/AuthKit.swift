@@ -3,26 +3,31 @@ import SwiftUI
 // Shared pieces of the Figma "Auth ·" screens (CHINEDU file: Sign up 1:830,
 // Sign in 1:879) — watermark, nav circle, social pills, inputs, the
 // sharp-cornered gradient CTA and the switch link row. Mirrors the Android
-// AuthKit.kt so both apps speak the same dialect. 1 Figma px = 1 pt.
+// AuthKit.kt so both apps speak the same dialect; every authored metric is
+// multiplied by `figmaUnit` (1 design px = figmaUnit pt).
 
 /// Figma-artboard scale: 1 design px = `figmaUnit` pt. The CHINEDU
 /// frames are fixed 390pt artboards; fixed compositions (hero renders,
 /// the swipe deck) multiply by this so their proportions hold on wider
-/// devices instead of shrinking relative to the screen. Text/paddings
-/// stay plain pt.
+/// devices instead of shrinking relative to the screen.
 var figmaUnit: CGFloat {
 	UIScreen.main.bounds.width / 390
 }
 
-/// 10%-alpha glass ball rotated 174.3°, centered 10pt left / 159.8pt below screen center.
+/// 10%-alpha glass ball behind the lower half of the auth screens.
 struct AuthWatermark: View {
 	var body: some View {
-		Image("SplashGlassBall")
+		let u = figmaUnit
+		// The authored node render (1:831): the tilt AND the 10% opacity are
+		// baked into the asset. Fitted pose: 364u square, center 185.6/582.2,
+		// no rotation. Top-anchored so taller devices don't sink it.
+		Image("AuthWatermark")
 			.resizable()
-			.frame(width: 332.65, height: 332.65)
-			.rotationEffect(.degrees(174.3))
-			.opacity(0.1)
-			.offset(x: -10, y: 159.78)
+			.frame(width: 364 * u, height: 364 * u)
+			.offset(x: -9.37 * u, y: 400.16 * u)
+			.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+			.ignoresSafeArea()
+			.allowsHitTesting(false)
 	}
 }
 
@@ -31,14 +36,15 @@ struct AuthBackCircle: View {
 	let action: () -> Void
 
 	var body: some View {
+		let u = figmaUnit
 		Button(action: action) {
 			ZStack {
 				Circle().fill(Auth.navCircle)
 				Image("BackChevron")
 					.resizable()
-					.frame(width: 22, height: 22)
+					.frame(width: 22 * u, height: 22 * u)
 			}
-			.frame(width: 40, height: 40)
+			.frame(width: 40 * u, height: 40 * u)
 		}
 		.buttonStyle(.plain)
 		.accessibilityLabel("Back")
@@ -79,18 +85,19 @@ struct SocialPill: View {
 	let action: () -> Void
 
 	var body: some View {
+		let u = figmaUnit
 		Button(action: action) {
-			HStack(spacing: 10) {
+			HStack(spacing: 10 * u) {
 				Image(icon)
 					.resizable()
-					.frame(width: 18, height: 18)
+					.frame(width: 18 * u, height: 18 * u)
 				Text(text)
-					.font(StakFont.geist(14, .medium))
+					.font(StakFont.geist(14 * u, .medium))
 					.foregroundStyle(Auth.darkOnWhite)
 			}
 			.frame(maxWidth: .infinity)
-			.padding(.vertical, 13)
-			.background(Color.white, in: RoundedRectangle(cornerRadius: 24))
+			.padding(.vertical, 13 * u)
+			.background(Color.white, in: RoundedRectangle(cornerRadius: 24 * u))
 		}
 		.buttonStyle(.plain)
 	}
@@ -99,12 +106,13 @@ struct SocialPill: View {
 /// The 1px #2a3346 "or" divider row.
 struct AuthOrDivider: View {
 	var body: some View {
-		HStack(spacing: 10) {
-			Rectangle().fill(Auth.dividerLine).frame(height: 1)
+		let u = figmaUnit
+		HStack(spacing: 10 * u) {
+			Rectangle().fill(Auth.dividerLine).frame(height: 1 * u)
 			Text("or")
-				.font(StakFont.geist(11))
+				.font(StakFont.geist(11 * u))
 				.foregroundStyle(Auth.faintText)
-			Rectangle().fill(Auth.dividerLine).frame(height: 1)
+			Rectangle().fill(Auth.dividerLine).frame(height: 1 * u)
 		}
 	}
 }
@@ -132,6 +140,7 @@ struct AuthInput<Trailing: View>: View {
 	}
 
 	var body: some View {
+		let u = figmaUnit
 		HStack {
 			Group {
 				if hidden {
@@ -140,7 +149,7 @@ struct AuthInput<Trailing: View>: View {
 					TextField("", text: $text, prompt: prompt)
 				}
 			}
-			.font(StakFont.geist(13))
+			.font(StakFont.geist(13 * u))
 			.foregroundStyle(StakColors.textPrimary)
 			.tint(StakColors.accent)
 			.keyboardType(keyboard)
@@ -148,12 +157,12 @@ struct AuthInput<Trailing: View>: View {
 			.autocorrectionDisabled()
 			trailing
 		}
-		.padding(16)
-		.background(Auth.inputBg, in: RoundedRectangle(cornerRadius: 14))
+		.padding(16 * u)
+		.background(Auth.inputBg, in: RoundedRectangle(cornerRadius: 14 * u))
 	}
 
 	private var prompt: Text {
-		Text(placeholder).font(StakFont.geist(13)).foregroundStyle(StakColors.muted)
+		Text(placeholder).font(StakFont.geist(13 * figmaUnit)).foregroundStyle(StakColors.muted)
 	}
 }
 
@@ -175,7 +184,7 @@ struct ShowHideToggle: View {
 	var body: some View {
 		Button { shown.toggle() } label: {
 			Text(shown ? "Hide" : "Show")
-				.font(StakFont.geist(11, .medium))
+				.font(StakFont.geist(11 * figmaUnit, .medium))
 				.foregroundStyle(Auth.linkTeal)
 		}
 		.buttonStyle(.plain)
@@ -188,12 +197,13 @@ struct AuthCta: View {
 	let action: () -> Void
 
 	var body: some View {
+		let u = figmaUnit
 		Button(action: action) {
 			Text(text)
-				.font(StakFont.geist(14, .medium))
+				.font(StakFont.geist(14 * u, .medium))
 				.foregroundStyle(StakColors.textPrimary)
 				.frame(maxWidth: .infinity)
-				.frame(height: 52)
+				.frame(height: 52 * u)
 				.background(
 					LinearGradient(
 						stops: [
@@ -205,15 +215,30 @@ struct AuthCta: View {
 						startPoint: .top,
 						endPoint: .bottom
 					),
-					in: RoundedRectangle(cornerRadius: 6)
+					in: RoundedRectangle(cornerRadius: 6 * u)
 				)
 				.overlay(
-					RoundedRectangle(cornerRadius: 6)
-						.strokeBorder(StakColors.ctaBorder, lineWidth: 0.36)
+					RoundedRectangle(cornerRadius: 6 * u)
+						.strokeBorder(StakColors.ctaBorder, lineWidth: 0.36 * u)
 				)
 		}
 		.buttonStyle(.plain)
-		.padding(.horizontal, 20)
+		// Authored glow (1:873): teal drop shadows cast downward — the
+		// soft wash behind the rows under the button.
+		.background(
+			ZStack {
+				RoundedRectangle(cornerRadius: 6 * u)
+					.fill(Color(argb: 0xFF52AAC7).opacity(0.03))
+					.blur(radius: 8.31 * u)
+					.offset(y: 28.18 * u)
+				RoundedRectangle(cornerRadius: 6 * u)
+					.fill(Color(argb: 0xFF52AAC7).opacity(0.01))
+					.blur(radius: 9.76 * u)
+					.offset(y: 49.86 * u)
+			}
+			.allowsHitTesting(false)
+		)
+		.padding(.horizontal, 20 * u)
 	}
 }
 
@@ -223,20 +248,21 @@ struct AuthSecondaryButton: View {
 	let action: () -> Void
 
 	var body: some View {
+		let u = figmaUnit
 		Button(action: action) {
 			Text(text)
-				.font(StakFont.sora(14))
+				.font(StakFont.sora(14 * u))
 				.foregroundStyle(StakColors.muted)
 				.frame(maxWidth: .infinity)
-				.frame(height: 52)
+				.frame(height: 52 * u)
 				.overlay(
-					RoundedRectangle(cornerRadius: 6)
-						.strokeBorder(Color(argb: 0x54343B4F), lineWidth: 0.36)
+					RoundedRectangle(cornerRadius: 6 * u)
+						.strokeBorder(Color(argb: 0x54343B4F), lineWidth: 0.36 * u)
 				)
 				.contentShape(Rectangle())
 		}
 		.buttonStyle(.plain)
-		.padding(.horizontal, 20)
+		.padding(.horizontal, 20 * u)
 	}
 }
 
@@ -247,13 +273,14 @@ struct AuthSwitchRow: View {
 	let action: () -> Void
 
 	var body: some View {
-		HStack(spacing: 5) {
+		let u = figmaUnit
+		HStack(spacing: 5 * u) {
 			Text(prefix)
-				.font(StakFont.geist(12))
+				.font(StakFont.geist(12 * u))
 				.foregroundStyle(StakColors.muted)
 			Button(action: action) {
 				Text(link)
-					.font(StakFont.geist(12, .medium))
+					.font(StakFont.geist(12 * u, .medium))
 					.foregroundStyle(Auth.linkTeal)
 			}
 			.buttonStyle(.plain)

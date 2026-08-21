@@ -3,20 +3,21 @@ import SwiftUI
 /// One 2x2 matrix option — icon in a #242b3d circle, Geist title/subtitle.
 /// Icon glyphs keep their native Figma frame size (21.06 for the goal set,
 /// up to the full 37.9 circle for the risk plus/eye).
-struct MatrixOption: Identifiable {
+struct MatrixOption {
 	let title: String
 	let subtitle: String
 	let icon: String
 	var iconSize: CGFloat = 21.06
 	var circleSize: CGFloat = 37.9
-	var id: String { title }
+	/// Authored icon-frame y within the card content (row 2 icons sit lower).
+	var iconDy: CGFloat = 0
 }
 
 /// Shared single-select 2x2 matrix quiz screen — the layout of Figma
-/// "Onboarding · 04 Goal · matrix" (1:498) and "05 Risk matrix" (1:569):
-/// step label, Sora 24/31 headline, Geist 12 subtitle, #181f30 cards
-/// (163.2x155.8, r16.85) with the hairline #69b3ca selected border, and
-/// Continue/Back CTAs (Continue gates on a pick).
+/// "Onboarding · 04 Goal · matrix" (1554:8828) and "05 Risk matrix"
+/// (1554:8913): step label, Sora 24/31 headline, Geist 12 subtitle,
+/// #181f30 cards (163.2x155.8, r16.85) with the hairline #69b3ca
+/// selected border, and Continue/Back CTAs (Continue gates on a pick).
 struct MatrixQuizView: View {
 	let stepLabel: String
 	let headline: String
@@ -25,57 +26,63 @@ struct MatrixQuizView: View {
 	let onBack: () -> Void
 	let onContinue: () -> Void
 
-	@State private var selected: String?
+	@State private var selected = -1
 
 	var body: some View {
+		let u = figmaUnit
 		VStack(spacing: 0) {
 			HStack {
 				AuthBackCircle(action: onBack)
 				Spacer()
-				StepLabel(text: stepLabel)
+				Text(stepLabel)
+					.font(StakFont.geist(10 * u, .medium))
+					.tracking(0.9 * u)
+					.foregroundStyle(Auth.faintText)
 			}
-			.padding(.horizontal, 20)
-			.padding(.top, 10)
-			.padding(.bottom, 4)
+			.padding(.horizontal, 20 * u)
+			.padding(.top, 10 * u)
+			.padding(.bottom, 4 * u)
 
 			ScrollView {
-				VStack(alignment: .leading, spacing: 16) {
-					VStack(alignment: .leading, spacing: 12) {
+				VStack(alignment: .leading, spacing: 16 * u) {
+					VStack(alignment: .leading, spacing: 12 * u) {
 						Text(headline)
-							.font(StakFont.sora(24, .semiBold))
-							.lineSpacing(31 - 24)
+							.font(StakFont.sora(24 * u, .semiBold))
+							.lineSpacing((31 - 24) * u)
 							.foregroundStyle(StakColors.textPrimary)
 						Text(subtitle)
-							.font(StakFont.geist(12))
+							.font(StakFont.geist(12 * u))
+							.lineSpacing((16 - 12) * u)
 							.foregroundStyle(Auth.subtitleGray)
 					}
 
-					VStack(alignment: .leading, spacing: 12) {
+					VStack(alignment: .leading, spacing: 12 * u) {
 						ForEach(0..<2) { row in
-							HStack(spacing: 12.63) {
-								ForEach(options[row * 2..<(row * 2 + 2)]) { option in
-									MatrixCard(option: option, selected: selected == option.id) {
-										selected = option.id
+							HStack(spacing: 13 * u) {
+								ForEach(0..<2) { col in
+									let index = row * 2 + col
+									MatrixCard(option: options[index], selected: selected == index) {
+										selected = index
 									}
 								}
 							}
 						}
 					}
-					.padding(.top, 4)
+					.padding(.top, 4 * u)
 				}
 				.frame(maxWidth: .infinity, alignment: .leading)
-				.padding(.horizontal, 24)
-				.padding(.top, 14)
+				.padding(.horizontal, 24 * u)
+				.padding(.top, 14 * u)
 			}
 
-			VStack(spacing: 10) {
+			VStack(spacing: 10 * u) {
 				AuthCta(text: "Continue") {
-					if selected != nil { onContinue() }
+					if selected >= 0 { onContinue() }
 				}
 				AuthSecondaryButton(text: "Back", action: onBack)
 			}
-			.padding(.top, 8)
-			.padding(.bottom, 26)
+			.padding(.top, 8 * u)
+			.padding(.bottom, 26 * u)
 		}
 		.background(StakColors.bg.ignoresSafeArea())
 	}
@@ -87,34 +94,42 @@ private struct MatrixCard: View {
 	let action: () -> Void
 
 	var body: some View {
+		let u = figmaUnit
+		// Authored interior (1:597): content top-anchored at 15.27; the icon
+		// at its per-option dy; the text block 21 below the icon. Never
+		// vertically centered — row 2 reads lower by design.
 		Button(action: action) {
-			VStack(alignment: .leading, spacing: 21.06) {
+			VStack(alignment: .leading, spacing: 0) {
+				Spacer().frame(height: option.iconDy * u)
 				ZStack {
 					Circle().fill(Color(argb: 0xFF242B3D))
 					Image(option.icon)
 						.resizable()
-						.frame(width: option.iconSize, height: option.iconSize)
+						.frame(width: option.iconSize * u, height: option.iconSize * u)
 				}
-				.frame(width: option.circleSize, height: option.circleSize)
-				VStack(alignment: .leading, spacing: 5.26) {
+				.frame(width: option.circleSize * u, height: option.circleSize * u)
+				Spacer().frame(height: 21 * u)
+				VStack(alignment: .leading, spacing: 5 * u) {
 					Text(option.title)
-						.font(StakFont.geist(12, .medium))
+						.font(StakFont.geist(12 * u, .medium))
+						.lineSpacing((16.85 - 12) * u)
 						.foregroundStyle(StakColors.textPrimary)
-						.frame(width: 142.13, alignment: .leading)
+						.frame(width: 142.13 * u, alignment: .leading)
 					Text(option.subtitle)
-						.font(StakFont.geist(10))
+						.font(StakFont.geist(10 * u))
+						.lineSpacing((13.69 - 10) * u)
 						.foregroundStyle(Auth.faintText)
-						.frame(width: 121.07, alignment: .leading)
+						.frame(width: 121.07 * u, alignment: .leading)
 				}
-				.frame(height: 66.33, alignment: .top)
 			}
-			.padding(.horizontal, 14.74)
-			.frame(width: 163.18, height: 155.81, alignment: .leading)
-			.background(Auth.inputBg, in: RoundedRectangle(cornerRadius: 16.85))
+			.padding(.horizontal, 14.74 * u)
+			.padding(.vertical, 15.27 * u)
+			.frame(width: 163.18 * u, height: 155.81 * u, alignment: .topLeading)
+			.background(Auth.inputBg, in: RoundedRectangle(cornerRadius: 16.85 * u))
 			.overlay {
 				if selected {
-					RoundedRectangle(cornerRadius: 16.85)
-						.strokeBorder(Auth.linkTeal, lineWidth: 0.53)
+					RoundedRectangle(cornerRadius: 16.85 * u)
+						.strokeBorder(Auth.linkTeal, lineWidth: 0.53 * u)
 				}
 			}
 		}

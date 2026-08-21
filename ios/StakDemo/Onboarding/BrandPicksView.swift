@@ -6,7 +6,7 @@ private struct Brand: Identifiable {
 	var id: String { name }
 }
 
-/// The 12 brand tiles of Figma "Onboarding · 02 Brand picks" (1:232), in grid order.
+/// The 12 brand tiles of Figma "Onboarding · 02 Brand picks" (1554:8541), in grid order.
 private let brands: [Brand] = [
 	Brand(name: "Apple", asset: "BrandApple"),
 	Brand(name: "Tesla", asset: "BrandTesla"),
@@ -22,7 +22,7 @@ private let brands: [Brand] = [
 	Brand(name: "Uber", asset: "BrandUber")
 ]
 
-/// Onboarding · 02 Brand picks — Figma node 1:232 (CHINEDU file, "STEP 2 OF 6").
+/// Onboarding · 02 Brand picks — Figma node 1554:8541 (CHINEDU file, "STEP 2 OF 6").
 ///
 /// A 3-wide grid of #181f30 tiles, each a white 34pt circle with the real
 /// brand mark (flattened Figma exports) and a Geist 11 label. Selected
@@ -35,32 +35,40 @@ struct BrandPicksView: View {
 	@State private var picked: Set<String> = []
 
 	var body: some View {
+		let u = figmaUnit
 		VStack(spacing: 0) {
+			// Nav row — back circle + step label.
 			HStack {
 				AuthBackCircle(action: onBack)
 				Spacer()
-				StepLabel(text: "STEP 2 OF 6")
+				Text("STEP 2 OF 6")
+					.font(StakFont.geist(10 * u, .medium))
+					.tracking(0.9 * u)
+					.foregroundStyle(Auth.faintText)
 			}
-			.padding(.horizontal, 20)
-			.padding(.top, 10)
-			.padding(.bottom, 4)
+			.padding(.horizontal, 20 * u)
+			.padding(.top, 10 * u)
+			.padding(.bottom, 4 * u)
 
 			ScrollView {
-				VStack(alignment: .leading, spacing: 18) {
-					VStack(alignment: .leading, spacing: 12) {
+				VStack(alignment: .leading, spacing: 18 * u) {
+					VStack(alignment: .leading, spacing: 12 * u) {
 						Text("Which brands do you know or use?")
-							.font(StakFont.sora(24, .semiBold))
-							.lineSpacing(31 - 24)
+							.font(StakFont.sora(24 * u, .semiBold))
+							.lineSpacing((31 - 24) * u)
 							.foregroundStyle(StakColors.textPrimary)
 						Text("Pick a few. STAK uses this to learn what feels familiar to you.")
-							.font(StakFont.geist(12))
+							// Authored box (1:255): 303 wide -> the designed two-line wrap.
+							.font(StakFont.geist(12 * u))
+							.lineSpacing((16 - 12) * u)
 							.foregroundStyle(Auth.subtitleGray)
+							.frame(width: 303 * u, alignment: .leading)
 					}
 
 					// 3-wide tile grid, 10pt gaps.
-					VStack(spacing: 10) {
+					VStack(spacing: 10 * u) {
 						ForEach(0..<4) { row in
-							HStack(spacing: 10) {
+							HStack(spacing: 10 * u) {
 								ForEach(brands[row * 3..<(row * 3 + 3)]) { brand in
 									BrandTile(brand: brand, selected: picked.contains(brand.name)) {
 										if picked.contains(brand.name) {
@@ -73,23 +81,25 @@ struct BrandPicksView: View {
 							}
 						}
 					}
-					.padding(.top, 6)
+					.padding(.top, 6 * u)
 				}
-				.padding(.horizontal, 24)
-				.padding(.top, 14)
+				.frame(maxWidth: .infinity, alignment: .leading)
+				.padding(.horizontal, 24 * u)
+				.padding(.top, 14 * u)
 			}
 
-			VStack(spacing: 10) {
+			VStack(spacing: 10 * u) {
 				AuthCta(text: picked.isEmpty ? "Continue" : "Continue · \(picked.count) picked") {
-					if !picked.isEmpty { onContinue() }
+					// User's call (2026-08-21): Continue unlocks at three picks.
+					if picked.count >= 3 { onContinue() }
 				}
 				AuthSecondaryButton(text: "Back", action: onBack)
 				Text("You can change this later")
-					.font(StakFont.geist(11))
+					.font(StakFont.geist(11 * u))
 					.foregroundStyle(Auth.faintText)
 			}
-			.padding(.top, 8)
-			.padding(.bottom, 26)
+			.padding(.top, 8 * u)
+			.padding(.bottom, 26 * u)
 		}
 		.background(StakColors.bg.ignoresSafeArea())
 	}
@@ -102,24 +112,28 @@ private struct BrandTile: View {
 	let action: () -> Void
 
 	var body: some View {
+		let u = figmaUnit
 		Button(action: action) {
-			VStack(spacing: 7) {
+			VStack(spacing: 7 * u) {
 				Image(brand.asset)
 					.resizable()
-					.frame(width: 34, height: 34)
+					.frame(width: 34 * u, height: 34 * u)
 				Text(brand.name)
-					.font(StakFont.geist(11))
+					.font(StakFont.geist(11 * u))
 					.foregroundStyle(selected ? StakColors.textPrimary : StakColors.muted)
+					// lh14 — a fixed 14u line box so the tile lands at the
+					// authored 79u height (13 + 34 + 7 + 14 + 11).
+					.frame(height: 14 * u)
 			}
 			.frame(maxWidth: .infinity)
-			.padding(.top, 13)
-			.padding(.bottom, 11)
-			.padding(.horizontal, 4)
-			.background(Auth.inputBg, in: RoundedRectangle(cornerRadius: 14))
+			.padding(.top, 13 * u)
+			.padding(.bottom, 11 * u)
+			.padding(.horizontal, 4 * u)
+			.background(Auth.inputBg, in: RoundedRectangle(cornerRadius: 14 * u))
 			.overlay {
 				if selected {
-					RoundedRectangle(cornerRadius: 14)
-						.strokeBorder(Color(argb: 0x8069B3CA), lineWidth: 1.5)
+					RoundedRectangle(cornerRadius: 14 * u)
+						.strokeBorder(Color(argb: 0x8069B3CA), lineWidth: 1.5 * u)
 				}
 			}
 		}

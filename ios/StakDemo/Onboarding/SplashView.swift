@@ -1,13 +1,17 @@
 import SwiftUI
 
-/// Onboarding · 00 Splash — Figma node 1:926 (CHINEDU file).
+/// Entry splash — Figma node 1554:11348 ("iPhone 13 & 14 - 5").
 ///
 /// Renders the frame's exact 390x844 composition — the tilted 2K glass
-/// ball (394 square rotated 48.43°), swoosh logo, "Welcome to STAK" and
-/// the Geist Light subtitle — as one canvas scaled uniformly to the
-/// device width, so the balance between ball, logo and type matches the
-/// design on every screen. Auto-advances after a short hold; tapping
-/// anywhere skips ahead.
+/// ball (394 square rotated 48.43°, top-left 183.8/23), swoosh logo,
+/// "Welcome to STAK" and the Geist Light subtitle — as one canvas
+/// anchored to the TOP of the screen like the frame (taller devices
+/// gain bottom background) and scaled about its top-center, so y0
+/// stays at the screen top and nothing sinks on taller phones.
+///
+/// Auto-advances after its 1200 ms hold — no tap-to-skip; the authored
+/// motion is delay-only (1:926) and the transition is owned by
+/// RootFlowView.
 struct SplashView: View {
 	let onContinue: () -> Void
 
@@ -15,13 +19,15 @@ struct SplashView: View {
 		GeometryReader { proxy in
 			let scale = proxy.size.width / 390
 
-			ZStack {
-				// Glass ball — 394 square rotated 48.43°, top-left (183.1, 20.1).
+			// The design canvas: fixed 390x844 anchored to the TOP of the
+			// screen, scaled about its top-center so y0 stays at the top.
+			ZStack(alignment: .top) {
+				// Glass ball — 394 square rotated 48.43°, top-left (183.8, 23).
 				Image("SplashGlassBall")
 					.resizable()
 					.frame(width: 394, height: 394)
 					.rotationEffect(.degrees(48.43))
-					.position(x: 183.1 + 197, y: 20.1 + 197)
+					.position(x: 183.8 + 197, y: 23 + 197)
 
 				VStack(spacing: 10) {
 					VStack(spacing: 37) {
@@ -38,16 +44,14 @@ struct SplashView: View {
 						.multilineTextAlignment(.center)
 						.foregroundStyle(StakColors.textPrimary.opacity(0.7))
 				}
-				.position(x: 195.3, y: 422.71)
+				.offset(x: 0.3, y: 334.49)
 			}
 			.frame(width: 390, height: 844)
-			.scaleEffect(scale)
-			.position(x: proxy.size.width / 2, y: proxy.size.height / 2)
+			.scaleEffect(scale, anchor: .top)
+			.position(x: proxy.size.width / 2, y: 422)
 		}
 		.background(StakColors.bg)
 		.ignoresSafeArea()
-		.contentShape(Rectangle())
-		.onTapGesture(perform: onContinue)
 		.task {
 			// Prototype: "After delay 1200ms" → Auth · Sign up.
 			try? await Task.sleep(for: .seconds(1.2))

@@ -33,6 +33,9 @@ struct MainTabsView: View {
 	@State private var tab = MainTab.home
 	@State private var homeFirstRun = true
 	@State private var pushed: [PushedPage] = []
+	/// Hoisted Discover buy ticket — the sheet's scrim covers the tab bar
+	/// (frame 1:1970), so the shell owns it, mirroring Android MainShell.
+	@State private var discoverBuy: BuySpec? = nil
 
 	var body: some View {
 		ZStack {
@@ -42,34 +45,54 @@ struct MainTabsView: View {
 					case .home:
 						HomeView(
 							firstRun: homeFirstRun,
-							onSeeTodaysPick: { homeFirstRun = false },
-							onProfile: { push(.profile) }
+							// Authored (1:958/1:1097 Motion): the pill and the deck
+							// banner jump to the Discover deck ("first run" frame),
+							// the mood card to News, the why-card to My STAK — all
+							// Instant; first-run ends once the pick is seen.
+							onSeeTodaysPick: { homeFirstRun = false; tab = .discover },
+							onProfile: { push(.profile) },
+							onOpenNews: { tab = .news },
+							onOpenMyStak: { tab = .myStak },
+							onOpenDeck: { homeFirstRun = false; tab = .discover }
 						)
 					case .news:
 						NewsView(onOpenArticle: { push(.newsDetail) })
 					case .discover:
-						DiscoverView(onLearnMore: { push(.stockDetail(fromMyStak: false)) })
+						DiscoverView(
+							onLearnMore: { push(.stockDetail(fromMyStak: false)) },
+							onPracticeBuy: { discoverBuy = $0 }
+						)
 					case .myStak:
 						MyStakView(
 							onOpenCollection: { push(.collection) },
 							onStartSwiping: { tab = .discover }
 						)
 					case .simulate:
-						// Placeholder until the Simulate tab is ported.
-						Text(tab.rawValue)
-							.foregroundStyle(Color.white)
+						SimulateView(
+							onOpenPortfolio: { push(.simPortfolio) },
+							onOpenPick: { push(.simPick) },
+							onOpenLeaderboard: { push(.leaderboard) }
+						)
 					}
 				}
 				.frame(maxWidth: .infinity, maxHeight: .infinity)
 				if !(tab == .home && homeFirstRun) {
-					MainTabBar(selected: $tab)
+					// Discover runs the compact 75-tall bar (1:1788); the bar's
+					// authored height includes the home-indicator zone, so the
+					// shell lets it run to the physical bottom of the screen.
+					MainTabBar(selected: $tab, compact: tab == .discover)
 				}
 			}
+			.ignoresSafeArea(edges: .bottom)
 
 			ForEach(pushed) { page in
 				pageView(page)
 					.id(page.id)
 					.transition(FlowAnim.pushRight.transition)
+			}
+
+			if let spec = discoverBuy {
+				DiscoverBuyFlow(spec: spec, onClose: { discoverBuy = nil })
 			}
 		}
 		.background(StakColors.bg.ignoresSafeArea())

@@ -15,25 +15,26 @@ struct PermissionsView: View {
 	@State private var accountSecurity = true
 
 	var body: some View {
+		let u = figmaUnit
 		VStack(spacing: 0) {
 			HStack {
 				AuthBackCircle(action: onBack)
 				Spacer()
 			}
-			.padding(.horizontal, 20)
-			.padding(.top, 10)
-			.padding(.bottom, 4)
+			.padding(.horizontal, 20 * u)
+			.padding(.top, 10 * u)
+			.padding(.bottom, 4 * u)
 			OnboardingKicker(text: "STEP · ALMOST THERE")
 
-			VStack(alignment: .leading, spacing: 18) {
-				VStack(alignment: .leading, spacing: 12) {
+			VStack(alignment: .leading, spacing: 18 * u) {
+				VStack(alignment: .leading, spacing: 12 * u) {
 					Text("Stay in the loop")
-						.font(StakFont.sora(26, .semiBold))
+						.font(StakFont.sora(26 * u, .semiBold))
 						.foregroundStyle(StakColors.textPrimary)
 					Text("Two quick permissions so STAK can alert you and keep your account secure.")
-						.font(StakFont.geist(12))
+						.font(StakFont.geist(12 * u))
 						.foregroundStyle(Auth.subtitleGray)
-						.frame(width: 276, alignment: .leading)
+						.frame(width: 276 * u, alignment: .leading)
 				}
 
 				PermissionCard(
@@ -48,21 +49,21 @@ struct PermissionsView: View {
 				)
 
 				Text("You can change these anytime in Settings.")
-					.font(StakFont.geist(11))
+					.font(StakFont.geist(11 * u))
 					.foregroundStyle(Auth.faintText)
 
 				Spacer(minLength: 0)
 			}
 			.frame(maxWidth: .infinity, alignment: .leading)
-			.padding(.horizontal, 24)
-			.padding(.top, 14)
+			.padding(.horizontal, 24 * u)
+			.padding(.top, 14 * u)
 
-			VStack(spacing: 10) {
+			VStack(spacing: 10 * u) {
 				AuthCta(text: "Allow and continue", action: onContinue)
 				AuthSecondaryButton(text: "Not now", action: onContinue)
 			}
-			.padding(.top, 8)
-			.padding(.bottom, 26)
+			.padding(.top, 8 * u)
+			.padding(.bottom, 26 * u)
 		}
 		.background(StakColors.bg.ignoresSafeArea())
 	}
@@ -75,20 +76,21 @@ private struct PermissionCard: View {
 	@Binding var isOn: Bool
 
 	var body: some View {
-		HStack(spacing: 12) {
-			VStack(alignment: .leading, spacing: 4) {
+		let u = figmaUnit
+		HStack(spacing: 12 * u) {
+			VStack(alignment: .leading, spacing: 4 * u) {
 				Text(title)
-					.font(StakFont.geist(14, .medium))
+					.font(StakFont.geist(14 * u, .medium))
 					.foregroundStyle(StakColors.textPrimary)
 				Text(description)
-					.font(StakFont.geist(11))
+					.font(StakFont.geist(11 * u))
 					.foregroundStyle(Auth.subtitleGray)
 			}
 			.frame(maxWidth: .infinity, alignment: .leading)
 			StakToggle(isOn: $isOn)
 		}
-		.padding(16)
-		.background(Auth.inputBg, in: RoundedRectangle(cornerRadius: 14))
+		.padding(16 * u)
+		.background(Auth.inputBg, in: RoundedRectangle(cornerRadius: 14 * u))
 	}
 }
 
@@ -99,18 +101,19 @@ struct StakToggle: View {
 	@Binding var isOn: Bool
 
 	var body: some View {
+		let u = figmaUnit
 		Button {
 			withAnimation(.easeInOut(duration: 0.15)) { isOn.toggle() }
 		} label: {
 			ZStack(alignment: isOn ? .trailing : .leading) {
-				RoundedRectangle(cornerRadius: 12)
+				RoundedRectangle(cornerRadius: 12 * u)
 					.fill(isOn ? StakColors.accentBlue : Color(argb: 0xFF242B3D))
 				Circle()
 					.fill(Color.white)
-					.frame(width: 18, height: 18)
-					.padding(3)
+					.frame(width: 18 * u, height: 18 * u)
+					.padding(3 * u)
 			}
-			.frame(width: 42, height: 24)
+			.frame(width: 42 * u, height: 24 * u)
 		}
 		.buttonStyle(.plain)
 		.accessibilityAddTraits(.isToggle)

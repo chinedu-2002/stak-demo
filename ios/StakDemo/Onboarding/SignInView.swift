@@ -15,6 +15,7 @@ struct SignInView: View {
 	@State private var showPassword = false
 
 	var body: some View {
+		let u = figmaUnit
 		ZStack {
 			AuthWatermark()
 
@@ -23,21 +24,23 @@ struct SignInView: View {
 					AuthBackCircle(action: onBack)
 					Spacer()
 				}
-				.padding(.leading, 20)
-				.padding(.top, 10)
-				.padding(.bottom, 4)
+				.padding(.leading, 20 * u)
+				.padding(.top, 10 * u)
+				.padding(.bottom, 4 * u)
 
 				ScrollView {
-					VStack(alignment: .leading, spacing: 14) {
-						VStack(alignment: .leading, spacing: 12) {
+					VStack(alignment: .leading, spacing: 14 * u) {
+						VStack(alignment: .leading, spacing: 12 * u) {
 							Text("Welcome back")
-								.font(StakFont.sora(26, .semiBold))
+								.font(StakFont.sora(26 * u, .semiBold))
+								.lineSpacing((33 - 26) * u)
 								.foregroundStyle(StakColors.textPrimary)
 							Text("Your deck kept learning while you were away.")
-								.font(StakFont.geist(12))
+								.font(StakFont.geist(12 * u))
+								.lineSpacing((16 - 12) * u)
 								.foregroundStyle(Auth.subtitleGray)
 						}
-						Spacer().frame(height: 4)
+						Spacer().frame(height: 4 * u)
 
 						SocialPill(text: "Continue with Google", icon: "IcGoogleG", action: onSignIn)
 						SocialPill(text: "Continue with Apple", icon: "IcAppleLogo", action: onSignIn)
@@ -50,22 +53,22 @@ struct SignInView: View {
 						}
 						Button(action: { /* recovery flow not designed yet */ }) {
 							Text("Forgot password?")
-								.font(StakFont.geist(12, .medium))
+								.font(StakFont.geist(12 * u, .medium))
 								.foregroundStyle(Auth.linkTeal)
 						}
 						.buttonStyle(.plain)
 					}
 					.frame(maxWidth: .infinity, alignment: .leading)
-					.padding(.horizontal, 24)
-					.padding(.top, 14)
+					.padding(.horizontal, 24 * u)
+					.padding(.top, 14 * u)
 				}
 
-				VStack(spacing: 12) {
+				VStack(spacing: 12 * u) {
 					AuthCta(text: "Sign in", action: onSignIn)
 					AuthSwitchRow(prefix: "New to STAK?", link: "Create account", action: onCreateAccount)
 				}
-				.padding(.top, 8)
-				.padding(.bottom, 26)
+				.padding(.top, 8 * u)
+				.padding(.bottom, 26 * u)
 			}
 		}
 		.background(StakColors.bg.ignoresSafeArea())

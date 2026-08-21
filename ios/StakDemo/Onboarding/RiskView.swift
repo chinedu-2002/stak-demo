@@ -15,8 +15,8 @@ struct RiskView: View {
 			options: [
 				MatrixOption(title: "Buy more after checking why", subtitle: "Comfortable with dips if the story holds", icon: "RiskPlus", iconSize: 37.9),
 				MatrixOption(title: "Hold and watch it closely", subtitle: "I can handle short-term drops", icon: "RiskEye", iconSize: 37.9),
-				MatrixOption(title: "Step away for now", subtitle: "Big drops make me uncomfortable", icon: "RiskPause", iconSize: 36, circleSize: 36),
-				MatrixOption(title: "Sell some, reduce risk", subtitle: "I’d rather protect part of my money", icon: "RiskShield", iconSize: 20, circleSize: 36)
+				MatrixOption(title: "Step away for now", subtitle: "Big drops make me uncomfortable", icon: "RiskPause", iconSize: 36, circleSize: 36, iconDy: 9.95),
+				MatrixOption(title: "Sell some, reduce risk", subtitle: "I’d rather protect part of my money", icon: "RiskShield", iconSize: 20, circleSize: 36, iconDy: 9.95)
 			],
 			onBack: onBack,
 			onContinue: onContinue

@@ -38,35 +38,46 @@ enum MainTab: String, CaseIterable, Identifiable {
 	}
 }
 
-/// CHINEDU tab bar (Home Main 1:1220 / News listing 1:1352) — 86pt
-/// #060c1d, five 24pt icons with 12pt white labels (Inter in the frame;
-/// that role maps onto Geist here), gap 28. Active tabs use their
-/// filled/bright glyph; switching is the prototype's "Swap overlay ·
-/// Instant". Ported from android/ ui/components/MainTabBar.kt;
-/// supersedes the pre-CHINEDU StakTabBar.
+/// CHINEDU tab bar (Home Main 1:1220 / News listing 1:1352) — 86px
+/// #060c1d, five 24px icons with 12px white labels (Inter in the frame;
+/// that role maps onto Geist here). The authored bar (86, compact 75)
+/// INCLUDES the home-indicator zone — the tab row sits at its authored
+/// top inset (18, compact 13) and the system gesture area overlays the
+/// bar's lower band, exactly like the frame; the shell runs the bar to
+/// the physical bottom of the screen (no safe-area padding beneath it).
+/// Active tabs use their filled/bright glyph; switching is the
+/// prototype's "Swap overlay · Instant". Ported from android/
+/// ui/components/MainTabBar.kt; supersedes the pre-CHINEDU StakTabBar.
 struct MainTabBar: View {
 	@Binding var selected: MainTab
+	/// True only while the Discover tab is up — its 75-tall bar (1:1788).
+	var compact: Bool = false
 
 	var body: some View {
-		HStack(spacing: 28) {
-			ForEach(MainTab.allCases) { tab in
-				Button {
-					if tab.built { selected = tab }
-				} label: {
-					VStack(spacing: 10) {
-						Image(tab == selected ? tab.activeIcon : tab.inactiveIcon)
-							.resizable()
-							.frame(width: 24, height: 24)
-						Text(tab.rawValue)
-							.font(StakFont.geist(12))
-							.foregroundStyle(Color.white)
+		let u = figmaUnit
+		ZStack(alignment: .top) {
+			Color(argb: 0xFF060C1D)
+			// Authored gaps: 28 on the 86 bar (1:1221), 30 on the compact 75 bar (1:1788).
+			HStack(alignment: .top, spacing: (compact ? 30 : 28) * u) {
+				ForEach(MainTab.allCases) { tab in
+					Button {
+						if tab.built { selected = tab }
+					} label: {
+						VStack(spacing: 10 * u) {
+							Image(tab == selected ? tab.activeIcon : tab.inactiveIcon)
+								.resizable()
+								.frame(width: 24 * u, height: 24 * u)
+							Text(tab.rawValue)
+								.font(StakFont.geist(12 * u))
+								.foregroundStyle(Color.white)
+						}
 					}
+					.buttonStyle(.plain)
 				}
-				.buttonStyle(.plain)
 			}
+			.padding(.top, (compact ? 13 : 18) * u)
 		}
 		.frame(maxWidth: .infinity)
-		.frame(height: 86)
-		.background(Color(argb: 0xFF060C1D).ignoresSafeArea(edges: .bottom))
+		.frame(height: (compact ? 75 : 86) * u)
 	}
 }

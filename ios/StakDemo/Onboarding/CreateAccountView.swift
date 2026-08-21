@@ -17,6 +17,7 @@ struct CreateAccountView: View {
 	@State private var showPassword = false
 
 	var body: some View {
+		let u = figmaUnit
 		ZStack {
 			AuthWatermark()
 
@@ -25,21 +26,23 @@ struct CreateAccountView: View {
 					AuthBackCircle(action: onBack)
 					Spacer()
 				}
-				.padding(.leading, 20)
-				.padding(.top, 10)
-				.padding(.bottom, 4)
+				.padding(.leading, 20 * u)
+				.padding(.top, 10 * u)
+				.padding(.bottom, 4 * u)
 
 				ScrollView {
-					VStack(alignment: .leading, spacing: 14) {
-						VStack(alignment: .leading, spacing: 12) {
+					VStack(alignment: .leading, spacing: 14 * u) {
+						VStack(alignment: .leading, spacing: 12 * u) {
 							Text("Create your account")
-								.font(StakFont.sora(26, .semiBold))
+								.font(StakFont.sora(26 * u, .semiBold))
+								.lineSpacing((33 - 26) * u)
 								.foregroundStyle(StakColors.textPrimary)
 							Text("Enter your details below to continue")
-								.font(StakFont.geist(12))
+								.font(StakFont.geist(12 * u))
+								.lineSpacing((16 - 12) * u)
 								.foregroundStyle(Auth.subtitleGray)
 						}
-						Spacer().frame(height: 4)
+						Spacer().frame(height: 4 * u)
 
 						SocialPill(text: "Continue with Google", icon: "IcGoogleG", action: onCreateAccount)
 						SocialPill(text: "Continue with Apple", icon: "IcAppleLogo", action: onCreateAccount)
@@ -53,23 +56,23 @@ struct CreateAccountView: View {
 						AuthInput("Confirm Password", text: $confirm, hidden: !showPassword)
 					}
 					.frame(maxWidth: .infinity, alignment: .leading)
-					.padding(.horizontal, 24)
-					.padding(.top, 14)
+					.padding(.horizontal, 24 * u)
+					.padding(.top, 14 * u)
 				}
 
 				// CTA block — sharp-cornered gradient button, switch link, fine print.
-				VStack(spacing: 12) {
+				VStack(spacing: 12 * u) {
 					AuthCta(text: "Create account", action: onCreateAccount)
 					AuthSwitchRow(prefix: "Already have an account?", link: "Sign in", action: onSignIn)
 					Text("By continuing you agree to the Terms and Privacy Policy.")
-						.font(StakFont.geist(10))
+						.font(StakFont.geist(10 * u))
 						.multilineTextAlignment(.center)
 						.foregroundStyle(Auth.faintText)
 						.frame(maxWidth: .infinity)
-						.padding(.horizontal, 24)
+						.padding(.horizontal, 24 * u)
 				}
-				.padding(.top, 8)
-				.padding(.bottom, 26)
+				.padding(.top, 8 * u)
+				.padding(.bottom, 26 * u)
 			}
 		}
 		.background(StakColors.bg.ignoresSafeArea())

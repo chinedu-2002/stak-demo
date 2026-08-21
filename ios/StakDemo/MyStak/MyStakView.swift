@@ -28,27 +28,30 @@ private let ctaGradient = LinearGradient(
 /// the performance summary (chart, range pills, best/worst), the
 /// Breakdown allocation donut with sector bars, and the teal
 /// "More like your STAK" Discover banner. Tab bar via MainTabsView.
+/// Every metric is scaled by the 390pt artboard unit (`figmaUnit`),
+/// exactly like the Android build's `u` scaling.
 /// Ported from android/ ui/mystak/MyStakScreen.kt.
 struct MyStakView: View {
 	let onOpenCollection: () -> Void
 	let onStartSwiping: () -> Void
 
 	var body: some View {
+		let u = figmaUnit
 		VStack(spacing: 0) {
-			VStack(alignment: .leading, spacing: 4) {
+			VStack(alignment: .leading, spacing: 4 * u) {
 				Text("My STAK")
-					.font(StakFont.sora(26, .semiBold))
+					.font(StakFont.sora(26 * u, .semiBold))
 					.foregroundStyle(StakColors.textPrimary)
 				Text("Your saved stocks, live.")
-					.font(StakFont.geist(13))
+					.font(StakFont.geist(13 * u))
 					.foregroundStyle(muted)
 			}
 			.frame(maxWidth: .infinity, alignment: .leading)
-			.padding(.horizontal, 20)
-			.padding(.top, 20)
+			.padding(.horizontal, 20 * u)
+			.padding(.top, 20 * u)
 
 			ScrollView {
-				VStack(spacing: 20) {
+				VStack(spacing: 20 * u) {
 					SectionHeader(title: "Collections")
 					collectionsGrid
 					addMoreCta
@@ -57,27 +60,28 @@ struct MyStakView: View {
 					SectionHeader(title: "Breakdown")
 					AllocationCard()
 					discoverBanner
-					// Mirrors the Android trailing 0dp spacer — buys one extra 20pt gap.
+					// Mirrors the Android trailing 0dp spacer — buys one extra 20u gap.
 					Color.clear.frame(height: 0)
 				}
-				.padding(.horizontal, 20)
-				.padding(.top, 20)
+				.padding(.horizontal, 20 * u)
+				.padding(.top, 20 * u)
 			}
 		}
 		.background(StakColors.bg.ignoresSafeArea())
 	}
 
 	private var collectionsGrid: some View {
-		VStack(spacing: 10) {
-			HStack(spacing: 10) {
+		let u = figmaUnit
+		return VStack(spacing: 10 * u) {
+			HStack(spacing: 10 * u) {
 				CollectionChip(name: "AI & Tech", count: "5 stocks", image: "MsCollAITech", action: onOpenCollection)
 				CollectionChip(name: "Finance", count: "3 stocks", image: "MsCollFinance")
 			}
-			HStack(spacing: 10) {
+			HStack(spacing: 10 * u) {
 				CollectionChip(name: "Green Energy", count: "3 stocks", icon: "IcCatGreen")
 				CollectionChip(name: "Real Estate", count: "2 stocks", icon: "IcCatRealEstate")
 			}
-			HStack(spacing: 10) {
+			HStack(spacing: 10 * u) {
 				CollectionChip(name: "Healthcare", count: "4 stocks", icon: "IcCatHealth")
 				CollectionChip(name: "Consumer", count: "2 stocks", icon: "IcCatConsumer")
 			}
@@ -85,20 +89,21 @@ struct MyStakView: View {
 	}
 
 	private var addMoreCta: some View {
-		Button(action: onStartSwiping) {
-			HStack(spacing: 8) {
+		let u = figmaUnit
+		return Button(action: onStartSwiping) {
+			HStack(spacing: 8 * u) {
 				Text("Add more")
-					.font(StakFont.geist(14, .medium))
+					.font(StakFont.geist(16 * u, .medium))
 					.foregroundStyle(StakColors.textPrimary)
 				Image("IcPlusSmall")
 					.resizable()
-					.frame(width: 14, height: 14)
+					.frame(width: 14 * u, height: 14 * u)
 			}
-			.frame(width: 150, height: 52)
-			.background(ctaGradient, in: RoundedRectangle(cornerRadius: 6))
+			.frame(width: 150 * u, height: 52 * u)
+			.background(ctaGradient, in: RoundedRectangle(cornerRadius: 6 * u))
 			.overlay(
-				RoundedRectangle(cornerRadius: 6)
-					.strokeBorder(StakColors.ctaBorder, lineWidth: 0.36)
+				RoundedRectangle(cornerRadius: 6 * u)
+					.strokeBorder(StakColors.ctaBorder, lineWidth: 0.36 * u)
 			)
 		}
 		.buttonStyle(.plain)
@@ -106,56 +111,59 @@ struct MyStakView: View {
 
 	/// Your read insight card.
 	private var yourReadCard: some View {
-		VStack(alignment: .leading, spacing: 7) {
-			HStack(spacing: 8) {
+		let u = figmaUnit
+		return VStack(alignment: .leading, spacing: 7 * u) {
+			HStack(spacing: 8 * u) {
 				Image("IcGistSparkle")
 					.resizable()
-					.frame(width: 24, height: 24)
+					.frame(width: 24 * u, height: 24 * u)
 				Text("Your read")
-					.font(StakFont.sora(14, .semiBold))
+					.font(StakFont.sora(14 * u, .semiBold))
 					.foregroundStyle(StakColors.textPrimary)
 			}
 			Text("You lean into growth and tech.")
-				.font(StakFont.sora(15, .semiBold))
+				.font(StakFont.sora(15 * u, .semiBold))
 				.foregroundStyle(StakColors.textPrimary)
 			Text("Six of your fourteen picks are tech or AI names. Your STAK skews high-growth, with a small hedge in real estate.")
-				.font(StakFont.geist(13))
-				.lineSpacing(19 - 13)
+				.font(StakFont.geist(14 * u))
+				.lineSpacing((19 - 14) * u)
 				.foregroundStyle(bodyColor)
 		}
 		.frame(maxWidth: .infinity, alignment: .leading)
-		.padding(16)
-		.background(cardBg, in: RoundedRectangle(cornerRadius: 14))
+		.padding(16 * u)
+		.background(cardBg, in: RoundedRectangle(cornerRadius: 14 * u))
 	}
 
 	/// Discover banner.
 	private var discoverBanner: some View {
-		Button(action: onStartSwiping) {
-			VStack(alignment: .leading, spacing: 9) {
+		let u = figmaUnit
+		return Button(action: onStartSwiping) {
+			VStack(alignment: .leading, spacing: 9 * u) {
 				Text("DISCOVER")
-					.font(StakFont.geist(10, .medium))
-					.tracking(0.6)
+					.font(StakFont.geist(10 * u, .medium))
+					.tracking(0.6 * u)
 					.foregroundStyle(ink)
 				Text("More like your STAK")
-					.font(StakFont.sora(18, .semiBold))
+					.font(StakFont.sora(18 * u, .semiBold))
 					.foregroundStyle(ink)
 				Text("Based on your taste, 8 fresh picks are waiting in the deck.")
-					.font(StakFont.geist(12))
-					.lineSpacing(17 - 12)
+					.font(StakFont.geist(13 * u))
+					.lineSpacing((17 - 13) * u)
 					.foregroundStyle(ink)
-				HStack(spacing: 4) {
+				// The Android row's 22sp line height makes it a 22u-tall strip.
+				HStack(spacing: 4 * u) {
 					Text("Start swiping")
-						.font(StakFont.geist(13, .medium))
+						.font(StakFont.geist(13 * u, .medium))
 						.foregroundStyle(Color(argb: 0xB80A1020))
 					Text("›")
-						.font(StakFont.geist(14, .medium))
+						.font(StakFont.geist(14 * u, .medium))
 						.foregroundStyle(ink)
 				}
-				.padding(.top, 4)
+				.frame(height: 22 * u)
 			}
 			.frame(maxWidth: .infinity, alignment: .leading)
-			.padding(18)
-			.background(teal, in: RoundedRectangle(cornerRadius: 16))
+			.padding(18 * u)
+			.background(teal, in: RoundedRectangle(cornerRadius: 16 * u))
 		}
 		.buttonStyle(.plain)
 	}
@@ -166,7 +174,7 @@ private struct SectionHeader: View {
 
 	var body: some View {
 		Text(title)
-			.font(StakFont.sora(16, .semiBold))
+			.font(StakFont.sora(16 * figmaUnit, .semiBold))
 			.foregroundStyle(headerGray)
 			.frame(maxWidth: .infinity, alignment: .leading)
 	}
@@ -181,35 +189,40 @@ private struct CollectionChip: View {
 	var action: () -> Void = {}
 
 	var body: some View {
+		let u = figmaUnit
 		Button(action: action) {
-			HStack(spacing: 10) {
+			HStack(spacing: 10 * u) {
 				if let image {
 					Image(image)
 						.resizable()
 						.scaledToFill()
-						.frame(width: 34, height: 34)
+						.frame(width: 34 * u, height: 34 * u)
 						.clipped()
 				} else if let icon {
 					Image(icon)
 						.resizable()
-						.frame(width: 36, height: 36)
+						.frame(width: 36 * u, height: 36 * u)
 				}
-				VStack(alignment: .leading, spacing: 2) {
+				VStack(alignment: .leading, spacing: 2 * u) {
+					// Authored: "Green Energy" (box 90) overflows its 84 column —
+					// the frame draws it past the column, so never wrap or clip it
+					// (Kotlin softWrap = false + TextOverflow.Visible).
 					Text(name)
-						.font(StakFont.sora(13, .semiBold))
+						.font(StakFont.sora(13 * u, .semiBold))
 						.foregroundStyle(StakColors.textPrimary)
 						.lineLimit(1)
+						.fixedSize(horizontal: true, vertical: false)
 					Text(count)
-						.font(StakFont.geist(11))
+						.font(StakFont.geist(11 * u))
 						.foregroundStyle(muted)
 				}
 				.frame(maxWidth: .infinity, alignment: .leading)
 				Text("›")
-					.font(StakFont.geist(16))
+					.font(StakFont.geist(16 * u))
 					.foregroundStyle(faint)
 			}
-			.padding(12)
-			.background(cardBg, in: RoundedRectangle(cornerRadius: 12))
+			.padding(12 * u)
+			.background(cardBg, in: RoundedRectangle(cornerRadius: 12 * u))
 		}
 		.buttonStyle(.plain)
 	}
@@ -218,85 +231,86 @@ private struct CollectionChip: View {
 /// Performance this week — +4.9%, chart, range pills, best/worst.
 private struct PortfolioSummary: View {
 	var body: some View {
-		VStack(spacing: 14) {
-			VStack(alignment: .leading, spacing: 8) {
+		let u = figmaUnit
+		VStack(spacing: 14 * u) {
+			VStack(alignment: .leading, spacing: 8 * u) {
 				Text("Performance this week")
-					.font(StakFont.sora(12))
+					.font(StakFont.sora(12 * u))
 					.foregroundStyle(muted)
 				Text("+4.9%")
-					.font(StakFont.sora(44, .semiBold))
-					.tracking(-0.44)
+					.font(StakFont.sora(44 * u, .semiBold))
+					.tracking(-0.44 * u)
 					.foregroundStyle(StakColors.textPrimary)
-				HStack(spacing: 10) {
+				HStack(spacing: 10 * u) {
 					Text("Across 14 stocks")
-						.font(StakFont.geist(14, .medium))
+						.font(StakFont.geist(14 * u, .medium))
 						.foregroundStyle(green)
 					Text(".")
-						.font(StakFont.sora(14))
+						.font(StakFont.sora(14 * u))
 						.foregroundStyle(muted)
 					Text("3M")
-						.font(StakFont.geist(14))
+						.font(StakFont.geist(14 * u))
 						.foregroundStyle(muted)
 				}
 			}
 			.frame(maxWidth: .infinity, alignment: .leading)
-			.padding(.leading, 20)
+			.padding(.leading, 20 * u)
 
 			Image("MsChartLine")
 				.resizable()
 				.scaledToFit()
-				.frame(width: 345, height: 76)
+				.frame(width: 343 * u, height: 73.56 * u)
 
-			HStack(spacing: 37) {
+			HStack(spacing: 37 * u) {
 				ForEach(["1D", "1W", "1M", "3M", "YTD", "1Y"], id: \.self) { label in
 					if label == "3M" {
 						Text(label)
-							.font(StakFont.geist(12, .medium))
+							.font(StakFont.geist(12 * u, .medium))
 							.foregroundStyle(teal)
-							.frame(width: 39, height: 22.5)
-							.background(Color(argb: 0x292C9DBC), in: RoundedRectangle(cornerRadius: 11.25))
+							.frame(width: 39 * u, height: 22.5 * u)
+							.background(Color(argb: 0x292C9DBC), in: RoundedRectangle(cornerRadius: 11.25 * u))
 							.overlay(
-								RoundedRectangle(cornerRadius: 11.25)
-									.strokeBorder(Color(argb: 0x662C9DBC), lineWidth: 0.75)
+								RoundedRectangle(cornerRadius: 11.25 * u)
+									.strokeBorder(Color(argb: 0x662C9DBC), lineWidth: 0.75 * u)
 							)
 					} else {
 						Text(label)
-							.font(StakFont.geist(12))
+							.font(StakFont.geist(12 * u))
 							.foregroundStyle(muted)
 					}
 				}
 			}
-			.padding(.top, 26)
+			.padding(.top, 26 * u)
 
 			Rectangle()
 				.fill(track)
 				.frame(maxWidth: .infinity)
-				.frame(height: 1)
+				.frame(height: 1 * u)
 
-			HStack(spacing: 151) {
-				VStack(alignment: .leading, spacing: 3) {
+			HStack(spacing: 151 * u) {
+				VStack(alignment: .leading, spacing: 3 * u) {
 					Text("Best this week")
-						.font(StakFont.geist(11))
+						.font(StakFont.geist(11 * u))
 						.foregroundStyle(faint)
-					HStack(spacing: 6) {
+					HStack(spacing: 6 * u) {
 						Text("TSLA")
-							.font(StakFont.sora(13, .semiBold))
+							.font(StakFont.sora(13 * u, .semiBold))
 							.foregroundStyle(StakColors.textPrimary)
 						Text("+3.4%")
-							.font(StakFont.geist(12, .medium))
+							.font(StakFont.geist(12 * u, .medium))
 							.foregroundStyle(green)
 					}
 				}
-				VStack(alignment: .leading, spacing: 3) {
+				VStack(alignment: .leading, spacing: 3 * u) {
 					Text("Worst")
-						.font(StakFont.geist(11))
+						.font(StakFont.geist(11 * u))
 						.foregroundStyle(faint)
-					HStack(spacing: 6) {
+					HStack(spacing: 6 * u) {
 						Text("SNOW")
-							.font(StakFont.sora(13, .semiBold))
+							.font(StakFont.sora(13 * u, .semiBold))
 							.foregroundStyle(StakColors.textPrimary)
 						Text("-0.5%")
-							.font(StakFont.geist(12, .medium))
+							.font(StakFont.geist(12 * u, .medium))
 							.foregroundStyle(red)
 					}
 				}
@@ -304,22 +318,23 @@ private struct PortfolioSummary: View {
 			.frame(maxWidth: .infinity)
 		}
 		.frame(maxWidth: .infinity)
-		.padding(.vertical, 18)
-		.background(cardBg, in: RoundedRectangle(cornerRadius: 8))
+		.padding(.vertical, 13.5 * u)
+		.background(cardBg, in: RoundedRectangle(cornerRadius: 8 * u))
 	}
 }
 
-/// Allocation — the 150pt donut render + sector bars.
+/// Allocation — the 150u donut render + sector bars.
 private struct AllocationCard: View {
 	var body: some View {
-		VStack(spacing: 16) {
+		let u = figmaUnit
+		VStack(spacing: 16 * u) {
 			Text("Allocation")
-				.font(StakFont.sora(15, .semiBold))
+				.font(StakFont.sora(15 * u, .semiBold))
 				.foregroundStyle(StakColors.textPrimary)
 			Image("MsDonut")
 				.resizable()
-				.frame(width: 150, height: 150)
-			VStack(spacing: 12) {
+				.frame(width: 150 * u, height: 150 * u)
+			VStack(spacing: 12 * u) {
 				SectorBar(name: "Tech & AI", share: "42% · 6 stocks", color: teal, fill: 132)
 				SectorBar(name: "Finance", share: "21% · 3 stocks", color: Color(argb: 0xFF7AB3F0), fill: 66)
 				SectorBar(name: "Green Energy", share: "20% · 3 stocks", color: green, fill: 63)
@@ -329,8 +344,8 @@ private struct AllocationCard: View {
 			.frame(maxWidth: .infinity)
 		}
 		.frame(maxWidth: .infinity)
-		.padding(18)
-		.background(cardBg, in: RoundedRectangle(cornerRadius: 16))
+		.padding(18 * u)
+		.background(cardBg, in: RoundedRectangle(cornerRadius: 16 * u))
 	}
 }
 
@@ -338,33 +353,34 @@ private struct SectorBar: View {
 	let name: String
 	let share: String
 	let color: Color
-	/// Exact Figma fill width in pt.
+	/// Exact Figma fill width in artboard units (scaled by `figmaUnit`).
 	let fill: CGFloat
 
 	var body: some View {
-		VStack(spacing: 6) {
+		let u = figmaUnit
+		VStack(spacing: 6 * u) {
 			HStack(spacing: 0) {
 				Circle()
 					.fill(color)
-					.frame(width: 9, height: 9)
-				Spacer().frame(width: 8)
+					.frame(width: 9 * u, height: 9 * u)
+				Spacer().frame(width: 8 * u)
 				Text(name)
-					.font(StakFont.geist(13))
+					.font(StakFont.geist(13 * u))
 					.foregroundStyle(StakColors.textPrimary)
 				Spacer(minLength: 0)
 				Text(share)
-					.font(StakFont.geist(12, .medium))
+					.font(StakFont.geist(12 * u, .medium))
 					.foregroundStyle(muted)
 			}
 			ZStack(alignment: .leading) {
-				RoundedRectangle(cornerRadius: 4)
+				RoundedRectangle(cornerRadius: 4 * u)
 					.fill(track)
-				RoundedRectangle(cornerRadius: 4)
+				RoundedRectangle(cornerRadius: 4 * u)
 					.fill(color)
-					.frame(width: fill)
+					.frame(width: fill * u)
 			}
 			.frame(maxWidth: .infinity)
-			.frame(height: 7)
+			.frame(height: 7 * u)
 		}
 	}
 }

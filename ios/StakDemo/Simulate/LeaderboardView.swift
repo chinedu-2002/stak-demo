@@ -3,7 +3,9 @@ import SwiftUI
 /// 07 · Simulate — "Final · Leaderboard · % return" (CHINEDU 1:4124).
 /// This-week/All-time chips, RANKED BY RETURN, the highlighted You row
 /// (#47, ▲ 12 spots) above the top five and the neighbors around you.
-/// Ported from android/ ui/simulate/LeaderboardScreen.kt.
+/// Ported from android/ ui/simulate/LeaderboardScreen.kt. Every metric
+/// is scaled by the 390pt artboard unit (`figmaUnit`), exactly like
+/// the Android build's `u` scaling.
 private struct Rank {
 	let rank: String
 	let initial: String
@@ -28,94 +30,95 @@ struct LeaderboardView: View {
 	let onBack: () -> Void
 
 	var body: some View {
+		let u = figmaUnit
 		VStack(spacing: 0) {
 			HStack {
 				AuthBackCircle(action: onBack)
 				Spacer()
 				Text("Leaderboard")
-					.font(StakFont.sora(16, .semiBold))
+					.font(StakFont.sora(16 * u, .semiBold))
 					.foregroundStyle(Color.white)
 				Spacer()
 				ZStack {
 					Circle().fill(Sim.cardBg)
 					Image("IcNewsShare")
 						.resizable()
-						.frame(width: 17, height: 17)
+						.frame(width: 17 * u, height: 17 * u)
 				}
-				.frame(width: 40, height: 40)
+				.frame(width: 40 * u, height: 40 * u)
 			}
-			.padding(.horizontal, 18)
-			.padding(.vertical, 8)
+			.padding(.horizontal, 18 * u)
+			.padding(.vertical, 8 * u)
 
 			ScrollView(showsIndicators: false) {
-				VStack(spacing: 10) {
-					HStack(spacing: 8) {
+				VStack(alignment: .leading, spacing: 16 * u) {
+					HStack(spacing: 8 * u) {
 						PeriodChip(label: "This week", selected: true)
 						PeriodChip(label: "All time", selected: false)
-						Spacer()
 					}
 					HStack {
 						Text("RANKED BY RETURN")
-							.font(StakFont.geist(10, .medium))
-							.tracking(0.9)
+							.font(StakFont.geist(10 * u, .medium))
+							.tracking(0.9 * u)
 							.foregroundStyle(Sim.faint)
+							.padding(.leading, 2 * u)
 						Spacer()
 						Text("Trailing 7 days")
-							.font(StakFont.geist(10))
+							.font(StakFont.geist(10 * u))
 							.foregroundStyle(Sim.faint)
 					}
-					.padding(.top, 4)
 
-					// You — highlighted with the ▲ spots delta.
-					HStack(spacing: 10) {
+					// You — highlighted with the ▲ spots delta. Teal-tint bg
+					// only, no border (1:4124).
+					HStack(spacing: 11 * u) {
 						Text("47")
-							.font(StakFont.sora(12, .semiBold))
+							.font(StakFont.sora(16 * u, .semiBold))
 							.foregroundStyle(Sim.teal)
+							.frame(width: 28 * u, alignment: .leading)
 						ZStack {
 							Circle().fill(Sim.chipBg)
 							Text("E")
-								.font(StakFont.sora(13, .semiBold))
+								.font(StakFont.sora(13 * u, .semiBold))
 								.foregroundStyle(Sim.badgeInk)
 						}
-						.frame(width: 32, height: 32)
-						VStack(alignment: .leading, spacing: 2) {
+						.frame(width: 36 * u, height: 36 * u)
+						VStack(alignment: .leading, spacing: 2 * u) {
 							Text("You")
-								.font(StakFont.geist(13, .semiBold))
+								.font(StakFont.geist(12 * u, .semiBold))
 								.foregroundStyle(Color.white)
 							Text("12 picks this week")
-								.font(StakFont.geist(10))
+								.font(StakFont.geist(10 * u))
 								.foregroundStyle(Sim.muted)
 						}
 						.frame(maxWidth: .infinity, alignment: .leading)
-						VStack(alignment: .trailing, spacing: 2) {
+						VStack(alignment: .trailing, spacing: 2 * u) {
 							Text("+4.2%")
-								.font(StakFont.sora(13, .semiBold))
+								.font(StakFont.sora(13 * u, .semiBold))
 								.foregroundStyle(Sim.teal)
 							Text("▲ 12 spots")
-								.font(StakFont.geist(10))
+								.font(StakFont.geist(10 * u))
 								.foregroundStyle(Sim.green)
 						}
 					}
-					.padding(.horizontal, 12)
-					.padding(.vertical, 10)
-					.background(Sim.tealTint, in: RoundedRectangle(cornerRadius: 12))
-					.overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(Color(argb: 0x662C9DBC), lineWidth: 0.75))
+					.padding(.horizontal, 16 * u)
+					.padding(.vertical, 14 * u)
+					.background(Sim.tealTint, in: RoundedRectangle(cornerRadius: 12 * u))
 
 					ForEach(top, id: \.rank) { LeaderRow(r: $0) }
 					Text("· · ·")
-						.font(StakFont.geist(12))
+						.font(StakFont.geist(12 * u))
 						.foregroundStyle(Sim.faint)
+						.frame(maxWidth: .infinity)
 					ForEach(near, id: \.rank) { LeaderRow(r: $0) }
-					Text("Percentage return, not dollar size, so everyone competes on the same scale. This week ranks are trailing 7 days.")
-						.font(StakFont.geist(10))
-						.lineSpacing(15 - 10)
+					Text("Percentage return, not dollar size, so everyone competes on the same scale. This week ranks the trailing 7 days.")
+						.font(StakFont.geist(11 * u))
+						.lineSpacing((16 - 11) * u)
 						.foregroundStyle(Sim.faint)
 						.frame(maxWidth: .infinity, alignment: .leading)
-						.padding(.top, 8)
 				}
-				.padding(.horizontal, 20)
-				.padding(.top, 10)
-				.padding(.bottom, 24)
+				.padding(.horizontal, 20 * u)
+				.padding(.top, 6 * u)
+				.padding(.bottom, 24 * u)
 			}
 		}
 		.background(StakColors.bg.ignoresSafeArea())
@@ -127,15 +130,16 @@ private struct PeriodChip: View {
 	let selected: Bool
 
 	var body: some View {
+		let u = figmaUnit
 		Text(label)
-			.font(StakFont.geist(12, .medium))
+			.font(StakFont.geist(12 * u, .medium))
 			.foregroundStyle(selected ? Sim.teal : Sim.muted)
-			.padding(.horizontal, 12)
-			.padding(.vertical, 6)
-			.background(selected ? Sim.tealTint : Sim.cardBg, in: RoundedRectangle(cornerRadius: 14))
+			.padding(.horizontal, 13 * u)
+			.padding(.vertical, 7 * u)
+			.background(selected ? Sim.tealTint : Sim.cardBg, in: RoundedRectangle(cornerRadius: 14 * u))
 			.overlay(
 				selected
-					? RoundedRectangle(cornerRadius: 14).strokeBorder(Color(argb: 0x662C9DBC), lineWidth: 0.75)
+					? RoundedRectangle(cornerRadius: 14 * u).strokeBorder(Color(argb: 0x662C9DBC), lineWidth: 0.75 * u)
 					: nil
 			)
 	}
@@ -145,32 +149,34 @@ private struct LeaderRow: View {
 	let r: Rank
 
 	var body: some View {
-		HStack(spacing: 10) {
+		let u = figmaUnit
+		HStack(spacing: 11 * u) {
 			Text(r.rank)
-				.font(StakFont.sora(12, .semiBold))
+				.font(StakFont.sora(12 * u, .semiBold))
 				.foregroundStyle(Sim.faint)
+				.frame(width: 24 * u, alignment: .leading)
 			ZStack {
 				Circle().fill(Sim.chipBg)
 				Text(r.initial)
-					.font(StakFont.sora(13, .semiBold))
+					.font(StakFont.sora(13 * u, .semiBold))
 					.foregroundStyle(Sim.badgeInk)
 			}
-			.frame(width: 32, height: 32)
-			VStack(alignment: .leading, spacing: 2) {
+			.frame(width: 32 * u, height: 32 * u)
+			VStack(alignment: .leading, spacing: 2 * u) {
 				Text(r.name)
-					.font(StakFont.geist(13, .medium))
+					.font(StakFont.geist(12 * u, .medium))
 					.foregroundStyle(Color.white)
 				Text(r.picks)
-					.font(StakFont.geist(10))
+					.font(StakFont.geist(10 * u))
 					.foregroundStyle(Sim.muted)
 			}
 			.frame(maxWidth: .infinity, alignment: .leading)
 			Text(r.pct)
-				.font(StakFont.sora(12, .semiBold))
+				.font(StakFont.sora(12 * u, .semiBold))
 				.foregroundStyle(Sim.headerGray)
 		}
-		.padding(.horizontal, 12)
-		.padding(.vertical, 10)
-		.background(Sim.cardBg, in: RoundedRectangle(cornerRadius: 12))
+		.padding(.horizontal, 14 * u)
+		.padding(.vertical, 11 * u)
+		.background(Sim.cardBg, in: RoundedRectangle(cornerRadius: 12 * u))
 	}
 }

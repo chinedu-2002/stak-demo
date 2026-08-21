@@ -232,7 +232,8 @@ private fun HeroImage(saved: Boolean, onBookmark: () -> Unit) {
 					.padding(top = (8 * u).dp, end = (7 * u).dp)
 					.clip(RoundedCornerShape((7.88 * u).dp))
 					.background(Color(0x40242B3D))
-					.padding(horizontal = (7 * u).dp, vertical = (5 * u).dp),
+					// Authored toast is 21 tall (1:1386): 13 text + 4/4 pads.
+					.padding(horizontal = (7 * u).dp, vertical = (4 * u).dp),
 			) {
 				Image(
 					painter = painterResource(R.drawable.ic_saved_bookmark),
@@ -413,10 +414,10 @@ private fun StockCard(saved: Boolean) {
 		}
 		if (saved) {
 			Box(modifier = Modifier.fillMaxWidth().height((1 * u).dp).background(News.Divider))
-			Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().padding(top = (1 * u).dp)) {
+			Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
 				Text(
 					text = "View AAPL in My STAK",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp, lineHeight = (17 * u).sp),
 					color = News.Teal,
 				)
 				Spacer(modifier = Modifier.weight(1f))

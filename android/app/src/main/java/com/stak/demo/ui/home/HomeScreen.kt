@@ -29,7 +29,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -167,7 +169,7 @@ private fun TopNav(onProfile: () -> Unit) {
 		}
 		Spacer(modifier = Modifier.height((10 * u).dp))
 		Text(
-			text = "Good Morning, Hamza",
+			text = "Good Morning, ${com.stak.demo.ui.UserProfile.greetingName}",
 			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp, lineHeight = (20 * u).sp),
 			color = Color.White,
 		)
@@ -226,11 +228,7 @@ private fun MarketMoodCard() {
 				)
 			}
 			Spacer(modifier = Modifier.width((46 * u).dp))
-			Image(
-				painter = painterResource(R.drawable.home_mood_gauge),
-				contentDescription = null,
-				modifier = Modifier.size((56.9 * u).dp, (28.84 * u).dp),
-			)
+			MarketMoodGauge(u = u)
 		}
 	}
 }
@@ -452,5 +450,72 @@ private fun FirstRunOverlay(onSeeTodaysPick: () -> Unit, modifier: Modifier = Mo
 				color = Color.White,
 			)
 		}
+	}
+}
+
+/**
+ * The Market Mood gauge, drawn live from the authored geometry (1:1158):
+ * three 60-degree segments (green 0x61A57F, neutral 0xD8CFCF, red
+ * 0xDE4E71), centerline r25.6, stroke 6.75, white tapered needle. The
+ * needle sweeps in from the green end to the mood value on entry and
+ * breathes gently so the market feels live; the value maps 0..100 onto
+ * 180..0 degrees and is demo-pinned to the frame's "high volatility"
+ * 33.4 until the worldwide market feed is wired in the data phase.
+ */
+@Composable
+private fun MarketMoodGauge(u: Float, moodAngleDeg: Float = 33.4f) {
+	val sweep = androidx.compose.runtime.remember { androidx.compose.animation.core.Animatable(178f) }
+	androidx.compose.runtime.LaunchedEffect(moodAngleDeg) {
+		sweep.animateTo(moodAngleDeg, androidx.compose.animation.core.tween(900, easing = androidx.compose.animation.core.EaseOut))
+	}
+	val idle = androidx.compose.animation.core.rememberInfiniteTransition(label = "gaugeIdle")
+	val wobble by idle.animateFloat(
+		initialValue = -1.5f,
+		targetValue = 1.5f,
+		animationSpec = androidx.compose.animation.core.infiniteRepeatable<Float>(
+			animation = androidx.compose.animation.core.tween(2400, easing = androidx.compose.animation.core.EaseInOutSine),
+			repeatMode = androidx.compose.animation.core.RepeatMode.Reverse,
+		),
+		label = "gaugeWobble",
+	)
+	androidx.compose.foundation.Canvas(modifier = Modifier.size((56.9 * u).dp, (28.84 * u).dp)) {
+		val cx = size.width / 2f
+		val cy = size.height
+		val r = (25.6 * u).dp.toPx()
+		val stroke = (6.75 * u).dp.toPx()
+		val rect = androidx.compose.ui.geometry.Rect(cx - r, cy - r, cx + r, cy + r)
+		for ((start, color) in listOf(
+			180f to Color(0xFF61A57F),
+			240f to Color(0xFFD8CFCF),
+			300f to Color(0xFFDE4E71),
+		)) {
+			drawArc(
+				color = color,
+				startAngle = start,
+				sweepAngle = 60f,
+				useCenter = false,
+				topLeft = rect.topLeft,
+				size = rect.size,
+				style = androidx.compose.ui.graphics.drawscope.Stroke(width = stroke),
+			)
+		}
+		// Needle — round blob at the pivot tapering to a fine point (1:1159).
+		val a = Math.toRadians((sweep.value + wobble).toDouble())
+		val len = (19.8 * u).dp.toPx()
+		val tipX = cx + (len * Math.cos(a)).toFloat()
+		val tipY = cy - (len * Math.sin(a)).toFloat()
+		val px = (Math.sin(a)).toFloat()   // unit perpendicular
+		val py = (Math.cos(a)).toFloat()
+		val wBase = (1.6 * u).dp.toPx()
+		val wTip = (0.35 * u).dp.toPx()
+		val needle = androidx.compose.ui.graphics.Path().apply {
+			moveTo(cx + px * wBase, cy + py * wBase)
+			lineTo(tipX + px * wTip, tipY + py * wTip)
+			lineTo(tipX - px * wTip, tipY - py * wTip)
+			lineTo(cx - px * wBase, cy - py * wBase)
+			close()
+		}
+		drawPath(needle, Color.White)
+		drawCircle(color = Color.White, radius = (2.2 * u).dp.toPx(), center = androidx.compose.ui.geometry.Offset(cx, cy))
 	}
 }

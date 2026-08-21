@@ -80,7 +80,7 @@ private object Home {
  * MainShell so the other tabs share it.
  */
 @Composable
-fun HomeScreen(firstRun: Boolean, onSeeTodaysPick: () -> Unit, onProfile: () -> Unit = {}) {
+fun HomeScreen(firstRun: Boolean, onSeeTodaysPick: () -> Unit, onProfile: () -> Unit = {}, onOpenNews: () -> Unit = {}) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	BoxWithConstraints(modifier = Modifier.fillMaxSize().background(StakColors.Bg)) {
 		val statusPad = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
@@ -95,7 +95,7 @@ fun HomeScreen(firstRun: Boolean, onSeeTodaysPick: () -> Unit, onProfile: () -> 
 					.padding(horizontal = (20 * u).dp),
 			) {
 				Spacer(modifier = Modifier.height((21 * u).dp))
-				MarketMoodCard()
+				MarketMoodCard(onOpenNews = onOpenNews)
 				Spacer(modifier = Modifier.height((10 * u).dp))
 				WhyThisMattersCard()
 				Spacer(modifier = Modifier.height((20 * u).dp))
@@ -178,13 +178,18 @@ private fun TopNav(onProfile: () -> Unit) {
 
 /** Market Mood — 350x397 #171d2c card with the clipped news-deck stack. */
 @Composable
-private fun MarketMoodCard() {
+private fun MarketMoodCard(onOpenNews: () -> Unit) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Box(
 		modifier = Modifier
 			.fillMaxWidth()
 			.height((397 * u).dp)
 			.clip(RoundedCornerShape((8 * u).dp))
+			.clickable(
+				interactionSource = remember { MutableInteractionSource() },
+				indication = null,
+				onClick = onOpenNews,
+			)
 			.background(Home.CardBg),
 	) {
 		Box(modifier = Modifier.matchParentSize()) { NewsDeck() }
@@ -327,10 +332,12 @@ private fun WhyThisMattersCard() {
 			// top by 7 in the frame and must stay visible.
 			.background(Home.CardBg, RoundedCornerShape((8 * u).dp)),
 	) {
+		// The authored card clips the ball (overflow-clip); the asset is the
+		// in-card slice of the node baked from the 2x frame render.
 		Image(
 			painter = painterResource(R.drawable.home_caution_ball),
 			contentDescription = null,
-			modifier = Modifier.offset(x = (3 * u).dp, y = (-7 * u).dp).size((105 * u).dp),
+			modifier = Modifier.offset(x = (3 * u).dp).size((105 * u).dp, (91 * u).dp),
 		)
 		Column(
 			verticalArrangement = Arrangement.spacedBy((6 * u).dp),
@@ -338,7 +345,8 @@ private fun WhyThisMattersCard() {
 		) {
 			Text(
 				text = "Why this matters to you",
-				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (13 * u).sp, lineHeight = (15 * u).sp),
+				// Authored (1:1040): Sora Regular 14 / lh15.
+				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp, lineHeight = (15 * u).sp),
 				color = Color.White,
 			)
 			Text(
@@ -463,8 +471,11 @@ private fun FirstRunOverlay(onSeeTodaysPick: () -> Unit, modifier: Modifier = Mo
  * 33.4 until the worldwide market feed is wired in the data phase.
  */
 @Composable
-private fun MarketMoodGauge(u: Float, moodAngleDeg: Float = 33.4f) {
+private fun MarketMoodGauge(u: Float) {
 	val sweep = androidx.compose.runtime.remember { androidx.compose.animation.core.Animatable(178f) }
+	androidx.compose.runtime.LaunchedEffect(Unit) { MarketMoodFeed.refresh() }
+	val live = MarketMoodFeed.score
+	val moodAngleDeg = if (live != null) MarketMoodFeed.angleFor(live) else MarketMoodFeed.DEMO_ANGLE_DEG
 	androidx.compose.runtime.LaunchedEffect(moodAngleDeg) {
 		sweep.animateTo(moodAngleDeg, androidx.compose.animation.core.tween(900, easing = androidx.compose.animation.core.EaseOut))
 	}

@@ -72,12 +72,12 @@ fun SignInScreen(
 				Column(verticalArrangement = Arrangement.spacedBy((12 * u).dp)) {
 					Text(
 						text = "Welcome back",
-						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (26 * u).sp),
+						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (26 * u).sp, lineHeight = (33 * u).sp),
 						color = StakColors.TextPrimary,
 					)
 					Text(
 						text = "Your deck kept learning while you were away.",
-						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp),
+						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
 						color = Auth.SubtitleGray,
 					)
 				}

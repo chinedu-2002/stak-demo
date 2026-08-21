@@ -2,8 +2,6 @@ package com.stak.demo.ui.onboarding
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -15,7 +13,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
@@ -51,27 +48,25 @@ fun SplashScreen(onContinue: () -> Unit) {
 		delay(1200) // prototype: "After delay 1200ms" → Auth · Sign up
 		onContinue()
 	}
+	// No touch transitions - the authored motion is delay-only (1:926).
 	BoxWithConstraints(
 		modifier = Modifier
 			.fillMaxSize()
-			.background(StakColors.Bg)
-			.clickable(
-				interactionSource = remember { MutableInteractionSource() },
-				indication = null,
-				onClick = onContinue,
-			),
+			.background(StakColors.Bg),
 	) {
 		val scale = maxWidth / 390.dp
 
-		// The design canvas: fixed 390x844, scaled from its top-center.
+		// The design canvas: fixed 390x844 anchored to the TOP of the
+		// screen like the frame (taller devices gain bottom background),
+		// scaled about its top-center so y0 stays at the screen top.
 		Box(
 			modifier = Modifier
-				.align(Alignment.Center)
+				.align(Alignment.TopCenter)
 				.requiredSize(390.dp, 844.dp)
 				.graphicsLayer(
 					scaleX = scale,
 					scaleY = scale,
-					transformOrigin = TransformOrigin(0.5f, 0.5f),
+					transformOrigin = TransformOrigin(0.5f, 0f),
 				),
 		) {
 			// Glass ball — 394 square rotated 48.43°, center (380.1, 217.1).
@@ -80,14 +75,14 @@ fun SplashScreen(onContinue: () -> Unit) {
 				contentDescription = null,
 				modifier = Modifier
 					.size(394.dp)
-					.offset(x = 183.1.dp, y = 20.1.dp)
+					.offset(x = 183.8.dp, y = 23.dp)
 					.rotate(48.43f),
 			)
 
 			Column(
 				horizontalAlignment = Alignment.CenterHorizontally,
 				verticalArrangement = Arrangement.spacedBy(10.dp),
-				modifier = Modifier.align(Alignment.Center).offset(x = 0.3.dp, y = 0.71.dp),
+				modifier = Modifier.align(Alignment.TopCenter).offset(x = 0.3.dp, y = 334.49.dp),
 			) {
 				Column(
 					horizontalAlignment = Alignment.CenterHorizontally,

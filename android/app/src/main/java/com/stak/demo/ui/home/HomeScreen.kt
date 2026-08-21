@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -336,8 +337,8 @@ private fun WhyThisMattersCard(onOpenMyStak: () -> Unit) {
 		modifier = Modifier
 			.fillMaxWidth()
 			.height((91 * u).dp)
-			// Shaped background, no clip — the glass ball overflows the card
-			// top by 7 in the frame and must stay visible.
+			// Shaped background, no clip needed — the visible ball never
+			// reaches the card edges, only transparent padding overhangs.
 			.clickable(
 				interactionSource = remember { MutableInteractionSource() },
 				indication = null,
@@ -345,12 +346,17 @@ private fun WhyThisMattersCard(onOpenMyStak: () -> Unit) {
 			)
 			.background(Home.CardBg, RoundedCornerShape((8 * u).dp)),
 	) {
-		// The authored card clips the ball (overflow-clip); the asset is the
-		// in-card slice of the node baked from the 2x frame render.
+		// Authored (1:1043/1:1044): the 105x105 image box sits at (3, -7) with
+		// the source mapped 1:1 (no crop) - the ball itself stays inside the
+		// card; only the box's transparent padding overhangs. unbounded, or the
+		// card's 91 height clamps the box and Fit shrinks the ball to 87%.
 		Image(
-			painter = painterResource(R.drawable.home_caution_ball),
+			painter = painterResource(R.drawable.home_caution_glass),
 			contentDescription = null,
-			modifier = Modifier.offset(x = (3 * u).dp).size((105 * u).dp, (91 * u).dp),
+			modifier = Modifier
+				.offset(x = (3 * u).dp, y = (-7 * u).dp)
+				.wrapContentSize(align = Alignment.TopStart, unbounded = true)
+				.size((105 * u).dp),
 		)
 		Column(
 			verticalArrangement = Arrangement.spacedBy((6 * u).dp),

@@ -48,11 +48,13 @@ struct NewsDetailView: View {
 						HeroImage(saved: saved)
 						VStack(alignment: .leading, spacing: 15 * u) {
 							Text("Apple climbs 5% on foldable iPhone push")
-								.font(StakFont.sora(24 * u, .semiBold))
-								.lineSpacing((32 - 24) * u)
+								// RENDER-measured 20sp (the metadata's 24 lied); lh32 box stands.
+								.font(StakFont.sora(20 * u, .semiBold))
+								.lineSpacing((32 - 20) * u)
 								.foregroundStyle(StakColors.textPrimary)
 							Text("A bigger foldable order and the widest iPhone lineup in years sent Apple toward a record, and to within touching distance of Nvidia’s crown.")
-								.font(StakFont.geist(14 * u))
+								// 14.3 keeps the authored line-1 break after "lineup".
+								.font(StakFont.geist(14.3 * u))
 								.lineSpacing((22 - 14) * u)
 								.foregroundStyle(News.muted)
 							Byline()
@@ -608,15 +610,16 @@ private struct SaveSuccessOverlay: View {
 			}
 			.padding(.horizontal, 20 * u)
 			.padding(.top, 10 * u)
+			// Authored sheet is 388 tall - its 30 bottom pad INCLUDES the
+			// home-indicator zone (101:1169), so the content ignores the
+			// bottom safe area and pads to the physical screen bottom.
 			.padding(.bottom, 30 * u)
 			.frame(maxWidth: .infinity)
-			// The sheet surface runs under the home indicator (the Android
-			// navigationBarsPadding sits inside the background too).
 			.background {
 				UnevenRoundedRectangle(topLeadingRadius: 24 * u, bottomLeadingRadius: 0, bottomTrailingRadius: 0, topTrailingRadius: 24 * u, style: .circular)
 					.fill(News.cardBg)
-					.ignoresSafeArea(edges: .bottom)
 			}
+			.ignoresSafeArea(edges: .bottom)
 		}
 	}
 }

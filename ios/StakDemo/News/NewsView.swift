@@ -132,7 +132,8 @@ private struct BriefCarousel: View {
 						.lineSpacing((25 - 19) * u)
 						.foregroundStyle(News.ink)
 					Text("Wall Street split into the long weekend. The Dow hit an all time high while a memory chip rout pulled the Nasdaq down, and a soft jobs report eased the pressure on the...")
-						.font(StakFont.geist(12.5 * u))
+						// 12.2 restores the authored 3-line wrap (12.5 wraps to 4).
+						.font(StakFont.geist(12.2 * u))
 						.lineSpacing((17 - 12.5) * u)
 						.foregroundStyle(News.ink)
 					HStack {

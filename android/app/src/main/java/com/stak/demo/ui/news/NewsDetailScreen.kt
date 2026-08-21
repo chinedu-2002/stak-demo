@@ -96,7 +96,7 @@ fun NewsDetailScreen(onBack: () -> Unit) {
 					.fillMaxWidth()
 					.verticalScroll(rememberScrollState()),
 			) {
-				HeroImage(saved = saved)
+				HeroImage(saved = saved, onBookmark = { saved = true })
 				Column(
 					verticalArrangement = Arrangement.spacedBy((15 * u).dp),
 					modifier = Modifier
@@ -162,16 +162,17 @@ fun NewsDetailScreen(onBack: () -> Unit) {
 	}
 }
 
-/** 360x208 r24 hero — phone art, Tech & Ai toast, play badge, bookmark/saved chip. */
+/** 360x208 r10 hero — phone art, Tech & Ai toast, play badge, bookmark/saved chip. */
 @Composable
-private fun HeroImage(saved: Boolean) {
+private fun HeroImage(saved: Boolean, onBookmark: () -> Unit) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Box(
 		modifier = Modifier
 			.padding(horizontal = (15 * u).dp)
 			.fillMaxWidth()
 			.height((208 * u).dp)
-			.clip(RoundedCornerShape((24 * u).dp))
+			// Authored radius 10 (1:1517 Inspect) - the earlier 24 was wrong.
+			.clip(RoundedCornerShape((10 * u).dp))
 			.background(Color(0xFFC4C4C4)),
 	) {
 		// The authored image is oversized (407x271.18 in the 360x208 card,
@@ -232,13 +233,20 @@ private fun HeroImage(saved: Boolean) {
 				)
 			}
 		} else {
+			// Authored motion (1:1495): the hero bookmark -> News detail page
+			// saved, Instant - a direct save that skips the success sheet.
 			Image(
 				painter = painterResource(R.drawable.ic_hero_bookmark),
-				contentDescription = null,
+				contentDescription = "Save",
 				modifier = Modifier
 					.align(Alignment.TopEnd)
 					.padding(top = (8 * u).dp, end = (11 * u).dp)
-					.size((17.79 * u).dp, (18.27 * u).dp),
+					.size((17.79 * u).dp, (18.27 * u).dp)
+					.clickable(
+						interactionSource = remember { MutableInteractionSource() },
+						indication = null,
+						onClick = onBookmark,
+					),
 			)
 		}
 	}

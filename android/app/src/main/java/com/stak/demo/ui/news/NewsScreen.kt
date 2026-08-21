@@ -197,7 +197,9 @@ private fun BriefCarousel(onRead: () -> Unit) {
 			)
 			Text(
 				text = "Wall Street split into the long weekend. The Dow hit an all time high while a memory chip rout pulled the Nasdaq down, and a soft jobs report eased the pressure on the...",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12.5 * u).sp, lineHeight = (17 * u).sp),
+				// Authored 13/lh17 wraps to 3 lines in the 314 box; Compose
+				// shapes Geist wider — 12.2 restores the authored 3-line wrap.
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12.2 * u).sp, lineHeight = (17 * u).sp),
 				color = News.Ink,
 			)
 			Row(

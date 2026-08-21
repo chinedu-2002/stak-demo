@@ -106,12 +106,16 @@ fun NewsDetailScreen(onBack: () -> Unit) {
 				) {
 					Text(
 						text = "Apple climbs 5% on foldable iPhone push",
-						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (24 * u).sp, lineHeight = (32 * u).sp),
+						// RENDER-measured: the frame draws the headline ~800 device px
+					// wide (≈20sp), not the metadata's 24 — lh32 box stands.
+					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (20 * u).sp, lineHeight = (32 * u).sp),
 						color = Color.White,
 					)
 					Text(
 						text = "A bigger foldable order and the widest iPhone lineup in years sent Apple toward a record, and to within touching distance of Nvidia’s crown.",
-						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp, lineHeight = (22 * u).sp),
+						// 14.3: at 14 Compose pulls "in" up to line 1; the frame
+						// breaks after "lineup" (authored 3-line shape, lh22).
+						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (14.3 * u).sp, lineHeight = (22 * u).sp),
 						color = News.Muted,
 					)
 					Byline()
@@ -657,7 +661,8 @@ private fun SaveSuccessOverlay(onViewInMyStak: () -> Unit, onDismiss: () -> Unit
 				.background(News.CardBg)
 				.padding(horizontal = (20 * u).dp)
 				.padding(top = (10 * u).dp)
-				.navigationBarsPadding()
+				// Authored sheet is 388 tall with a 30 bottom pad that INCLUDES
+				// the home-indicator zone (101:1169) — no extra system inset.
 				.padding(bottom = (30 * u).dp),
 		) {
 			Box(

@@ -105,7 +105,10 @@ fun HomeScreen(firstRun: Boolean, onSeeTodaysPick: () -> Unit, onProfile: () -> 
 					WhyThisMattersCard(onOpenMyStak = onOpenMyStak)
 					Spacer(modifier = Modifier.height((20 * u).dp))
 					DeckBanner(onOpenDeck = onOpenDeck)
-					Spacer(modifier = Modifier.height(if (firstRun) (140 * u).dp else (20 * u).dp))
+					// Authored scroll content (118:1634) ends exactly at the
+					// banner's bottom edge - no trailing gap. First run keeps
+					// room for the scrim pill.
+					if (firstRun) Spacer(modifier = Modifier.height((140 * u).dp))
 				}
 			}
 		}
@@ -489,7 +492,9 @@ private fun FirstRunOverlay(onSeeTodaysPick: () -> Unit, modifier: Modifier = Mo
  */
 @Composable
 private fun MarketMoodGauge(u: Float) {
-	val sweep = androidx.compose.runtime.remember { androidx.compose.animation.core.Animatable(178f) }
+	// Starts at the design's default pose; moves to the live worldwide
+	// reading once it arrives (user's call, 2026-08-21).
+	val sweep = androidx.compose.runtime.remember { androidx.compose.animation.core.Animatable(MarketMoodFeed.DEMO_ANGLE_DEG) }
 	androidx.compose.runtime.LaunchedEffect(Unit) { MarketMoodFeed.refresh() }
 	val live = MarketMoodFeed.score
 	val moodAngleDeg = if (live != null) MarketMoodFeed.angleFor(live) else MarketMoodFeed.DEMO_ANGLE_DEG

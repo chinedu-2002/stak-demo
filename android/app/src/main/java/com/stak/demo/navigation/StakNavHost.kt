@@ -15,7 +15,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -60,6 +63,11 @@ import com.stak.demo.ui.onboarding.TasteRevealScreen
  */
 @Composable
 fun StakRoot(navController: NavHostController = rememberNavController()) {
+	// Signals from pushed routes back into the shell: the Save-success
+	// sheet's View-in-My-STAK pops WITH a Push Right (101:1005 Motion)
+	// and lands on the My STAK tab.
+	var newsPopPush by remember { mutableStateOf(false) }
+	val pendingShellTab = remember { mutableStateOf<MainTab?>(null) }
 	NavHost(
 		navController = navController,
 		startDestination = StakRoutes.SPLASH,
@@ -268,7 +276,8 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
 			},
 		) {
 			MainShell(
-				onOpenArticle = { navController.navigate(StakRoutes.NEWS_DETAIL) },
+				pendingTab = pendingShellTab,
+				onOpenArticle = { newsPopPush = false; navController.navigate(StakRoutes.NEWS_DETAIL) },
 				onOpenStock = { navController.navigate(StakRoutes.stockDetail("AAPL")) },
 				onOpenCollection = { navController.navigate(StakRoutes.COLLECTION) },
 				onOpenProfile = { navController.navigate(StakRoutes.PROFILE) },
@@ -307,15 +316,28 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
 		composable(
 			StakRoutes.NEWS_DETAIL,
 			// Authored (1:1228 Motion): Story tile -> News detail unsaved is
-			// INSTANT, not the house push. The article's own back/share motion
-			// is not yet authored - the pop mirrors the instant entry until
-			// its panel says otherwise.
+			// INSTANT; the article's Back -> listing is also Instant (1:1495).
+			// The ONE animated exit: View in My STAK pops with the house
+			// Push Right 300 EaseOut (101:1005 Motion).
 			enterTransition = { androidx.compose.animation.EnterTransition.None },
 			exitTransition = { androidx.compose.animation.ExitTransition.None },
-			popEnterTransition = { androidx.compose.animation.EnterTransition.None },
-			popExitTransition = { androidx.compose.animation.ExitTransition.None },
+			popEnterTransition = {
+				if (newsPopPush) slideInHorizontally(tween(300, easing = EaseOut)) { -it }
+				else androidx.compose.animation.EnterTransition.None
+			},
+			popExitTransition = {
+				if (newsPopPush) slideOutHorizontally(tween(300, easing = EaseOut)) { it }
+				else androidx.compose.animation.ExitTransition.None
+			},
 		) {
-			NewsDetailScreen(onBack = { navController.popBackStack() })
+			NewsDetailScreen(
+				onBack = { newsPopPush = false; navController.popBackStack() },
+				onViewInMyStak = {
+					newsPopPush = true
+					pendingShellTab.value = MainTab.MySTAK
+					navController.popBackStack()
+				},
+			)
 		}
 	}
 }
@@ -327,6 +349,7 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
  */
 @Composable
 private fun MainShell(
+	pendingTab: MutableState<MainTab?>,
 	onOpenArticle: () -> Unit,
 	onOpenStock: () -> Unit,
 	onOpenCollection: () -> Unit,
@@ -336,6 +359,9 @@ private fun MainShell(
 	onOpenLeaderboard: () -> Unit,
 ) {
 	var tab by rememberSaveable { mutableStateOf(MainTab.Home) }
+	LaunchedEffect(pendingTab.value) {
+		pendingTab.value?.let { tab = it; pendingTab.value = null }
+	}
 	var homeFirstRun by rememberSaveable { mutableStateOf(true) }
 	var discoverBuy by rememberSaveable { mutableStateOf(false) }
 	Box(modifier = Modifier.fillMaxSize()) {

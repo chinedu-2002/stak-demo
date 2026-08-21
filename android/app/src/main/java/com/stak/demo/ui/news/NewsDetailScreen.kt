@@ -1,5 +1,10 @@
 package com.stak.demo.ui.news
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.core.EaseOut
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -65,7 +70,7 @@ private val CtaBorder = Color(0xA1659EAD)
  * View-in-My-STAK row on the stock card, Apple + Tech tags).
  */
 @Composable
-fun NewsDetailScreen(onBack: () -> Unit) {
+fun NewsDetailScreen(onBack: () -> Unit, onViewInMyStak: () -> Unit = {}) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	var saved by rememberSaveable { mutableStateOf(false) }
 	var showSuccess by rememberSaveable { mutableStateOf(false) }
@@ -153,9 +158,17 @@ fun NewsDetailScreen(onBack: () -> Unit) {
 				}
 			}
 		}
-		if (showSuccess) {
+		// Authored (101:1005 Motion): Back -> News detail page saved,
+		// DISSOLVE 300 EaseOut; View in My STAK -> My STAK Overview,
+		// Push Right 300 (hoisted to the nav). Entry stays instant (its
+		// authored animate type is still unreadable from the file).
+		AnimatedVisibility(
+			visible = showSuccess,
+			enter = EnterTransition.None,
+			exit = fadeOut(tween(300, easing = EaseOut)),
+		) {
 			SaveSuccessOverlay(
-				onViewInMyStak = { showSuccess = false; saved = true },
+				onViewInMyStak = { saved = true; onViewInMyStak() },
 				onDismiss = { showSuccess = false; saved = true },
 			)
 		}
@@ -644,7 +657,7 @@ private fun ReadNext() {
 	}
 }
 
-/** Save success — #0a1020 scrim at ~45% + the r24 #181f30 bottom sheet (101:1169). */
+/** Save success — rgba(12,19,32,0.55) scrim + the r24 #181f30 bottom sheet (101:1169). */
 @Composable
 private fun SaveSuccessOverlay(onViewInMyStak: () -> Unit, onDismiss: () -> Unit) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
@@ -652,12 +665,9 @@ private fun SaveSuccessOverlay(onViewInMyStak: () -> Unit, onDismiss: () -> Unit
 		Box(
 			modifier = Modifier
 				.fillMaxSize()
-				.background(Color(0x730A1020))
-				.clickable(
-					interactionSource = remember { MutableInteractionSource() },
-					indication = null,
-					onClick = onDismiss,
-				),
+				// Authored scrim rgba(12,19,32,0.55) (101:1168); it has NO
+				// prototype connection - tapping it does not dismiss.
+				.background(Color(0x8C0C1320)),
 		)
 		Column(
 			horizontalAlignment = Alignment.CenterHorizontally,

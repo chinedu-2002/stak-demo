@@ -105,7 +105,16 @@ struct MainTabsView: View {
 		case .newsDetail:
 			// The article's back motion is not yet authored - it mirrors the
 			// instant entry until its panel says otherwise.
-			NewsDetailView(onBack: { popInstant() })
+			NewsDetailView(
+				onBack: { popInstant() },
+				// Authored (101:1005): View in My STAK -> My STAK Overview,
+				// Push Right 300 - the article slides out trailing while the
+				// shell (already on the My STAK tab) is revealed.
+				onViewInMyStak: {
+					tab = .myStak
+					withAnimation(FlowAnim.pushRight.animation) { _ = pushed.popLast() }
+				}
+			)
 		case .stockDetail(let fromMyStak):
 			StockDetailView(onBack: { pop() }, fromMyStak: fromMyStak)
 		case .collection:

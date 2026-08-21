@@ -15,12 +15,13 @@ private let ctaBorder = Color(argb: 0xA1659EAD)
 
 /// 03 · News — the article page in its three frames: "News detail page
 /// unsaved" (1:1495), "News detail · Save success" (101:1005, the bottom
-/// sheet over a 45% #0a1020 scrim) and "News detail page saved" (1:1359 —
+/// sheet over a rgba(12,19,32,0.55) scrim) and "News detail page saved" (1:1359 —
 /// hero toast, View-in-My-STAK row on the stock card, Apple + Tech tags).
 /// Mirrors android/ NewsDetailScreen.kt. Every metric is scaled by the
 /// 390pt artboard unit (`figmaUnit`), exactly like the Android build.
 struct NewsDetailView: View {
 	let onBack: () -> Void
+	var onViewInMyStak: () -> Void = {}
 
 	@State private var saved = false
 	@State private var showSuccess = false
@@ -99,11 +100,19 @@ struct NewsDetailView: View {
 					}
 				}
 			}
+			// Authored (101:1005 Motion): Back -> News detail page saved,
+			// DISSOLVE 300 EaseOut; View in My STAK -> My STAK Overview,
+			// Push Right 300 (hoisted to the shell). Entry stays instant (its
+			// authored animate type is still unreadable from the file).
 			if showSuccess {
 				SaveSuccessOverlay(
-					onViewInMyStak: { showSuccess = false; saved = true },
-					onDismiss: { showSuccess = false; saved = true }
+					onViewInMyStak: { saved = true; onViewInMyStak() },
+					onDismiss: {
+						saved = true
+						withAnimation(.easeOut(duration: 0.3)) { showSuccess = false }
+					}
 				)
+				.transition(.asymmetric(insertion: .identity, removal: .opacity))
 			}
 		}
 		.background(StakColors.bg.ignoresSafeArea())
@@ -533,7 +542,7 @@ private struct ReadNext: View {
 	}
 }
 
-/// Save success — #0a1020 scrim at ~45% + the r24 #181f30 bottom sheet (101:1169).
+/// Save success — rgba(12,19,32,0.55) scrim + the r24 #181f30 bottom sheet (101:1169).
 private struct SaveSuccessOverlay: View {
 	let onViewInMyStak: () -> Void
 	let onDismiss: () -> Void
@@ -541,9 +550,10 @@ private struct SaveSuccessOverlay: View {
 	var body: some View {
 		let u = figmaUnit
 		ZStack(alignment: .bottom) {
-			Color(argb: 0x730A1020)
+			// Authored scrim rgba(12,19,32,0.55) (101:1168); it has NO
+			// prototype connection - tapping it does not dismiss.
+			Color(argb: 0x8C0C1320)
 				.ignoresSafeArea()
-				.onTapGesture(perform: onDismiss)
 			VStack(spacing: 14 * u) {
 				RoundedRectangle(cornerRadius: 2 * u)
 					.fill(News.divider)

@@ -503,8 +503,8 @@ private fun MarketMoodGauge(u: Float) {
 	}
 	val idle = androidx.compose.animation.core.rememberInfiniteTransition(label = "gaugeIdle")
 	val wobble by idle.animateFloat(
-		initialValue = -1.5f,
-		targetValue = 1.5f,
+		initialValue = -0.8f,
+		targetValue = 0.8f,
 		animationSpec = androidx.compose.animation.core.infiniteRepeatable<Float>(
 			animation = androidx.compose.animation.core.tween(2400, easing = androidx.compose.animation.core.EaseInOutSine),
 			repeatMode = androidx.compose.animation.core.RepeatMode.Reverse,

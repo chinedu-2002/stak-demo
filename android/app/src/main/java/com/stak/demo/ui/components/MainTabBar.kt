@@ -46,7 +46,8 @@ fun MainTabBar(selected: MainTab, onSelect: (MainTab) -> Unit, compact: Boolean 
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Box(modifier = Modifier.fillMaxWidth().background(Color(0xFF060C1D)).navigationBarsPadding()) {
 		Row(
-			horizontalArrangement = Arrangement.spacedBy((30 * u).dp),
+			// Authored gaps: 28 on the 86 bar (1:1221), 30 on the compact 75 bar (1:1788).
+			horizontalArrangement = Arrangement.spacedBy(((if (compact) 30 else 28) * u).dp),
 			verticalAlignment = Alignment.CenterVertically,
 			modifier = Modifier.align(Alignment.Center)// Discover's frame (1:1627) authors a 75-tall bar; the other four author 86.
 				.height(((if (compact) 75 else 86) * u).dp),

@@ -334,10 +334,15 @@ private fun MainShell(
 				when (tab) {
 					MainTab.Home -> HomeScreen(
 						firstRun = homeFirstRun,
-						onSeeTodaysPick = { homeFirstRun = false },
+						// Authored (1:958/1:1097 Motion): the pill and the deck
+						// banner jump to the Discover deck ("first run" frame),
+						// the mood card to News, the why-card to My STAK - all
+						// Instant; first-run ends once the pick is seen.
+						onSeeTodaysPick = { homeFirstRun = false; tab = MainTab.Discover },
 						onProfile = onOpenProfile,
-						// Authored (1:958 Motion): Deck promo -> 03 News, Instant.
 						onOpenNews = { tab = MainTab.News },
+						onOpenMyStak = { tab = MainTab.MySTAK },
+						onOpenDeck = { homeFirstRun = false; tab = MainTab.Discover },
 					)
 					MainTab.News -> NewsScreen(onOpenArticle = onOpenArticle)
 					MainTab.Discover -> DiscoverScreen(

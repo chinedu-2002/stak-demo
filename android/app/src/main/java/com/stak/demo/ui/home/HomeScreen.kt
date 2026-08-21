@@ -80,7 +80,7 @@ private object Home {
  * MainShell so the other tabs share it.
  */
 @Composable
-fun HomeScreen(firstRun: Boolean, onSeeTodaysPick: () -> Unit, onProfile: () -> Unit = {}, onOpenNews: () -> Unit = {}) {
+fun HomeScreen(firstRun: Boolean, onSeeTodaysPick: () -> Unit, onProfile: () -> Unit = {}, onOpenNews: () -> Unit = {}, onOpenMyStak: () -> Unit = {}, onOpenDeck: () -> Unit = {}) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	BoxWithConstraints(modifier = Modifier.fillMaxSize().background(StakColors.Bg)) {
 		val statusPad = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
@@ -97,9 +97,9 @@ fun HomeScreen(firstRun: Boolean, onSeeTodaysPick: () -> Unit, onProfile: () -> 
 				Spacer(modifier = Modifier.height((21 * u).dp))
 				MarketMoodCard(onOpenNews = onOpenNews)
 				Spacer(modifier = Modifier.height((10 * u).dp))
-				WhyThisMattersCard()
+				WhyThisMattersCard(onOpenMyStak = onOpenMyStak)
 				Spacer(modifier = Modifier.height((20 * u).dp))
-				DeckBanner()
+				DeckBanner(onOpenDeck = onOpenDeck)
 				Spacer(modifier = Modifier.height(if (firstRun) (140 * u).dp else (20 * u).dp))
 			}
 		}
@@ -322,7 +322,7 @@ private fun BoxScope.NewsDeckCard(
 
 /** "Why this matters to you" — 350x91 card with the glass caution ball art. */
 @Composable
-private fun WhyThisMattersCard() {
+private fun WhyThisMattersCard(onOpenMyStak: () -> Unit) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Box(
 		modifier = Modifier
@@ -330,6 +330,11 @@ private fun WhyThisMattersCard() {
 			.height((91 * u).dp)
 			// Shaped background, no clip — the glass ball overflows the card
 			// top by 7 in the frame and must stay visible.
+			.clickable(
+				interactionSource = remember { MutableInteractionSource() },
+				indication = null,
+				onClick = onOpenMyStak,
+			)
 			.background(Home.CardBg, RoundedCornerShape((8 * u).dp)),
 	) {
 		// The authored card clips the ball (overflow-clip); the asset is the
@@ -361,13 +366,18 @@ private fun WhyThisMattersCard() {
 
 /** Teal deck banner — 350x116 with the box-and-coins art and Go to Deck chip. */
 @Composable
-private fun DeckBanner() {
+private fun DeckBanner(onOpenDeck: () -> Unit) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Box(
 		modifier = Modifier
 			.fillMaxWidth()
 			.height((116 * u).dp)
 			.clip(RoundedCornerShape((8 * u).dp))
+			.clickable(
+				interactionSource = remember { MutableInteractionSource() },
+				indication = null,
+				onClick = onOpenDeck,
+			)
 			.background(Home.Teal),
 	) {
 		// The illustration zone of the frame (box + coins + shadow), cropped
@@ -377,7 +387,9 @@ private fun DeckBanner() {
 			painter = painterResource(R.drawable.home_banner_illustration),
 			contentDescription = null,
 			contentScale = ContentScale.Fit,
-			modifier = Modifier.align(Alignment.CenterStart).size((172 * u).dp, (116 * u).dp),
+			// The 1:1191 node's in-banner slice (121.5x116 at x13), baked
+			// from the 2x frame render.
+			modifier = Modifier.align(Alignment.TopStart).offset(x = (13 * u).dp).size((121.5 * u).dp, (116 * u).dp),
 		)
 		Column(
 			verticalArrangement = Arrangement.spacedBy((10 * u).dp),

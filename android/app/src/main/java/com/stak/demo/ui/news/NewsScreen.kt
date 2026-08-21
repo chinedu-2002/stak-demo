@@ -109,7 +109,9 @@ fun NewsScreen(onOpenArticle: () -> Unit) {
 				.padding(top = (22 * u).dp),
 		) {
 			MoodMiniRow()
-			BriefCarousel(onRead = onOpenArticle)
+			// Authored motion (1:1228): only the Story tile navigates - the
+			// brief card and the For You / Markets rows have no connection.
+			BriefCarousel()
 			StoryGrid(onOpenArticle = onOpenArticle)
 			NewsSection(
 				title = "For You",
@@ -118,7 +120,6 @@ fun NewsScreen(onOpenArticle: () -> Unit) {
 					Triple(R.drawable.news_thumb_aapl, "Bloomberg · 2d", "Apple climbs 5% on foldable iPhone push"),
 					Triple(R.drawable.news_thumb_tsla, "CNBC · 2d", "Tesla drops 7% even after beating deliveries"),
 				),
-				onOpenArticle = onOpenArticle,
 			)
 			NewsSection(
 				title = "Markets",
@@ -127,7 +128,6 @@ fun NewsScreen(onOpenArticle: () -> Unit) {
 					Triple(R.drawable.news_thumb_chips, "Bloomberg · 2d", "Memory chips soar as the AI trade rotates"),
 					Triple(R.drawable.news_thumb_oil, "Reuters · 3d", "Oil slips after positive Iran talks"),
 				),
-				onOpenArticle = onOpenArticle,
 			)
 			Spacer(modifier = Modifier.height(0.dp))
 		}
@@ -169,7 +169,7 @@ private fun MoodMiniRow() {
 
 /** TODAY'S BRIEF — teal r18 feature card + pager dots. */
 @Composable
-private fun BriefCarousel(onRead: () -> Unit) {
+private fun BriefCarousel() {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy((12 * u).dp)) {
 		Column(
@@ -178,11 +178,6 @@ private fun BriefCarousel(onRead: () -> Unit) {
 				.fillMaxWidth()
 				.clip(RoundedCornerShape((18 * u).dp))
 				.background(News.Teal)
-				.clickable(
-					interactionSource = remember { MutableInteractionSource() },
-					indication = null,
-					onClick = onRead,
-				)
 				.padding(start = (18 * u).dp, end = (18 * u).dp, top = (18 * u).dp, bottom = (16 * u).dp),
 		) {
 			Text(
@@ -320,7 +315,6 @@ internal fun NewsTag(text: String, letterSpacing: androidx.compose.ui.unit.TextU
 private fun NewsSection(
 	title: String,
 	rows: List<Triple<Int, String, String>>,
-	onOpenArticle: () -> Unit,
 ) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Column(verticalArrangement = Arrangement.spacedBy((10 * u).dp), modifier = Modifier.fillMaxWidth()) {
@@ -337,10 +331,6 @@ private fun NewsSection(
 					.fillMaxWidth()
 					.clip(RoundedCornerShape((14 * u).dp))
 					.background(News.CardBg)
-					.clickable(
-						interactionSource = remember { MutableInteractionSource() },
-						indication = null,
-					) { if ("Apple" in headline) onOpenArticle() }
 					.padding((12 * u).dp),
 			) {
 				Image(

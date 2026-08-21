@@ -57,7 +57,7 @@ struct NewsDetailView: View {
 							Text("A bigger foldable order and the widest iPhone lineup in years sent Apple toward a record, and to within touching distance of Nvidia’s crown.")
 								// 14.3 keeps the authored line-1 break after "lineup".
 								.font(StakFont.geist(14.3 * u))
-								.lineSpacing((22 - 14) * u)
+								.lineSpacing((22 - 14.3) * u)
 								.foregroundStyle(News.muted)
 							Byline()
 							if !saved {

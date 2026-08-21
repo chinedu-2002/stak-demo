@@ -195,7 +195,11 @@ fun ProfileSetupScreen(onBack: () -> Unit, onProceed: () -> Unit) {
 		}
 
 		Column(modifier = Modifier.fillMaxWidth().padding(top = (8 * u).dp, bottom = (26 * u).dp)) {
-			AuthCta(text = "Proceed to home", onClick = onProceed)
+			AuthCta(text = "Proceed to home", onClick = {
+				com.stak.demo.ui.UserProfile.displayName = name.trim()
+				com.stak.demo.ui.UserProfile.photoUri = photoUri
+				onProceed()
+			})
 		}
 	}
 }

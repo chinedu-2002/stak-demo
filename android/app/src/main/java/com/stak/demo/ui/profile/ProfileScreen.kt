@@ -94,7 +94,7 @@ fun ProfileScreen(onBack: () -> Unit) {
 					)
 				}
 				Text(
-					text = "Hamza",
+					text = com.stak.demo.ui.UserProfile.greetingName,
 					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (20 * u).sp, lineHeight = (25 * u).sp),
 					color = Color.White,
 				)

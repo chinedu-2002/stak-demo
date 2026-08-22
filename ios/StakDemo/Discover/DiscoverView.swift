@@ -466,21 +466,22 @@ private struct EndOfDeck: View {
 	var body: some View {
 		let u = figmaUnit
 		VStack(spacing: 0) {
-			Spacer().frame(height: 47 * u)
+			// Authored column (1:2330): title 190, stats 274, CTA 396, swipe 577.
+			Spacer().frame(height: 34 * u)
 			Text("Deck complete")
 				.font(StakFont.sora(22 * u, .semiBold))
 				.foregroundStyle(Disc.brightInk)
-			Spacer().frame(height: 14 * u)
+			Spacer().frame(height: 8 * u)
 			Text("Twelve cards, twelve signals. Your taste graph got smarter.")
 				.font(StakFont.geist(12 * u))
 				.foregroundStyle(Disc.muted)
-			Spacer().frame(height: 33 * u)
+			Spacer().frame(height: 32 * u)
 			HStack(spacing: 10 * u) {
 				statTile("Seen", "12", u)
 				statTile("Saved", "7", u)
 				statTile("Bought", "2", u)
 			}
-			Spacer().frame(height: 56 * u)
+			Spacer().frame(height: 52 * u)
 			SheetCta(text: "Practice buy your saves", action: onPracticeBuySaves)
 			Spacer().frame(height: 9 * u)
 			Button(action: { /* My STAK lands in a later phase. */ }) {
@@ -496,7 +497,7 @@ private struct EndOfDeck: View {
 			Text("A new deck lands tomorrow with your morning brief.")
 				.font(StakFont.geist(10 * u))
 				.foregroundStyle(Disc.muted)
-			Spacer().frame(height: 22 * u)
+			Spacer().frame(height: 40.5 * u)
 			Button(action: onSwipeAgain) {
 				Text("Swipe today’s deck again")
 					.font(StakFont.sora(13 * u))
@@ -535,7 +536,8 @@ struct SheetScaffold<Content: View>: View {
 	var body: some View {
 		let u = figmaUnit
 		ZStack(alignment: .bottom) {
-			Color(argb: 0x730A1020)
+			// Authored ticket scrim rgba(0,0,0,0.6) (1:2158).
+			Color(argb: 0x99000000)
 				.ignoresSafeArea()
 				.onTapGesture(perform: onDismiss)
 			VStack(spacing: 0) {

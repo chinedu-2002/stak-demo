@@ -552,7 +552,8 @@ private struct DetailSavedSheet: View {
 	var body: some View {
 		let u = figmaUnit
 		ZStack(alignment: .bottom) {
-			Color(argb: 0x730A1020)
+			// Authored scrim rgba(12,19,32,0.55) (106:1037).
+			Color(argb: 0x8C0C1320)
 				.ignoresSafeArea()
 				.onTapGesture(perform: onDone)
 			VStack(spacing: 14 * u) {

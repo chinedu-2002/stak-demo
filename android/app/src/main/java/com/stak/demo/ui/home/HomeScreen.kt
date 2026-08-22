@@ -233,9 +233,11 @@ private fun MarketMoodCard(onOpenNews: () -> Unit) {
 					color = Color.White,
 				)
 				Text(
+					// Backend-served with the mood score in production (the words
+					// change with the market); authored demo copy this phase.
 					text = buildAnnotatedString {
-						withStyle(SpanStyle(color = Home.Teal)) { append("High volatility") }
-						append(", you should consider being cautious.")
+						withStyle(SpanStyle(color = Home.Teal)) { append(MarketMoodFeed.DEMO_STATUS_LEAD) }
+						append(MarketMoodFeed.DEMO_STATUS_REST)
 					},
 					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
 					color = Color.White,

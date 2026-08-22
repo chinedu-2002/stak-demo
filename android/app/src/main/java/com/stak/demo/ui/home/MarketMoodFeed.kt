@@ -40,6 +40,12 @@ object MarketMoodFeed {
 	/** Authored demo needle angle (1:1158) used until data arrives. */
 	const val DEMO_ANGLE_DEG = 33.4f
 
+	// The status line is backend-served with the score (designer,
+	// 2026-08-22): the lead word pair and the advice change with the
+	// computed mood. Authored demo copy for this phase:
+	const val DEMO_STATUS_LEAD = "High volatility"
+	const val DEMO_STATUS_REST = ", you should consider being cautious."
+
 	fun angleFor(score: Float): Float = (score.coerceIn(0f, 100f) / 100f) * 180f
 
 	suspend fun refresh() {

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
@@ -53,10 +54,13 @@ fun IntroScreen(onGetStarted: () -> Unit) {
 				)
 				Text(
 					text = "STAK turns brands you already know into simple, clear stock ideas, so you can invest with confidence.",
-					// Wrap-true 14x0.95: Compose shapes Geist ~5% wider, and the
-					// authored break is "...into simple, clear / stock ideas...".
+					// RENDER-measured (2x ref): the authored break is after
+					// "simple," (frame line1 ink 922, line2 991). At 13.3 the
+					// build pulls "clear" up - the 318u width pin forces the
+					// authored wrap (the earlier comment had the break backwards).
 					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (13.3 * u).sp, lineHeight = (21 * u).sp),
 					color = Auth.SubtitleGray,
+					modifier = Modifier.width((318 * u).dp),
 				)
 			}
 			// Hero — flattened Figma group (render bounds 342x488 at 1x),

@@ -45,6 +45,16 @@ private let marketsRows: [NewsRowModel] = [
 struct NewsView: View {
 	let onOpenArticle: () -> Void
 
+	// Designer's call (2026-08-22): the search icon opens a search bar that
+	// word-matches the news content; empty when nothing matches.
+	@State private var searching = false
+	@State private var query = ""
+
+	private var q: String { query.trimmingCharacters(in: .whitespaces) }
+	private func matches(_ text: String) -> Bool {
+		q.isEmpty || text.range(of: q, options: .caseInsensitive) != nil
+	}
+
 	var body: some View {
 		let u = figmaUnit
 		VStack(spacing: 0) {
@@ -58,27 +68,54 @@ struct NewsView: View {
 						.foregroundStyle(News.muted)
 				}
 				Spacer()
-				ZStack {
-					Circle().fill(News.cardBg)
-					Image("IcNewsSearch")
-						.resizable()
-						.frame(width: 20 * u, height: 20 * u)
+				Button {
+					searching.toggle()
+					if !searching { query = "" }
+				} label: {
+					ZStack {
+						Circle().fill(News.cardBg)
+						Image("IcNewsSearch")
+							.resizable()
+							.frame(width: 20 * u, height: 20 * u)
+					}
+					.frame(width: 40 * u, height: 40 * u)
 				}
-				.frame(width: 40 * u, height: 40 * u)
+				.buttonStyle(.plain)
 				.accessibilityLabel("Search")
 			}
 			.padding(.horizontal, 20 * u)
 			.padding(.top, 22 * u)
 
+			if searching {
+				TextField("Search news", text: $query)
+					.font(StakFont.geist(13 * u))
+					.foregroundStyle(StakColors.textPrimary)
+					.tint(News.teal)
+					.autocorrectionDisabled()
+					.textInputAutocapitalization(.never)
+					.padding(.horizontal, 16 * u)
+					.padding(.vertical, 13 * u)
+					.background(News.cardBg, in: RoundedRectangle(cornerRadius: 12 * u))
+					.padding(.horizontal, 20 * u)
+					.padding(.top, 12 * u)
+			}
 			ScrollView {
 				VStack(spacing: 22 * u) {
-					MoodMiniRow()
-					// Authored motion (1:1228): only the Story tile navigates - the
-					// brief card and the For You / Markets rows have no connection.
-					BriefCarousel(onRead: {})
-					StoryGrid(onOpenArticle: onOpenArticle)
-					NewsSectionView(title: "For You", rows: forYouRows, onOpenArticle: onOpenArticle)
-					NewsSectionView(title: "Markets", rows: marketsRows, onOpenArticle: onOpenArticle)
+					if q.isEmpty { MoodMiniRow() }
+					// Designer's call (2026-08-22): today's brief on tap leads to
+					// the News info page (Story tile stays wired per 1:1228).
+					if matches("Dow closes at a record as chips slide") {
+						BriefCarousel(onRead: onOpenArticle)
+					}
+					StoryGrid(onOpenArticle: onOpenArticle, query: q)
+					let forYou = forYouRows.filter { matches($0.headline) }
+					if !forYou.isEmpty {
+						NewsSectionView(title: "For You", rows: forYou, onOpenArticle: onOpenArticle)
+					}
+					let markets = marketsRows.filter { matches($0.headline) }
+					if !markets.isEmpty {
+						NewsSectionView(title: "Markets", rows: markets, onOpenArticle: onOpenArticle)
+					}
 				}
 				.padding(.horizontal, 20 * u)
 				.padding(.top, 22 * u)
@@ -182,24 +219,37 @@ private struct BriefCarousel: View {
 /// The two 128-unit story tiles ("Markets" / "Your stocks").
 private struct StoryGrid: View {
 	let onOpenArticle: () -> Void
+	var query: String = ""
+
+	private func show(_ text: String) -> Bool {
+		query.isEmpty || text.range(of: query, options: .caseInsensitive) != nil
+	}
 
 	var body: some View {
 		let u = figmaUnit
-		HStack(spacing: 12 * u) {
-			StoryTile(
-				tag: "Markets",
-				headline: "Fed minutes land Wednesday",
-				source: "Reuters · 2h",
-				onTap: {}
-			)
-			StoryTile(
-				tag: "Your stocks",
-				headline: "Apple Climbs 5% on foldable iphone",
-				source: "CNBC · 3h",
-				onTap: onOpenArticle
-			)
+		let fed = show("Fed minutes land Wednesday")
+		let apple = show("Apple Climbs 5% on foldable iphone")
+		if fed || apple {
+			HStack(spacing: 12 * u) {
+				if fed {
+					StoryTile(
+						tag: "Markets",
+						headline: "Fed minutes land Wednesday",
+						source: "Reuters · 2h",
+						onTap: {}
+					)
+				}
+				if apple {
+					StoryTile(
+						tag: "Your stocks",
+						headline: "Apple Climbs 5% on foldable iphone",
+						source: "CNBC · 3h",
+						onTap: onOpenArticle
+					)
+				}
+			}
+			.frame(height: 128 * u)
 		}
-		.frame(height: 128 * u)
 	}
 }
 

@@ -34,10 +34,15 @@ struct NewsDetailView: View {
 				HStack {
 					AuthBackCircle(action: onBack)
 					Spacer()
-					Image("IcNewsShare")
-						.resizable()
-						.frame(width: 24 * u, height: 24 * u)
-						.accessibilityLabel("Share")
+					// Designer's call (2026-08-22): share creates a link that
+					// takes a co-app user to the shared info.
+					ShareLink(item: "Apple climbs 5% on foldable iPhone push - read it on STAK: https://stak.app/news/apple-foldable-iphone-push") {
+						Image("IcNewsShare")
+							.resizable()
+							.frame(width: 24 * u, height: 24 * u)
+					}
+					.buttonStyle(.plain)
+					.accessibilityLabel("Share")
 				}
 				.padding(.leading, 16 * u)
 				.padding(.trailing, 18 * u)
@@ -62,7 +67,8 @@ struct NewsDetailView: View {
 								.foregroundStyle(News.muted)
 							Byline()
 							if !saved {
-								AddToStakButton { showSuccess = true }
+								// Designer's call (2026-08-22): the sheet scale-ins.
+								AddToStakButton { withAnimation(.easeOut(duration: 0.3)) { showSuccess = true } }
 							}
 							NewsHairline()
 							StockCard(saved: saved)
@@ -112,7 +118,7 @@ struct NewsDetailView: View {
 						withAnimation(.easeOut(duration: 0.3)) { showSuccess = false }
 					}
 				)
-				.transition(.asymmetric(insertion: .identity, removal: .opacity))
+				.transition(.asymmetric(insertion: .scale(scale: 0.92).combined(with: .opacity), removal: .opacity))
 			}
 		}
 		.background(StakColors.bg.ignoresSafeArea())

@@ -25,6 +25,12 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -65,6 +71,12 @@ internal object News {
 @Composable
 fun NewsScreen(onOpenArticle: () -> Unit) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
+	// Designer's call (2026-08-22): the search icon opens a search bar that
+	// word-matches the news content; the list is empty when nothing matches.
+	var searching by rememberSaveable { mutableStateOf(false) }
+	var query by rememberSaveable { mutableStateOf("") }
+	val q = query.trim()
+	fun matches(text: String) = q.isEmpty() || text.contains(q, ignoreCase = true)
 	Column(modifier = Modifier.fillMaxSize().background(StakColors.Bg)) {
 		Row(
 			verticalAlignment = Alignment.CenterVertically,
@@ -90,7 +102,16 @@ fun NewsScreen(onOpenArticle: () -> Unit) {
 			Spacer(modifier = Modifier.weight(1f))
 			Box(
 				contentAlignment = Alignment.Center,
-				modifier = Modifier.size((40 * u).dp).background(News.CardBg, CircleShape),
+				modifier = Modifier
+					.size((40 * u).dp)
+					.background(News.CardBg, CircleShape)
+					.clickable(
+						interactionSource = remember { MutableInteractionSource() },
+						indication = null,
+					) {
+						searching = !searching
+						if (!searching) query = ""
+					},
 			) {
 				Image(
 					painter = painterResource(R.drawable.ic_news_search),
@@ -98,6 +119,34 @@ fun NewsScreen(onOpenArticle: () -> Unit) {
 					modifier = Modifier.size((20 * u).dp),
 				)
 			}
+		}
+		if (searching) {
+			BasicTextField(
+				value = query,
+				onValueChange = { query = it },
+				singleLine = true,
+				textStyle = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (13 * u).sp, color = Color.White),
+				cursorBrush = SolidColor(News.Teal),
+				decorationBox = { inner ->
+					Box(contentAlignment = Alignment.CenterStart) {
+						if (query.isEmpty()) {
+							Text(
+								text = "Search news",
+								style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (13 * u).sp),
+								color = News.Faint,
+							)
+						}
+						inner()
+					}
+				},
+				modifier = Modifier
+					.fillMaxWidth()
+					.padding(horizontal = (20 * u).dp)
+					.padding(top = (12 * u).dp)
+					.clip(RoundedCornerShape((12 * u).dp))
+					.background(News.CardBg)
+					.padding(horizontal = (16 * u).dp, vertical = (13 * u).dp),
+			)
 		}
 		Column(
 			verticalArrangement = Arrangement.spacedBy((22 * u).dp),
@@ -108,27 +157,25 @@ fun NewsScreen(onOpenArticle: () -> Unit) {
 				.padding(horizontal = (20 * u).dp)
 				.padding(top = (22 * u).dp),
 		) {
-			MoodMiniRow()
-			// Authored motion (1:1228): only the Story tile navigates - the
-			// brief card and the For You / Markets rows have no connection.
-			BriefCarousel()
-			StoryGrid(onOpenArticle = onOpenArticle)
-			NewsSection(
-				title = "For You",
-				rows = listOf(
-					Triple(R.drawable.news_thumb_nvda, "Reuters · 2d", "Nvidia lags the chip rally it kicked off"),
-					Triple(R.drawable.news_thumb_aapl, "Bloomberg · 2d", "Apple climbs 5% on foldable iPhone push"),
-					Triple(R.drawable.news_thumb_tsla, "CNBC · 2d", "Tesla drops 7% even after beating deliveries"),
-				),
-			)
-			NewsSection(
-				title = "Markets",
-				rows = listOf(
-					Triple(R.drawable.news_thumb_jobs, "Reuters · 2d", "June jobs miss eases Fed hike bets"),
-					Triple(R.drawable.news_thumb_chips, "Bloomberg · 2d", "Memory chips soar as the AI trade rotates"),
-					Triple(R.drawable.news_thumb_oil, "Reuters · 3d", "Oil slips after positive Iran talks"),
-				),
-			)
+			if (q.isEmpty()) MoodMiniRow()
+			// Designer's call (2026-08-22): today's brief on tap leads to the
+			// News info page (the Story tile stays wired per panel 1:1228).
+			if (matches("Dow closes at a record as chips slide")) {
+				BriefCarousel(onRead = onOpenArticle)
+			}
+			StoryGrid(onOpenArticle = onOpenArticle, query = q)
+			val forYou = listOf(
+				Triple(R.drawable.news_thumb_nvda, "Reuters · 2d", "Nvidia lags the chip rally it kicked off"),
+				Triple(R.drawable.news_thumb_aapl, "Bloomberg · 2d", "Apple climbs 5% on foldable iPhone push"),
+				Triple(R.drawable.news_thumb_tsla, "CNBC · 2d", "Tesla drops 7% even after beating deliveries"),
+			).filter { matches(it.third) }
+			if (forYou.isNotEmpty()) NewsSection(title = "For You", rows = forYou)
+			val markets = listOf(
+				Triple(R.drawable.news_thumb_jobs, "Reuters · 2d", "June jobs miss eases Fed hike bets"),
+				Triple(R.drawable.news_thumb_chips, "Bloomberg · 2d", "Memory chips soar as the AI trade rotates"),
+				Triple(R.drawable.news_thumb_oil, "Reuters · 3d", "Oil slips after positive Iran talks"),
+			).filter { matches(it.third) }
+			if (markets.isNotEmpty()) NewsSection(title = "Markets", rows = markets)
 			Spacer(modifier = Modifier.height(0.dp))
 		}
 	}
@@ -169,7 +216,7 @@ private fun MoodMiniRow() {
 
 /** TODAY'S BRIEF — teal r18 feature card + pager dots. */
 @Composable
-private fun BriefCarousel() {
+private fun BriefCarousel(onRead: () -> Unit) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy((12 * u).dp)) {
 		Column(
@@ -178,6 +225,11 @@ private fun BriefCarousel() {
 				.fillMaxWidth()
 				.clip(RoundedCornerShape((18 * u).dp))
 				.background(News.Teal)
+				.clickable(
+					interactionSource = remember { MutableInteractionSource() },
+					indication = null,
+					onClick = onRead,
+				)
 				.padding(start = (18 * u).dp, end = (18 * u).dp, top = (18 * u).dp, bottom = (16 * u).dp),
 		) {
 			Text(
@@ -241,23 +293,30 @@ private fun BriefCarousel() {
 
 /** The two 128dp story tiles ("Markets" / "Your stocks"). */
 @Composable
-private fun StoryGrid(onOpenArticle: () -> Unit) {
+private fun StoryGrid(onOpenArticle: () -> Unit, query: String = "") {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
+	val showFed = query.isEmpty() || "Fed minutes land Wednesday".contains(query, ignoreCase = true)
+	val showApple = query.isEmpty() || "Apple Climbs 5% on foldable iphone".contains(query, ignoreCase = true)
+	if (!showFed && !showApple) return
 	Row(horizontalArrangement = Arrangement.spacedBy((12 * u).dp), modifier = Modifier.fillMaxWidth().height((128 * u).dp)) {
-		StoryTile(
-			tag = "Markets",
-			headline = "Fed minutes land Wednesday",
-			source = "Reuters · 2h",
-			onClick = {},
-			modifier = Modifier.weight(1f),
-		)
-		StoryTile(
-			tag = "Your stocks",
-			headline = "Apple Climbs 5% on foldable iphone",
-			source = "CNBC · 3h",
-			onClick = onOpenArticle,
-			modifier = Modifier.weight(1f),
-		)
+		if (showFed) {
+			StoryTile(
+				tag = "Markets",
+				headline = "Fed minutes land Wednesday",
+				source = "Reuters · 2h",
+				onClick = {},
+				modifier = Modifier.weight(1f),
+			)
+		}
+		if (showApple) {
+			StoryTile(
+				tag = "Your stocks",
+				headline = "Apple Climbs 5% on foldable iphone",
+				source = "CNBC · 3h",
+				onClick = onOpenArticle,
+				modifier = Modifier.weight(1f),
+			)
+		}
 	}
 }
 

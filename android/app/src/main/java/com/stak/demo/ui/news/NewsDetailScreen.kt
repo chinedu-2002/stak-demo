@@ -1,7 +1,8 @@
 package com.stak.demo.ui.news
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.core.EaseOut
 import androidx.compose.animation.core.tween
@@ -91,10 +92,27 @@ fun NewsDetailScreen(onBack: () -> Unit, onViewInMyStak: () -> Unit = {}) {
 			) {
 				AuthBackCircle(onClick = onBack)
 				Spacer(modifier = Modifier.weight(1f))
+				// Designer's call (2026-08-22): share creates a link that takes
+				// a co-app user to the shared info - the system share sheet.
+				val context = androidx.compose.ui.platform.LocalContext.current
 				Image(
 					painter = painterResource(R.drawable.ic_news_share),
 					contentDescription = "Share",
-					modifier = Modifier.size((24 * u).dp),
+					modifier = Modifier
+						.size((24 * u).dp)
+						.clickable(
+							interactionSource = remember { MutableInteractionSource() },
+							indication = null,
+						) {
+							val send = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
+								type = "text/plain"
+								putExtra(
+									android.content.Intent.EXTRA_TEXT,
+									"Apple climbs 5% on foldable iPhone push - read it on STAK: https://stak.app/news/apple-foldable-iphone-push",
+								)
+							}
+							context.startActivity(android.content.Intent.createChooser(send, "Share article"))
+						},
 				)
 			}
 			Column(
@@ -167,7 +185,10 @@ fun NewsDetailScreen(onBack: () -> Unit, onViewInMyStak: () -> Unit = {}) {
 		// authored animate type is still unreadable from the file).
 		AnimatedVisibility(
 			visible = showSuccess,
-			enter = EnterTransition.None,
+			// Designer's call (2026-08-22): the sheet appears with a
+			// SCALE-IN animation; it still dissolves out per 101:1005.
+			enter = scaleIn(initialScale = 0.92f, animationSpec = tween(300, easing = EaseOut)) +
+				fadeIn(tween(300, easing = EaseOut)),
 			exit = fadeOut(tween(300, easing = EaseOut)),
 		) {
 			SaveSuccessOverlay(

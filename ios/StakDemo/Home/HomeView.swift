@@ -335,22 +335,19 @@ private struct DeckBanner: View {
 					.font(StakFont.geist(12 * u, .light))
 					.lineSpacing((15 - 12) * u)
 					.foregroundStyle(Color.black)
-				Button {
-					// Deck screen lands in a later phase.
-				} label: {
-					HStack(spacing: 3 * u) {
-						Text("Go to Deck")
-							.font(StakFont.geist(11.49 * u, .medium))
-							.lineSpacing((15 - 11.49) * u)
-							.foregroundStyle(Color.white)
-						Image("IcArrowRightSmall")
-							.resizable()
-							.frame(width: 16 * u, height: 16 * u)
-					}
-					.frame(width: 123 * u, height: 32 * u)
-					.background(StakColors.bg, in: RoundedRectangle(cornerRadius: 15 * u))
+				// No button of its own: the authored connection is on the whole
+				// banner (1:1184), whose tap target includes this chip.
+				HStack(spacing: 3 * u) {
+					Text("Go to Deck")
+						.font(StakFont.geist(11.49 * u, .medium))
+						.lineSpacing((15 - 11.49) * u)
+						.foregroundStyle(Color.white)
+					Image("IcArrowRightSmall")
+						.resizable()
+						.frame(width: 16 * u, height: 16 * u)
 				}
-				.buttonStyle(.plain)
+				.frame(width: 123 * u, height: 32 * u)
+				.background(StakColors.bg, in: RoundedRectangle(cornerRadius: 15 * u))
 			}
 			.frame(width: 156 * u, alignment: .leading)
 			.offset(y: 0.5 * u)

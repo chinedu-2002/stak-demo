@@ -232,7 +232,7 @@ internal fun AuthCta(text: String, onClick: () -> Unit) {
 				),
 				RoundedCornerShape((6 * u).dp),
 			)
-			.border((0.36 * u).dp, StakColors.CtaBorder, RoundedCornerShape((6 * u).dp))
+			.border((0.36 * u).dp, StakColors.CtaBorderBrush, RoundedCornerShape((6 * u).dp))
 			.clickable(onClick = onClick),
 		contentAlignment = Alignment.Center,
 	) {

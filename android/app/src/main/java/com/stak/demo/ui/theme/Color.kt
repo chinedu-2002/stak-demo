@@ -48,6 +48,12 @@ object StakColors {
 	val CtaGradBottom = Color(0xFF3C98B4)
 	/** rgba(101,158,173,0.63) border on the landing-style pill button. */
 	val CtaBorder = Color(0xA1659EAD)
+	// Authored CTA hairline (1:921 Inspect): a vertical gradient
+	// #659EAD@63% -> #16363F@43%, border 0.36 outside.
+	val CtaBorderBrush = Brush.verticalGradient(
+		0f to Color(0xA1659EAD),
+		1f to Color(0x6E16363F),
+	)
 	/** rgba(44,157,188,0.45) border on secondary pill buttons. */
 	val CtaSecondaryBorder = Color(0x732C9DBC)
 	/** rgba(82,170,199,x) glow behind primary CTAs. */

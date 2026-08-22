@@ -61,7 +61,10 @@ private val CtaGradient = Brush.verticalGradient(
 	0.7255f to Color(0xFF3C98B4),
 	1f to Color(0xFF3C98B4),
 )
-private val CtaBorder = Color(0xA1659EAD)
+private val CtaBorder = Brush.verticalGradient(
+	0f to Color(0xA1659EAD),
+	1f to Color(0x6E16363F),
+)
 
 /**
  * 03 · News — the article page in its three frames: "News detail page

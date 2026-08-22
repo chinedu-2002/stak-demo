@@ -100,7 +100,10 @@ private val CtaGradient = Brush.verticalGradient(
 	0.7255f to Color(0xFF3C98B4),
 	1f to Color(0xFF3C98B4),
 )
-private val CtaBorder = Color(0xA1659EAD)
+private val CtaBorder = androidx.compose.ui.graphics.Brush.verticalGradient(
+	0f to Color(0xA1659EAD),
+	1f to Color(0x6E16363F),
+)
 
 /** A practice-buy ticket's stock values (Buy NVDA? 1:2159 / Buy AAPL? 1:3423). */
 internal data class BuySpec(

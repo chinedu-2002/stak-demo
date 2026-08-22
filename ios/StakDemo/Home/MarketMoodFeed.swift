@@ -1,10 +1,17 @@
 import Foundation
 
-/// Market Mood data source. Mirrors android ui/home/MarketMoodFeed.kt.
-/// In this build phase the gauge always rests at the authored design
-/// default (CHINEDU 1:958); flip `live` for production, where the needle
-/// measures the worldwide CNN Fear & Greed index in current time —
-/// green = market is good, middle = neutral, red = big problem.
+/// Market Mood data source.
+///
+/// CONTRACT (designer, 2026-08-22): the mood is computed by the STAK
+/// BACKEND from current economic news trends and investor bias - the
+/// app only renders the served score. `angleFor(score:)` maps the
+/// backend's 0..100 onto the gauge's 180deg sweep (0 = trouble/red on
+/// the right, 100 = good/green on the left).
+///
+/// In this build phase `live` stays false so the gauge always matches
+/// the authored frame (rest 33.4deg). When the backend endpoint
+/// exists, point refresh() at it and flip `live`. The CNN Fear & Greed
+/// fetch below is an INTERIM reference implementation only.
 enum MarketMoodFeed {
 	/// Production switch — keep false while reviews compare build vs frame.
 	static let live = false

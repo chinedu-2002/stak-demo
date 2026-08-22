@@ -12,7 +12,7 @@
         android:strokeWidth="1.01204"
         android:strokeLineCap="round"
         android:strokeLineJoin="round" />
-    <path
-        android:pathData="M23.3333,11.6667 A2.9167,2.9167 0 1 0 29.1667,11.6667 A2.9167,2.9167 0 1 0 23.3333,11.6667 Z"
-        android:fillColor="#FF8030" />
+    <!-- The authored unread dot (cx26.25 cy11.667 r2.917 #FF8030) is NOT
+         baked here: it is stateful - drawn by TopNav while unread
+         notifications exist (CHINEDU 151:1207). -->
 </vector>

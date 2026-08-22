@@ -10,12 +10,19 @@ import kotlinx.coroutines.withContext
 import org.json.JSONObject
 
 /**
- * The worldwide market mood behind the Market Mood gauge — the CNN
- * Fear & Greed Index (the same index the design cites: "Wall Street's
- * fear gauge reads 32"). Score 0 = extreme fear .. 100 = extreme
- * greed; the gauge maps it across the dial so fear points into the
- * red and greed into the green. Fetched once per app start; on any
- * failure the gauge rests at the authored demo pose.
+ * Market Mood data source.
+ *
+ * CONTRACT (designer, 2026-08-22): the mood is computed by the STAK
+ * BACKEND from current economic news trends and investor bias - the
+ * app only renders the served score. `angleFor(score)` maps the
+ * backend's 0..100 onto the gauge's 180deg sweep (0 = trouble/red on
+ * the right, 100 = good/green on the left).
+ *
+ * In this build phase LIVE stays false so the gauge always matches the
+ * authored frame (rest 33.4deg). When the backend endpoint exists,
+ * point refresh() at it and flip LIVE. The CNN Fear & Greed fetch
+ * below is an INTERIM reference implementation only - it stands in
+ * until the STAK backend serves the real mood score.
  */
 object MarketMoodFeed {
 	/**

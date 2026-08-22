@@ -48,6 +48,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
@@ -316,6 +317,17 @@ fun DiscoverScreen(onLearnMore: () -> Unit = {}, onPracticeBuy: () -> Unit = {})
 						contentAlignment = Alignment.Center,
 						modifier = Modifier
 							.size((120 * u).dp, (52 * u).dp)
+							// Authored drop shadow (1:1783 Inspect): dy 12.28, blur
+							// 12.28, #52AAC7 at 9% - the faint teal wash under the
+							// button (render-verified; Learn more's is disabled).
+							.drawBehind {
+								val r = (6 * u).dp.toPx()
+								val fw = drawContext.canvas.nativeCanvas
+								val paint = android.graphics.Paint().apply { isAntiAlias = true }
+								paint.color = android.graphics.Color.argb(23, 82, 170, 199)
+								paint.maskFilter = android.graphics.BlurMaskFilter((12.28f * u).dp.toPx(), android.graphics.BlurMaskFilter.Blur.NORMAL)
+								fw.drawRoundRect(0f, (12.28f * u).dp.toPx(), size.width, (12.28f * u).dp.toPx() + size.height, r, r, paint)
+							}
 							.background(CtaGradient, RoundedCornerShape((6 * u).dp))
 							.border((0.36 * u).dp, CtaBorder, RoundedCornerShape((6 * u).dp))
 							.clickable(

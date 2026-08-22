@@ -286,7 +286,16 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
 				onOpenLeaderboard = { navController.navigate(StakRoutes.LEADERBOARD) },
 			)
 		}
-		composable(StakRoutes.STOCK_DETAIL) {
+		composable(
+			StakRoutes.STOCK_DETAIL,
+			// Authored (1:1785 Motion): Learn more -> Stock Detail Unsaved
+			// folded is INSTANT. The detail's own back edge is not yet
+			// authored - the pop mirrors the instant entry until its panel.
+			enterTransition = { androidx.compose.animation.EnterTransition.None },
+			exitTransition = { androidx.compose.animation.ExitTransition.None },
+			popEnterTransition = { androidx.compose.animation.EnterTransition.None },
+			popExitTransition = { androidx.compose.animation.ExitTransition.None },
+		) {
 			StockDetailScreen(onBack = { navController.popBackStack() })
 		}
 		composable(StakRoutes.COLLECTION) {

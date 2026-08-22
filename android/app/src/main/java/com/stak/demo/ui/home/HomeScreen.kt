@@ -218,8 +218,18 @@ private fun MarketMoodCard(onOpenNews: () -> Unit) {
 					.offset(y = (-183.5 * u).dp)
 					.fillMaxWidth()
 					.requiredHeight((397 * u).dp)
-					.blur((4 * u).dp),
-			) { NewsDeck() }
+					// Render-calibrated: band diff vs the frame is minimal on the
+					// 2.4-2.8u plateau (8.26 vs 9.55 at the old 4u). The strip's
+					// blurred ink stays ~15% lighter than the frame's - that's the
+					// app-wide glyph-coverage class, not the kernel.
+					.blur((2.6 * u).dp),
+			) {
+				// Opaque ground: backdrop blur replaces everything behind the
+				// strip. Without it the blurred cards' soft alpha edges let the
+				// crisp deck below show through (sharp+soft union at the edges).
+				Box(modifier = Modifier.matchParentSize().background(Home.CardBg))
+				NewsDeck()
+			}
 		}
 		Row(
 			verticalAlignment = Alignment.CenterVertically,

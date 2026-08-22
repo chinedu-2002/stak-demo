@@ -547,7 +547,8 @@ private fun SheetScaffold(onDismiss: () -> Unit, content: @Composable () -> Unit
 		Box(
 			modifier = Modifier
 				.fillMaxSize()
-				.background(Color(0x730A1020))
+				// Authored ticket scrim rgba(0,0,0,0.6) (1:2158).
+				.background(Color(0x99000000))
 				.clickable(
 					interactionSource = remember { MutableInteractionSource() },
 					indication = null,
@@ -562,7 +563,8 @@ private fun SheetScaffold(onDismiss: () -> Unit, content: @Composable () -> Unit
 				.background(Disc.SheetBg)
 				.padding(horizontal = (20 * u).dp)
 				.padding(top = (10 * u).dp)
-				.navigationBarsPadding()
+				// Authored sheets (1:2159 et al) are bottom-anchored with a 30
+				// pad that INCLUDES the home-indicator zone - no extra inset.
 				.padding(bottom = (30 * u).dp),
 		) {
 			Box(
@@ -844,19 +846,21 @@ private fun EndOfDeck(onPracticeBuySaves: () -> Unit, onSwipeAgain: () -> Unit) 
 		horizontalAlignment = Alignment.CenterHorizontally,
 		modifier = Modifier.fillMaxWidth().padding(horizontal = (20 * u).dp),
 	) {
-		Spacer(modifier = Modifier.height((47 * u).dp))
+		// Authored column (1:2330): title box 190-218 (lh28), subtitle 226-242
+		// (lh16), stats 274, CTA 396, review 457, footnote ~523.5, swipe 577.
+		Spacer(modifier = Modifier.height((34 * u).dp))
 		Text(
 			text = "Deck complete",
-			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (22 * u).sp),
+			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (22 * u).sp, lineHeight = (28 * u).sp),
 			color = Disc.BrightInk,
 		)
-		Spacer(modifier = Modifier.height((14 * u).dp))
+		Spacer(modifier = Modifier.height((8 * u).dp))
 		Text(
 			text = "Twelve cards, twelve signals. Your taste graph got smarter.",
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
 			color = Disc.Muted,
 		)
-		Spacer(modifier = Modifier.height((33 * u).dp))
+		Spacer(modifier = Modifier.height((32 * u).dp))
 		Row(horizontalArrangement = Arrangement.spacedBy((10 * u).dp)) {
 			listOf("Seen" to "12", "Saved" to "7", "Bought" to "2").forEach { (label, value) ->
 				Column(
@@ -870,18 +874,18 @@ private fun EndOfDeck(onPracticeBuySaves: () -> Unit, onSwipeAgain: () -> Unit) 
 				) {
 					Text(
 						text = label,
-						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (10 * u).sp),
+						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (10 * u).sp, lineHeight = (13 * u).sp),
 						color = Disc.Muted,
 					)
 					Text(
 						text = value,
-						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (20 * u).sp),
+						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (20 * u).sp, lineHeight = (25 * u).sp),
 						color = Disc.BrightInk,
 					)
 				}
 			}
 		}
-		Spacer(modifier = Modifier.height((56 * u).dp))
+		Spacer(modifier = Modifier.height((52 * u).dp))
 		SheetCta(text = "Practice buy your saves", onClick = onPracticeBuySaves)
 		Spacer(modifier = Modifier.height((9 * u).dp))
 		Box(
@@ -904,10 +908,10 @@ private fun EndOfDeck(onPracticeBuySaves: () -> Unit, onSwipeAgain: () -> Unit) 
 		Spacer(modifier = Modifier.height((14 * u).dp))
 		Text(
 			text = "A new deck lands tomorrow with your morning brief.",
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (10 * u).sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (10 * u).sp, lineHeight = (13 * u).sp),
 			color = Disc.Muted,
 		)
-		Spacer(modifier = Modifier.height((22 * u).dp))
+		Spacer(modifier = Modifier.height((40.5 * u).dp))
 		Box(
 			contentAlignment = Alignment.Center,
 			modifier = Modifier

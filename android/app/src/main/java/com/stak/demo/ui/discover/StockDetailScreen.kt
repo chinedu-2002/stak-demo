@@ -456,7 +456,8 @@ private fun DetailSavedSheet(onDone: () -> Unit) {
 		Box(
 			modifier = Modifier
 				.fillMaxSize()
-				.background(Color(0x730A1020))
+				// Authored scrim rgba(12,19,32,0.55) (106:1037).
+				.background(Color(0x8C0C1320))
 				.clickable(
 					interactionSource = remember { MutableInteractionSource() },
 					indication = null,
@@ -473,7 +474,6 @@ private fun DetailSavedSheet(onDone: () -> Unit) {
 				.background(Card)
 				.padding(horizontal = (20 * u).dp)
 				.padding(top = (10 * u).dp)
-				.navigationBarsPadding()
 				.padding(bottom = (30 * u).dp),
 		) {
 			Box(

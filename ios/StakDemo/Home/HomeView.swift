@@ -187,10 +187,18 @@ private struct MarketMoodCard: View {
 			// redraw the same deck blurred, clipped to the card's last 30 units.
 			// An oversized child gets centered in the 30-unit band; shift it up
 			// by (397-30)/2 so the stack's bottom edge lines up with the band.
-			NewsDeck()
+			// Opaque ground: backdrop blur replaces everything behind the strip;
+			// without it the blurred cards' soft alpha edges let the crisp deck
+			// below show through. Radius render-calibrated on Android against the
+			// frame's blurred title ink (band diff 9.55 -> 8.23); verify the 2.6u
+			// visual on a simulator once this compiles on the Mac.
+			ZStack {
+				Home.cardBg
+				NewsDeck()
+			}
 				.frame(maxWidth: .infinity)
 				.frame(height: 397 * u)
-				.blur(radius: 4 * u)
+				.blur(radius: 2.6 * u)
 				.offset(y: -183.5 * u)
 				.frame(height: 30 * u)
 				.frame(maxWidth: .infinity)

@@ -231,6 +231,15 @@ struct DiscoverView: View {
 									.font(StakFont.geist(14 * u, .medium))
 									.foregroundStyle(Color.white)
 									.frame(width: 120 * u, height: 52 * u)
+									// Authored drop shadow (1:1783 Inspect): dy 12.28, blur
+									// 12.28, #52AAC7 at 9% (Learn more's is disabled).
+									.background {
+										RoundedRectangle(cornerRadius: 6 * u)
+											.fill(Color(argb: 0xFF52AAC7))
+											.opacity(0.09)
+											.blur(radius: 12.28 * u)
+											.offset(y: 12.28 * u)
+									}
 									.background(discCtaGradient, in: RoundedRectangle(cornerRadius: 6 * u))
 									.overlay(RoundedRectangle(cornerRadius: 6 * u).strokeBorder(Disc.ctaBorder, lineWidth: 0.36 * u))
 							}

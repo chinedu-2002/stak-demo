@@ -60,7 +60,8 @@ struct MainTabsView: View {
 						NewsView(onOpenArticle: { pushInstant(.newsDetail) })
 					case .discover:
 						DiscoverView(
-							onLearnMore: { push(.stockDetail(fromMyStak: false)) },
+							// Authored (1:1785): Learn more -> Stock Detail folded, Instant.
+							onLearnMore: { pushInstant(.stockDetail(fromMyStak: false)) },
 							onPracticeBuy: { discoverBuy = $0 }
 						)
 					case .myStak:
@@ -116,7 +117,9 @@ struct MainTabsView: View {
 				}
 			)
 		case .stockDetail(let fromMyStak):
-			StockDetailView(onBack: { pop() }, fromMyStak: fromMyStak)
+			// Discover-entry back mirrors the instant entry (provisional);
+			// the My STAK entry keeps the house pop until its panel.
+			StockDetailView(onBack: { if fromMyStak { pop() } else { popInstant() } }, fromMyStak: fromMyStak)
 		case .collection:
 			CollectionView(
 				onBack: { pop() },

@@ -131,6 +131,7 @@ struct HomeView: View {
 private struct TopNav: View {
 	let onProfile: () -> Void
 	@ObservedObject var profile = UserProfile.shared
+	@ObservedObject var notifications = StakNotifications.shared
 
 	var body: some View {
 		let u = figmaUnit
@@ -145,10 +146,23 @@ private struct TopNav: View {
 					.frame(width: 78.16 * u, height: 14.98 * u)
 					.accessibilityLabel("STAK")
 				Spacer()
-				Image("IcNavBell")
-					.resizable()
-					.frame(width: 35 * u, height: 35 * u)
-					.accessibilityLabel("Notifications")
+				// Bell + stateful unread dot (151:1207): the authored badge
+				// (cx26.25 cy11.667 r2.917 #FF8030) shows while untouched
+				// notifications exist and clears once they're opened and read.
+				ZStack(alignment: .topLeading) {
+					Image("IcNavBell")
+						.resizable()
+						.frame(width: 35 * u, height: 35 * u)
+					if notifications.hasUnread {
+						Circle()
+							.fill(Color(argb: 0xFFFF8030))
+							.frame(width: 5.833 * u, height: 5.833 * u)
+							.offset(x: 23.333 * u, y: 8.75 * u)
+					}
+				}
+				.contentShape(Rectangle())
+				.onTapGesture { StakNotifications.shared.markAllRead() }
+				.accessibilityLabel("Notifications")
 				Spacer().frame(width: 4 * u)
 				Button(action: onProfile) {
 					ZStack {

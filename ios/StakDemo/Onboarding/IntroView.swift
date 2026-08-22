@@ -24,6 +24,9 @@ struct IntroView: View {
 						// "...into simple, clear / stock ideas...".
 						.font(StakFont.geist(13.3 * u))
 						.lineSpacing((21 - 13.3) * u)
+					// RENDER-measured: the authored break is after "simple," -
+					// the 318u width pin forces the authored wrap (mirrors android).
+					.frame(width: 318 * u, alignment: .leading)
 						.foregroundStyle(Auth.subtitleGray)
 				}
 				.frame(maxWidth: .infinity, alignment: .leading)

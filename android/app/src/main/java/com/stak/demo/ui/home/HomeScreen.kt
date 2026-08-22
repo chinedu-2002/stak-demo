@@ -152,11 +152,31 @@ private fun TopNav(onProfile: () -> Unit, modifier: Modifier = Modifier) {
 				modifier = Modifier.size((78.16 * u).dp, (14.98 * u).dp),
 			)
 			Spacer(modifier = Modifier.weight(1f))
-			Image(
-				painter = painterResource(R.drawable.ic_nav_bell),
-				contentDescription = "Notifications",
-				modifier = Modifier.size((35 * u).dp),
-			)
+			// Bell + stateful unread dot (151:1207): the authored badge
+			// (cx26.25 cy11.667 r2.917 #FF8030) shows while untouched
+			// notifications exist and clears once they're opened and read.
+			Box(
+				modifier = Modifier
+					.size((35 * u).dp)
+					.clickable(
+						interactionSource = remember { MutableInteractionSource() },
+						indication = null,
+					) { com.stak.demo.ui.StakNotifications.markAllRead() },
+			) {
+				Image(
+					painter = painterResource(R.drawable.ic_nav_bell),
+					contentDescription = "Notifications",
+					modifier = Modifier.size((35 * u).dp),
+				)
+				if (com.stak.demo.ui.StakNotifications.hasUnread) {
+					Box(
+						modifier = Modifier
+							.offset(x = (23.333 * u).dp, y = (8.75 * u).dp)
+							.size((5.833 * u).dp)
+							.background(Color(0xFFFF8030), CircleShape),
+					)
+				}
+			}
 			Spacer(modifier = Modifier.width((4 * u).dp))
 			Box(
 				contentAlignment = Alignment.Center,

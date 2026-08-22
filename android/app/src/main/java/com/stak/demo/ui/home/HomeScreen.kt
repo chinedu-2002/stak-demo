@@ -430,16 +430,14 @@ private fun DeckBanner(onOpenDeck: () -> Unit) {
 				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Light, fontSize = (12 * u).sp, lineHeight = (15 * u).sp),
 				color = Color.Black,
 			)
-			Box(
-				contentAlignment = Alignment.Center,
-				modifier = Modifier
-					.size((123 * u).dp, (32 * u).dp)
-					.background(StakColors.Bg, RoundedCornerShape((15 * u).dp))
-					.clickable(
-						interactionSource = remember { MutableInteractionSource() },
-						indication = null,
-					) { /* Deck screen lands in a later phase. */ },
-			) {
+			// No clickable of its own: the authored connection is on the whole
+				// banner (1:1184), whose tap target includes this chip.
+				Box(
+					contentAlignment = Alignment.Center,
+					modifier = Modifier
+						.size((123 * u).dp, (32 * u).dp)
+						.background(StakColors.Bg, RoundedCornerShape((15 * u).dp)),
+				) {
 				Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy((3 * u).dp)) {
 					Text(
 						text = "Go to Deck",

@@ -122,7 +122,7 @@ fun MyStakScreen(onOpenCollection: () -> Unit, onStartSwiping: () -> Unit) {
 				modifier = Modifier
 					.size((150 * u).dp, (52 * u).dp)
 					.background(CtaGradient, RoundedCornerShape((6 * u).dp))
-					.border((0.36 * u).dp, Color(0xA1659EAD), RoundedCornerShape((6 * u).dp))
+					.border((0.36 * u).dp, StakColors.CtaBorderBrush, RoundedCornerShape((6 * u).dp))
 					.clickable(
 						interactionSource = remember { MutableInteractionSource() },
 						indication = null,

@@ -61,7 +61,10 @@ internal object Sim {
 	val Bright = Color(0xFFF2F6FC)
 	val HeaderGray = Color(0xFFD3D3DD)
 	val DarkCta = Color(0xFF12203E)
-	val CtaBorder = Color(0xA1659EAD)
+	val CtaBorder = androidx.compose.ui.graphics.Brush.verticalGradient(
+		0f to Color(0xA1659EAD),
+		1f to Color(0x6E16363F),
+	)
 }
 
 internal val PLTR_BUY = BuySpec(

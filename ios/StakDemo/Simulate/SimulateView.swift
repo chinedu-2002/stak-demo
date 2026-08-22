@@ -20,7 +20,7 @@ enum Sim {
 	static let bright = Color(argb: 0xFFF2F6FC)
 	static let headerGray = Color(argb: 0xFFD3D3DD)
 	static let darkCta = Color(argb: 0xFF12203E)
-	static let ctaBorder = Color(argb: 0xA1659EAD)
+	static let ctaBorder = StakColors.ctaBorderGradient
 }
 
 let pltrBuy = BuySpec(

@@ -57,6 +57,15 @@ enum StakColors {
 	static let ctaGradBottom = Color(argb: 0xFF3C98B4)
 	/// rgba(101,158,173,0.63) border on the landing-style pill button.
 	static let ctaBorder = Color(argb: 0xA1659EAD)
+	/// Authored CTA hairline (1:921 Inspect): vertical gradient
+	/// #659EAD@63% -> #16363F@43%, border 0.36 outside.
+	static let ctaBorderGradient = LinearGradient(
+		stops: [
+			.init(color: Color(argb: 0xA1659EAD), location: 0),
+			.init(color: Color(argb: 0x6E16363F), location: 1)
+		],
+		startPoint: .top, endPoint: .bottom
+	)
 	/// rgba(44,157,188,0.45) border on secondary pill buttons.
 	static let ctaSecondaryBorder = Color(argb: 0x732C9DBC)
 	/// rgba(82,170,199,x) glow behind primary CTAs.

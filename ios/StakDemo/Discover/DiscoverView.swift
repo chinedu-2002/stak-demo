@@ -24,7 +24,7 @@ enum Disc {
 	static let amountSelBg = Color(argb: 0xFF0F2A38)
 	static let amountSelBorder = Color(argb: 0xFF5DA8BF)
 	static let amountSelInk = Color(argb: 0xFFA6E4F7)
-	static let ctaBorder = Color(argb: 0xA1659EAD)
+	static let ctaBorder = StakColors.ctaBorderGradient
 }
 
 let discCtaGradient = LinearGradient(

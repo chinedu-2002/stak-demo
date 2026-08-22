@@ -219,7 +219,7 @@ struct AuthCta: View {
 				)
 				.overlay(
 					RoundedRectangle(cornerRadius: 6 * u)
-						.strokeBorder(StakColors.ctaBorder, lineWidth: 0.36 * u)
+						.strokeBorder(StakColors.ctaBorderGradient, lineWidth: 0.36 * u)
 				)
 		}
 		.buttonStyle(.plain)

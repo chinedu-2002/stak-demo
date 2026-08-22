@@ -133,7 +133,7 @@ struct StockDetailView: View {
 								}
 								.frame(maxWidth: .infinity)
 								.frame(height: 52 * u)
-								.overlay(RoundedRectangle(cornerRadius: 6 * u).strokeBorder(Color(argb: 0xA1659EAD), lineWidth: 0.36 * u))
+								.overlay(RoundedRectangle(cornerRadius: 6 * u).strokeBorder(StakColors.ctaBorderGradient, lineWidth: 0.36 * u))
 								DetailSecondary(text: "Practice buy") { showBuy = true }
 							} else {
 								DetailCta(text: "Save") { showSuccess = true }
@@ -170,7 +170,7 @@ private struct DetailCta: View {
 				.frame(maxWidth: .infinity)
 				.frame(height: 52 * u)
 				.background(discCtaGradient, in: RoundedRectangle(cornerRadius: 6 * u))
-				.overlay(RoundedRectangle(cornerRadius: 6 * u).strokeBorder(Color(argb: 0xA1659EAD), lineWidth: 0.36 * u))
+				.overlay(RoundedRectangle(cornerRadius: 6 * u).strokeBorder(StakColors.ctaBorderGradient, lineWidth: 0.36 * u))
 		}
 		.buttonStyle(.plain)
 	}

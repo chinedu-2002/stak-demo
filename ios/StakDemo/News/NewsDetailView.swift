@@ -11,7 +11,7 @@ private let ctaGradient = LinearGradient(
 	startPoint: .top,
 	endPoint: .bottom
 )
-private let ctaBorder = Color(argb: 0xA1659EAD)
+private let ctaBorder = StakColors.ctaBorderGradient
 
 /// 03 · News — the article page in its three frames: "News detail page
 /// unsaved" (1:1495), "News detail · Save success" (101:1005, the bottom

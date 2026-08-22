@@ -19,6 +19,12 @@ enum MarketMoodFeed {
 	/// Authored rest angle of the needle (math degrees CCW from +x).
 	static let demoAngleDeg: Double = 33.4
 
+	/// The status line is backend-served with the score (designer,
+	/// 2026-08-22): the lead word pair and the advice change with the
+	/// computed mood. Authored demo copy for this phase:
+	static let demoStatusLead = "High volatility"
+	static let demoStatusRest = ", you should consider being cautious."
+
 	/// 0 = extreme fear (red, right) … 100 = greed (green, left).
 	static func angleFor(score: Double) -> Double { score / 100 * 180 }
 

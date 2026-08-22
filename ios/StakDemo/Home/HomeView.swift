@@ -202,9 +202,11 @@ private struct MarketMoodCard: View {
 						.font(StakFont.sora(20 * u, .medium))
 						.lineSpacing((25 - 20) * u)
 						.foregroundStyle(Color.white)
+					// Backend-served with the mood score in production (the words
+					// change with the market); authored demo copy this phase.
 					(
-						Text("High volatility").foregroundColor(Home.teal)
-							+ Text(", you should consider being cautious.").foregroundColor(Color.white)
+						Text(MarketMoodFeed.demoStatusLead).foregroundColor(Home.teal)
+							+ Text(MarketMoodFeed.demoStatusRest).foregroundColor(Color.white)
 					)
 					.font(StakFont.geist(12 * u))
 					.lineSpacing((16 - 12) * u)

@@ -104,7 +104,7 @@ struct NewsView: View {
 					if q.isEmpty { MoodMiniRow() }
 					// Designer's call (2026-08-22): today's brief on tap leads to
 					// the News info page (Story tile stays wired per 1:1228).
-					if matches("Dow closes at a record as chips slide") {
+					if NewsBriefFeed.briefs().contains(where: { matches($0.title) }) {
 						BriefCarousel(onRead: onOpenArticle)
 					}
 					StoryGrid(onOpenArticle: onOpenArticle, query: q)
@@ -153,66 +153,95 @@ private struct MoodMiniRow: View {
 	}
 }
 
-/// TODAY'S BRIEF — teal r18 feature card + pager dots.
+/// TODAY'S BRIEF — teal r18 feature card + pager dots. The user swipes
+/// left and right through the served briefs (user, 2026-08-22); the
+/// active dot follows the page. Text comes from NewsBriefFeed.
 private struct BriefCarousel: View {
+	let onRead: () -> Void
+	@State private var page: Int? = 0
+
+	var body: some View {
+		let u = figmaUnit
+		let briefs = NewsBriefFeed.briefs()
+		VStack(spacing: 12 * u) {
+			ScrollView(.horizontal, showsIndicators: false) {
+				LazyHStack(spacing: 0) {
+					ForEach(briefs) { brief in
+						BriefCard(brief: brief, onRead: onRead)
+							.containerRelativeFrame(.horizontal)
+							.id(brief.id)
+					}
+				}
+				.scrollTargetLayout()
+			}
+			.scrollTargetBehavior(.paging)
+			.scrollPosition(id: $page)
+
+			// Pager dots — the active page is the 16x6 teal pill, the rest
+			// 6pt #5c6b85 dots, 6pt gaps: the authored 52x6 strip.
+			HStack(spacing: 6 * u) {
+				ForEach(briefs) { brief in
+					if brief.id == (page ?? 0) {
+						RoundedRectangle(cornerRadius: 3 * u)
+							.fill(News.teal)
+							.frame(width: 16 * u, height: 6 * u)
+					} else {
+						Circle()
+							.fill(News.faint)
+							.frame(width: 6 * u, height: 6 * u)
+					}
+				}
+			}
+			.frame(height: 6 * u)
+		}
+	}
+}
+
+/// One brief card in the carousel slot.
+private struct BriefCard: View {
+	let brief: NewsBriefFeed.Brief
 	let onRead: () -> Void
 
 	var body: some View {
 		let u = figmaUnit
-		VStack(spacing: 12 * u) {
-			Button(action: onRead) {
-				VStack(alignment: .leading, spacing: 9 * u) {
-					Text("TODAY’S BRIEF")
-						.font(StakFont.geist(10 * u, .medium))
-						.tracking(0.6 * u)
-						.foregroundStyle(News.ink)
-					Text("Dow closes at a record as chips slide")
-						.font(StakFont.sora(19 * u, .semiBold))
-						.lineSpacing((25 - 19) * u)
-						.foregroundStyle(News.ink)
-					Text("Wall Street split into the long weekend. The Dow hit an all time high while a memory chip rout pulled the Nasdaq down, and a soft jobs report eased the pressure on the...")
-						// 12.2 restores the authored 3-line wrap (12.5 wraps to 4).
-						.font(StakFont.geist(12.2 * u))
-						.lineSpacing((17 - 12.2) * u)
-						.foregroundStyle(News.ink)
-					HStack {
-						Text("Bloomberg · 10h")
-							.font(StakFont.geist(11 * u))
-							.foregroundStyle(News.ink.opacity(0.6))
-						Spacer()
-						HStack(spacing: 4 * u) {
-							Text("Read")
-								.font(StakFont.geist(12 * u, .medium))
-								.foregroundStyle(News.ink)
-							Text("›")
-								.font(StakFont.geist(13 * u, .medium))
-								.foregroundStyle(News.ink)
-						}
+		Button(action: onRead) {
+			VStack(alignment: .leading, spacing: 9 * u) {
+				Text("TODAY\u{2019}S BRIEF")
+					.font(StakFont.geist(10 * u, .medium))
+					.tracking(0.6 * u)
+					.foregroundStyle(News.ink)
+				Text(brief.title)
+					.font(StakFont.sora(19 * u, .semiBold))
+					.lineSpacing((25 - 19) * u)
+					.foregroundStyle(News.ink)
+				Text(brief.body)
+					// 12.2 restores the authored 3-line wrap (12.5 wraps to 4).
+					.font(StakFont.geist(12.2 * u))
+					.lineSpacing((17 - 12.2) * u)
+					.foregroundStyle(News.ink)
+				HStack {
+					Text(brief.source)
+						.font(StakFont.geist(11 * u))
+						.foregroundStyle(News.ink.opacity(0.6))
+					Spacer()
+					HStack(spacing: 4 * u) {
+						Text("Read")
+							.font(StakFont.geist(12 * u, .medium))
+							.foregroundStyle(News.ink)
+						Text("\u{203A}")
+							.font(StakFont.geist(13 * u, .medium))
+							.foregroundStyle(News.ink)
 					}
-					.frame(height: 21 * u)
 				}
-				.frame(maxWidth: .infinity, alignment: .leading)
-				.padding(.top, 18 * u)
-				.padding(.horizontal, 18 * u)
-				.padding(.bottom, 16 * u)
-				.background(News.teal, in: RoundedRectangle(cornerRadius: 18 * u))
+				.frame(height: 21 * u)
 			}
-			.buttonStyle(.plain)
-
-			// Pager dots — 16x6 active pill (#69b3ca) + three #5c6b85 dots,
-			// 6pt gaps: the same 52x6 strip the Android Canvas draws.
-			HStack(spacing: 6 * u) {
-				RoundedRectangle(cornerRadius: 3 * u)
-					.fill(News.teal)
-					.frame(width: 16 * u, height: 6 * u)
-				ForEach(0..<3, id: \.self) { _ in
-					Circle()
-						.fill(News.faint)
-						.frame(width: 6 * u, height: 6 * u)
-				}
-			}
-			.frame(width: 52 * u, height: 6 * u)
+			.frame(maxWidth: .infinity, alignment: .leading)
+			.padding(.top, 18 * u)
+			.padding(.horizontal, 18 * u)
+			.padding(.bottom, 16 * u)
+			.background(News.teal, in: RoundedRectangle(cornerRadius: 18 * u))
 		}
+		.buttonStyle(.plain)
 	}
 }
 

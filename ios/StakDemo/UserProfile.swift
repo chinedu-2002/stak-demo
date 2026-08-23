@@ -10,10 +10,25 @@ final class UserProfile: ObservableObject {
 	@Published var displayName: String = ""
 	@Published var photoData: Data? = nil
 
+	/// The name as the app addresses the user - always capitalized.
 	var greetingName: String {
 		let name = displayName.trimmingCharacters(in: .whitespaces)
-		return name.isEmpty ? "Hamza" : name
+		return (name.isEmpty ? "Hamza" : name).capitalizedWords
 	}
 
 	private init() {}
+}
+
+extension String {
+	/// "fish" -> "Fish", "mary ann" -> "Mary Ann": the first letter of every
+	/// word uppercased, the rest left as typed (user, 2026-08-22: names
+	/// typed in lower case must still read capitalized everywhere).
+	var capitalizedWords: String {
+		split(separator: " ", omittingEmptySubsequences: false)
+			.map { w -> String in
+				guard let first = w.first else { return String(w) }
+				return first.uppercased() + w.dropFirst()
+			}
+			.joined(separator: " ")
+	}
 }

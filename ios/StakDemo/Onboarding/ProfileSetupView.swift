@@ -115,7 +115,7 @@ struct ProfileSetupView: View {
 
 			VStack(spacing: 0) {
 				AuthCta(text: "Proceed to home", action: {
-					UserProfile.shared.displayName = name.trimmingCharacters(in: .whitespaces)
+					UserProfile.shared.displayName = name.trimmingCharacters(in: .whitespaces).capitalizedWords
 					UserProfile.shared.photoData = photoData
 					onProceed()
 				})

@@ -139,6 +139,10 @@ private struct TopNav: View {
 	let onProfile: () -> Void
 	@ObservedObject var profile = UserProfile.shared
 	@ObservedObject var notifications = StakNotifications.shared
+	/// Time-of-day in the user's own timezone (device clock); re-read every
+	/// 30s so an open app rolls over at noon / 5pm.
+	@State private var greeting = Greeting.now()
+	private let clock = Timer.publish(every: 30, on: .main, in: .common).autoconnect()
 
 	var body: some View {
 		let u = figmaUnit
@@ -185,7 +189,8 @@ private struct TopNav: View {
 			}
 			.frame(height: 35 * u)
 			Spacer().frame(height: 10 * u)
-			Text("Good Morning, \(profile.greetingName)")
+			Text("\(greeting), \(profile.greetingName)")
+				.onReceive(clock) { _ in greeting = Greeting.now() }
 				.font(StakFont.sora(16 * u, .semiBold))
 				.lineSpacing((20 - 16) * u)
 				.foregroundStyle(Color.white)

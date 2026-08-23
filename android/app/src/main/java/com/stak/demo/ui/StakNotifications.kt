@@ -14,6 +14,10 @@ import androidx.compose.runtime.setValue
  * flag; the demo carries one authored unread set so the rest state
  * matches the frame (dot on), and opening the bell reads it.
  *
+ * Notification timing is per user: the backend sends time-sensitive
+ * items (the morning deck, mood alerts) at the user's LOCAL hours using
+ * the timezone ID the app sends with the session (UserProfile.timeZoneId).
+ *
  * The notification PANEL the bell opens has no designed frame yet -
  * the tap only marks the set read until the designer draws it.
  */

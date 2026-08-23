@@ -9,6 +9,10 @@ import Foundation
 /// want to open them, and the app renders whatever is served into the
 /// authored deck slots (poses, colors and typography stay authored).
 ///
+/// Delivery timing is per user: the backend schedules the day's deck
+/// (and the mood refresh) for the user's LOCAL morning using the
+/// timezone ID the app sends with the session (UserProfile.timeZoneId).
+///
 /// `live` stays false this phase so the deck always matches the frame;
 /// the demo stories below are the authored copy.
 enum NewsDeckFeed {

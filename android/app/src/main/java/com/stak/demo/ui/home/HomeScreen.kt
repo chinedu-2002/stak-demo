@@ -203,8 +203,16 @@ private fun TopNav(onProfile: () -> Unit, modifier: Modifier = Modifier) {
 			}
 		}
 		Spacer(modifier = Modifier.height((10 * u).dp))
+		// Time-of-day in the user's own timezone (device clock); re-read
+		// every 30s so an open app rolls over at noon / 5pm.
+		val greeting by androidx.compose.runtime.produceState(initialValue = com.stak.demo.ui.Greeting.now()) {
+			while (true) {
+				kotlinx.coroutines.delay(30_000)
+				value = com.stak.demo.ui.Greeting.now()
+			}
+		}
 		Text(
-			text = "Good Morning, ${com.stak.demo.ui.UserProfile.greetingName}",
+			text = "$greeting, ${com.stak.demo.ui.UserProfile.greetingName}",
 			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp, lineHeight = (20 * u).sp),
 			color = Color.White,
 		)

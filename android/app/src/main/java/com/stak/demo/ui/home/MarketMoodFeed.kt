@@ -19,7 +19,7 @@ import org.json.JSONObject
  * the right, 100 = good/green on the left).
  *
  * In this build phase LIVE stays false so the gauge always matches the
- * authored frame (rest 33.4deg). When the backend endpoint exists,
+ * authored frame rest pose. When the backend endpoint exists,
  * point refresh() at it and flip LIVE. The CNN Fear & Greed fetch
  * below is an INTERIM reference implementation only - it stands in
  * until the STAK backend serves the real mood score.
@@ -38,7 +38,11 @@ object MarketMoodFeed {
 	private var attempted = false
 
 	/** Authored demo needle angle (1:1158) used until data arrives. */
-	const val DEMO_ANGLE_DEG = 33.4f
+	// The authored rest pose measured from the 1:1159 SVG itself (blob
+	// center -> tip axis). Under angleFor() this corresponds to score
+	// ~14.6 - recalibrate the mapping against the backend's scale when
+	// it lands (the old 33.4 was a raster estimate with a wrong pivot).
+	const val DEMO_ANGLE_DEG = 26.27f
 
 	// The status line is backend-served with the score (designer,
 	// 2026-08-22): the lead word pair and the advice change with the

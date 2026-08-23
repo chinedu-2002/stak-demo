@@ -43,6 +43,7 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
@@ -518,13 +519,15 @@ private fun FirstRunOverlay(onSeeTodaysPick: () -> Unit, modifier: Modifier = Mo
 }
 
 /**
- * The Market Mood gauge, drawn live from the authored geometry (1:1158):
- * three 60-degree segments (green 0x61A57F, neutral 0xD8CFCF, red
- * 0xDE4E71), centerline r25.6, stroke 6.75, white tapered needle. The
- * needle sweeps in from the green end to the mood value on entry and
- * breathes gently so the market feels live; the value maps 0..100 onto
- * 180..0 degrees and is demo-pinned to the frame's "high volatility"
- * 33.4 until the worldwide market feed is wired in the data phase.
+ * The Market Mood gauge, drawn from the AUTHORED SVG primitives of
+ * 1:1159 (Group 314): ring center (28.4509, 28.4509), centerline
+ * r24.8946, stroke 7.1127 in the 56.9018x28.8371 canvas; three
+ * 60-degree segments (green 0x61A57F 180..120, neutral 0xD8CFCF
+ * 120..60, red 0xDE4E71 60..0); the needle is the exact authored
+ * path - tip (48.8472, 16.37), base (28.0396, 28.2577) /
+ * (26.7526, 25.6491) - with the pivot blob at (27.8686, 26.7203)
+ * r1.5806. Rest = the authored pose verbatim (axis 26.27deg from the
+ * blob); live values rotate the needle group about the blob center.
  */
 @Composable
 private fun MarketMoodGauge(u: Float) {
@@ -547,12 +550,13 @@ private fun MarketMoodGauge(u: Float) {
 		),
 		label = "gaugeWobble",
 	)
-	androidx.compose.foundation.Canvas(modifier = Modifier.size((56.9 * u).dp, (28.84 * u).dp)) {
-		val cx = size.width / 2f
-		val cy = size.height
-		val r = (25.6 * u).dp.toPx()
-		val stroke = (6.75 * u).dp.toPx()
-		val rect = androidx.compose.ui.geometry.Rect(cx - r, cy - r, cx + r, cy + r)
+	androidx.compose.foundation.Canvas(modifier = Modifier.size((56.9018 * u).dp, (28.8371 * u).dp)) {
+		val k = size.width / 56.9018f          // canvas px per authored unit
+		val cx = 28.4509f * k
+		val cy = 28.4509f * k
+		val rc = 24.8946f * k
+		val stroke = 7.1127f * k
+		val rect = androidx.compose.ui.geometry.Rect(cx - rc, cy - rc, cx + rc, cy + rc)
 		for ((start, color) in listOf(
 			180f to Color(0xFF61A57F),
 			240f to Color(0xFFD8CFCF),
@@ -568,23 +572,22 @@ private fun MarketMoodGauge(u: Float) {
 				style = androidx.compose.ui.graphics.drawscope.Stroke(width = stroke),
 			)
 		}
-		// Needle — round blob at the pivot tapering to a fine point (1:1159).
-		val a = Math.toRadians((sweep.value + wobble).toDouble())
-		val len = (19.8 * u).dp.toPx()
-		val tipX = cx + (len * Math.cos(a)).toFloat()
-		val tipY = cy - (len * Math.sin(a)).toFloat()
-		val px = (Math.sin(a)).toFloat()   // unit perpendicular
-		val py = (Math.cos(a)).toFloat()
-		val wBase = (1.6 * u).dp.toPx()
-		val wTip = (0.35 * u).dp.toPx()
+		// Needle - the exact authored path, rotated about the authored
+		// pivot blob when the value departs the rest pose.
+		val pivot = androidx.compose.ui.geometry.Offset(27.8686f * k, 26.7203f * k)
 		val needle = androidx.compose.ui.graphics.Path().apply {
-			moveTo(cx + px * wBase, cy + py * wBase)
-			lineTo(tipX + px * wTip, tipY + py * wTip)
-			lineTo(tipX - px * wTip, tipY - py * wTip)
-			lineTo(cx - px * wBase, cy - py * wBase)
+			moveTo(48.8472f * k, 16.37f * k)
+			lineTo(28.0396f * k, 28.2577f * k)
+			lineTo(26.7526f * k, 25.6491f * k)
 			close()
 		}
-		drawPath(needle, Color.White)
-		drawCircle(color = Color.White, radius = (2.2 * u).dp.toPx(), center = androidx.compose.ui.geometry.Offset(cx, cy))
+		val rotationCw = AUTHORED_AXIS_DEG - (sweep.value + wobble)
+		withTransform({ rotate(rotationCw, pivot) }) {
+			drawPath(needle, Color.White)
+			drawCircle(color = Color.White, radius = 1.5806f * k, center = pivot)
+		}
 	}
 }
+
+/** Authored needle axis (blob center -> tip) in math degrees. */
+private const val AUTHORED_AXIS_DEG = 26.27f

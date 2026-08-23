@@ -164,17 +164,19 @@ fun NewsScreen(onOpenArticle: () -> Unit) {
 				BriefCarousel(onRead = onOpenArticle)
 			}
 			StoryGrid(onOpenArticle = onOpenArticle, query = q)
+			// Each story names the stocks it relates to; the "In your STAK"
+			// chip shows only when one of them is in the user's My STAK.
 			val forYou = listOf(
-				Triple(R.drawable.news_thumb_nvda, "Reuters · 2d", "Nvidia lags the chip rally it kicked off"),
-				Triple(R.drawable.news_thumb_aapl, "Bloomberg · 2d", "Apple climbs 5% on foldable iPhone push"),
-				Triple(R.drawable.news_thumb_tsla, "CNBC · 2d", "Tesla drops 7% even after beating deliveries"),
-			).filter { matches(it.third) }
+				NewsRow(R.drawable.news_thumb_nvda, "Reuters · 2d", "Nvidia lags the chip rally it kicked off", listOf("NVDA")),
+				NewsRow(R.drawable.news_thumb_aapl, "Bloomberg · 2d", "Apple climbs 5% on foldable iPhone push", listOf("AAPL")),
+				NewsRow(R.drawable.news_thumb_tsla, "CNBC · 2d", "Tesla drops 7% even after beating deliveries", listOf("TSLA")),
+			).filter { matches(it.headline) }
 			if (forYou.isNotEmpty()) NewsSection(title = "For You", rows = forYou)
 			val markets = listOf(
-				Triple(R.drawable.news_thumb_jobs, "Reuters · 2d", "June jobs miss eases Fed hike bets"),
-				Triple(R.drawable.news_thumb_chips, "Bloomberg · 2d", "Memory chips soar as the AI trade rotates"),
-				Triple(R.drawable.news_thumb_oil, "Reuters · 3d", "Oil slips after positive Iran talks"),
-			).filter { matches(it.third) }
+				NewsRow(R.drawable.news_thumb_jobs, "Reuters · 2d", "June jobs miss eases Fed hike bets", emptyList()),
+				NewsRow(R.drawable.news_thumb_chips, "Bloomberg · 2d", "Memory chips soar as the AI trade rotates", listOf("MU")),
+				NewsRow(R.drawable.news_thumb_oil, "Reuters · 3d", "Oil slips after positive Iran talks", listOf("XOM")),
+			).filter { matches(it.headline) }
 			if (markets.isNotEmpty()) NewsSection(title = "Markets", rows = markets)
 			Spacer(modifier = Modifier.height(0.dp))
 		}
@@ -391,7 +393,7 @@ internal fun NewsTag(text: String, letterSpacing: androidx.compose.ui.unit.TextU
 @Composable
 private fun NewsSection(
 	title: String,
-	rows: List<Triple<Int, String, String>>,
+	rows: List<NewsRow>,
 ) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Column(verticalArrangement = Arrangement.spacedBy((10 * u).dp), modifier = Modifier.fillMaxWidth()) {
@@ -400,7 +402,10 @@ private fun NewsSection(
 			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp, lineHeight = (22 * u).sp),
 			color = News.HeaderGray,
 		)
-		rows.forEach { (thumbRes, source, headline) ->
+		rows.forEach { row ->
+			val thumbRes = row.thumbRes
+			val source = row.source
+			val headline = row.headline
 			Row(
 				verticalAlignment = Alignment.CenterVertically,
 				horizontalArrangement = Arrangement.spacedBy((12 * u).dp),
@@ -424,7 +429,8 @@ private fun NewsSection(
 							color = News.Muted,
 						)
 						Spacer(modifier = Modifier.weight(1f))
-						NewsTag(text = "In your STAK")
+						// Only for stocks the user holds (user, 2026-08-23).
+						if (com.stak.demo.ui.MyStakHoldings.holdsAny(row.tickers)) NewsTag(text = "In your STAK")
 					}
 					Text(
 						text = headline,
@@ -436,3 +442,6 @@ private fun NewsSection(
 		}
 	}
 }
+
+/** One For You / Markets row; `tickers` = the stocks the story relates to. */
+internal data class NewsRow(val thumbRes: Int, val source: String, val headline: String, val tickers: List<String>)

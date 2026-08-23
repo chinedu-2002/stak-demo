@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.foundation.text.BasicTextField
+import com.stak.demo.ui.capitalizeWords
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -177,6 +178,11 @@ fun ProfileSetupScreen(onBack: () -> Unit, onProceed: () -> Unit) {
 					onValueChange = { name = it.take(NAME_MAX) },
 					textStyle = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp, color = StakColors.TextPrimary),
 					singleLine = true,
+					// Names start capitalized on the keyboard; whatever is typed
+					// is capitalized again at save (UserProfile.capitalizeWords).
+					keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+						capitalization = androidx.compose.ui.text.input.KeyboardCapitalization.Words,
+					),
 					cursorBrush = SolidColor(StakColors.Accent),
 					modifier = Modifier.weight(1f),
 				)
@@ -196,7 +202,7 @@ fun ProfileSetupScreen(onBack: () -> Unit, onProceed: () -> Unit) {
 
 		Column(modifier = Modifier.fillMaxWidth().padding(top = (8 * u).dp, bottom = (26 * u).dp)) {
 			AuthCta(text = "Proceed to home", onClick = {
-				com.stak.demo.ui.UserProfile.displayName = name.trim()
+				com.stak.demo.ui.UserProfile.displayName = name.trim().capitalizeWords()
 				com.stak.demo.ui.UserProfile.photoUri = photoUri
 				onProceed()
 			})

@@ -51,7 +51,7 @@ private val ChipInk = Color(0xFF7FD4E8)
  * Log out hairline button.
  */
 @Composable
-fun ProfileScreen(onBack: () -> Unit) {
+fun ProfileScreen(onBack: () -> Unit, onLogOut: () -> Unit = {}) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Column(modifier = Modifier.fillMaxSize().background(StakColors.Bg)) {
 		Box(
@@ -211,7 +211,7 @@ fun ProfileScreen(onBack: () -> Unit) {
 					.clickable(
 						interactionSource = remember { MutableInteractionSource() },
 						indication = null,
-					) { /* Sign-out wiring comes with Firebase. */ },
+					) { onLogOut() },
 			) {
 				Text(
 					text = "Log out",

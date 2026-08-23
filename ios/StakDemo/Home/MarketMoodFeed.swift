@@ -9,15 +9,18 @@ import Foundation
 /// the right, 100 = good/green on the left).
 ///
 /// In this build phase `live` stays false so the gauge always matches
-/// the authored frame (rest 33.4deg). When the backend endpoint
+/// the authored frame's rest pose. When the backend endpoint
 /// exists, point refresh() at it and flip `live`. The CNN Fear & Greed
 /// fetch below is an INTERIM reference implementation only.
 enum MarketMoodFeed {
 	/// Production switch — keep false while reviews compare build vs frame.
 	static let live = false
 
-	/// Authored rest angle of the needle (math degrees CCW from +x).
-	static let demoAngleDeg: Double = 33.4
+	/// Authored rest pose measured from the 1:1159 SVG itself (blob
+	/// center -> tip axis). Under angleFor() this corresponds to score
+	/// ~14.6 - recalibrate the mapping against the backend's scale when
+	/// it lands (the old 33.4 was a raster estimate with a wrong pivot).
+	static let demoAngleDeg: Double = 26.27
 
 	/// The status line is backend-served with the score (designer,
 	/// 2026-08-22): the lead word pair and the advice change with the

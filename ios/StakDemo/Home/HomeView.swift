@@ -413,13 +413,14 @@ private struct FirstRunOverlay: View {
 	}
 }
 
-/// The Market Mood gauge, drawn live from the authored geometry (1:1158):
-/// three 60-degree segments (green 0x61A57F, neutral 0xD8CFCF, red
-/// 0xDE4E71), centerline r25.6, stroke 6.75, white tapered needle. The
-/// needle RESTS at the authored design default (33.4 — the build must
-/// always match the frame in this phase, per the 2026-08-21 ruling) and
-/// breathes gently; when the production feed is on it animates to the
-/// live worldwide reading (0..100 mapped onto 180..0 degrees).
+/// The Market Mood gauge, drawn from the AUTHORED SVG primitives of
+/// 1:1159 (Group 314): ring center (28.4509, 28.4509), centerline
+/// r24.8946, stroke 7.1127 in the 56.9018x28.8371 canvas; three
+/// 60-degree segments (green 180..120, neutral 120..60, red 60..0);
+/// the needle is the exact authored path - tip (48.8472, 16.37), base
+/// (28.0396, 28.2577)/(26.7526, 25.6491) - with the pivot blob at
+/// (27.8686, 26.7203) r1.5806. Rest = the authored pose verbatim (axis
+/// 26.27 deg from the blob); live values rotate about the blob center.
 private struct MarketMoodGauge: View {
 	/// Needle pose in math degrees CCW from +x — rests at the authored
 	/// default; no entry sweep (the frame's pose is the rest state).
@@ -429,20 +430,24 @@ private struct MarketMoodGauge: View {
 
 	var body: some View {
 		let u = figmaUnit
+		let k = u   // canvas pt per authored unit (canvas width = 56.9018u)
 		ZStack {
 			GaugeArc(startDeg: 180)
-				.stroke(Color(argb: 0xFF61A57F), style: StrokeStyle(lineWidth: 6.75 * u, lineCap: .butt))
+				.stroke(Color(argb: 0xFF61A57F), style: StrokeStyle(lineWidth: 7.1127 * k, lineCap: .butt))
 			GaugeArc(startDeg: 240)
-				.stroke(Color(argb: 0xFFD8CFCF), style: StrokeStyle(lineWidth: 6.75 * u, lineCap: .butt))
+				.stroke(Color(argb: 0xFFD8CFCF), style: StrokeStyle(lineWidth: 7.1127 * k, lineCap: .butt))
 			GaugeArc(startDeg: 300)
-				.stroke(Color(argb: 0xFFDE4E71), style: StrokeStyle(lineWidth: 6.75 * u, lineCap: .butt))
-			GaugeNeedle(angleDeg: sweepDeg)
+				.stroke(Color(argb: 0xFFDE4E71), style: StrokeStyle(lineWidth: 7.1127 * k, lineCap: .butt))
+			GaugeNeedle()
 				.fill(Color.white)
-				// Math degrees run CCW; rotationEffect runs CW on screen — flip
-				// the sign. Anchor (0.5, 1) is the needle pivot (bottom-center).
-				.rotationEffect(.degrees(-wobbleDeg), anchor: UnitPoint(x: 0.5, y: 1))
+				// Rotate the authored needle group about the authored blob
+				// center; math degrees run CCW, rotationEffect CW - flip sign.
+				.rotationEffect(
+					.degrees(authoredAxisDeg - (sweepDeg + wobbleDeg)),
+					anchor: UnitPoint(x: 27.8686 / 56.9018, y: 26.7203 / 28.8371)
+				)
 		}
-		.frame(width: 56.9 * u, height: 28.84 * u)
+		.frame(width: 56.9018 * u, height: 28.8371 * u)
 		.onAppear {
 			// Idle breathe, tween 2400 EaseInOutSine reversing (cubic-bezier
 			// 0.37, 0, 0.63, 1 is the sine ease-in-out curve).
@@ -465,11 +470,11 @@ private struct GaugeArc: Shape {
 	let startDeg: Double
 
 	func path(in rect: CGRect) -> Path {
-		let u = figmaUnit
+		let k = rect.width / 56.9018
 		var path = Path()
 		path.addArc(
-			center: CGPoint(x: rect.midX, y: rect.maxY),
-			radius: 25.6 * u,
+			center: CGPoint(x: 28.4509 * k, y: 28.4509 * k),
+			radius: 24.8946 * k,
 			startAngle: .degrees(startDeg),
 			endAngle: .degrees(startDeg + 60),
 			// In SwiftUI's y-down space `clockwise: false` sweeps with
@@ -481,36 +486,22 @@ private struct GaugeArc: Shape {
 	}
 }
 
-/// The white needle (1:1159) — round blob at the pivot tapering to a fine
-/// point. `angleDeg` is math degrees CCW from +x; pivot at bottom-center.
+/// The white needle (1:1159) — the exact authored path: tapered blade to
+/// the tip plus the pivot blob. Rotation happens on the view, about the
+/// authored blob center.
 private struct GaugeNeedle: Shape {
-	var angleDeg: Double
-
-	var animatableData: Double {
-		get { angleDeg }
-		set { angleDeg = newValue }
-	}
-
 	func path(in rect: CGRect) -> Path {
-		let u = figmaUnit
-		let cx = rect.midX
-		let cy = rect.maxY
-		let a = angleDeg * .pi / 180
-		let len = 19.8 * u
-		let tipX = cx + len * cos(a)
-		let tipY = cy - len * sin(a)
-		let px = sin(a)   // unit perpendicular
-		let py = cos(a)
-		let wBase = 1.6 * u
-		let wTip = 0.35 * u
+		let k = rect.width / 56.9018
 		var path = Path()
-		path.move(to: CGPoint(x: cx + px * wBase, y: cy + py * wBase))
-		path.addLine(to: CGPoint(x: tipX + px * wTip, y: tipY + py * wTip))
-		path.addLine(to: CGPoint(x: tipX - px * wTip, y: tipY - py * wTip))
-		path.addLine(to: CGPoint(x: cx - px * wBase, y: cy - py * wBase))
+		path.move(to: CGPoint(x: 48.8472 * k, y: 16.37 * k))
+		path.addLine(to: CGPoint(x: 28.0396 * k, y: 28.2577 * k))
+		path.addLine(to: CGPoint(x: 26.7526 * k, y: 25.6491 * k))
 		path.closeSubpath()
-		let pivotR = 2.2 * u
-		path.addEllipse(in: CGRect(x: cx - pivotR, y: cy - pivotR, width: pivotR * 2, height: pivotR * 2))
+		let r = 1.5806 * k
+		path.addEllipse(in: CGRect(x: (27.8686 - 1.5806) * k, y: (26.7203 - 1.5806) * k, width: r * 2, height: r * 2))
 		return path
 	}
 }
+
+/// Authored needle axis (blob center -> tip) in math degrees.
+private let authoredAxisDeg = 26.27

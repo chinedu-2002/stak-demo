@@ -53,7 +53,7 @@ struct NewsDetailView: View {
 					VStack(spacing: 0) {
 						// Authored motion (1:1495): the hero bookmark -> News detail
 						// page saved, Instant - a direct save that skips the sheet.
-						HeroImage(saved: saved, onBookmark: { saved = true })
+						HeroImage(saved: saved, onBookmark: { saved = true; MyStakHoldings.shared.add("AAPL") })
 						VStack(alignment: .leading, spacing: 15 * u) {
 							Text("Apple climbs 5% on foldable iPhone push")
 								// RENDER-measured 20sp (the metadata's 24 lied); lh32 box stands.
@@ -112,7 +112,7 @@ struct NewsDetailView: View {
 			// authored animate type is still unreadable from the file).
 			if showSuccess {
 				SaveSuccessOverlay(
-					onViewInMyStak: { saved = true; onViewInMyStak() },
+					onViewInMyStak: { saved = true; MyStakHoldings.shared.add("AAPL"); onViewInMyStak() },
 					onDismiss: {
 						saved = true
 						withAnimation(.easeOut(duration: 0.3)) { showSuccess = false }

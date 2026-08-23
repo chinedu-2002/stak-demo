@@ -168,7 +168,7 @@ struct DiscoverView: View {
 								.frame(width: 313.14 * u, height: 352.87 * u)
 								.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
 								.offset(x: 18 * u, y: 24 * u)
-							FrontDeckCard(card: deck[seen % 3], onSave: { savedToast = true }, u: u)
+							FrontDeckCard(card: deck[seen % 3], onSave: { MyStakHoldings.shared.add(deck[seen % 3].ticker); savedToast = true }, u: u)
 								.scaleEffect(frontScale)
 								.opacity(frontOpacity)
 								.offset(y: 54.65 * u + dragOffset)

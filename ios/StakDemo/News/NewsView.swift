@@ -20,19 +20,22 @@ private struct NewsRowModel: Identifiable {
 	let thumb: String
 	let source: String
 	let headline: String
+	/// The stocks the story relates to; the "In your STAK" chip shows
+	/// only when one of them is in the user's My STAK.
+	let tickers: [String]
 	var id: String { headline }
 }
 
 private let forYouRows: [NewsRowModel] = [
-	NewsRowModel(thumb: "NewsThumbNVDA", source: "Reuters · 2d", headline: "Nvidia lags the chip rally it kicked off"),
-	NewsRowModel(thumb: "NewsThumbAAPL", source: "Bloomberg · 2d", headline: "Apple climbs 5% on foldable iPhone push"),
-	NewsRowModel(thumb: "NewsThumbTSLA", source: "CNBC · 2d", headline: "Tesla drops 7% even after beating deliveries")
+	NewsRowModel(thumb: "NewsThumbNVDA", source: "Reuters · 2d", headline: "Nvidia lags the chip rally it kicked off", tickers: ["NVDA"]),
+	NewsRowModel(thumb: "NewsThumbAAPL", source: "Bloomberg · 2d", headline: "Apple climbs 5% on foldable iPhone push", tickers: ["AAPL"]),
+	NewsRowModel(thumb: "NewsThumbTSLA", source: "CNBC · 2d", headline: "Tesla drops 7% even after beating deliveries", tickers: ["TSLA"])
 ]
 
 private let marketsRows: [NewsRowModel] = [
-	NewsRowModel(thumb: "NewsThumbJobs", source: "Reuters · 2d", headline: "June jobs miss eases Fed hike bets"),
-	NewsRowModel(thumb: "NewsThumbChips", source: "Bloomberg · 2d", headline: "Memory chips soar as the AI trade rotates"),
-	NewsRowModel(thumb: "NewsThumbOil", source: "Reuters · 3d", headline: "Oil slips after positive Iran talks")
+	NewsRowModel(thumb: "NewsThumbJobs", source: "Reuters · 2d", headline: "June jobs miss eases Fed hike bets", tickers: []),
+	NewsRowModel(thumb: "NewsThumbChips", source: "Bloomberg · 2d", headline: "Memory chips soar as the AI trade rotates", tickers: ["MU"]),
+	NewsRowModel(thumb: "NewsThumbOil", source: "Reuters · 3d", headline: "Oil slips after positive Iran talks", tickers: ["XOM"])
 ]
 
 /// 03 · News — "News listing tab", Figma node 1:1228 (CHINEDU file; mirrors
@@ -331,6 +334,7 @@ struct NewsTag: View {
 /// "For You" / "Markets" — Sora 16 #d3d3d3 header + 60-unit-thumb cards
 /// (84-unit rows: 60 thumb + 12 padding each side, 10-unit gaps).
 private struct NewsSectionView: View {
+	@ObservedObject var holdings = MyStakHoldings.shared
 	let title: String
 	let rows: [NewsRowModel]
 	let onOpenArticle: () -> Void
@@ -357,7 +361,10 @@ private struct NewsSectionView: View {
 									.font(StakFont.geist(11 * u))
 									.foregroundStyle(News.muted)
 								Spacer()
-								NewsTag(text: "In your STAK")
+								// Only for stocks the user holds (user, 2026-08-23).
+								if holdings.holdsAny(row.tickers) {
+									NewsTag(text: "In your STAK")
+								}
 							}
 							Text(row.headline)
 								.font(StakFont.sora(14 * u, .light))

@@ -15,52 +15,59 @@ private enum Home {
 /// All values are artboard units, multiplied by `figmaUnit` at use.
 private struct DeckCard {
 	let bg: Color
-	let title: String
-	let bodyText: String
 	let bodyWeight: StakFont.Weight
 	let bodySize: CGFloat
 	let titleBodyGap: CGFloat
 	let offsetX: CGFloat
 	let offsetY: CGFloat
 	let rotation: Double
+	let maxUpU: CGFloat
 }
 
 /// Front card straight, the two behind rotated; later cards draw on top.
+/// Story text comes from NewsDeckFeed; card bottoms sit at
+/// 397.4/527.2/602.7 in the 397 card, so the up-drag clamps at bottom-397.
 private let deckCards: [DeckCard] = [
 	DeckCard(
 		bg: Home.paperWhite,
-		title: "Wall Street's fear gauge reads 32",
-		bodyText: "The Fear & Greed Index is firmly in Fear territory. Money is rotating out of the ....",
 		bodyWeight: .light,
 		bodySize: 12,
 		titleBodyGap: 12,
 		offsetX: 6.2,
 		offsetY: 59.73,
-		rotation: 0
+		rotation: 0,
+		maxUpU: 0.4
 	),
 	DeckCard(
 		bg: Home.teal,
-		title: "Fed meeting notes drop Wednesday",
-		bodyText: "Minutes from the last Fed meeting land July 8. A market this tense moves on every word....",
 		bodyWeight: .regular,
 		bodySize: 11.89,
 		titleBodyGap: 17,
 		offsetX: 8.33,
 		offsetY: 189.44,
-		rotation: -3.72
+		rotation: -3.72,
+		maxUpU: 130.2
 	),
 	DeckCard(
 		bg: Home.paperWhite,
-		title: "The OpenAI IPO is reportedly delayed",
-		bodyText: "The year's most anticipated listing just slipped. Markets riding a wave of IPO excitement...",
 		bodyWeight: .light,
 		bodySize: 12,
 		titleBodyGap: 12,
 		offsetX: -0.02,
 		offsetY: 264.57,
-		rotation: -7.68
+		rotation: -7.68,
+		maxUpU: 205.7
 	)
 ]
+
+/// Shared per-card drag offsets (pt): the crisp deck takes the gesture,
+/// the blurred band copy mirrors the same motion. Each card can be
+/// dragged up to reveal its full info and eases back to the authored
+/// rest pose when the thumb leaves (user, 2026-08-22).
+private final class DeckDragState: ObservableObject {
+	@Published var offsets: [CGFloat] = [0, 0, 0]
+	var active: Int = -1
+}
 
 /// 02 · Home — CHINEDU "Home first run" (1:958) and "Home Main" (1:1097),
 /// dev-ready geometry from "Home Main" (118:1633).
@@ -193,10 +200,12 @@ private struct TopNav: View {
 private struct MarketMoodCard: View {
 	let onOpenNews: () -> Void
 
+	@StateObject private var deckDrags = DeckDragState()
+
 	var body: some View {
 		let u = figmaUnit
 		ZStack {
-			NewsDeck()
+			NewsDeck(drags: deckDrags, interactive: true)
 			// The frame's bottom strip (1:1175, 30px) backdrop-blurs the stack —
 			// redraw the same deck blurred, clipped to the card's last 30 units.
 			// An oversized child gets centered in the 30-unit band; shift it up
@@ -208,7 +217,7 @@ private struct MarketMoodCard: View {
 			// visual on a simulator once this compiles on the Mac.
 			ZStack {
 				Home.cardBg
-				NewsDeck()
+				NewsDeck(drags: deckDrags, interactive: false)
 			}
 				.frame(maxWidth: .infinity)
 				.frame(height: 397 * u)
@@ -251,28 +260,81 @@ private struct MarketMoodCard: View {
 
 /// The stacked news cards in their frame poses — front card straight, the
 /// two behind rotated; offsets are from the parent card's center (350x397).
+/// Story text comes from NewsDeckFeed (backend-proxied breaking news in
+/// production). A drag lifts the touched card above its siblings, reveals
+/// its full info, and eases back to the authored rest pose on release;
+/// the card is picked with a rotation-aware point test, topmost first.
 private struct NewsDeck: View {
+	@ObservedObject var drags: DeckDragState
+	let interactive: Bool
+
 	var body: some View {
+		let u = figmaUnit
+		let stories = NewsDeckFeed.stories()
 		ZStack {
-			ForEach(deckCards, id: \.title) { card in
-				NewsDeckCard(card: card)
+			ForEach(deckCards.indices, id: \.self) { i in
+				NewsDeckCard(card: deckCards[i], story: stories[i])
+					.offset(y: drags.offsets[i])
+					.zIndex(drags.offsets[i] != 0 ? 1 : 0)
+			}
+			if interactive {
+				Color.clear
+					.contentShape(Rectangle())
+					.gesture(
+						DragGesture(minimumDistance: 8)
+							.onChanged { value in
+								if drags.active < 0 {
+									drags.active = pickCard(at: value.startLocation, u: u)
+								}
+								let i = drags.active
+								guard i >= 0 else { return }
+								let maxUp = deckCards[i].maxUpU * u
+								drags.offsets[i] = min(0, max(-maxUp, value.translation.height))
+							}
+							.onEnded { _ in
+								let i = drags.active
+								drags.active = -1
+								guard i >= 0 else { return }
+								withAnimation(.easeOut(duration: 0.3)) { drags.offsets[i] = 0 }
+							}
+					)
 			}
 		}
+	}
+
+	/// Topmost card whose rotated 236.86x278.45 rect contains the point;
+	/// the deck area is the 350x397 mood card.
+	private func pickCard(at p: CGPoint, u: CGFloat) -> Int {
+		for i in deckCards.indices.reversed() {
+			let card = deckCards[i]
+			let cx = 175 * u + card.offsetX * u
+			let cy = 198.5 * u + card.offsetY * u + drags.offsets[i]
+			let rad = -card.rotation * .pi / 180
+			let dx = p.x - cx
+			let dy = p.y - cy
+			let lx = dx * CGFloat(cos(rad)) + dy * CGFloat(sin(rad))
+			let ly = -dx * CGFloat(sin(rad)) + dy * CGFloat(cos(rad))
+			if abs(lx) <= 236.86 * u / 2, abs(ly) <= 278.45 * u / 2 {
+				return i
+			}
+		}
+		return -1
 	}
 }
 
 /// One 236.86x278.45 news card of the deck, placed by its rotated-bounds center.
 private struct NewsDeckCard: View {
 	let card: DeckCard
+	let story: NewsDeckFeed.Story
 
 	var body: some View {
 		let u = figmaUnit
 		VStack(alignment: .leading, spacing: card.titleBodyGap * u) {
-			Text(card.title)
+			Text(story.title)
 				.font(StakFont.sora(16 * u, .medium))
 				.foregroundStyle(Home.cardInk)
 				.frame(width: 202.9 * u, alignment: .leading)
-			Text(card.bodyText)
+			Text(story.body)
 				.font(StakFont.geist(card.bodySize * u, card.bodyWeight))
 				.foregroundStyle(Home.cardInk)
 				.frame(width: 189.31 * u, alignment: .leading)

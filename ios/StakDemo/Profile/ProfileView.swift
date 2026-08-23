@@ -34,6 +34,7 @@ private let settingsRows = ["Notifications", "Appearance", "Linked accounts", "H
 /// Ports android/ ui/profile/ProfileScreen.kt.
 struct ProfileView: View {
 	let onBack: () -> Void
+	var onLogOut: () -> Void = {}
 
 	var body: some View {
 		let u = figmaUnit
@@ -149,7 +150,7 @@ struct ProfileView: View {
 					// stroke as AuthSecondaryButton (which brings its own 20pt
 					// h-padding, so it is rebuilt inline here).
 					Button {
-						// Sign-out wiring comes with Firebase.
+						onLogOut()
 					} label: {
 						Text("Log out")
 							.font(StakFont.sora(14 * u))

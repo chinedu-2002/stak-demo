@@ -68,13 +68,22 @@ struct RootFlowView: View {
 			switch phase {
 			case .splash:
 				SplashView {
-					// Prototype: dissolve, ease out, 350ms.
-					withAnimation(.easeOut(duration: 0.35)) { phase = .flow }
+					// Prototype: dissolve, ease out, 350ms. A returning user
+					// (signed in before) goes straight to Home; a first-time
+					// user is taken to create an account (user, 2026-08-23).
+					withAnimation(.easeOut(duration: 0.35)) {
+						phase = Session.shared.signedIn ? .main : .flow
+					}
 				}
 				.transition(.opacity)
 			case .main:
-				MainTabsView()
-					.transition(anim.transition)
+				MainTabsView(onLogOut: {
+					Session.shared.signOut()
+					anim = .dissolve
+					stack = [.createAccount]
+					withAnimation(FlowAnim.dissolve.animation) { phase = .flow }
+				})
+				.transition(anim.transition)
 			case .flow:
 				ZStack {
 					screen(for: stack.last ?? .createAccount)
@@ -115,6 +124,8 @@ struct RootFlowView: View {
 				// Right; the "Create account" link dissolves back.
 				onBack: { pop(.pushLeft) },
 				onSignIn: {
+					// Signed in - remembered across launches.
+					Session.shared.signIn()
 					anim = .pushRight
 					withAnimation(FlowAnim.pushRight.animation) { phase = .main }
 				},
@@ -175,6 +186,8 @@ struct RootFlowView: View {
 				onBack: { pop() },
 				// Prototype: "Proceed to home" → Home first run, Push Right.
 				onProceed: {
+					// Account created - remembered across launches.
+					Session.shared.signIn()
 					anim = .pushRight
 					withAnimation(FlowAnim.pushRight.animation) { phase = .main }
 				}

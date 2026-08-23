@@ -30,8 +30,11 @@ private enum PushedPage: Identifiable, Equatable {
 /// the Simulate portfolio/pick/leaderboard) slide in with the house
 /// Push Right.
 struct MainTabsView: View {
+	var onLogOut: () -> Void = {}
 	@State private var tab = MainTab.home
-	@State private var homeFirstRun = true
+	// First run shows only in the session that signed in / created the
+	// account; a launch that resumed a saved session lands on Home Main.
+	@State private var homeFirstRun = !Session.shared.resumedSignedIn
 	@State private var pushed: [PushedPage] = []
 	/// Hoisted Discover buy ticket — the sheet's scrim covers the tab bar
 	/// (frame 1:1970), so the shell owns it, mirroring Android MainShell.
@@ -126,7 +129,7 @@ struct MainTabsView: View {
 				onOpenStock: { push(.stockDetail(fromMyStak: true)) }
 			)
 		case .profile:
-			ProfileView(onBack: { pop() })
+			ProfileView(onBack: { pop() }, onLogOut: onLogOut)
 		case .simPortfolio:
 			SimPortfolioView(
 				onBack: { pop() },

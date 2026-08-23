@@ -122,7 +122,7 @@ fun NewsDetailScreen(onBack: () -> Unit, onViewInMyStak: () -> Unit = {}) {
 					.fillMaxWidth()
 					.verticalScroll(rememberScrollState()),
 			) {
-				HeroImage(saved = saved, onBookmark = { saved = true })
+				HeroImage(saved = saved, onBookmark = { saved = true; com.stak.demo.ui.MyStakHoldings.add("AAPL") })
 				Column(
 					verticalArrangement = Arrangement.spacedBy((15 * u).dp),
 					modifier = Modifier
@@ -192,8 +192,8 @@ fun NewsDetailScreen(onBack: () -> Unit, onViewInMyStak: () -> Unit = {}) {
 			exit = fadeOut(tween(300, easing = EaseOut)),
 		) {
 			SaveSuccessOverlay(
-				onViewInMyStak = { saved = true; onViewInMyStak() },
-				onDismiss = { showSuccess = false; saved = true },
+				onViewInMyStak = { saved = true; com.stak.demo.ui.MyStakHoldings.add("AAPL"); onViewInMyStak() },
+				onDismiss = { showSuccess = false; saved = true; com.stak.demo.ui.MyStakHoldings.add("AAPL") },
 			)
 		}
 	}

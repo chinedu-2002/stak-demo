@@ -280,7 +280,7 @@ fun DiscoverScreen(onLearnMore: () -> Unit = {}, onPracticeBuy: () -> Unit = {})
 					)
 					FrontDeckCard(
 						card = DECK[seen % 3],
-						onSave = { savedToast = true },
+						onSave = { com.stak.demo.ui.MyStakHoldings.add(DECK[seen % 3].ticker); savedToast = true },
 						u = u,
 						modifier = Modifier
 							.align(Alignment.TopCenter)

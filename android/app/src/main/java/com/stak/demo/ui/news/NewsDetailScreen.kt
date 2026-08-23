@@ -122,7 +122,7 @@ fun NewsDetailScreen(onBack: () -> Unit, onViewInMyStak: () -> Unit = {}) {
 					.fillMaxWidth()
 					.verticalScroll(rememberScrollState()),
 			) {
-				HeroImage(saved = saved, onBookmark = { saved = true; com.stak.demo.ui.MyStakHoldings.add("AAPL") })
+				HeroImage(media = NewsMedia.demo(), saved = saved, onBookmark = { saved = true; com.stak.demo.ui.MyStakHoldings.add("AAPL") })
 				Column(
 					verticalArrangement = Arrangement.spacedBy((15 * u).dp),
 					modifier = Modifier
@@ -201,8 +201,11 @@ fun NewsDetailScreen(onBack: () -> Unit, onViewInMyStak: () -> Unit = {}) {
 
 /** 360x208 r10 hero — phone art, Tech & Ai toast, play badge, bookmark/saved chip. */
 @Composable
-private fun HeroImage(saved: Boolean, onBookmark: () -> Unit) {
+private fun HeroImage(media: NewsMedia, saved: Boolean, onBookmark: () -> Unit) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
+	// The hero is a media slot: poster + play glyph at rest (frame-exact),
+	// the served video playing IN PLACE once tapped (user, 2026-08-23).
+	var playing by remember { mutableStateOf(false) }
 	Box(
 		modifier = Modifier
 			.padding(horizontal = (15 * u).dp)
@@ -212,27 +215,56 @@ private fun HeroImage(saved: Boolean, onBookmark: () -> Unit) {
 			.clip(RoundedCornerShape((10 * u).dp))
 			.background(Color(0xFFC4C4C4)),
 	) {
-		// The authored image is oversized (407x271.18 in the 360x208 card,
-		// top-left at -24,-15) — requiredSize so the card's constraints
-		// don't shrink it back to 360x208 and letterbox the art.
-		Image(
-			painter = painterResource(R.drawable.news_hero_phone),
-			contentDescription = null,
-			contentScale = ContentScale.Crop,
-			modifier = Modifier
-				.align(Alignment.Center)
-				.offset(x = (-0.5 * u).dp, y = (16.59 * u).dp)
-				.requiredSize((407 * u).dp, (271.18 * u).dp),
-		)
-		Image(
-			painter = painterResource(R.drawable.ic_hero_play),
-			contentDescription = null,
-			modifier = Modifier
-				.align(Alignment.Center)
-				.offset(x = (-0.5 * u).dp, y = (12.5 * u).dp)
-				.rotate(90f)
-				.size((59.92 * u).dp, (53.75 * u).dp),
-		)
+		val video = media as? NewsMedia.Video
+		if (playing && video != null) {
+			NewsVideoPlayer(video = video, modifier = Modifier.matchParentSize())
+		} else {
+			val posterRes = when (media) {
+				is NewsMedia.Image -> media.posterRes
+				is NewsMedia.Video -> media.posterRes
+			}
+			// The authored image is oversized (407x271.18 in the 360x208 card,
+			// top-left at -24,-15) — requiredSize so the card's constraints
+			// don't shrink it back to 360x208 and letterbox the art.
+			val posterUrl = when (media) {
+				is NewsMedia.Image -> media.url
+				is NewsMedia.Video -> media.posterUrl
+			}
+			if (posterRes != null) {
+				Image(
+					painter = painterResource(posterRes),
+					contentDescription = null,
+					contentScale = ContentScale.Crop,
+					modifier = Modifier
+						.align(Alignment.Center)
+						.offset(x = (-0.5 * u).dp, y = (16.59 * u).dp)
+						.requiredSize((407 * u).dp, (271.18 * u).dp),
+				)
+			} else if (posterUrl != null) {
+				// Served poster/image: fills the authored box.
+				coil.compose.AsyncImage(
+					model = posterUrl,
+					contentDescription = null,
+					contentScale = ContentScale.Crop,
+					modifier = Modifier.matchParentSize(),
+				)
+			}
+			if (video != null) {
+				Image(
+					painter = painterResource(R.drawable.ic_hero_play),
+					contentDescription = "Play",
+					modifier = Modifier
+						.align(Alignment.Center)
+						.offset(x = (-0.5 * u).dp, y = (12.5 * u).dp)
+						.rotate(90f)
+						.size((59.92 * u).dp, (53.75 * u).dp)
+						.clickable(
+							interactionSource = remember { MutableInteractionSource() },
+							indication = null,
+						) { playing = true },
+				)
+			}
+		}
 		Box(
 			modifier = Modifier
 				.align(Alignment.BottomStart)
@@ -805,5 +837,47 @@ private fun SaveSuccessOverlay(onViewInMyStak: () -> Unit, onDismiss: () -> Unit
 				}
 			}
 		}
+	}
+}
+
+/**
+ * Plays the served video inside the hero box: YouTube links through the
+ * embeddable player (WebView), any other link through the platform
+ * VideoView. Both autoplay once the user tapped the play glyph.
+ */
+@Composable
+private fun NewsVideoPlayer(video: NewsMedia.Video, modifier: Modifier = Modifier) {
+	val embed = video.youTubeEmbedUrl
+	if (embed != null) {
+		androidx.compose.ui.viewinterop.AndroidView(
+			modifier = modifier,
+			factory = { ctx ->
+				android.webkit.WebView(ctx).apply {
+					settings.javaScriptEnabled = true
+					settings.mediaPlaybackRequiresUserGesture = false
+					settings.domStorageEnabled = true
+					webChromeClient = android.webkit.WebChromeClient()
+					webViewClient = object : android.webkit.WebViewClient() {
+						override fun onPageFinished(view: android.webkit.WebView?, url: String?) {
+							android.util.Log.i("NewsMedia", "embed loaded: $url")
+						}
+						override fun onReceivedError(view: android.webkit.WebView?, request: android.webkit.WebResourceRequest?, error: android.webkit.WebResourceError?) {
+							android.util.Log.w("NewsMedia", "embed error ${error?.errorCode} ${error?.description} for ${request?.url}")
+						}
+					}
+					loadUrl(embed)
+				}
+			},
+		)
+	} else {
+		androidx.compose.ui.viewinterop.AndroidView(
+			modifier = modifier,
+			factory = { ctx ->
+				android.widget.VideoView(ctx).apply {
+					setVideoURI(android.net.Uri.parse(video.url))
+					setOnPreparedListener { mp -> mp.isLooping = false; start() }
+				}
+			},
+		)
 	}
 }

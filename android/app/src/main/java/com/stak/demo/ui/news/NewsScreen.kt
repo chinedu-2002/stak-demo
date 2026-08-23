@@ -160,7 +160,7 @@ fun NewsScreen(onOpenArticle: () -> Unit) {
 			if (q.isEmpty()) MoodMiniRow()
 			// Designer's call (2026-08-22): today's brief on tap leads to the
 			// News info page (the Story tile stays wired per panel 1:1228).
-			if (matches("Dow closes at a record as chips slide")) {
+			if (NewsBriefFeed.briefs().any { matches(it.title) }) {
 				BriefCarousel(onRead = onOpenArticle)
 			}
 			StoryGrid(onOpenArticle = onOpenArticle, query = q)
@@ -214,77 +214,95 @@ private fun MoodMiniRow() {
 	}
 }
 
-/** TODAY'S BRIEF — teal r18 feature card + pager dots. */
+/**
+ * TODAY'S BRIEF — teal r18 feature card + pager dots. The user swipes
+ * left and right through the served briefs (user, 2026-08-22); the
+ * active dot follows the page. Text comes from NewsBriefFeed.
+ */
 @Composable
 private fun BriefCarousel(onRead: () -> Unit) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
+	val briefs = NewsBriefFeed.briefs()
+	val pager = androidx.compose.foundation.pager.rememberPagerState(pageCount = { briefs.size })
 	Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy((12 * u).dp)) {
-		Column(
-			verticalArrangement = Arrangement.spacedBy((9 * u).dp),
-			modifier = Modifier
-				.fillMaxWidth()
-				.clip(RoundedCornerShape((18 * u).dp))
-				.background(News.Teal)
-				.clickable(
-					interactionSource = remember { MutableInteractionSource() },
-					indication = null,
-					onClick = onRead,
-				)
-				.padding(start = (18 * u).dp, end = (18 * u).dp, top = (18 * u).dp, bottom = (16 * u).dp),
+		androidx.compose.foundation.pager.HorizontalPager(
+			state = pager,
+			modifier = Modifier.fillMaxWidth(),
+		) { page ->
+			BriefCard(brief = briefs[page], onRead = onRead)
+		}
+		// Pager dots — the active page is the 16x6 teal pill, the rest
+		// 6px #5c6b85 dots, 6px gaps: the authored 52x6 strip.
+		Row(
+			horizontalArrangement = Arrangement.spacedBy((6 * u).dp),
+			verticalAlignment = Alignment.CenterVertically,
+			modifier = Modifier.height((6 * u).dp),
 		) {
-			Text(
-				text = "TODAY’S BRIEF",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, lineHeight = (13 * u).sp, letterSpacing = (0.6 * u).sp),
-				color = News.Ink,
-			)
-			Text(
-				text = "Dow closes at a record as chips slide",
-				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (19 * u).sp, lineHeight = (25 * u).sp),
-				color = News.Ink,
-			)
-			Text(
-				text = "Wall Street split into the long weekend. The Dow hit an all time high while a memory chip rout pulled the Nasdaq down, and a soft jobs report eased the pressure on the...",
-				// Authored 13/lh17 wraps to 3 lines in the 314 box; Compose
-				// shapes Geist wider — 12.2 restores the authored 3-line wrap.
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12.2 * u).sp, lineHeight = (17 * u).sp),
-				color = News.Ink,
-			)
-			Row(
-				verticalAlignment = Alignment.CenterVertically,
-				modifier = Modifier.fillMaxWidth().height((21 * u).dp),
-			) {
-				Text(
-					text = "Bloomberg · 10h",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp, lineHeight = (14 * u).sp),
-					color = News.Ink.copy(alpha = 0.6f),
-				)
-				Spacer(modifier = Modifier.weight(1f))
-				Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy((4 * u).dp)) {
-					Text(
-						text = "Read",
-						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp),
-						color = News.Ink,
-					)
-					Text(
-						text = "›",
-						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp),
-						color = News.Ink,
-					)
+			for (i in briefs.indices) {
+				if (i == pager.currentPage) {
+					Box(modifier = Modifier.size((16 * u).dp, (6 * u).dp).background(News.Teal, RoundedCornerShape((3 * u).dp)))
+				} else {
+					Box(modifier = Modifier.size((6 * u).dp).background(Color(0xFF5C6B85), CircleShape))
 				}
 			}
 		}
-		// Pager dots — 16x6 active pill (#69b3ca) + three #5c6b85 dots.
-		Canvas(modifier = Modifier.size((52 * u).dp, (6 * u).dp)) {
-			drawRoundRect(
-				News.Teal,
-				size = androidx.compose.ui.geometry.Size((16 * u).dp.toPx(), (6 * u).dp.toPx()),
-				cornerRadius = androidx.compose.ui.geometry.CornerRadius((3 * u).dp.toPx()),
+	}
+}
+
+/** One brief card in the carousel slot. */
+@Composable
+private fun BriefCard(brief: NewsBriefFeed.Brief, onRead: () -> Unit) {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
+	Column(
+		verticalArrangement = Arrangement.spacedBy((9 * u).dp),
+		modifier = Modifier
+			.fillMaxWidth()
+			.clip(RoundedCornerShape((18 * u).dp))
+			.background(News.Teal)
+			.clickable(
+				interactionSource = remember { MutableInteractionSource() },
+				indication = null,
+				onClick = onRead,
 			)
-			for (i in 0..2) {
-				drawCircle(
-					Color(0xFF5C6B85),
-					radius = (3 * u).dp.toPx(),
-					center = androidx.compose.ui.geometry.Offset(((25 + i * 12) * u).dp.toPx(), (3 * u).dp.toPx()),
+			.padding(start = (18 * u).dp, end = (18 * u).dp, top = (18 * u).dp, bottom = (16 * u).dp),
+	) {
+		Text(
+			text = "TODAY\u2019S BRIEF",
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, lineHeight = (13 * u).sp, letterSpacing = (0.6 * u).sp),
+			color = News.Ink,
+		)
+		Text(
+			text = brief.title,
+			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (19 * u).sp, lineHeight = (25 * u).sp),
+			color = News.Ink,
+		)
+		Text(
+			text = brief.body,
+			// Authored 13/lh17 wraps to 3 lines in the 314 box; Compose
+			// shapes Geist wider — 12.2 restores the authored 3-line wrap.
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12.2 * u).sp, lineHeight = (17 * u).sp),
+			color = News.Ink,
+		)
+		Row(
+			verticalAlignment = Alignment.CenterVertically,
+			modifier = Modifier.fillMaxWidth().height((21 * u).dp),
+		) {
+			Text(
+				text = brief.source,
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp, lineHeight = (14 * u).sp),
+				color = News.Ink.copy(alpha = 0.6f),
+			)
+			Spacer(modifier = Modifier.weight(1f))
+			Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy((4 * u).dp)) {
+				Text(
+					text = "Read",
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp),
+					color = News.Ink,
+				)
+				Text(
+					text = "\u203a",
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp),
+					color = News.Ink,
 				)
 			}
 		}

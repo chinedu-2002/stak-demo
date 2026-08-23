@@ -1,4 +1,6 @@
 import SwiftUI
+import WebKit
+import AVKit
 
 /// The CHINEDU CTA gradient (Add to STAK / View in My STAK).
 private let ctaGradient = LinearGradient(
@@ -53,7 +55,7 @@ struct NewsDetailView: View {
 					VStack(spacing: 0) {
 						// Authored motion (1:1495): the hero bookmark -> News detail
 						// page saved, Instant - a direct save that skips the sheet.
-						HeroImage(saved: saved, onBookmark: { saved = true; MyStakHoldings.shared.add("AAPL") })
+						HeroImage(media: NewsMedia.demo(), saved: saved, onBookmark: { saved = true; MyStakHoldings.shared.add("AAPL") })
 						VStack(alignment: .leading, spacing: 15 * u) {
 							Text("Apple climbs 5% on foldable iPhone push")
 								// RENDER-measured 20sp (the metadata's 24 lied); lh32 box stands.
@@ -131,24 +133,45 @@ struct NewsDetailView: View {
 /// requiredSize + Crop becomes .scaledToFill + explicit .frame + .clipped)
 /// and the card's rounded clip crops the overflow.
 private struct HeroImage: View {
+	let media: NewsMedia
 	let saved: Bool
 	let onBookmark: () -> Void
+	/// The hero is a media slot: poster + play glyph at rest (frame-exact),
+	/// the served video playing IN PLACE once tapped (user, 2026-08-23).
+	@State private var playing = false
 
 	var body: some View {
 		let u = figmaUnit
 		ZStack {
 			Color(argb: 0xFFC4C4C4)
-			Image("NewsHeroPhone")
-				.resizable()
-				.scaledToFill()
-				.frame(width: 407 * u, height: 271.18 * u)
-				.clipped()
-				.offset(x: -0.5 * u, y: 16.59 * u)
-			Image("IcHeroPlay")
-				.resizable()
-				.frame(width: 59.92 * u, height: 53.75 * u)
-				.rotationEffect(.degrees(90))
-				.offset(x: -0.5 * u, y: 12.5 * u)
+			if playing, case let .video(url, _, _) = media {
+				NewsVideoPlayer(url: url)
+			} else {
+				let poster: String? = {
+					switch media {
+					case let .image(asset, _): return asset
+					case let .video(_, asset, _): return asset
+					}
+				}()
+				if let poster {
+					Image(poster)
+						.resizable()
+						.scaledToFill()
+						.frame(width: 407 * u, height: 271.18 * u)
+						.clipped()
+						.offset(x: -0.5 * u, y: 16.59 * u)
+				}
+				if case .video = media {
+					Button { playing = true } label: {
+						Image("IcHeroPlay")
+							.resizable()
+							.frame(width: 59.92 * u, height: 53.75 * u)
+							.rotationEffect(.degrees(90))
+					}
+					.buttonStyle(.plain)
+					.offset(x: -0.5 * u, y: 12.5 * u)
+				}
+			}
 			Text("Tech & Ai")
 				.font(StakFont.geist(10 * u, .medium))
 				.foregroundStyle(StakColors.textPrimary)
@@ -645,4 +668,51 @@ private struct SaveSuccessOverlay: View {
 			.ignoresSafeArea(edges: .bottom)
 		}
 	}
+}
+
+/// Plays the served video inside the hero box: YouTube links through the
+/// embeddable player (WKWebView), any other link through AVKit. Both
+/// autoplay once the user tapped the play glyph.
+private struct NewsVideoPlayer: View {
+	let url: String
+
+	var body: some View {
+		if let embed = NewsMedia.youTubeEmbedURL(for: url) {
+			YouTubeEmbedView(url: embed)
+		} else if let direct = URL(string: url) {
+			AutoplayVideoPlayer(url: direct)
+		}
+	}
+}
+
+private struct AutoplayVideoPlayer: View {
+	let url: URL
+	@State private var player: AVPlayer? = nil
+
+	var body: some View {
+		VideoPlayer(player: player)
+			.onAppear {
+				let p = AVPlayer(url: url)
+				player = p
+				p.play()
+			}
+			.onDisappear { player?.pause() }
+	}
+}
+
+private struct YouTubeEmbedView: UIViewRepresentable {
+	let url: URL
+
+	func makeUIView(context: Context) -> WKWebView {
+		let config = WKWebViewConfiguration()
+		config.allowsInlineMediaPlayback = true
+		config.mediaTypesRequiringUserActionForPlayback = []
+		let view = WKWebView(frame: .zero, configuration: config)
+		view.isOpaque = false
+		view.scrollView.isScrollEnabled = false
+		view.load(URLRequest(url: url))
+		return view
+	}
+
+	func updateUIView(_ uiView: WKWebView, context: Context) {}
 }

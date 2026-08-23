@@ -38,6 +38,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.ui.draw.blur
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
+import androidx.compose.ui.zIndex
+import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Brush
@@ -222,7 +227,12 @@ private fun MarketMoodCard(onOpenNews: () -> Unit) {
 			)
 			.background(Home.CardBg),
 	) {
-		Box(modifier = Modifier.matchParentSize()) { NewsDeck() }
+		// Shared per-card drag offsets (px): the crisp deck takes the
+		// gesture, the blurred band copy mirrors the same motion - exactly
+		// what a real backdrop blur would show.
+		val deckDrags = remember { List(3) { androidx.compose.animation.core.Animatable(0f) } }
+		val dragScope = androidx.compose.runtime.rememberCoroutineScope()
+		Box(modifier = Modifier.matchParentSize()) { NewsDeck(deckDrags, dragScope, interactive = true) }
 		// The frame's bottom strip (1:1175, 30px) backdrop-blurs the stack —
 		// redraw the same deck blurred, clipped to the card's last 30dp.
 		Box(
@@ -249,7 +259,7 @@ private fun MarketMoodCard(onOpenNews: () -> Unit) {
 				// strip. Without it the blurred cards' soft alpha edges let the
 				// crisp deck below show through (sharp+soft union at the edges).
 				Box(modifier = Modifier.matchParentSize().background(Home.CardBg))
-				NewsDeck()
+				NewsDeck(deckDrags, dragScope, interactive = false)
 			}
 		}
 		Row(
@@ -283,44 +293,114 @@ private fun MarketMoodCard(onOpenNews: () -> Unit) {
 /**
  * The stacked news cards in their frame poses — front card straight, the
  * two behind rotated; offsets are from the parent card's center (350x397).
+ * Story text comes from NewsDeckFeed (backend-proxied breaking news in
+ * production; authored demo copy this phase). Each card can be dragged
+ * up to reveal its full info and springs back to the authored rest pose
+ * when the thumb leaves (user, 2026-08-22); the drag clamps where the
+ * card's bottom edge fully enters the mood card.
  */
 @Composable
-private fun BoxScope.NewsDeck() {
+private fun BoxScope.NewsDeck(
+	drags: List<androidx.compose.animation.core.Animatable<Float, androidx.compose.animation.core.AnimationVector1D>>,
+	dragScope: kotlinx.coroutines.CoroutineScope,
+	interactive: Boolean,
+) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
-	NewsDeckCard(
-		bg = Home.PaperWhite,
-		title = "Wall Street's fear gauge reads 32",
-		body = "The Fear & Greed Index is firmly in Fear territory. Money is rotating out of the ....",
-		bodyWeight = FontWeight.Light,
-		bodySize = (12 * u).sp,
-		titleBodyGap = (12 * u).dp,
-		offsetX = (6.2 * u).dp,
-		offsetY = (59.73 * u).dp,
-		rotation = 0f,
+	val stories = NewsDeckFeed.stories()
+	// Per-slot authored styling; card bottoms sit at 397.4/527.2/602.7 in
+	// the 397 card, so the up-drag clamps at bottom-397.
+	val slots = listOf(
+		DeckSlot(Home.PaperWhite, FontWeight.Light, 12f, 12f, 6.2f, 59.73f, 0f, 0.4f),
+		DeckSlot(Home.Teal, FontWeight.Normal, 11.89f, 17f, 8.33f, 189.44f, -3.72f, 130.2f),
+		DeckSlot(Home.PaperWhite, FontWeight.Light, 12f, 12f, -0.02f, 264.57f, -7.68f, 205.7f),
 	)
-	NewsDeckCard(
-		bg = Home.Teal,
-		title = "Fed meeting notes drop Wednesday",
-		body = "Minutes from the last Fed meeting land July 8. A market this tense moves on every word....",
-		bodyWeight = FontWeight.Normal,
-		bodySize = (11.89 * u).sp,
-		titleBodyGap = (17 * u).dp,
-		offsetX = (8.33 * u).dp,
-		offsetY = (189.44 * u).dp,
-		rotation = -3.72f,
-	)
-	NewsDeckCard(
-		bg = Home.PaperWhite,
-		title = "The OpenAI IPO is reportedly delayed",
-		body = "The year's most anticipated listing just slipped. Markets riding a wave of IPO excitement...",
-		bodyWeight = FontWeight.Light,
-		bodySize = (12 * u).sp,
-		titleBodyGap = (12 * u).dp,
-		offsetX = (-0.02 * u).dp,
-		offsetY = (264.57 * u).dp,
-		rotation = -7.68f,
-	)
+	slots.forEachIndexed { i, slot ->
+		val drag = drags[i]
+		NewsDeckCard(
+			bg = slot.bg,
+			title = stories[i].title,
+			body = stories[i].body,
+			bodyWeight = slot.bodyWeight,
+			bodySize = (slot.bodySize * u).sp,
+			titleBodyGap = (slot.gap * u).dp,
+			offsetX = (slot.dx * u).dp,
+			offsetY = (slot.dy * u).dp,
+			rotation = slot.rot,
+			// A dragged card lifts above its siblings so the revealed info
+			// isn't occluded; rest z-order is the authored stacking.
+			modifier = Modifier
+				.zIndex(if (drag.value != 0f) 1f else 0f)
+				.offset { androidx.compose.ui.unit.IntOffset(0, drag.value.roundToInt()) },
+		)
+	}
+	if (interactive) {
+		// One deck-level gesture: per-card pointerInput hit-tests the
+		// UNROTATED layout box (the modifier sits before the rotation), so
+		// overlapping tilted cards grab wrong touches. Pick the card here
+		// with a rotation-aware point-in-card test, topmost first.
+		val density = androidx.compose.ui.platform.LocalDensity.current
+		val uPx = with(density) { (1f * u).dp.toPx() }
+		val active = remember { intArrayOf(-1) }
+		Box(
+			modifier = Modifier
+				.matchParentSize()
+				.pointerInput(uPx) {
+					detectVerticalDragGestures(
+						onDragStart = { pos ->
+							active[0] = -1
+							for (i in slots.indices.reversed()) {
+								val slot = slots[i]
+								val cx = size.width / 2f + slot.dx * uPx
+								val cy = size.height / 2f + slot.dy * uPx + drags[i].value
+								val rad = Math.toRadians(-slot.rot.toDouble())
+								val dxp = pos.x - cx
+								val dyp = pos.y - cy
+								val lx = dxp * Math.cos(rad).toFloat() + dyp * Math.sin(rad).toFloat()
+								val ly = -dxp * Math.sin(rad).toFloat() + dyp * Math.cos(rad).toFloat()
+							if (Math.abs(lx) <= 236.86f * uPx / 2f && Math.abs(ly) <= 278.45f * uPx / 2f) {
+									active[0] = i
+									break
+								}
+							}
+						},
+						onDragEnd = {
+							val i = active[0]
+							if (i >= 0) dragScope.launch {
+								drags[i].animateTo(0f, androidx.compose.animation.core.tween(300, easing = androidx.compose.animation.core.EaseOut))
+							}
+							active[0] = -1
+						},
+						onDragCancel = {
+							val i = active[0]
+							if (i >= 0) dragScope.launch {
+								drags[i].animateTo(0f, androidx.compose.animation.core.tween(300, easing = androidx.compose.animation.core.EaseOut))
+							}
+							active[0] = -1
+						},
+					) { change, dy ->
+						val i = active[0]
+						if (i >= 0) {
+							change.consume()
+							val maxUpPx = slots[i].maxUpU * uPx
+							dragScope.launch { drags[i].snapTo((drags[i].value + dy).coerceIn(-maxUpPx, 0f)) }
+						}
+					}
+				},
+		)
+	}
 }
+
+/** One deck slot's authored styling + drag clamp (u units). */
+private data class DeckSlot(
+	val bg: Color,
+	val bodyWeight: FontWeight,
+	val bodySize: Float,
+	val gap: Float,
+	val dx: Float,
+	val dy: Float,
+	val rot: Float,
+	val maxUpU: Float,
+)
 
 /** One 236.86x278.45 news card of the deck, placed by its rotated-bounds center. */
 @Composable
@@ -334,11 +414,12 @@ private fun BoxScope.NewsDeckCard(
 	offsetX: Dp,
 	offsetY: Dp,
 	rotation: Float,
+	modifier: Modifier = Modifier,
 ) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Column(
 		verticalArrangement = Arrangement.spacedBy(titleBodyGap),
-		modifier = Modifier
+		modifier = modifier
 			.align(Alignment.Center)
 			.offset(x = offsetX, y = offsetY)
 			.graphicsLayer { rotationZ = rotation }

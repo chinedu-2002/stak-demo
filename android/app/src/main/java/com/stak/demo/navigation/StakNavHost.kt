@@ -68,6 +68,10 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
 	// and lands on the My STAK tab.
 	var newsPopPush by remember { mutableStateOf(false) }
 	val pendingShellTab = remember { mutableStateOf<MainTab?>(null) }
+	// Persisted session: restores sign-in state + profile before the
+	// splash decides where to go.
+	val appContext = androidx.compose.ui.platform.LocalContext.current
+	remember { com.stak.demo.ui.Session.init(appContext) }
 	NavHost(
 		navController = navController,
 		startDestination = StakRoutes.SPLASH,
@@ -87,7 +91,11 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
 		) {
 			SplashScreen(
 				onContinue = {
-					navController.navigate(StakRoutes.CREATE_ACCOUNT) {
+					// Returning user (signed in before) goes straight to Home;
+					// a first-time user is taken to create an account
+					// (user, 2026-08-23).
+					val next = if (com.stak.demo.ui.Session.signedIn) StakRoutes.MAIN else StakRoutes.CREATE_ACCOUNT
+					navController.navigate(next) {
 						popUpTo(StakRoutes.SPLASH) { inclusive = true }
 					}
 				},
@@ -218,6 +226,8 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
 			ProfileSetupScreen(
 				onBack = { navController.popBackStack() },
 				onProceed = {
+					// Account created - remembered across launches.
+					com.stak.demo.ui.Session.signIn()
 					navController.navigate(StakRoutes.MAIN) {
 						popUpTo(0) { inclusive = true }
 					}
@@ -252,6 +262,8 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
 			SignInScreen(
 				onBack = { navController.popBackStack() },
 				onSignIn = {
+					// Signed in - remembered across launches.
+					com.stak.demo.ui.Session.signIn()
 					navController.navigate(StakRoutes.MAIN) {
 						popUpTo(0) { inclusive = true }
 					}
@@ -320,7 +332,15 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
 			LeaderboardScreen(onBack = { navController.popBackStack() })
 		}
 		composable(StakRoutes.PROFILE) {
-			ProfileScreen(onBack = { navController.popBackStack() })
+			ProfileScreen(
+				onBack = { navController.popBackStack() },
+				onLogOut = {
+					com.stak.demo.ui.Session.signOut()
+					navController.navigate(StakRoutes.CREATE_ACCOUNT) {
+						popUpTo(0) { inclusive = true }
+					}
+				},
+			)
 		}
 		composable(
 			StakRoutes.NEWS_DETAIL,
@@ -371,7 +391,9 @@ private fun MainShell(
 	LaunchedEffect(pendingTab.value) {
 		pendingTab.value?.let { tab = it; pendingTab.value = null }
 	}
-	var homeFirstRun by rememberSaveable { mutableStateOf(true) }
+	// First run shows only in the session that signed in / created the
+	// account; a launch that resumed a saved session lands on Home Main.
+	var homeFirstRun by rememberSaveable { mutableStateOf(!com.stak.demo.ui.Session.resumedSignedIn) }
 	var discoverBuy by rememberSaveable { mutableStateOf(false) }
 	Box(modifier = Modifier.fillMaxSize()) {
 		Column(modifier = Modifier.fillMaxSize()) {

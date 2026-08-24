@@ -42,7 +42,7 @@ enum MainTab: String, CaseIterable, Identifiable {
 /// #060c1d, five 24px icons with 12px white labels (Inter in the frame;
 /// that role maps onto Geist here). The authored bar (86, compact 75)
 /// INCLUDES the home-indicator zone — the tab row sits at its authored
-/// top inset (18, compact 13) and the system gesture area overlays the
+/// top inset (18) and the system gesture area overlays the
 /// bar's lower band, exactly like the frame; the shell runs the bar to
 /// the physical bottom of the screen (no safe-area padding beneath it).
 /// Active tabs use their filled/bright glyph; switching is the
@@ -51,14 +51,13 @@ enum MainTab: String, CaseIterable, Identifiable {
 struct MainTabBar: View {
 	@Binding var selected: MainTab
 	/// True only while the Discover tab is up — its 75-tall bar (1:1788).
-	var compact: Bool = false
 
 	var body: some View {
 		let u = figmaUnit
 		ZStack(alignment: .top) {
 			Color(argb: 0xFF060C1D)
 			// Authored gaps: 28 on the 86 bar (1:1221), 30 on the compact 75 bar (1:1788).
-			HStack(alignment: .top, spacing: (compact ? 30 : 28) * u) {
+			HStack(alignment: .top, spacing: 28 * u) {
 				ForEach(MainTab.allCases) { tab in
 					Button {
 						if tab.built { selected = tab }
@@ -75,9 +74,9 @@ struct MainTabBar: View {
 					.buttonStyle(.plain)
 				}
 			}
-			.padding(.top, (compact ? 13 : 18) * u)
+			.padding(.top, 18 * u)
 		}
 		.frame(maxWidth: .infinity)
-		.frame(height: (compact ? 75 : 86) * u)
+		.frame(height: 86 * u)
 	}
 }

@@ -82,10 +82,11 @@ struct MainTabsView: View {
 				}
 				.frame(maxWidth: .infinity, maxHeight: .infinity)
 				if !(tab == .home && homeFirstRun) {
-					// Discover runs the compact 75-tall bar (1:1788); the bar's
 					// authored height includes the home-indicator zone, so the
 					// shell lets it run to the physical bottom of the screen.
-					MainTabBar(selected: $tab, compact: tab == .discover)
+					// One stable bar on every tab (user, 2026-08-23): only the
+					// active tab changes.
+					MainTabBar(selected: $tab)
 				}
 			}
 			.ignoresSafeArea(edges: .bottom)

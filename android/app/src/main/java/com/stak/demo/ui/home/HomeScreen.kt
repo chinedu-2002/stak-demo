@@ -491,7 +491,9 @@ private fun WhyThisMattersCard(onOpenMyStak: () -> Unit) {
 				color = Color.White,
 			)
 			Text(
-				text = "Your STAK collections houses 80% of stocks from effected industries.",
+				// Backend-served summary of why today's news matters to THIS
+				// user (holdings + risk profile); authored demo copy this phase.
+				text = WhyThisMattersFeed.body(),
 				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Light, fontSize = (12 * u).sp, lineHeight = (15 * u).sp),
 				color = Color.White,
 				modifier = Modifier.width((198 * u).dp),

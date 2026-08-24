@@ -13,6 +13,14 @@ object UserProfile {
 	var displayName by mutableStateOf("")
 	var photoUri by mutableStateOf<String?>(null)
 
+	/**
+	 * The user's risk profile - the "Risk style" the taste graph derives
+	 * from the onboarding answers (05 Risk et al). Feeds the
+	 * why-this-matters summary; the backend computes/refines it in
+	 * production. Authored demo default until then.
+	 */
+	var riskStyle by mutableStateOf("Growth-Oriented")
+
 	/** The name as the app addresses the user - always capitalized. */
 	val greetingName: String
 		get() = displayName.ifBlank { "Hamza" }.capitalizeWords()

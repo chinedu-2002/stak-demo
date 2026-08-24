@@ -429,7 +429,10 @@ private fun MainShell(
 				}
 			}
 			if (!(tab == MainTab.Home && homeFirstRun)) {
-				MainTabBar(selected = tab, onSelect = { tab = it }, compact = tab == MainTab.Discover)
+				// One stable bar on every tab (user, 2026-08-23: only the
+				// tabs should change when switching) - the Discover frame's
+				// compact 75 bar is a recorded standing deviation.
+				MainTabBar(selected = tab, onSelect = { tab = it })
 			}
 		}
 		// Practice-buy flow overlays the whole shell — in frame 1:1970 the

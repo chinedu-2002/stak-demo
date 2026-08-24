@@ -18,6 +18,7 @@ object Session {
 	private const val KEY_SIGNED_IN = "signed_in"
 	private const val KEY_NAME = "display_name"
 	private const val KEY_PHOTO = "photo_uri"
+	private const val KEY_RISK = "risk_style"
 
 	private var prefs: SharedPreferences? = null
 
@@ -37,6 +38,7 @@ object Session {
 		resumedSignedIn = signedIn
 		UserProfile.displayName = p.getString(KEY_NAME, "") ?: ""
 		UserProfile.photoUri = p.getString(KEY_PHOTO, null)
+		UserProfile.riskStyle = p.getString(KEY_RISK, UserProfile.riskStyle) ?: UserProfile.riskStyle
 	}
 
 	/** Sign-in CTA or account creation (09 Proceed) - remembered across launches. */
@@ -54,6 +56,7 @@ object Session {
 		resumedSignedIn = false
 		UserProfile.displayName = ""
 		UserProfile.photoUri = null
+		UserProfile.riskStyle = "Growth-Oriented"
 		prefs?.edit()?.clear()?.apply()
 	}
 
@@ -62,6 +65,7 @@ object Session {
 			?.putBoolean(KEY_SIGNED_IN, signedIn)
 			?.putString(KEY_NAME, UserProfile.displayName)
 			?.putString(KEY_PHOTO, UserProfile.photoUri)
+			?.putString(KEY_RISK, UserProfile.riskStyle)
 			?.apply()
 	}
 }

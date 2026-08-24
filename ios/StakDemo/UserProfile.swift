@@ -10,6 +10,12 @@ final class UserProfile: ObservableObject {
 	@Published var displayName: String = ""
 	@Published var photoData: Data? = nil
 
+	/// The user's risk profile - the "Risk style" the taste graph derives
+	/// from the onboarding answers (05 Risk et al). Feeds the
+	/// why-this-matters summary; the backend computes/refines it in
+	/// production. Authored demo default until then.
+	@Published var riskStyle: String = "Growth-Oriented"
+
 	/// The name as the app addresses the user - always capitalized.
 	var greetingName: String {
 		let name = displayName.trimmingCharacters(in: .whitespaces)

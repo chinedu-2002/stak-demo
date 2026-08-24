@@ -376,7 +376,9 @@ private struct WhyThisMattersCard: View {
 					.font(StakFont.sora(14 * u))
 					.lineSpacing((15 - 14) * u)
 					.foregroundStyle(Color.white)
-				Text("Your STAK collections houses 80% of stocks from effected industries.")
+				// Backend-served summary of why today's news matters to THIS
+				// user (holdings + risk profile); authored demo copy this phase.
+				Text(WhyThisMattersFeed.body())
 					.font(StakFont.geist(12 * u, .light))
 					.lineSpacing((15 - 12) * u)
 					.foregroundStyle(Color.white)

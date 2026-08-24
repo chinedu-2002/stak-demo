@@ -11,6 +11,7 @@ final class Session: ObservableObject {
 
 	private static let keySignedIn = "stak.signedIn"
 	private static let keyName = "stak.displayName"
+	private static let keyRisk = "stak.riskStyle"
 
 	@Published private(set) var signedIn: Bool
 
@@ -22,6 +23,7 @@ final class Session: ObservableObject {
 		signedIn = d.bool(forKey: Self.keySignedIn)
 		resumedSignedIn = signedIn
 		UserProfile.shared.displayName = d.string(forKey: Self.keyName) ?? ""
+		if let risk = d.string(forKey: Self.keyRisk) { UserProfile.shared.riskStyle = risk }
 	}
 
 	/// Sign-in CTA or account creation (09 Proceed) - remembered across launches.
@@ -39,14 +41,17 @@ final class Session: ObservableObject {
 		resumedSignedIn = false
 		UserProfile.shared.displayName = ""
 		UserProfile.shared.photoData = nil
+		UserProfile.shared.riskStyle = "Growth-Oriented"
 		let d = UserDefaults.standard
 		d.removeObject(forKey: Self.keySignedIn)
 		d.removeObject(forKey: Self.keyName)
+		d.removeObject(forKey: Self.keyRisk)
 	}
 
 	private func persist() {
 		let d = UserDefaults.standard
 		d.set(signedIn, forKey: Self.keySignedIn)
 		d.set(UserProfile.shared.displayName, forKey: Self.keyName)
+		d.set(UserProfile.shared.riskStyle, forKey: Self.keyRisk)
 	}
 }

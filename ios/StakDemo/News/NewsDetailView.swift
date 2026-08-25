@@ -79,47 +79,34 @@ struct NewsDetailView: View {
 								// Designer's call (2026-08-22): the sheet scale-ins.
 								AddToStakButton { withAnimation(.easeOut(duration: 0.3)) { showSuccess = true } }
 							}
-							NewsHairline()
-							// Authored Apple-specific blocks render only on the
-							// authored article; served stories show their own body.
-							if !isAuthored {
-								ForEach(Array(article.paragraphs.enumerated()), id: \.offset) { i, text in
-									if i == 0 {
-										Paragraph(text: text, size: 15, line: 24)
-									} else {
-										Paragraph(text: text)
-									}
-								}
+						NewsHairline()
+							// ONE template for every story (user, 2026-08-25: the
+							// Apple article is the section's PLACEHOLDER - each
+							// block renders per story from served data; stock
+							// blocks appear whenever the story has a ticker).
+							if article.ticker != nil { StockCard(saved: saved) }
+							if !article.gist.isEmpty { GistCard(bullets: article.gist) }
+							if let first = article.paragraphs.first {
+								Paragraph(text: first, size: 15, line: 24)
 							}
-							if isAuthored {
-							StockCard(saved: saved)
-							GistCard()
-							Paragraph(
-								text: "Apple had one of its best days in months on Thursday, climbing almost 5 percent after word got out that the company is planning its widest iPhone lineup in years. Nikkei Asia reported that Apple has asked suppliers to prepare at least five new models, and to lift output of its first foldable to around 10 million units, well above the seven to eight million it had penciled in.",
-								size: 15, line: 24
-							)
-							Paragraph(
-								text: "That last number is the tell. Companies do not quietly double down on a product they expect to flop, and the foldable, which the rumor mill has taken to calling the iPhone Ultra, is now expected to land between late 2026 and the first half of 2027. Traders read the order size as confidence and bought accordingly. Apple gained about 182 billion dollars in market value on the day, nearly enough on its own to paper over a sell-off tearing through chip stocks."
-							)
-							PullQuote()
-							NewToThisCard()
-							Paragraph(
-								text: "The rally leaves Apple roughly 4 percent shy of retaking the title of most valuable company in the world from Nvidia, a crown the two have passed back and forth all year. It also lets the stock shake off a rough June, when a rare mid-cycle price increase on Macs and iPads, blamed on climbing memory costs, sent shares lower and rattled investors who had grown used to Apple holding the line."
-							)
-							Paragraph(
-								text: "The real verdict comes on July 30, when Apple reports fiscal third quarter results. Wall Street is penciling in revenue of around 108 billion dollars, but the number everyone will hunt for is any early read on how the new lineup, and its price tags, are actually selling."
-							)
+							if article.paragraphs.count > 1 {
+								Paragraph(text: article.paragraphs[1])
+							}
+							if let quote = article.pullQuote { PullQuote(text: quote) }
+							if let explainer = article.explainer { NewToThisCard(body_: explainer) }
+							ForEach(Array(article.paragraphs.dropFirst(2).enumerated()), id: \.offset) { _, text in
+								Paragraph(text: text)
+							}
 							SourceRow()
-							KeyStatsCard()
+							if article.ticker != nil { KeyStatsCard() }
 							NewsHairline()
 							HStack(spacing: 8 * u) {
-								ArticleTag(text: "Apple")
-								if saved {
-									ArticleTag(text: "Tech")
+								if let first = article.tags.first { ArticleTag(text: first) }
+								if saved, article.tags.count > 1 {
+									ArticleTag(text: article.tags[1])
 								}
 							}
 							ReadNext()
-							}
 						}
 						.frame(maxWidth: .infinity, alignment: .leading)
 						.padding(.horizontal, 20 * u)
@@ -380,6 +367,8 @@ private struct StockCard: View {
 
 /// "The gist" — sparkle header + three check bullets.
 private struct GistCard: View {
+	let bullets: [String]
+
 	var body: some View {
 		let u = figmaUnit
 		VStack(alignment: .leading, spacing: 12 * u) {
@@ -391,9 +380,7 @@ private struct GistCard: View {
 					.font(StakFont.sora(14 * u, .semiBold))
 					.foregroundStyle(StakColors.textPrimary)
 			}
-			GistBullet(text: "Apple rose about 5% on plans for its widest iPhone lineup yet.")
-			GistBullet(text: "It raised foldable orders to 10 million units, a show of confidence.")
-			GistBullet(text: "The stock sits about 4% from passing Nvidia as the most valuable company.")
+			ForEach(bullets, id: \.self) { GistBullet(text: $0) }
 		}
 		.frame(maxWidth: .infinity, alignment: .leading)
 		.padding(16 * u)
@@ -435,13 +422,15 @@ private struct Paragraph: View {
 }
 
 private struct PullQuote: View {
+	let text: String
+
 	var body: some View {
 		let u = figmaUnit
 		HStack(spacing: 14 * u) {
 			RoundedRectangle(cornerRadius: 2 * u)
 				.fill(News.teal)
 				.frame(width: 3 * u)
-			Text("Companies do not quietly double down on a product they expect to flop.")
+			Text(text)
 				.font(StakFont.sora(16 * u, .semiBold))
 				.lineSpacing((26 - 16) * u)
 				.foregroundStyle(Color(argb: 0xFFD3D3DD))
@@ -456,6 +445,8 @@ private struct PullQuote: View {
 }
 
 private struct NewToThisCard: View {
+	let body_: String
+
 	var body: some View {
 		let u = figmaUnit
 		VStack(alignment: .leading, spacing: 9 * u) {
@@ -467,7 +458,7 @@ private struct NewToThisCard: View {
 					.font(StakFont.sora(13 * u, .semiBold))
 					.foregroundStyle(News.teal)
 			}
-			Text("A foldable phone opens out into a small tablet. For Apple it means a pricier device to sell, and a way to win back buyers who drifted to Samsung, which has offered foldables for years.")
+			Text(body_)
 				.font(StakFont.geist(13 * u))
 				.lineSpacing((20 - 13) * u)
 				.foregroundStyle(News.body)

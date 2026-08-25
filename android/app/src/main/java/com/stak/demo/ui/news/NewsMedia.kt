@@ -30,9 +30,15 @@ sealed class NewsMedia {
 	}
 
 	companion object {
-		/** Demo story media: authored poster + Apple's official iPhone film on YouTube (oEmbed-verified). */
+		/**
+		 * Demo story media: the authored poster art over a verified
+		 * direct-stream phone b-roll (Mixkit). YouTube embeds stay the
+		 * production contract, but this environment's in-app WebViews are
+		 * refused YouTube's video streams (user, 2026-08-25 black screen),
+		 * so the demo serves direct MP4s the platform players decode.
+		 */
 		fun demo(): NewsMedia = Video(
-			url = "https://www.youtube.com/watch?v=_-AS5DtDeqs",
+			url = "https://assets.mixkit.co/videos/4915/4915-720.mp4",
 			posterRes = R.drawable.news_hero_phone,
 		)
 	}

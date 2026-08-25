@@ -28,13 +28,13 @@ import androidx.compose.ui.unit.sp
 import com.stak.demo.R
 import com.stak.demo.ui.theme.Inter
 
-/** The five CHINEDU tabs. Home and News are built; the rest land later. */
-enum class MainTab(val label: String, val activeIcon: Int, val inactiveIcon: Int, val built: Boolean) {
-	Home("Home", R.drawable.ic_tab_home, R.drawable.ic_tab_home_inactive, true),
-	News("News", R.drawable.ic_tab_news_active, R.drawable.ic_tab_news, true),
-	Discover("Discover", R.drawable.tab_discover_active, R.drawable.ic_tab_discover, true),
-	MySTAK("My STAK", R.drawable.ic_tab_mystak_active, R.drawable.ic_tab_mystak, true),
-	Simulate("Simulate", R.drawable.tab_simulate_active, R.drawable.ic_tab_simulate, true),
+/** The five CHINEDU tabs - all built. */
+enum class MainTab(val label: String, val activeIcon: Int, val inactiveIcon: Int) {
+	Home("Home", R.drawable.ic_tab_home, R.drawable.ic_tab_home_inactive),
+	News("News", R.drawable.ic_tab_news_active, R.drawable.ic_tab_news),
+	Discover("Discover", R.drawable.tab_discover_active, R.drawable.ic_tab_discover),
+	MySTAK("My STAK", R.drawable.ic_tab_mystak_active, R.drawable.ic_tab_mystak),
+	Simulate("Simulate", R.drawable.tab_simulate_active, R.drawable.ic_tab_simulate),
 }
 
 /**
@@ -74,7 +74,7 @@ fun MainTabBar(selected: MainTab, onSelect: (MainTab) -> Unit) {
 					modifier = (if (tab == MainTab.Home) Modifier.width((34 * u).dp) else Modifier).clickable(
 						interactionSource = remember { MutableInteractionSource() },
 						indication = null,
-					) { if (tab.built) onSelect(tab) },
+					) { onSelect(tab) },
 				) {
 					Image(
 						painter = painterResource(if (tab == selected) tab.activeIcon else tab.inactiveIcon),

@@ -67,17 +67,21 @@ fun ProfileSetupScreen(onBack: () -> Unit, onProceed: () -> Unit) {
 	// permission flow, so no runtime permission is requested by the app.
 	var photoUri by rememberSaveable { mutableStateOf<String?>(null) }
 	val context = LocalContext.current
-	val avatar = remember(photoUri) {
-		photoUri?.let { stored ->
-			runCatching {
-				val uri = Uri.parse(stored)
-				val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
-				context.contentResolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, bounds) }
-				val opts = BitmapFactory.Options().apply {
-					inSampleSize = maxOf(1, minOf(bounds.outWidth, bounds.outHeight) / 512)
-				}
-				context.contentResolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, opts) }
-			}.getOrNull()
+	// Decoded off the main thread - a large gallery image decoded inside
+	// composition can freeze the first frame after picking (audit 2026-08-25).
+	val avatar by androidx.compose.runtime.produceState<android.graphics.Bitmap?>(initialValue = null, photoUri) {
+		value = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+			photoUri?.let { stored ->
+				runCatching {
+					val uri = Uri.parse(stored)
+					val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+					context.contentResolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, bounds) }
+					val opts = BitmapFactory.Options().apply {
+						inSampleSize = maxOf(1, minOf(bounds.outWidth, bounds.outHeight) / 512)
+					}
+					context.contentResolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, opts) }
+				}.getOrNull()
+			}
 		}
 	}
 	val pickPhoto = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->

@@ -372,7 +372,7 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
 }
 
 /**
- * The bottom-tab shell — Home and News are built; the bar hides while
+ * The bottom-tab shell — all five tabs are built; the bar hides while
  * Home is in its first-run state (the scrim + pill own the bottom).
  * Tab switches are the prototype's "Swap overlay · Instant".
  */
@@ -425,7 +425,6 @@ private fun MainShell(
 						onOpenCollection = onOpenCollection,
 						onStartSwiping = { tab = MainTab.Discover },
 					)
-					else -> HomeScreen(firstRun = false, onSeeTodaysPick = {})
 				}
 			}
 			if (!(tab == MainTab.Home && homeFirstRun)) {

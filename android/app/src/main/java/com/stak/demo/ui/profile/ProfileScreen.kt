@@ -87,11 +87,23 @@ fun ProfileScreen(onBack: () -> Unit, onLogOut: () -> Unit = {}) {
 					contentAlignment = Alignment.Center,
 					modifier = Modifier.size((64 * u).dp).background(Color(0xFF242B3D), CircleShape),
 				) {
-					Text(
-						text = "H",
-						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (22 * u).sp, lineHeight = (28 * u).sp),
-						color = Color(0xFF9EADC7),
-					)
+					// The picked photo when one exists; else the live initial of
+					// the display name ("H" was hardcoded - audit 2026-08-25).
+					val photo = com.stak.demo.ui.UserProfile.photoUri
+					if (photo != null) {
+						coil.compose.AsyncImage(
+							model = photo,
+							contentDescription = null,
+							contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+							modifier = Modifier.matchParentSize().clip(CircleShape),
+						)
+					} else {
+						Text(
+							text = com.stak.demo.ui.UserProfile.greetingName.take(1).uppercase(),
+							style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (22 * u).sp, lineHeight = (28 * u).sp),
+							color = Color(0xFF9EADC7),
+						)
+					}
 				}
 				Text(
 					text = com.stak.demo.ui.UserProfile.greetingName,

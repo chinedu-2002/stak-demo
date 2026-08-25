@@ -764,7 +764,19 @@ private struct YouTubeEmbedView: UIViewRepresentable {
 		let view = WKWebView(frame: .zero, configuration: config)
 		view.isOpaque = false
 		view.scrollView.isScrollEnabled = false
-		view.load(URLRequest(url: url))
+		// YouTube's player refuses embeds with no HTTP Referer - a bare
+		// URLRequest load dies with "configuration error 153" (user,
+		// 2026-08-25; reproduced + fix verified in the browser). The
+		// iframe wrapper + base URL presents an embedding origin.
+		let html = """
+		<!doctype html><html><head>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<style>html,body{margin:0;padding:0;background:#000;height:100%;overflow:hidden}iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0}</style>
+		</head><body>
+		<iframe src="\(url.absoluteString)" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+		</body></html>
+		"""
+		view.loadHTMLString(html, baseURL: URL(string: "https://stak.app"))
 		return view
 	}
 

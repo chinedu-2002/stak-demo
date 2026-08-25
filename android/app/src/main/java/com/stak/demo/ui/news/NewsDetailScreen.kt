@@ -471,7 +471,10 @@ private fun StockCard(saved: Boolean, ticker: String, facts: NewsArticleFeed.Sto
 			}
 			Spacer(modifier = Modifier.weight(1f))
 			Image(
-				painter = painterResource(R.drawable.news_sparkline),
+				// The chart must agree with the move (user, 2026-08-25:
+				// "showing red then the graph is green") - the down variant
+				// is the authored line flipped + recolored to the app red.
+				painter = painterResource(if (facts.up) R.drawable.news_sparkline else R.drawable.news_sparkline_down),
 				contentDescription = null,
 				modifier = Modifier.size((110 * u).dp, (40 * u).dp),
 			)

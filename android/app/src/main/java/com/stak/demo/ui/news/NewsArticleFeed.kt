@@ -183,6 +183,10 @@ object NewsArticleFeed {
 			"Oil prices move on expected supply and demand. More supply - real or promised - usually means lower prices at the pump and lower costs for fuel-hungry industries.",
 			listOf("Energy", "Markets"),
 			// Also the third Markets row (1:1228) - "Reuters · 3d", XOM chip.
+			// NOTE: the frame's oil-row image is an authored PLACEHOLDER
+			// (806-byte near-black texture, unlike the real sibling photos);
+			// the user chose to keep it until the backend serves story
+			// images (2026-08-25). Not a loading bug.
 			"Reuters", "3d", "· Jul 1 · 2 min read",
 			R.drawable.news_thumb_oil, listOf("XOM"),
 		),

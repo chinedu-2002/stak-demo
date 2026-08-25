@@ -149,43 +149,27 @@ fun NewsDetailScreen(articleId: String = NewsArticleFeed.APPLE, onBack: () -> Un
 						AddToStakButton(onClick = { showSuccess = true })
 					}
 					Divider()
-					// Authored Apple-specific blocks render only on the authored
-					// article; served stories show their own body until the
-					// backend serves this data per story.
-					if (!isAuthored) {
-						article.paragraphs.forEachIndexed { i, text ->
-							if (i == 0) Paragraph(text, size = 15.sp, line = 24.sp) else Paragraph(text)
-						}
-					}
-					if (isAuthored) {
-					StockCard(saved = saved)
-					GistCard()
-					Paragraph(
-						"Apple had one of its best days in months on Thursday, climbing almost 5 percent after word got out that the company is planning its widest iPhone lineup in years. Nikkei Asia reported that Apple has asked suppliers to prepare at least five new models, and to lift output of its first foldable to around 10 million units, well above the seven to eight million it had penciled in.",
-						size = 15.sp, line = 24.sp,
-					)
-					Paragraph(
-						"That last number is the tell. Companies do not quietly double down on a product they expect to flop, and the foldable, which the rumor mill has taken to calling the iPhone Ultra, is now expected to land between late 2026 and the first half of 2027. Traders read the order size as confidence and bought accordingly. Apple gained about 182 billion dollars in market value on the day, nearly enough on its own to paper over a sell-off tearing through chip stocks.",
-					)
-					PullQuote()
-					NewToThisCard()
-					Paragraph(
-						"The rally leaves Apple roughly 4 percent shy of retaking the title of most valuable company in the world from Nvidia, a crown the two have passed back and forth all year. It also lets the stock shake off a rough June, when a rare mid-cycle price increase on Macs and iPads, blamed on climbing memory costs, sent shares lower and rattled investors who had grown used to Apple holding the line.",
-					)
-					Paragraph(
-						"The real verdict comes on July 30, when Apple reports fiscal third quarter results. Wall Street is penciling in revenue of around 108 billion dollars, but the number everyone will hunt for is any early read on how the new lineup, and its price tags, are actually selling.",
-					)
+					// ONE template for every story (user, 2026-08-25: the Apple
+					// article is the section's PLACEHOLDER - each block renders
+					// per story from served data; stock blocks appear whenever
+					// the story has a related ticker).
+					if (article.ticker != null) StockCard(saved = saved)
+					if (article.gist.isNotEmpty()) GistCard(bullets = article.gist)
+					article.paragraphs.getOrNull(0)?.let { Paragraph(it, size = 15.sp, line = 24.sp) }
+					article.paragraphs.getOrNull(1)?.let { Paragraph(it) }
+					article.pullQuote?.let { PullQuote(it) }
+					article.explainer?.let { NewToThisCard(it) }
+					article.paragraphs.drop(2).forEach { Paragraph(it) }
 					SourceRow()
-					KeyStatsCard()
+					if (article.ticker != null) KeyStatsCard()
 					Divider()
 					Row(horizontalArrangement = Arrangement.spacedBy((8 * u).dp)) {
-						ArticleTag("Apple")
+						article.tags.getOrNull(0)?.let { ArticleTag(it) }
 						if (saved) {
-							ArticleTag("Tech")
+							article.tags.getOrNull(1)?.let { ArticleTag(it) }
 						}
 					}
 					ReadNext()
-					}
 				}
 			}
 		}
@@ -504,7 +488,7 @@ private fun StockCard(saved: Boolean) {
 
 /** "The gist" — sparkle header + three check bullets. */
 @Composable
-private fun GistCard() {
+private fun GistCard(bullets: List<String>) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Column(
 		verticalArrangement = Arrangement.spacedBy((12 * u).dp),
@@ -522,9 +506,7 @@ private fun GistCard() {
 				color = Color.White,
 			)
 		}
-		GistBullet("Apple rose about 5% on plans for its widest iPhone lineup yet.")
-		GistBullet("It raised foldable orders to 10 million units, a show of confidence.")
-		GistBullet("The stock sits about 4% from passing Nvidia as the most valuable company.")
+		bullets.forEach { GistBullet(it) }
 	}
 }
 
@@ -553,7 +535,7 @@ private fun Paragraph(text: String, size: androidx.compose.ui.unit.TextUnit = 14
 }
 
 @Composable
-private fun PullQuote() {
+private fun PullQuote(text: String) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Row(
 		horizontalArrangement = Arrangement.spacedBy((14 * u).dp),
@@ -566,7 +548,7 @@ private fun PullQuote() {
 				.background(News.Teal, RoundedCornerShape((2 * u).dp)),
 		)
 		Text(
-			text = "Companies do not quietly double down on a product they expect to flop.",
+			text = text,
 			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp, lineHeight = (26 * u).sp),
 			color = Color(0xFFD3D3DD),
 			modifier = Modifier.weight(1f),
@@ -575,7 +557,7 @@ private fun PullQuote() {
 }
 
 @Composable
-private fun NewToThisCard() {
+private fun NewToThisCard(body: String) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Column(
 		verticalArrangement = Arrangement.spacedBy((9 * u).dp),
@@ -594,7 +576,7 @@ private fun NewToThisCard() {
 			)
 		}
 		Text(
-			text = "A foldable phone opens out into a small tablet. For Apple it means a pricier device to sell, and a way to win back buyers who drifted to Samsung, which has offered foldables for years.",
+			text = body,
 			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (13 * u).sp, lineHeight = (20 * u).sp),
 			color = News.Body,
 		)

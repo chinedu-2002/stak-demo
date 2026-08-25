@@ -365,7 +365,11 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
 				onViewInMyStak = {
 					newsPopPush = true
 					pendingShellTab.value = MainTab.MySTAK
-					navController.popBackStack()
+					// Pop the whole article chain to the shell - after READ
+					// NEXT hops the stack can hold several articles, and a
+					// single pop would strand the user on the previous story
+					// (audit 2026-08-25).
+					navController.popBackStack(StakRoutes.MAIN, false)
 				},
 				// READ NEXT rows push the next story's article (user, 2026-08-25).
 				onOpenArticle = { id -> newsPopPush = false; navController.navigate(StakRoutes.newsDetail(id)) },

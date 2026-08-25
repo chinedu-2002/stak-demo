@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -261,13 +260,21 @@ private fun MarketMoodCard(onOpenNews: () -> Unit) {
 					// 2.4-2.8u plateau (8.26 vs 9.55 at the old 4u). The strip's
 					// blurred ink stays ~15% lighter than the frame's - that's the
 					// app-wide glyph-coverage class, not the kernel.
-					.blur((2.6 * u).dp),
+					.then(
+						// Modifier.blur is a documented no-op below API 31 (minSdk
+						// 26) - a translucent veil approximates the frosted band
+						// there (audit 2026-08-25).
+						if (android.os.Build.VERSION.SDK_INT >= 31) Modifier.blur((2.6 * u).dp) else Modifier,
+					),
 			) {
 				// Opaque ground: backdrop blur replaces everything behind the
 				// strip. Without it the blurred cards' soft alpha edges let the
 				// crisp deck below show through (sharp+soft union at the edges).
 				Box(modifier = Modifier.matchParentSize().background(Home.CardBg))
 				NewsDeck(deckDrags, dragScope, interactive = false)
+				if (android.os.Build.VERSION.SDK_INT < 31) {
+					Box(modifier = Modifier.matchParentSize().background(Home.CardBg.copy(alpha = 0.85f)))
+				}
 			}
 		}
 		Row(

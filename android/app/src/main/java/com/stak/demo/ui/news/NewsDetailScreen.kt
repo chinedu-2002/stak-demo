@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
@@ -201,6 +200,11 @@ fun NewsDetailScreen(onBack: () -> Unit, onViewInMyStak: () -> Unit = {}) {
 
 /** 360x208 r10 hero — phone art, Tech & Ai toast, play badge, bookmark/saved chip. */
 @Composable
+// CONTRACT (user, 2026-08-25): this screen is the News info page TEMPLATE.
+// The design authors exactly ONE article (1:1495, the Apple foldable
+// story), so every authored news tap lands here in the demo. In
+// production the backend serves each story's own headline, subtitle,
+// body and media into this page - same slot pattern as NewsMedia.
 private fun HeroImage(media: NewsMedia, saved: Boolean, onBookmark: () -> Unit) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	// The hero is a media slot: poster + play glyph at rest (frame-exact),
@@ -868,6 +872,12 @@ private fun NewsVideoPlayer(video: NewsMedia.Video, modifier: Modifier = Modifie
 					loadUrl(embed)
 				}
 			},
+			// Backing out of the article must stop playback and free the
+			// JS-enabled WebView (audit 2026-08-25).
+			onRelease = { web ->
+				web.loadUrl("about:blank")
+				web.destroy()
+			},
 		)
 	} else {
 		androidx.compose.ui.viewinterop.AndroidView(
@@ -878,6 +888,7 @@ private fun NewsVideoPlayer(video: NewsMedia.Video, modifier: Modifier = Modifie
 					setOnPreparedListener { mp -> mp.isLooping = false; start() }
 				}
 			},
+			onRelease = { v -> v.stopPlayback() },
 		)
 	}
 }

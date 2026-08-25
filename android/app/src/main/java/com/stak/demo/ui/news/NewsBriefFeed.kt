@@ -25,9 +25,11 @@ object NewsBriefFeed {
 			"Wall Street split into the long weekend. The Dow hit an all time high while a memory chip rout pulled the Nasdaq down, and a soft jobs report eased the pressure on the...",
 			"Bloomberg · 10h",
 		),
+		// STRICT stock news (user, 2026-08-25): the old Fed-rates demo
+		// brief was macro, not stock news - replaced with a stock story.
 		Brief(
-			"Fed holds rates, signals patience on cuts",
-			"Policymakers left the benchmark rate unchanged and pointed to cooling inflation, but want more data before easing. Futures trimmed bets on a September cut...",
+			"Alphabet jumps after a blowout ad quarter",
+			"Search revenue accelerated for a third straight quarter and YouTube beat expectations, quieting the fear that AI chatbots are eating into Google's ads...",
 			"Reuters · 6h",
 		),
 		Brief(

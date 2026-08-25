@@ -158,12 +158,13 @@ fun NewsScreen(onOpenArticle: (String) -> Unit) {
 			// Designer's call (2026-08-22): today's brief on tap leads to the
 			// News info page (the Story tile stays wired per panel 1:1228).
 			if (NewsBriefFeed.briefs().any { matches(it.title) }) {
-				// Each brief opens ITS OWN article (user, 2026-08-25).
-				BriefCarousel(onRead = { page -> onOpenArticle(NewsArticleFeed.BRIEF_ARTICLES[page]) })
+				// Each brief opens ITS OWN article (user, 2026-08-25). The
+				// index guard covers a served brief without a mapped article.
+				BriefCarousel(onRead = { page -> NewsArticleFeed.BRIEF_ARTICLES.getOrNull(page)?.let(onOpenArticle) })
 			}
 			StoryGrid(onOpenArticle = onOpenArticle, query = q)
-			// The rows render from the served section feeds - market-related
-			// stories only (user, 2026-08-25); EVERY story opens its article.
+			// The rows render from the served section feeds - STRICT stock
+			// news only (user, 2026-08-25); EVERY story opens its article.
 			// Each story names the stocks it relates to; the "In your STAK"
 			// chip shows only when one of them is in the user's My STAK.
 			val forYou = NewsArticleFeed.forYou().filter { matches(it.headline) }
@@ -303,31 +304,40 @@ private fun BriefCard(brief: NewsBriefFeed.Brief, onRead: () -> Unit) {
 	}
 }
 
-/** The two 128dp story tiles ("Markets" / "Your stocks"). */
+/**
+ * The two 128dp story tiles. The tags are authored SLOT labels (1:1228:
+ * "Markets" = the day's top stock story, "Your stocks" = the top story
+ * from the user's holdings); the tile copy renders from the SERVED
+ * story - the frame's copy was placeholder (user, 2026-08-25: "the
+ * design by the ui is just placeholder"), and only strict stock news
+ * is served.
+ */
 @Composable
 private fun StoryGrid(onOpenArticle: (String) -> Unit, query: String = "") {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
-	val showFed = query.isEmpty() || "Fed minutes land Wednesday".contains(query, ignoreCase = true)
-	val showApple = query.isEmpty() || "Apple Climbs 5% on foldable iphone".contains(query, ignoreCase = true)
-	if (!showFed && !showApple) return
+	val market = NewsArticleFeed.article(NewsArticleFeed.MARKET_TILE)
+	val yours = NewsArticleFeed.article(NewsArticleFeed.APPLE)
+	fun visible(a: NewsArticleFeed.Article) =
+		NewsArticleFeed.isStockNews(a) && (query.isEmpty() || a.headline.contains(query, ignoreCase = true))
+	val showMarket = visible(market)
+	val showYours = visible(yours)
+	if (!showMarket && !showYours) return
 	Row(horizontalArrangement = Arrangement.spacedBy((12 * u).dp), modifier = Modifier.fillMaxWidth().height((128 * u).dp)) {
-		if (showFed) {
+		if (showMarket) {
 			StoryTile(
 				tag = "Markets",
-				headline = "Fed minutes land Wednesday",
-				source = "Reuters · 2h",
-				// Its story too (user, 2026-08-25: "this was clicked and
-				// nothing happened").
-				onClick = { onOpenArticle(NewsArticleFeed.FED_TILE) },
+				headline = market.headline,
+				source = "${market.source} · ${market.age}",
+				onClick = { onOpenArticle(market.id) },
 				modifier = Modifier.weight(1f),
 			)
 		}
-		if (showApple) {
+		if (showYours) {
 			StoryTile(
 				tag = "Your stocks",
-				headline = "Apple Climbs 5% on foldable iphone",
-				source = "CNBC · 3h",
-				onClick = { onOpenArticle(NewsArticleFeed.APPLE) },
+				headline = yours.headline,
+				source = "${yours.source} · ${yours.age}",
+				onClick = { onOpenArticle(yours.id) },
 				modifier = Modifier.weight(1f),
 			)
 		}

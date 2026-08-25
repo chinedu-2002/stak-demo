@@ -2,7 +2,7 @@ import SwiftUI
 
 /// A page pushed over the tab shell (the house Push Right transition).
 private enum PushedPage: Identifiable, Equatable {
-	case newsDetail
+	case newsDetail(article: String)
 	case stockDetail(fromMyStak: Bool)
 	case collection
 	case profile
@@ -12,7 +12,7 @@ private enum PushedPage: Identifiable, Equatable {
 
 	var id: String {
 		switch self {
-		case .newsDetail: return "newsDetail"
+		case .newsDetail(let article): return "newsDetail-\(article)"
 		case .stockDetail(let fromMyStak): return "stockDetail-\(fromMyStak)"
 		case .collection: return "collection"
 		case .profile: return "profile"
@@ -60,7 +60,7 @@ struct MainTabsView: View {
 						)
 					case .news:
 						// Authored (1:1228): Story tile -> News detail unsaved, Instant.
-						NewsView(onOpenArticle: { pushInstant(.newsDetail) })
+						NewsView(onOpenArticle: { id in pushInstant(.newsDetail(article: id)) })
 					case .discover:
 						DiscoverView(
 							// Authored (1:1785): Learn more -> Stock Detail folded, Instant.
@@ -107,10 +107,11 @@ struct MainTabsView: View {
 	@ViewBuilder
 	private func pageView(_ page: PushedPage) -> some View {
 		switch page {
-		case .newsDetail:
+		case .newsDetail(let article):
 			// The article's back motion is not yet authored - it mirrors the
 			// instant entry until its panel says otherwise.
 			NewsDetailView(
+				articleId: article,
 				onBack: { popInstant() },
 				// Authored (101:1005): View in My STAK -> My STAK Overview,
 				// Push Right 300 - the article slides out trailing while the

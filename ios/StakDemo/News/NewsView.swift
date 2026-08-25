@@ -46,7 +46,7 @@ private let marketsRows: [NewsRowModel] = [
 /// Every metric is scaled by the 390pt artboard unit (`figmaUnit`), exactly
 /// like the Android build's `u` scaling.
 struct NewsView: View {
-	let onOpenArticle: () -> Void
+	let onOpenArticle: (String) -> Void
 
 	// Designer's call (2026-08-22): the search icon opens a search bar that
 	// word-matches the news content; empty when nothing matches.
@@ -108,16 +108,17 @@ struct NewsView: View {
 					// Designer's call (2026-08-22): today's brief on tap leads to
 					// the News info page (Story tile stays wired per 1:1228).
 					if NewsBriefFeed.briefs().contains(where: { matches($0.title) }) {
-						BriefCarousel(onRead: onOpenArticle)
+						// Each brief opens ITS OWN article (user, 2026-08-25).
+						BriefCarousel(onRead: { page in onOpenArticle(NewsArticleFeed.briefArticles[page]) })
 					}
-					StoryGrid(onOpenArticle: onOpenArticle, query: q)
+					StoryGrid(onOpenArticle: { onOpenArticle(NewsArticleFeed.apple) }, query: q)
 					let forYou = forYouRows.filter { matches($0.headline) }
 					if !forYou.isEmpty {
-						NewsSectionView(title: "For You", rows: forYou, onOpenArticle: onOpenArticle)
+						NewsSectionView(title: "For You", rows: forYou)
 					}
 					let markets = marketsRows.filter { matches($0.headline) }
 					if !markets.isEmpty {
-						NewsSectionView(title: "Markets", rows: markets, onOpenArticle: onOpenArticle)
+						NewsSectionView(title: "Markets", rows: markets)
 					}
 				}
 				.padding(.horizontal, 20 * u)
@@ -160,7 +161,7 @@ private struct MoodMiniRow: View {
 /// left and right through the served briefs (user, 2026-08-22); the
 /// active dot follows the page. Text comes from NewsBriefFeed.
 private struct BriefCarousel: View {
-	let onRead: () -> Void
+	let onRead: (Int) -> Void
 	@State private var page: Int? = 0
 
 	var body: some View {
@@ -170,7 +171,7 @@ private struct BriefCarousel: View {
 			ScrollView(.horizontal, showsIndicators: false) {
 				LazyHStack(spacing: 0) {
 					ForEach(briefs) { brief in
-						BriefCard(brief: brief, onRead: onRead)
+						BriefCard(brief: brief, onRead: { onRead(brief.id) })
 							.containerRelativeFrame(.horizontal)
 							.id(brief.id)
 					}
@@ -337,7 +338,6 @@ private struct NewsSectionView: View {
 	@ObservedObject var holdings = MyStakHoldings.shared
 	let title: String
 	let rows: [NewsRowModel]
-	let onOpenArticle: () -> Void
 
 	var body: some View {
 		let u = figmaUnit

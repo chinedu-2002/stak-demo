@@ -22,14 +22,21 @@ private let ctaBorder = StakColors.ctaBorderGradient
 /// Mirrors android/ NewsDetailScreen.kt. Every metric is scaled by the
 /// 390pt artboard unit (`figmaUnit`), exactly like the Android build.
 struct NewsDetailView: View {
+	/// The served article for the tapped story (user, 2026-08-25); the
+	/// Apple article is the authored one and renders frame-exact.
+	var articleId: String = NewsArticleFeed.apple
 	let onBack: () -> Void
 	var onViewInMyStak: () -> Void = {}
 
 	@State private var saved = false
 	@State private var showSuccess = false
 
+	private var article: NewsArticleFeed.Article { NewsArticleFeed.article(articleId) }
+	private var isAuthored: Bool { articleId == NewsArticleFeed.apple }
+
 	var body: some View {
 		let u = figmaUnit
+		let article = self.article
 		ZStack {
 			VStack(spacing: 0) {
 				// Fixed top bar — back circle + share.
@@ -38,7 +45,7 @@ struct NewsDetailView: View {
 					Spacer()
 					// Designer's call (2026-08-22): share creates a link that
 					// takes a co-app user to the shared info.
-					ShareLink(item: "Apple climbs 5% on foldable iPhone push - read it on STAK: https://stak.app/news/apple-foldable-iphone-push") {
+					ShareLink(item: article.shareText) {
 						Image("IcNewsShare")
 							.resizable()
 							.frame(width: 24 * u, height: 24 * u)
@@ -55,14 +62,14 @@ struct NewsDetailView: View {
 					VStack(spacing: 0) {
 						// Authored motion (1:1495): the hero bookmark -> News detail
 						// page saved, Instant - a direct save that skips the sheet.
-						HeroImage(media: NewsMedia.demo(), saved: saved, onBookmark: { saved = true; MyStakHoldings.shared.add("AAPL") })
+						HeroImage(media: article.media, category: article.category, saved: saved, onBookmark: { saved = true; if let t = article.ticker { MyStakHoldings.shared.add(t) } })
 						VStack(alignment: .leading, spacing: 15 * u) {
-							Text("Apple climbs 5% on foldable iPhone push")
+							Text(article.headline)
 								// RENDER-measured 20sp (the metadata's 24 lied); lh32 box stands.
 								.font(StakFont.sora(20 * u, .semiBold))
 								.lineSpacing((32 - 20) * u)
 								.foregroundStyle(StakColors.textPrimary)
-							Text("A bigger foldable order and the widest iPhone lineup in years sent Apple toward a record, and to within touching distance of Nvidia’s crown.")
+							Text(article.subtitle)
 								// 14.3 keeps the authored line-1 break after "lineup".
 								.font(StakFont.geist(14.3 * u))
 								.lineSpacing((22 - 14.3) * u)
@@ -73,6 +80,18 @@ struct NewsDetailView: View {
 								AddToStakButton { withAnimation(.easeOut(duration: 0.3)) { showSuccess = true } }
 							}
 							NewsHairline()
+							// Authored Apple-specific blocks render only on the
+							// authored article; served stories show their own body.
+							if !isAuthored {
+								ForEach(Array(article.paragraphs.enumerated()), id: \.offset) { i, text in
+									if i == 0 {
+										Paragraph(text: text, size: 15, line: 24)
+									} else {
+										Paragraph(text: text)
+									}
+								}
+							}
+							if isAuthored {
 							StockCard(saved: saved)
 							GistCard()
 							Paragraph(
@@ -100,6 +119,7 @@ struct NewsDetailView: View {
 								}
 							}
 							ReadNext()
+							}
 						}
 						.frame(maxWidth: .infinity, alignment: .leading)
 						.padding(.horizontal, 20 * u)
@@ -114,10 +134,10 @@ struct NewsDetailView: View {
 			// authored animate type is still unreadable from the file).
 			if showSuccess {
 				SaveSuccessOverlay(
-					onViewInMyStak: { saved = true; MyStakHoldings.shared.add("AAPL"); onViewInMyStak() },
+					onViewInMyStak: { saved = true; if let t = article.ticker { MyStakHoldings.shared.add(t) }; onViewInMyStak() },
 					onDismiss: {
 						saved = true
-						MyStakHoldings.shared.add("AAPL")
+						if let t = article.ticker { MyStakHoldings.shared.add(t) }
 						withAnimation(.easeOut(duration: 0.3)) { showSuccess = false }
 					}
 				)
@@ -140,6 +160,7 @@ struct NewsDetailView: View {
 // body and media into this page - same slot pattern as NewsMedia.
 private struct HeroImage: View {
 	let media: NewsMedia
+	let category: String
 	let saved: Bool
 	let onBookmark: () -> Void
 	/// The hero is a media slot: poster + play glyph at rest (frame-exact),
@@ -178,7 +199,7 @@ private struct HeroImage: View {
 					.offset(x: -0.5 * u, y: 12.5 * u)
 				}
 			}
-			Text("Tech & Ai")
+			Text(category)
 				.font(StakFont.geist(10 * u, .medium))
 				.foregroundStyle(StakColors.textPrimary)
 				.padding(.horizontal, 7 * u)

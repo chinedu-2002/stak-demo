@@ -24,6 +24,12 @@ enum StakFont {
 		.custom("Geist-\(weight.rawValue)", size: size)
 	}
 
+	/// Inter — the authored tab-bar label face (static Regular instance cut
+	/// from the same variable font the Android app ships).
+	static func inter(_ size: CGFloat) -> Font {
+		.custom("Inter-Regular", size: size)
+	}
+
 	/// Squarish Sans CT — display face for the STAK wordmark / big numerals.
 	static func squarish(_ size: CGFloat, smallCaps: Bool = false) -> Font {
 		.custom(smallCaps ? "SquarishSansCTRegularSC" : "SquarishSansCTRegular", size: size)

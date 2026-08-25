@@ -57,7 +57,10 @@ struct MainTabBar: View {
 		ZStack(alignment: .top) {
 			Color(argb: 0xFF060C1D)
 			// Authored gaps: 28 on the 86 bar (1:1221), 30 on the compact 75 bar (1:1788).
-			HStack(alignment: .top, spacing: 28 * u) {
+			// Gap 30 / row 337 (+0.5 nudge) - the spec on the News, My STAK,
+			// Simulate and Discover bars; the Home bars' 28/329 is overridden
+			// by the one-stable-bar ruling (user, 2026-08-23).
+			HStack(alignment: .top, spacing: 30 * u) {
 				ForEach(MainTab.allCases) { tab in
 					Button {
 						if tab.built { selected = tab }
@@ -67,13 +70,17 @@ struct MainTabBar: View {
 								.resizable()
 								.frame(width: 24 * u, height: 24 * u)
 							Text(tab.rawValue)
-								.font(StakFont.geist(12 * u))
+								// Authored label face: Inter Regular 12.
+								.font(StakFont.inter(12 * u))
 								.foregroundStyle(Color.white)
 						}
+						// Authored: only Tab - Home has a fixed width (34); the rest hug.
+						.frame(width: tab == .home ? 34 * u : nil)
 					}
 					.buttonStyle(.plain)
 				}
 			}
+			.offset(x: 0.5 * u)
 			.padding(.top, 18 * u)
 		}
 		.frame(maxWidth: .infinity)

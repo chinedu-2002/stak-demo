@@ -73,7 +73,7 @@ private val CtaBorder = Brush.verticalGradient(
  * View-in-My-STAK row on the stock card, Apple + Tech tags).
  */
 @Composable
-fun NewsDetailScreen(articleId: String = NewsArticleFeed.APPLE, onBack: () -> Unit, onViewInMyStak: () -> Unit = {}) {
+fun NewsDetailScreen(articleId: String = NewsArticleFeed.APPLE, onBack: () -> Unit, onViewInMyStak: () -> Unit = {}, onOpenArticle: (String) -> Unit = {}) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	// The served article for the tapped story (user, 2026-08-25); the
 	// Apple article is the authored one and renders frame-exact.
@@ -144,7 +144,7 @@ fun NewsDetailScreen(articleId: String = NewsArticleFeed.APPLE, onBack: () -> Un
 						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (14.3 * u).sp, lineHeight = (22 * u).sp),
 						color = News.Muted,
 					)
-					Byline()
+					Byline(source = article.source, meta = article.sourceMeta)
 					if (!saved) {
 						AddToStakButton(onClick = { showSuccess = true })
 					}
@@ -169,7 +169,7 @@ fun NewsDetailScreen(articleId: String = NewsArticleFeed.APPLE, onBack: () -> Un
 							article.tags.getOrNull(1)?.let { ArticleTag(it) }
 						}
 					}
-					ReadNext()
+					ReadNext(currentId = article.id, onOpen = onOpenArticle)
 				}
 			}
 		}
@@ -321,8 +321,9 @@ private fun HeroImage(media: NewsMedia, category: String, saved: Boolean, onBook
 	}
 }
 
+/** Templated per story - the authored sample is "Bloomberg · Jul 2 · 3 min read". */
 @Composable
-private fun Byline() {
+private fun Byline(source: String, meta: String) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Row(
 		verticalAlignment = Alignment.CenterVertically,
@@ -334,19 +335,19 @@ private fun Byline() {
 			modifier = Modifier.size((24 * u).dp).background(News.ChipBg, CircleShape),
 		) {
 			Text(
-				text = "B",
+				text = source.take(1),
 				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (10 * u).sp, lineHeight = (13 * u).sp),
 				color = Color(0xFF9EADC7),
 			)
 		}
 		Row(horizontalArrangement = Arrangement.spacedBy((5 * u).dp), verticalAlignment = Alignment.CenterVertically) {
 			Text(
-				text = "Bloomberg",
+				text = source,
 				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
 				color = Color.White,
 			)
 			Text(
-				text = "· Jul 2 · 3 min read",
+				text = meta,
 				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
 				color = News.Faint,
 			)
@@ -671,8 +672,13 @@ private fun ArticleTag(text: String) {
 	}
 }
 
+/**
+ * READ NEXT - the authored sample repeats the Tesla row twice as its
+ * placeholder; the served rows are two other stories, and each opens
+ * its own article (user, 2026-08-25).
+ */
 @Composable
-private fun ReadNext() {
+private fun ReadNext(currentId: String, onOpen: (String) -> Unit) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Column(verticalArrangement = Arrangement.spacedBy((10 * u).dp), modifier = Modifier.fillMaxWidth().padding(top = (6 * u).dp)) {
 		Text(
@@ -680,7 +686,7 @@ private fun ReadNext() {
 			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, lineHeight = (13 * u).sp, letterSpacing = (0.5 * u).sp),
 			color = News.Muted,
 		)
-		repeat(2) {
+		NewsArticleFeed.readNext(excluding = currentId).forEach { next ->
 			Row(
 				verticalAlignment = Alignment.CenterVertically,
 				horizontalArrangement = Arrangement.spacedBy((12 * u).dp),
@@ -688,22 +694,29 @@ private fun ReadNext() {
 					.fillMaxWidth()
 					.clip(RoundedCornerShape((14 * u).dp))
 					.background(News.CardBg)
+					.clickable(
+						interactionSource = remember { MutableInteractionSource() },
+						indication = null,
+						onClick = { onOpen(next.id) },
+					)
 					.padding((12 * u).dp),
 			) {
-				Image(
-					painter = painterResource(R.drawable.news_thumb_tsla_rn),
-					contentDescription = null,
-					contentScale = ContentScale.Crop,
-					modifier = Modifier.size((60 * u).dp).clip(RoundedCornerShape((10 * u).dp)),
-				)
+				next.thumbRes?.let { thumbRes ->
+					Image(
+						painter = painterResource(thumbRes),
+						contentDescription = null,
+						contentScale = ContentScale.Crop,
+						modifier = Modifier.size((60 * u).dp).clip(RoundedCornerShape((10 * u).dp)),
+					)
+				}
 				Column(verticalArrangement = Arrangement.spacedBy((5 * u).dp), modifier = Modifier.weight(1f)) {
 					Text(
-						text = "CNBC · 2d",
+						text = "${next.source} · ${next.age}",
 						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp, lineHeight = (14 * u).sp),
 						color = News.Muted,
 					)
 					Text(
-						text = "Tesla drops 7% even after beating deliveries",
+						text = next.headline,
 						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp, lineHeight = (19 * u).sp),
 						color = Color.White,
 					)

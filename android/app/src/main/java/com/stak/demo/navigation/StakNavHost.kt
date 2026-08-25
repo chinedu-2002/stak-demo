@@ -367,6 +367,8 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
 					pendingShellTab.value = MainTab.MySTAK
 					navController.popBackStack()
 				},
+				// READ NEXT rows push the next story's article (user, 2026-08-25).
+				onOpenArticle = { id -> newsPopPush = false; navController.navigate(StakRoutes.newsDetail(id)) },
 			)
 		}
 	}

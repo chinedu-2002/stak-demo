@@ -1,5 +1,7 @@
 package com.stak.demo.ui.news
 
+import com.stak.demo.R
+
 /**
  * News article data source - the article page is a TEMPLATE (user,
  * 2026-08-25: tapping the Dow brief must open the DOW story, not the
@@ -12,9 +14,18 @@ package com.stak.demo.ui.news
  * source, tags and read-next come from the served article, and the
  * stock card / key stats appear whenever the story has a ticker. The
  * authored Apple copy ships as data, so that page stays frame-exact.
+ *
+ * EVERY story surface opens its article (user, 2026-08-25: the Fed
+ * tile and the For You / Markets rows did nothing on tap): the listing
+ * rows themselves render from these articles - [FOR_YOU], [MARKETS]
+ * and [FED_TILE] are the demo stand-ins for the backend's section
+ * feeds, and [readNext] serves the article page's READ NEXT rows.
  */
 object NewsArticleFeed {
 	const val APPLE = "apple-foldable"
+
+	/** The Top Stories "Markets" tile's story (1:1228). */
+	const val FED_TILE = "fed-minutes-wednesday"
 
 	data class Article(
 		val id: String,
@@ -29,9 +40,24 @@ object NewsArticleFeed {
 		val pullQuote: String?,
 		val explainer: String?,
 		val tags: List<String>,
+		/** Byline source name ("Bloomberg") - the avatar shows its initial. */
+		val source: String,
+		/** Relative age for list rows ("2d" -> "Reuters · 2d"). */
+		val age: String,
+		/** Byline suffix after the source ("· Jul 2 · 3 min read"). */
+		val sourceMeta: String,
+		/** List-row thumbnail; null = the story has no row presentation. */
+		val thumbRes: Int? = null,
+		/**
+		 * The stocks the story relates to - gates the "In your STAK" chip
+		 * on listing rows (user, 2026-08-23). Distinct from [ticker], which
+		 * keys the article's stock card / key stats and stays null until
+		 * the backend serves that stock's data module (AAPL only in demo).
+		 */
+		val relatedTickers: List<String> = emptyList(),
 	)
 
-	private fun demo(id: String, category: String, headline: String, subtitle: String, paragraphs: List<String>, gist: List<String>, pullQuote: String, explainer: String, tags: List<String>) = Article(
+	private fun demo(id: String, category: String, headline: String, subtitle: String, paragraphs: List<String>, gist: List<String>, pullQuote: String, explainer: String, tags: List<String>, source: String, age: String, sourceMeta: String, thumbRes: Int? = null, relatedTickers: List<String> = emptyList()) = Article(
 		id = id,
 		category = category,
 		headline = headline,
@@ -45,6 +71,11 @@ object NewsArticleFeed {
 		pullQuote = pullQuote,
 		explainer = explainer,
 		tags = tags,
+		source = source,
+		age = age,
+		sourceMeta = sourceMeta,
+		thumbRes = thumbRes,
+		relatedTickers = relatedTickers,
 	)
 
 	private val ARTICLES = listOf(
@@ -72,6 +103,12 @@ object NewsArticleFeed {
 			pullQuote = "Companies do not quietly double down on a product they expect to flop.",
 			explainer = "A foldable phone opens out into a small tablet. For Apple it means a pricier device to sell, and a way to win back buyers who drifted to Samsung, which has offered foldables for years.",
 			tags = listOf("Apple", "Tech"),
+			// The AUTHORED byline (1:1495) and the For You row (1:1228).
+			source = "Bloomberg",
+			age = "2d",
+			sourceMeta = "· Jul 2 · 3 min read",
+			thumbRes = R.drawable.news_thumb_aapl,
+			relatedTickers = listOf("AAPL"),
 		),
 		demo(
 			"dow-record-chips-slide", "Markets",
@@ -90,6 +127,7 @@ object NewsArticleFeed {
 			"Two indexes, two very different stories about the same economy.",
 			"The Dow tracks 30 large, established companies, so it can rise even when tech-heavy indexes fall. A split like this usually means money is rotating, not leaving.",
 			listOf("Markets", "Stocks"),
+			"Reuters", "1d", "· Jul 3 · 3 min read",
 		),
 		demo(
 			"fed-holds-rates", "Markets",
@@ -108,6 +146,7 @@ object NewsArticleFeed {
 			"The bar for the first cut has clearly moved higher.",
 			"When the Fed holds rates, borrowing costs stay where they are. Markets care less about the decision itself than about hints of when cuts begin.",
 			listOf("Markets", "Fed"),
+			"Reuters", "1d", "· Jul 3 · 3 min read",
 		),
 		demo(
 			"oil-opec-supply", "Markets",
@@ -126,6 +165,9 @@ object NewsArticleFeed {
 			"Both stories point the same direction: more barrels.",
 			"Oil prices move on expected supply and demand. More supply - real or promised - usually means lower prices at the pump and lower costs for fuel-hungry industries.",
 			listOf("Energy", "Markets"),
+			// Also the third Markets row (1:1228) - "Reuters · 3d", XOM chip.
+			"Reuters", "3d", "· Jul 1 · 2 min read",
+			R.drawable.news_thumb_oil, listOf("XOM"),
 		),
 		demo(
 			"tech-earnings-week", "Tech & Ai",
@@ -144,6 +186,106 @@ object NewsArticleFeed {
 			"Their guidance will set the tone for the whole tape.",
 			"Earnings season is when companies report results and give guidance. For the largest names, that guidance moves entire indexes, not just their own stock.",
 			listOf("Tech", "Earnings"),
+			"Bloomberg", "1d", "· Jul 3 · 3 min read",
+		),
+		demo(
+			FED_TILE, "Markets",
+			"Fed minutes land Wednesday",
+			"The minutes from June's meeting arrive midweek - traders will comb them for how close the committee really is to cutting.",
+			listOf(
+				"The Federal Reserve publishes the minutes of its June meeting on Wednesday, and for a document that is three weeks old it carries unusual weight. The committee held rates steady, but the vote hid a live debate over how soon cuts should begin.",
+				"Traders will look for how many officials leaned toward easing, and how the staff framed the recent soft patch in hiring. A minutes release rarely moves markets on its own; one that reveals a split this wide can.",
+				"The timing matters too. The release lands two days before the July jobs report, giving markets a rare same-week read on both what the Fed was thinking and the data that will test it.",
+			),
+			listOf(
+				"June's meeting minutes arrive Wednesday.",
+				"The vote hid a live debate over the timing of cuts.",
+				"A July jobs report lands two days later.",
+			),
+			"For a document that is three weeks old it carries unusual weight.",
+			"The Fed publishes minutes three weeks after each meeting. They show the debate behind the decision, which is often more revealing than the decision itself.",
+			listOf("Markets", "Fed"),
+			"Reuters", "2h", "· Jul 4 · 2 min read",
+		),
+		demo(
+			"nvda-lags-rally", "Tech & Ai",
+			"Nvidia lags the chip rally it kicked off",
+			"The stock that started the AI trade is sitting out its latest leg, and the reasons say a lot about where the rally goes next.",
+			listOf(
+				"Nvidia spent two years as the engine of the AI trade. This week it became a passenger, edging higher while the memory and networking names around it ripped double digits.",
+				"Nothing is wrong with the business; forecasts keep climbing. What changed is the market's appetite: with Nvidia priced for perfection, money hunting the next leg of the trade is rotating into suppliers that still look cheap by comparison.",
+				"Bulls call it healthy broadening, bears call it fatigue. The distinction matters, because a rally carried by the whole supply chain lasts longer than one carried by a single stock.",
+			),
+			listOf(
+				"Nvidia trailed while smaller chip names surged.",
+				"Money is rotating into cheaper AI suppliers.",
+				"Analysts split on broadening versus fatigue.",
+			),
+			"This week it became a passenger.",
+			"When a leader stock pauses, gains often spread to smaller related companies. Investors call this rotation, and it can signal a rally maturing rather than ending.",
+			listOf("Nvidia", "Tech"),
+			"Reuters", "2d", "· Jul 2 · 3 min read",
+			R.drawable.news_thumb_nvda, listOf("NVDA"),
+		),
+		demo(
+			"tsla-drops-deliveries", "Tech & Ai",
+			"Tesla drops 7% even after beating deliveries",
+			"A delivery beat was not enough - the margin behind each car is now the number that moves the stock.",
+			listOf(
+				"Tesla delivered more cars last quarter than Wall Street expected and its stock fell 7 percent anyway, the kind of reaction that tells you the market has changed the question it is asking.",
+				"The beat was built on price cuts and incentives, and every discount comes straight out of margin. Analysts now put automotive gross margin, not deliveries, at the center of the story, and that number will not arrive until the full earnings report.",
+				"The selloff also reflects positioning: the stock had run hard into the delivery print, so a beat with caveats was read as a reason to take profits rather than add.",
+			),
+			listOf(
+				"Deliveries beat estimates, the stock fell 7% anyway.",
+				"Price cuts mean the beat cost margin.",
+				"Full margins arrive with the earnings report.",
+			),
+			"The market has changed the question it is asking.",
+			"Deliveries count how many cars were handed to customers; margin is what each sale earns after costs. A company can sell more cars and still make less money.",
+			listOf("Tesla", "Tech"),
+			"CNBC", "2d", "· Jul 2 · 3 min read",
+			R.drawable.news_thumb_tsla, listOf("TSLA"),
+		),
+		demo(
+			"jobs-miss-fed-bets", "Markets",
+			"June jobs miss eases Fed hike bets",
+			"A cooler hiring month rewired the rate debate in a single morning.",
+			listOf(
+				"The June employment report came in below every major forecast, and markets treated the miss as good news: odds of another rate hike collapsed within minutes of the release.",
+				"Slower hiring means less pressure on wages, and less wage pressure gives the Federal Reserve room to stay patient. Bond yields slipped and rate-sensitive stocks - housing, banks, small caps - led the day's gains.",
+				"One soft month is not a trend, and Fed officials were quick to say so. But with inflation already cooling, the report tilts the argument toward the committee's patient wing.",
+			),
+			listOf(
+				"June hiring came in below every major forecast.",
+				"Rate-hike odds collapsed within minutes.",
+				"Rate-sensitive stocks led the gains.",
+			),
+			"Markets treated the miss as good news.",
+			"Weak jobs data can lift stocks: slower hiring cools inflation, which makes rate cuts more likely, and lower rates tend to support share prices.",
+			listOf("Markets", "Jobs"),
+			"Reuters", "2d", "· Jul 2 · 2 min read",
+			R.drawable.news_thumb_jobs,
+		),
+		demo(
+			"memory-chips-soar", "Tech & Ai",
+			"Memory chips soar as the AI trade rotates",
+			"The unglamorous end of the chip business is suddenly the hottest trade in the AI boom.",
+			listOf(
+				"Memory chipmakers were the best performers in the market this week, extending a run that has quietly turned the sector's cheapest names into the AI trade's new leadership.",
+				"The driver is high-bandwidth memory, the specialized chips that feed data to AI accelerators. Supply is sold out through next year, prices are rising, and every new data center order tightens the market further.",
+				"The risk is the memory cycle itself, a business famous for violent swings from shortage to glut. For now, though, the shortage side of the cycle is doing the heavy lifting.",
+			),
+			listOf(
+				"Memory names led the market this week.",
+				"High-bandwidth memory is sold out through next year.",
+				"The cycle's boom-bust history is the main risk.",
+			),
+			"The sector's cheapest names are the AI trade's new leadership.",
+			"Memory chips store the data AI systems work on. Demand from AI data centers has turned a boom-and-bust commodity business into a growth story, at least for now.",
+			listOf("Chips", "Tech"),
+			"Bloomberg", "2d", "· Jul 2 · 3 min read",
+			R.drawable.news_thumb_chips, listOf("MU"),
 		),
 	)
 
@@ -152,4 +294,14 @@ object NewsArticleFeed {
 
 	/** Brief page index -> its article id (demo mapping). */
 	val BRIEF_ARTICLES = listOf("dow-record-chips-slide", "fed-holds-rates", "oil-opec-supply", "tech-earnings-week")
+
+	/** The For You section's stories, in row order (1:1228). */
+	val FOR_YOU = listOf("nvda-lags-rally", APPLE, "tsla-drops-deliveries")
+
+	/** The Markets section's stories, in row order (1:1228). */
+	val MARKETS = listOf("jobs-miss-fed-bets", "memory-chips-soar", "oil-opec-supply")
+
+	/** The article page's READ NEXT rows - two other row-presented stories. */
+	fun readNext(excluding: String): List<Article> =
+		ARTICLES.filter { it.thumbRes != null && it.id != excluding }.take(2)
 }

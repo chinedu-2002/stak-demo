@@ -352,7 +352,10 @@ private struct StockCard: View {
 						.foregroundStyle(facts.up ? News.green : Color(argb: 0xFFFF5A6A))
 				}
 				Spacer()
-				Image("NewsSparkline")
+				// The chart must agree with the move (user, 2026-08-25:
+				// "showing red then the graph is green") - the down variant
+				// is the authored line flipped + recolored to the app red.
+				Image(facts.up ? "NewsSparkline" : "NewsSparklineDown")
 					.resizable()
 					.frame(width: 110 * u, height: 40 * u)
 			}

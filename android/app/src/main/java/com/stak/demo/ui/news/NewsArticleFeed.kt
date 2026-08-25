@@ -67,7 +67,7 @@ object NewsArticleFeed {
 		val relatedTickers: List<String> = emptyList(),
 	)
 
-	private fun demo(id: String, category: String, headline: String, subtitle: String, paragraphs: List<String>, gist: List<String>, pullQuote: String, explainer: String, tags: List<String>, source: String, age: String, sourceMeta: String, thumbRes: Int? = null, relatedTickers: List<String> = emptyList()) = Article(
+	private fun demo(id: String, category: String, headline: String, subtitle: String, paragraphs: List<String>, gist: List<String>, pullQuote: String, explainer: String, tags: List<String>, source: String, age: String, sourceMeta: String, thumbRes: Int? = null, relatedTickers: List<String> = emptyList(), media: NewsMedia = NewsMedia.Image(posterRes = null, url = null)) = Article(
 		id = id,
 		category = category,
 		headline = headline,
@@ -77,9 +77,10 @@ object NewsArticleFeed {
 		// primary related stock keys the stock card / key stats.
 		ticker = relatedTickers.firstOrNull(),
 		paragraphs = paragraphs,
-		// The Apple demo media is the PLACEHOLDER for every story's hero
-		// until the backend serves per-story media (same user ruling).
-		media = NewsMedia.demo(),
+		// PER-STORY media (user, 2026-08-25: the Tesla story must show
+		// Tesla, not Apple) - each story passes its own oEmbed-verified
+		// official video; the empty-Image default is the no-media slot.
+		media = media,
 		shareText = "$headline - read it on STAK: https://stak.app/news/$id",
 		gist = gist,
 		pullQuote = pullQuote,
@@ -145,6 +146,8 @@ object NewsArticleFeed {
 			// STRICT stock news (user, 2026-08-25): an index story counts
 			// only through the stocks it is about - the chip names.
 			null, listOf("NVDA", "MU"),
+			// CNBC's NYSE opening-bell film.
+			media = NewsMedia.Video(url = "https://www.youtube.com/watch?v=f5U1vLwbySw", posterUrl = "https://i.ytimg.com/vi/f5U1vLwbySw/hqdefault.jpg"),
 		),
 		// STRICT stock news (user, 2026-08-25): the old fed-holds-rates
 		// demo article was macro, not stock news - replaced with the
@@ -168,6 +171,8 @@ object NewsArticleFeed {
 			listOf("Alphabet", "Tech"),
 			"Reuters", "1d", "· Jul 3 · 3 min read",
 			null, listOf("GOOGL"),
+			// Google's official Year in Search film.
+			media = NewsMedia.Video(url = "https://www.youtube.com/watch?v=Vv_sjpclsZ8", posterUrl = "https://i.ytimg.com/vi/Vv_sjpclsZ8/hqdefault.jpg"),
 		),
 		demo(
 			"oil-opec-supply", "Markets",
@@ -193,6 +198,8 @@ object NewsArticleFeed {
 			// images (2026-08-25). Not a loading bug.
 			"Reuters", "3d", "· Jul 1 · 2 min read",
 			R.drawable.news_thumb_oil, listOf("XOM"),
+			// ExxonMobil's official operations film.
+			media = NewsMedia.Video(url = "https://www.youtube.com/watch?v=sYNhUg7mmnU", posterUrl = "https://i.ytimg.com/vi/sYNhUg7mmnU/hqdefault.jpg"),
 		),
 		demo(
 			"tech-earnings-week", "Tech & Ai",
@@ -214,6 +221,8 @@ object NewsArticleFeed {
 			"Bloomberg", "1d", "· Jul 3 · 3 min read",
 			// STRICT stock news: the earnings week is about these stocks.
 			null, listOf("MSFT", "GOOGL"),
+			// Nasdaq's official MarketSite film.
+			media = NewsMedia.Video(url = "https://www.youtube.com/watch?v=R-lVIFlHnCo", posterUrl = "https://i.ytimg.com/vi/R-lVIFlHnCo/hqdefault.jpg"),
 		),
 		// STRICT stock news (user, 2026-08-25): the old fed-minutes tile
 		// story was macro, not stock news - the Markets tile now serves
@@ -237,6 +246,8 @@ object NewsArticleFeed {
 			listOf("Amazon", "Tech"),
 			"Reuters", "2h", "· Jul 4 · 3 min read",
 			null, listOf("AMZN"),
+			// AWS's official data-center tour.
+			media = NewsMedia.Video(url = "https://www.youtube.com/watch?v=bFYDrHYDns4", posterUrl = "https://i.ytimg.com/vi/bFYDrHYDns4/hqdefault.jpg"),
 		),
 		demo(
 			"nvda-lags-rally", "Tech & Ai",
@@ -257,6 +268,8 @@ object NewsArticleFeed {
 			listOf("Nvidia", "Tech"),
 			"Reuters", "2d", "· Jul 2 · 3 min read",
 			R.drawable.news_thumb_nvda, listOf("NVDA"),
+			// NVIDIA's official Rise of AI film.
+			media = NewsMedia.Video(url = "https://www.youtube.com/watch?v=d24W8AqeOHM", posterUrl = "https://i.ytimg.com/vi/d24W8AqeOHM/hqdefault.jpg"),
 		),
 		demo(
 			"tsla-drops-deliveries", "Tech & Ai",
@@ -277,6 +290,8 @@ object NewsArticleFeed {
 			listOf("Tesla", "Tech"),
 			"CNBC", "2d", "· Jul 2 · 3 min read",
 			R.drawable.news_thumb_tsla, listOf("TSLA"),
+			// Tesla's official The New Model Y film.
+			media = NewsMedia.Video(url = "https://www.youtube.com/watch?v=Jt7DqX2AlNo", posterUrl = "https://i.ytimg.com/vi/Jt7DqX2AlNo/hqdefault.jpg"),
 		),
 		// STRICT stock news (user, 2026-08-25): the old jobs-report demo
 		// row was macro, not stock news - replaced with a stock story.
@@ -300,6 +315,8 @@ object NewsArticleFeed {
 			listOf("AMD", "Chips"),
 			"Reuters", "2d", "· Jul 2 · 2 min read",
 			R.drawable.news_thumb_jobs, listOf("AMD"),
+			// AMD's official Advancing AI film.
+			media = NewsMedia.Video(url = "https://www.youtube.com/watch?v=pVl25BbczLI", posterUrl = "https://i.ytimg.com/vi/pVl25BbczLI/hqdefault.jpg"),
 		),
 		demo(
 			"memory-chips-soar", "Tech & Ai",
@@ -320,6 +337,8 @@ object NewsArticleFeed {
 			listOf("Chips", "Tech"),
 			"Bloomberg", "2d", "· Jul 2 · 3 min read",
 			R.drawable.news_thumb_chips, listOf("MU"),
+			// Micron's official HBM3E film.
+			media = NewsMedia.Video(url = "https://www.youtube.com/watch?v=bzwPZD1w7UY", posterUrl = "https://i.ytimg.com/vi/bzwPZD1w7UY/hqdefault.jpg"),
 		),
 		// OFF-TOPIC by design: a general-pool story with no market topic
 		// and no related stock. It is SERVED (it sits in the For You

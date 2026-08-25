@@ -153,7 +153,7 @@ fun NewsDetailScreen(articleId: String = NewsArticleFeed.APPLE, onBack: () -> Un
 					// article is the section's PLACEHOLDER - each block renders
 					// per story from served data; stock blocks appear whenever
 					// the story has a related ticker).
-					article.ticker?.let { StockCard(saved = saved, ticker = it) }
+					article.ticker?.let { StockCard(saved = saved, ticker = it, facts = NewsArticleFeed.stockFacts(it)) }
 					if (article.gist.isNotEmpty()) GistCard(bullets = article.gist)
 					article.paragraphs.getOrNull(0)?.let { Paragraph(it, size = 15.sp, line = 24.sp) }
 					article.paragraphs.getOrNull(1)?.let { Paragraph(it) }
@@ -161,7 +161,7 @@ fun NewsDetailScreen(articleId: String = NewsArticleFeed.APPLE, onBack: () -> Un
 					article.explainer?.let { NewToThisCard(it) }
 					article.paragraphs.drop(2).forEach { Paragraph(it) }
 					SourceRow()
-					if (article.ticker != null) KeyStatsCard()
+					article.ticker?.let { KeyStatsCard(facts = NewsArticleFeed.stockFacts(it)) }
 					Divider()
 					Row(horizontalArrangement = Arrangement.spacedBy((8 * u).dp)) {
 						article.tags.getOrNull(0)?.let { ArticleTag(it) }
@@ -186,6 +186,7 @@ fun NewsDetailScreen(articleId: String = NewsArticleFeed.APPLE, onBack: () -> Un
 			exit = fadeOut(tween(300, easing = EaseOut)),
 		) {
 			SaveSuccessOverlay(
+				facts = NewsArticleFeed.stockFacts(article.ticker ?: "AAPL"),
 				onViewInMyStak = { saved = true; article.ticker?.let { com.stak.demo.ui.MyStakHoldings.add(it) }; onViewInMyStak() },
 				onDismiss = { showSuccess = false; saved = true; article.ticker?.let { com.stak.demo.ui.MyStakHoldings.add(it) } },
 			)
@@ -391,9 +392,14 @@ private fun Divider() {
 	Box(modifier = Modifier.fillMaxWidth().height((1 * u).dp).background(News.Divider))
 }
 
-/** AAPL price card — badge, Daily chip, $308.63 + sparkline; saved adds View row. */
+/**
+ * The story's stock card - EVERY article renders it with its own
+ * stock's served facts (user, 2026-08-25: "use the apple features...
+ * replace the placeholder"). The sparkline stays the authored demo
+ * asset until the backend serves chart data.
+ */
 @Composable
-private fun StockCard(saved: Boolean, ticker: String = "AAPL") {
+private fun StockCard(saved: Boolean, ticker: String, facts: NewsArticleFeed.StockFacts) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Column(
 		verticalArrangement = Arrangement.spacedBy((13 * u).dp),
@@ -409,7 +415,7 @@ private fun StockCard(saved: Boolean, ticker: String = "AAPL") {
 				modifier = Modifier.size((44 * u).dp).background(News.ChipBg, CircleShape),
 			) {
 				Text(
-					text = "A",
+					text = facts.name.take(1),
 					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (18 * u).sp, lineHeight = (23 * u).sp),
 					color = Color(0xFF9EADC7),
 				)
@@ -417,12 +423,12 @@ private fun StockCard(saved: Boolean, ticker: String = "AAPL") {
 			Spacer(modifier = Modifier.width((12 * u).dp))
 			Column(verticalArrangement = Arrangement.spacedBy((3 * u).dp)) {
 				Text(
-					text = "Apple Inc.",
+					text = facts.name,
 					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp, lineHeight = (19 * u).sp),
 					color = Color.White,
 				)
 				Text(
-					text = "AAPL",
+					text = ticker,
 					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
 					color = News.Muted,
 				)
@@ -451,14 +457,16 @@ private fun StockCard(saved: Boolean, ticker: String = "AAPL") {
 		Row(verticalAlignment = Alignment.Bottom, modifier = Modifier.fillMaxWidth()) {
 			Column(verticalArrangement = Arrangement.spacedBy((3 * u).dp)) {
 				Text(
-					text = "$308.63",
+					text = facts.price,
 					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (26 * u).sp, lineHeight = (33 * u).sp),
 					color = Color.White,
 				)
 				Text(
-					text = "+4.84% today",
+					text = facts.change,
 					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp, lineHeight = (17 * u).sp),
-					color = News.Green,
+					// The app's authored up/down pair (green here, the
+					// My STAK / Simulate red for down moves).
+					color = if (facts.up) News.Green else Color(0xFFFF5A6A),
 				)
 			}
 			Spacer(modifier = Modifier.weight(1f))
@@ -472,8 +480,6 @@ private fun StockCard(saved: Boolean, ticker: String = "AAPL") {
 			Box(modifier = Modifier.fillMaxWidth().height((1 * u).dp).background(News.Divider))
 			Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
 				Text(
-					// Templated per story; the card's company/price figures are
-					// authored demo values until the backend serves stock data.
 					text = "View $ticker in My STAK",
 					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp, lineHeight = (17 * u).sp),
 					color = News.Teal,
@@ -604,7 +610,7 @@ private fun SourceRow() {
 }
 
 @Composable
-private fun KeyStatsCard() {
+private fun KeyStatsCard(facts: NewsArticleFeed.StockFacts) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Column(
 		verticalArrangement = Arrangement.spacedBy((13 * u).dp),
@@ -622,9 +628,9 @@ private fun KeyStatsCard() {
 				color = Color.White,
 			)
 		}
-		StatRow("Market cap", "$4.58T", "P/E ratio", "34.2")
-		StatRow("Day range", "$301.20–$309.80", "Volume", "82.4M")
-		StatRow("52-wk range", "$201.50–$317.40", "Div yield", "0.42%")
+		StatRow("Market cap", facts.marketCap, "P/E ratio", facts.peRatio)
+		StatRow("Day range", facts.dayRange, "Volume", facts.volume)
+		StatRow("52-wk range", facts.week52, "Div yield", facts.divYield)
 	}
 }
 
@@ -726,9 +732,14 @@ private fun ReadNext(currentId: String, onOpen: (String) -> Unit) {
 	}
 }
 
-/** Save success — rgba(12,19,32,0.55) scrim + the r24 #181f30 bottom sheet (101:1169). */
+/**
+ * Save success — rgba(12,19,32,0.55) scrim + the r24 #181f30 bottom
+ * sheet (101:1169). The stock row shows the SAVED stock's served facts
+ * (user, 2026-08-25: every article = the full Apple page with the
+ * story's own content; the frame's Apple row was placeholder).
+ */
 @Composable
-private fun SaveSuccessOverlay(onViewInMyStak: () -> Unit, onDismiss: () -> Unit) {
+private fun SaveSuccessOverlay(facts: NewsArticleFeed.StockFacts, onViewInMyStak: () -> Unit, onDismiss: () -> Unit) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Box(modifier = Modifier.fillMaxSize()) {
 		Box(
@@ -780,27 +791,28 @@ private fun SaveSuccessOverlay(onViewInMyStak: () -> Unit, onDismiss: () -> Unit
 					modifier = Modifier.size((38 * u).dp).background(News.ChipBg, CircleShape),
 				) {
 					Text(
-						text = "A",
+						text = facts.shortName.take(1),
 						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp),
 						color = Color(0xFF9EADC7),
 					)
 				}
 				Column(verticalArrangement = Arrangement.spacedBy((2 * u).dp), modifier = Modifier.weight(1f)) {
 					Text(
-						text = "Apple",
+						text = facts.shortName,
 						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp),
 						color = Color.White,
 					)
 					Text(
-						text = "$229.35 today",
+						text = "${facts.price} today",
 						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (10 * u).sp),
 						color = News.Muted,
 					)
 				}
 				Text(
-					text = "▲ 1.2%",
+					// "+4.84% today" -> "▲ 4.84%" (the sheet's authored format).
+					text = "${if (facts.up) "▲" else "▼"} ${facts.change.drop(1).removeSuffix(" today")}",
 					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp),
-					color = News.Green,
+					color = if (facts.up) News.Green else Color(0xFFFF5A6A),
 				)
 			}
 			Text(

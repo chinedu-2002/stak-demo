@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -56,16 +58,20 @@ fun MainTabBar(selected: MainTab, onSelect: (MainTab) -> Unit) {
 			.height((86 * u).dp),
 	) {
 		Row(
-			// The 86 bar's authored gap (1:1221).
-			horizontalArrangement = Arrangement.spacedBy((28 * u).dp),
+			// Gap 30 / row 337 (+0.5 nudge) - the spec on the News, My STAK,
+			// Simulate and Discover bars (1:1353/1:3327/1:4116/1:1788). The
+			// HOME bars author 28/329 (1:1221, dev 118:1757) - overridden by
+			// the one-stable-bar ruling; majority spec wins (user, 2026-08-23).
+			horizontalArrangement = Arrangement.spacedBy((30 * u).dp),
 			verticalAlignment = Alignment.Top,
-			modifier = Modifier.align(Alignment.TopCenter).padding(top = (18 * u).dp),
+			modifier = Modifier.align(Alignment.TopCenter).offset(x = (0.5 * u).dp).padding(top = (18 * u).dp),
 		) {
 			MainTab.entries.forEach { tab ->
 				Column(
 					horizontalAlignment = Alignment.CenterHorizontally,
 					verticalArrangement = Arrangement.spacedBy((10 * u).dp),
-					modifier = Modifier.clickable(
+					// Authored: only Tab - Home has a fixed width (34); the rest hug.
+					modifier = (if (tab == MainTab.Home) Modifier.width((34 * u).dp) else Modifier).clickable(
 						interactionSource = remember { MutableInteractionSource() },
 						indication = null,
 					) { if (tab.built) onSelect(tab) },

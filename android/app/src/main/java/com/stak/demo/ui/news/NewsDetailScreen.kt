@@ -73,8 +73,12 @@ private val CtaBorder = Brush.verticalGradient(
  * View-in-My-STAK row on the stock card, Apple + Tech tags).
  */
 @Composable
-fun NewsDetailScreen(onBack: () -> Unit, onViewInMyStak: () -> Unit = {}) {
+fun NewsDetailScreen(articleId: String = NewsArticleFeed.APPLE, onBack: () -> Unit, onViewInMyStak: () -> Unit = {}) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
+	// The served article for the tapped story (user, 2026-08-25); the
+	// Apple article is the authored one and renders frame-exact.
+	val article = NewsArticleFeed.article(articleId)
+	val isAuthored = article.id == NewsArticleFeed.APPLE
 	var saved by rememberSaveable { mutableStateOf(false) }
 	var showSuccess by rememberSaveable { mutableStateOf(false) }
 
@@ -105,10 +109,7 @@ fun NewsDetailScreen(onBack: () -> Unit, onViewInMyStak: () -> Unit = {}) {
 						) {
 							val send = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
 								type = "text/plain"
-								putExtra(
-									android.content.Intent.EXTRA_TEXT,
-									"Apple climbs 5% on foldable iPhone push - read it on STAK: https://stak.app/news/apple-foldable-iphone-push",
-								)
+								putExtra(android.content.Intent.EXTRA_TEXT, article.shareText)
 							}
 							context.startActivity(android.content.Intent.createChooser(send, "Share article"))
 						},
@@ -121,7 +122,7 @@ fun NewsDetailScreen(onBack: () -> Unit, onViewInMyStak: () -> Unit = {}) {
 					.fillMaxWidth()
 					.verticalScroll(rememberScrollState()),
 			) {
-				HeroImage(media = NewsMedia.demo(), saved = saved, onBookmark = { saved = true; com.stak.demo.ui.MyStakHoldings.add("AAPL") })
+				HeroImage(media = article.media, category = article.category, saved = saved, onBookmark = { saved = true; article.ticker?.let { com.stak.demo.ui.MyStakHoldings.add(it) } })
 				Column(
 					verticalArrangement = Arrangement.spacedBy((15 * u).dp),
 					modifier = Modifier
@@ -130,14 +131,14 @@ fun NewsDetailScreen(onBack: () -> Unit, onViewInMyStak: () -> Unit = {}) {
 						.padding(top = (22 * u).dp, bottom = (28 * u).dp),
 				) {
 					Text(
-						text = "Apple climbs 5% on foldable iPhone push",
+						text = article.headline,
 						// RENDER-measured: the frame draws the headline ~800 device px
 					// wide (≈20sp), not the metadata's 24 — lh32 box stands.
 					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (20 * u).sp, lineHeight = (32 * u).sp),
 						color = Color.White,
 					)
 					Text(
-						text = "A bigger foldable order and the widest iPhone lineup in years sent Apple toward a record, and to within touching distance of Nvidia’s crown.",
+						text = article.subtitle,
 						// 14.3: at 14 Compose pulls "in" up to line 1; the frame
 						// breaks after "lineup" (authored 3-line shape, lh22).
 						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (14.3 * u).sp, lineHeight = (22 * u).sp),
@@ -148,6 +149,15 @@ fun NewsDetailScreen(onBack: () -> Unit, onViewInMyStak: () -> Unit = {}) {
 						AddToStakButton(onClick = { showSuccess = true })
 					}
 					Divider()
+					// Authored Apple-specific blocks render only on the authored
+					// article; served stories show their own body until the
+					// backend serves this data per story.
+					if (!isAuthored) {
+						article.paragraphs.forEachIndexed { i, text ->
+							if (i == 0) Paragraph(text, size = 15.sp, line = 24.sp) else Paragraph(text)
+						}
+					}
+					if (isAuthored) {
 					StockCard(saved = saved)
 					GistCard()
 					Paragraph(
@@ -175,6 +185,7 @@ fun NewsDetailScreen(onBack: () -> Unit, onViewInMyStak: () -> Unit = {}) {
 						}
 					}
 					ReadNext()
+					}
 				}
 			}
 		}
@@ -191,8 +202,8 @@ fun NewsDetailScreen(onBack: () -> Unit, onViewInMyStak: () -> Unit = {}) {
 			exit = fadeOut(tween(300, easing = EaseOut)),
 		) {
 			SaveSuccessOverlay(
-				onViewInMyStak = { saved = true; com.stak.demo.ui.MyStakHoldings.add("AAPL"); onViewInMyStak() },
-				onDismiss = { showSuccess = false; saved = true; com.stak.demo.ui.MyStakHoldings.add("AAPL") },
+				onViewInMyStak = { saved = true; article.ticker?.let { com.stak.demo.ui.MyStakHoldings.add(it) }; onViewInMyStak() },
+				onDismiss = { showSuccess = false; saved = true; article.ticker?.let { com.stak.demo.ui.MyStakHoldings.add(it) } },
 			)
 		}
 	}
@@ -205,7 +216,7 @@ fun NewsDetailScreen(onBack: () -> Unit, onViewInMyStak: () -> Unit = {}) {
 // story), so every authored news tap lands here in the demo. In
 // production the backend serves each story's own headline, subtitle,
 // body and media into this page - same slot pattern as NewsMedia.
-private fun HeroImage(media: NewsMedia, saved: Boolean, onBookmark: () -> Unit) {
+private fun HeroImage(media: NewsMedia, category: String, saved: Boolean, onBookmark: () -> Unit) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	// The hero is a media slot: poster + play glyph at rest (frame-exact),
 	// the served video playing IN PLACE once tapped (user, 2026-08-23).
@@ -278,7 +289,7 @@ private fun HeroImage(media: NewsMedia, saved: Boolean, onBookmark: () -> Unit) 
 				.padding(horizontal = (7 * u).dp, vertical = (5 * u).dp),
 		) {
 			Text(
-				text = "Tech & Ai",
+				text = category,
 				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, lineHeight = (13 * u).sp),
 				color = Color.White,
 			)

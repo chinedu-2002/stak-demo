@@ -289,7 +289,7 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
 		) {
 			MainShell(
 				pendingTab = pendingShellTab,
-				onOpenArticle = { newsPopPush = false; navController.navigate(StakRoutes.NEWS_DETAIL) },
+				onOpenArticle = { id -> newsPopPush = false; navController.navigate(StakRoutes.newsDetail(id)) },
 				onOpenStock = { navController.navigate(StakRoutes.stockDetail("AAPL")) },
 				onOpenCollection = { navController.navigate(StakRoutes.COLLECTION) },
 				onOpenProfile = { navController.navigate(StakRoutes.PROFILE) },
@@ -358,8 +358,9 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
 				if (newsPopPush) slideOutHorizontally(tween(300, easing = EaseOut)) { it }
 				else androidx.compose.animation.ExitTransition.None
 			},
-		) {
+		) { backStackEntry ->
 			NewsDetailScreen(
+				articleId = backStackEntry.arguments?.getString("articleId") ?: com.stak.demo.ui.news.NewsArticleFeed.APPLE,
 				onBack = { newsPopPush = false; navController.popBackStack() },
 				onViewInMyStak = {
 					newsPopPush = true
@@ -379,7 +380,7 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
 @Composable
 private fun MainShell(
 	pendingTab: MutableState<MainTab?>,
-	onOpenArticle: () -> Unit,
+	onOpenArticle: (String) -> Unit,
 	onOpenStock: () -> Unit,
 	onOpenCollection: () -> Unit,
 	onOpenProfile: () -> Unit,

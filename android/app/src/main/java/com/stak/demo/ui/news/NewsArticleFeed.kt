@@ -60,9 +60,9 @@ object NewsArticleFeed {
 		val thumbRes: Int? = null,
 		/**
 		 * The stocks the story relates to - gates the "In your STAK" chip
-		 * on listing rows (user, 2026-08-23). Distinct from [ticker], which
-		 * keys the article's stock card / key stats and stays null until
-		 * the backend serves that stock's data module (AAPL only in demo).
+		 * on listing rows (user, 2026-08-23). [ticker] is the PRIMARY one:
+		 * it keys the article's stock card / key stats ([stockFacts]) and
+		 * is the stock a save adds to My STAK.
 		 */
 		val relatedTickers: List<String> = emptyList(),
 	)
@@ -72,10 +72,14 @@ object NewsArticleFeed {
 		category = category,
 		headline = headline,
 		subtitle = subtitle,
-		ticker = null,
+		// EVERY story renders the full Apple page (user, 2026-08-25:
+		// "use the apple features... replace the placeholder"): the
+		// primary related stock keys the stock card / key stats.
+		ticker = relatedTickers.firstOrNull(),
 		paragraphs = paragraphs,
-		// No served media yet - the hero renders its empty slot.
-		media = NewsMedia.Image(posterRes = null, url = null),
+		// The Apple demo media is the PLACEHOLDER for every story's hero
+		// until the backend serves per-story media (same user ruling).
+		media = NewsMedia.demo(),
 		shareText = "$headline - read it on STAK: https://stak.app/news/$id",
 		gist = gist,
 		pullQuote = pullQuote,
@@ -376,4 +380,42 @@ object NewsArticleFeed {
 	/** The article page's READ NEXT rows - two other row-presented stories. */
 	fun readNext(excluding: String): List<Article> =
 		ARTICLES.filter { isStockNews(it) && it.thumbRes != null && it.id != excluding }.take(2)
+
+	/**
+	 * The story's stock module - name, quote and key stats for the
+	 * article page's stock card (authored AAPL values = the frame;
+	 * the rest are DEMO stand-ins until the backend serves quotes).
+	 * `up` picks the change color (green/red, the app's authored pair).
+	 */
+	data class StockFacts(
+		val name: String,
+		/** Sheet-row name ("Apple" on 101:1169). */
+		val shortName: String,
+		val price: String,
+		val change: String,
+		val up: Boolean,
+		val marketCap: String,
+		val peRatio: String,
+		val dayRange: String,
+		val volume: String,
+		val week52: String,
+		val divYield: String,
+	)
+
+	private val STOCK_FACTS = mapOf(
+		// The AUTHORED card (1:1495) - keep these values frame-exact.
+		"AAPL" to StockFacts("Apple Inc.", "Apple", "$308.63", "+4.84% today", true, "$4.58T", "34.2", "$301.20–$309.80", "82.4M", "$201.50–$317.40", "0.42%"),
+		"NVDA" to StockFacts("NVIDIA Corp.", "NVIDIA", "$178.42", "+1.12% today", true, "$4.35T", "51.8", "$175.90–$180.10", "195.7M", "$98.60–$184.30", "0.03%"),
+		"TSLA" to StockFacts("Tesla, Inc.", "Tesla", "$291.30", "-6.95% today", false, "$928.5B", "68.4", "$288.10–$312.60", "142.3M", "$182.00–$488.50", "—"),
+		"AMD" to StockFacts("Advanced Micro Devices", "AMD", "$186.75", "+4.10% today", true, "$302.4B", "45.6", "$178.90–$187.40", "88.1M", "$76.50–$189.20", "—"),
+		"GOOGL" to StockFacts("Alphabet Inc.", "Alphabet", "$203.55", "+3.65% today", true, "$2.47T", "24.8", "$196.40–$204.90", "41.2M", "$142.70–$207.05", "0.39%"),
+		"AMZN" to StockFacts("Amazon.com, Inc.", "Amazon", "$242.18", "+2.87% today", true, "$2.57T", "38.9", "$236.50–$243.70", "55.6M", "$151.60–$246.30", "—"),
+		"MSFT" to StockFacts("Microsoft Corp.", "Microsoft", "$512.40", "+1.45% today", true, "$3.81T", "37.5", "$505.80–$514.20", "22.8M", "$385.60–$518.30", "0.66%"),
+		"XOM" to StockFacts("Exxon Mobil Corp.", "Exxon Mobil", "$109.84", "-1.84% today", false, "$472.6B", "13.9", "$108.90–$112.30", "18.4M", "$101.40–$126.30", "3.41%"),
+		"MU" to StockFacts("Micron Technology", "Micron", "$128.66", "+6.21% today", true, "$142.8B", "21.3", "$120.70–$129.40", "33.9M", "$61.50–$131.20", "0.36%"),
+	)
+
+	/** The served stock module for a ticker - the backend resolves this in production. */
+	fun stockFacts(ticker: String): StockFacts =
+		STOCK_FACTS[ticker] ?: STOCK_FACTS.getValue("AAPL")
 }

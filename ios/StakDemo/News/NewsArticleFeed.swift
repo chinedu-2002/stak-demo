@@ -24,6 +24,9 @@ enum NewsArticleFeed {
 	/// The Top Stories "Markets" tile's story (1:1228).
 	static let fedTile = "fed-minutes-wednesday"
 
+	/// The served demo payload's off-topic story - see the gate below.
+	private static let offTopic = "wimbledon-final"
+
 	struct Article {
 		let id: String
 		let category: String
@@ -284,6 +287,27 @@ enum NewsArticleFeed {
 			"Bloomberg", "2d", "· Jul 2 · 3 min read",
 			"NewsThumbChips", ["MU"]
 		),
+		// OFF-TOPIC by design: a general-pool story with no market topic
+		// and no related stock. It is SERVED (it sits in the For You
+		// payload) but `isMarketRelated` drops it, so it never renders -
+		// the on-device proof of the filter (user, 2026-08-25).
+		demo(
+			offTopic, "Sports",
+			"Alcaraz outlasts Sinner in five-set Wimbledon final",
+			"A four-and-a-half-hour final delivered the rivalry the sport has waited a decade for.",
+			[
+				"Carlos Alcaraz won his third straight Wimbledon title on Sunday, coming from two sets to one down to beat Jannik Sinner in a final that stretched past four and a half hours.",
+				"The pair have now split the last six major titles between them, and the head-to-head is even again.",
+			],
+			[
+				"Alcaraz won a third straight Wimbledon title.",
+				"The final ran past four and a half hours.",
+			],
+			"The rivalry the sport has waited a decade for.",
+			"Wimbledon is tennis's oldest major tournament, played on grass in London each July.",
+			["Sports", "Tennis"],
+			"AP", "5h", "· Jul 4 · 2 min read"
+		),
 	]
 
 	/// The served article for a story - the backend resolves this in production.
@@ -291,17 +315,37 @@ enum NewsArticleFeed {
 		articles.first { $0.id == id } ?? articles[0]
 	}
 
-	/// Brief page index -> its article id (demo mapping).
+	/// Brief page index -> its article id (demo mapping). Served briefs
+	/// pass the same market-relevance gate as the listing rows.
 	static let briefArticles = ["dow-record-chips-slide", "fed-holds-rates", "oil-opec-supply", "tech-earnings-week"]
 
-	/// The For You section's stories, in row order (1:1228).
-	static let forYou = ["nvda-lags-rally", apple, "tsla-drops-deliveries"]
+	/// Market-relevance gate (user, 2026-08-25: News carries ONLY stock /
+	/// market news). The backend serves stories from a general news pool,
+	/// so every News surface filters what it renders: a story passes only
+	/// when it names a related stock or carries a market topic. The
+	/// off-topic sports story in the served demo payload proves the gate -
+	/// no surface ever renders it.
+	private static let marketTopics: Set<String> = ["Markets", "Stocks", "Fed", "Energy", "Earnings", "Tech", "Tech & Ai", "Chips", "Jobs"]
 
-	/// The Markets section's stories, in row order (1:1228).
-	static let markets = ["jobs-miss-fed-bets", "memory-chips-soar", "oil-opec-supply"]
+	static func isMarketRelated(_ article: Article) -> Bool {
+		!article.relatedTickers.isEmpty || article.ticker != nil ||
+			marketTopics.contains(article.category) || article.tags.contains { marketTopics.contains($0) }
+	}
+
+	/// The For You stories the backend served, in row order (1:1228).
+	private static let forYouIds = ["nvda-lags-rally", apple, "tsla-drops-deliveries", offTopic]
+
+	/// The Markets stories the backend served, in row order (1:1228).
+	private static let marketsIds = ["jobs-miss-fed-bets", "memory-chips-soar", "oil-opec-supply"]
+
+	/// The For You rows - market-related served stories only.
+	static func forYou() -> [Article] { forYouIds.map { article($0) }.filter { isMarketRelated($0) } }
+
+	/// The Markets rows - market-related served stories only.
+	static func markets() -> [Article] { marketsIds.map { article($0) }.filter { isMarketRelated($0) } }
 
 	/// The article page's READ NEXT rows - two other row-presented stories.
 	static func readNext(excluding: String) -> [Article] {
-		Array(articles.filter { $0.thumb != nil && $0.id != excluding }.prefix(2))
+		Array(articles.filter { isMarketRelated($0) && $0.thumb != nil && $0.id != excluding }.prefix(2))
 	}
 }

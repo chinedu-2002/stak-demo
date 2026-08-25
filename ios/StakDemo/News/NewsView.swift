@@ -93,11 +93,14 @@ struct NewsView: View {
 						BriefCarousel(onRead: { page in onOpenArticle(NewsArticleFeed.briefArticles[page]) })
 					}
 					StoryGrid(onOpenArticle: onOpenArticle, query: q)
-					let forYou = NewsArticleFeed.forYou.map { NewsArticleFeed.article($0) }.filter { matches($0.headline) }
+					// The rows render from the served section feeds - market-
+					// related stories only (user, 2026-08-25); EVERY story
+					// opens its article.
+					let forYou = NewsArticleFeed.forYou().filter { matches($0.headline) }
 					if !forYou.isEmpty {
 						NewsSectionView(title: "For You", rows: forYou, onOpen: onOpenArticle)
 					}
-					let markets = NewsArticleFeed.markets.map { NewsArticleFeed.article($0) }.filter { matches($0.headline) }
+					let markets = NewsArticleFeed.markets().filter { matches($0.headline) }
 					if !markets.isEmpty {
 						NewsSectionView(title: "Markets", rows: markets, onOpen: onOpenArticle)
 					}

@@ -89,13 +89,18 @@ struct NewsView: View {
 					// Designer's call (2026-08-22): today's brief on tap leads to
 					// the News info page (Story tile stays wired per 1:1228).
 					if NewsBriefFeed.briefs().contains(where: { matches($0.title) }) {
-						// Each brief opens ITS OWN article (user, 2026-08-25).
-						BriefCarousel(onRead: { page in onOpenArticle(NewsArticleFeed.briefArticles[page]) })
+						// Each brief opens ITS OWN article (user, 2026-08-25). The
+						// index guard covers a served brief without a mapped article.
+						BriefCarousel(onRead: { page in
+							if NewsArticleFeed.briefArticles.indices.contains(page) {
+								onOpenArticle(NewsArticleFeed.briefArticles[page])
+							}
+						})
 					}
 					StoryGrid(onOpenArticle: onOpenArticle, query: q)
-					// The rows render from the served section feeds - market-
-					// related stories only (user, 2026-08-25); EVERY story
-					// opens its article.
+					// The rows render from the served section feeds - STRICT
+					// stock news only (user, 2026-08-25); EVERY story opens
+					// its article.
 					let forYou = NewsArticleFeed.forYou().filter { matches($0.headline) }
 					if !forYou.isEmpty {
 						NewsSectionView(title: "For You", rows: forYou, onOpen: onOpenArticle)
@@ -233,37 +238,43 @@ private struct BriefCard: View {
 	}
 }
 
-/// The two 128-unit story tiles ("Markets" / "Your stocks").
+/// The two 128-unit story tiles. The tags are authored SLOT labels
+/// (1:1228: "Markets" = the day's top stock story, "Your stocks" = the
+/// top story from the user's holdings); the tile copy renders from the
+/// SERVED story - the frame's copy was placeholder (user, 2026-08-25:
+/// "the design by the ui is just placeholder"), and only strict stock
+/// news is served.
 private struct StoryGrid: View {
 	let onOpenArticle: (String) -> Void
 	var query: String = ""
 
-	private func show(_ text: String) -> Bool {
-		query.isEmpty || text.range(of: query, options: .caseInsensitive) != nil
+	private func visible(_ a: NewsArticleFeed.Article) -> Bool {
+		NewsArticleFeed.isStockNews(a) &&
+			(query.isEmpty || a.headline.range(of: query, options: .caseInsensitive) != nil)
 	}
 
 	var body: some View {
 		let u = figmaUnit
-		let fed = show("Fed minutes land Wednesday")
-		let apple = show("Apple Climbs 5% on foldable iphone")
-		if fed || apple {
+		let market = NewsArticleFeed.article(NewsArticleFeed.marketTile)
+		let yours = NewsArticleFeed.article(NewsArticleFeed.apple)
+		let showMarket = visible(market)
+		let showYours = visible(yours)
+		if showMarket || showYours {
 			HStack(spacing: 12 * u) {
-				if fed {
+				if showMarket {
 					StoryTile(
 						tag: "Markets",
-						headline: "Fed minutes land Wednesday",
-						source: "Reuters · 2h",
-						// Its story too (user, 2026-08-25: "this was clicked
-						// and nothing happened").
-						onTap: { onOpenArticle(NewsArticleFeed.fedTile) }
+						headline: market.headline,
+						source: "\(market.source) · \(market.age)",
+						onTap: { onOpenArticle(market.id) }
 					)
 				}
-				if apple {
+				if showYours {
 					StoryTile(
 						tag: "Your stocks",
-						headline: "Apple Climbs 5% on foldable iphone",
-						source: "CNBC · 3h",
-						onTap: { onOpenArticle(NewsArticleFeed.apple) }
+						headline: yours.headline,
+						source: "\(yours.source) · \(yours.age)",
+						onTap: { onOpenArticle(yours.id) }
 					)
 				}
 			}

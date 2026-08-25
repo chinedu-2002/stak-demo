@@ -13,16 +13,21 @@ import Foundation
 /// stock card / key stats appear whenever the story has a ticker. The
 /// authored Apple copy ships as data, so that page stays frame-exact.
 ///
-/// EVERY story surface opens its article (user, 2026-08-25: the Fed
-/// tile and the For You / Markets rows did nothing on tap): the listing
-/// rows themselves render from these articles - `forYou`, `markets`
-/// and `fedTile` are the demo stand-ins for the backend's section
+/// EVERY story surface opens its article (user, 2026-08-25: the tiles
+/// and the For You / Markets rows did nothing on tap): the listing rows
+/// AND tiles render from these articles - `forYou()`, `markets()` and
+/// `marketTile` are the demo stand-ins for the backend's section
 /// feeds, and `readNext` serves the article page's READ NEXT rows.
+/// Everything served passes the strict stock-news gate (`isStockNews`).
 enum NewsArticleFeed {
 	static let apple = "apple-foldable"
 
-	/// The Top Stories "Markets" tile's story (1:1228).
-	static let fedTile = "fed-minutes-wednesday"
+	/// The Top Stories "Markets" tile's story. The tile LABELS are
+	/// authored slots (1:1228: "Markets" = the day's top stock story,
+	/// "Your stocks" = the top story from the user's holdings); the tile
+	/// COPY was placeholder (user, 2026-08-25: "the design by the ui is
+	/// just placeholder") - the served story renders into the slot.
+	static let marketTile = "amzn-cloud-beat"
 
 	/// The served demo payload's off-topic story - see the gate below.
 	private static let offTopic = "wimbledon-final"
@@ -127,26 +132,33 @@ enum NewsArticleFeed {
 			"Two indexes, two very different stories about the same economy.",
 			"The Dow tracks 30 large, established companies, so it can rise even when tech-heavy indexes fall. A split like this usually means money is rotating, not leaving.",
 			["Markets", "Stocks"],
-			"Reuters", "1d", "· Jul 3 · 3 min read"
+			"Reuters", "1d", "· Jul 3 · 3 min read",
+			// STRICT stock news (user, 2026-08-25): an index story counts
+			// only through the stocks it is about - the chip names.
+			nil, ["NVDA", "MU"]
 		),
+		// STRICT stock news (user, 2026-08-25): the old fed-holds-rates
+		// demo article was macro, not stock news - replaced with the
+		// Alphabet story its brief now carries.
 		demo(
-			"fed-holds-rates", "Markets",
-			"Fed holds rates, signals patience on cuts",
-			"Policymakers left the benchmark rate unchanged and made clear they want more data before easing.",
+			"googl-ad-quarter", "Tech & Ai",
+			"Alphabet jumps after a blowout ad quarter",
+			"An advertising beat on every line quieted the market's biggest question about the company.",
 			[
-				"The Federal Reserve held its benchmark rate steady and, in language traders read as deliberately unhurried, said it wants further evidence that inflation is cooling before it begins cutting.",
-				"Futures markets trimmed bets on a September move within minutes of the statement. The dot plot still pencils in easing this year, but the bar for the first cut has clearly moved higher.",
-				"For savers the pause means more of the same; for borrowers it delays relief. Markets will now comb every speech and inflation print between here and the next meeting for the word the Fed would not say: when.",
+				"Alphabet jumped after reporting an advertising quarter that beat every major estimate, with search revenue accelerating for the third straight period.",
+				"The beat quiets the market's biggest worry about the company: that AI chatbots would eat into search. Instead, AI-powered ad tools are lifting prices, and YouTube grew faster than expected.",
+				"The move carried the rest of the ad-supported internet with it, and it hands the megacap earnings week an early win.",
 			],
 			[
-				"Rates were left unchanged again.",
-				"The Fed wants more inflation data before cutting.",
-				"Markets trimmed bets on a September cut.",
+				"Ad revenue beat every major estimate.",
+				"Search accelerated for a third straight quarter.",
+				"AI ad tools are lifting prices.",
 			],
-			"The bar for the first cut has clearly moved higher.",
-			"When the Fed holds rates, borrowing costs stay where they are. Markets care less about the decision itself than about hints of when cuts begin.",
-			["Markets", "Fed"],
-			"Reuters", "1d", "· Jul 3 · 3 min read"
+			"The beat quiets the market's biggest worry about the company.",
+			"Alphabet is Google's parent company. Most of its profit comes from ads on search and YouTube, so ad growth is the number that moves the stock.",
+			["Alphabet", "Tech"],
+			"Reuters", "1d", "· Jul 3 · 3 min read",
+			nil, ["GOOGL"]
 		),
 		demo(
 			"oil-opec-supply", "Markets",
@@ -186,26 +198,32 @@ enum NewsArticleFeed {
 			"Their guidance will set the tone for the whole tape.",
 			"Earnings season is when companies report results and give guidance. For the largest names, that guidance moves entire indexes, not just their own stock.",
 			["Tech", "Earnings"],
-			"Bloomberg", "1d", "· Jul 3 · 3 min read"
+			"Bloomberg", "1d", "· Jul 3 · 3 min read",
+			// STRICT stock news: the earnings week is about these stocks.
+			nil, ["MSFT", "GOOGL"]
 		),
+		// STRICT stock news (user, 2026-08-25): the old fed-minutes tile
+		// story was macro, not stock news - the Markets tile now serves
+		// the day's top stock story.
 		demo(
-			fedTile, "Markets",
-			"Fed minutes land Wednesday",
-			"The minutes from June's meeting arrive midweek - traders will comb them for how close the committee really is to cutting.",
+			marketTile, "Tech & Ai",
+			"Amazon climbs on cloud margin beat",
+			"A cloud profit surprise eased the market's doubt about how much of the AI buildout turns into earnings.",
 			[
-				"The Federal Reserve publishes the minutes of its June meeting on Wednesday, and for a document that is three weeks old it carries unusual weight. The committee held rates steady, but the vote hid a live debate over how soon cuts should begin.",
-				"Traders will look for how many officials leaned toward easing, and how the staff framed the recent soft patch in hiring. A minutes release rarely moves markets on its own; one that reveals a split this wide can.",
-				"The timing matters too. The release lands two days before the July jobs report, giving markets a rare same-week read on both what the Fed was thinking and the data that will test it.",
+				"Amazon rose sharply after its cloud unit posted margins well above what Wall Street had penciled in, easing a quarter of doubt about how much of the AI buildout the company can turn into profit.",
+				"AWS is the company's profit engine, and the beat matters more than the headline number: every point of cloud margin flows almost straight to operating income. Analysts spent the morning raising targets.",
+				"The move also steadies the wider AI trade. Amazon is one of the largest buyers of AI chips, and a profitable buildout supports the spending plans the whole supply chain is priced on.",
 			],
 			[
-				"June's meeting minutes arrive Wednesday.",
-				"The vote hid a live debate over the timing of cuts.",
-				"A July jobs report lands two days later.",
+				"Cloud margins came in well above estimates.",
+				"AWS is the company's profit engine.",
+				"Analysts raised targets through the morning.",
 			],
-			"For a document that is three weeks old it carries unusual weight.",
-			"The Fed publishes minutes three weeks after each meeting. They show the debate behind the decision, which is often more revealing than the decision itself.",
-			["Markets", "Fed"],
-			"Reuters", "2h", "· Jul 4 · 2 min read"
+			"Every point of cloud margin flows almost straight to operating income.",
+			"Cloud margin measures what a cloud business keeps after its costs. For big tech, small margin changes move billions in profit.",
+			["Amazon", "Tech"],
+			"Reuters", "2h", "· Jul 4 · 3 min read",
+			nil, ["AMZN"]
 		),
 		demo(
 			"nvda-lags-rally", "Tech & Ai",
@@ -247,25 +265,28 @@ enum NewsArticleFeed {
 			"CNBC", "2d", "· Jul 2 · 3 min read",
 			"NewsThumbTSLA", ["TSLA"]
 		),
+		// STRICT stock news (user, 2026-08-25): the old jobs-report demo
+		// row was macro, not stock news - replaced with a stock story.
+		// The authored row image is reused as the served-thumb stand-in.
 		demo(
-			"jobs-miss-fed-bets", "Markets",
-			"June jobs miss eases Fed hike bets",
-			"A cooler hiring month rewired the rate debate in a single morning.",
+			"amd-yearly-high", "Tech & Ai",
+			"AMD rides the AI rotation to a yearly high",
+			"The clearest winner of the week's rotation out of the AI trade's most crowded names.",
 			[
-				"The June employment report came in below every major forecast, and markets treated the miss as good news: odds of another rate hike collapsed within minutes of the release.",
-				"Slower hiring means less pressure on wages, and less wage pressure gives the Federal Reserve room to stay patient. Bond yields slipped and rate-sensitive stocks - housing, banks, small caps - led the day's gains.",
-				"One soft month is not a trend, and Fed officials were quick to say so. But with inflation already cooling, the report tilts the argument toward the committee's patient wing.",
+				"AMD closed at its highest level in a year, the clearest winner of the week's rotation out of the AI trade's most crowded names and into its challengers.",
+				"The company's new accelerators are landing with cloud buyers hunting a second supplier, and every headline about tight supply at the market leader reads as demand flowing to AMD.",
+				"The catch is execution: the stock now prices meaningful share gains, and the next earnings report has to show them.",
 			],
 			[
-				"June hiring came in below every major forecast.",
-				"Rate-hike odds collapsed within minutes.",
-				"Rate-sensitive stocks led the gains.",
+				"AMD closed at a one-year high.",
+				"Cloud buyers want a second AI chip supplier.",
+				"The stock now prices real share gains.",
 			],
-			"Markets treated the miss as good news.",
-			"Weak jobs data can lift stocks: slower hiring cools inflation, which makes rate cuts more likely, and lower rates tend to support share prices.",
-			["Markets", "Jobs"],
+			"The clearest winner of the week's rotation.",
+			"When one company dominates a hot market, buyers often fund a second supplier to keep prices honest. Investors call it the challenger trade.",
+			["AMD", "Chips"],
 			"Reuters", "2d", "· Jul 2 · 2 min read",
-			"NewsThumbJobs"
+			"NewsThumbJobs", ["AMD"]
 		),
 		demo(
 			"memory-chips-soar", "Tech & Ai",
@@ -289,7 +310,7 @@ enum NewsArticleFeed {
 		),
 		// OFF-TOPIC by design: a general-pool story with no market topic
 		// and no related stock. It is SERVED (it sits in the For You
-		// payload) but `isMarketRelated` drops it, so it never renders -
+		// payload) but `isStockNews` drops it, so it never renders -
 		// the on-device proof of the filter (user, 2026-08-25).
 		demo(
 			offTopic, "Sports",
@@ -316,36 +337,34 @@ enum NewsArticleFeed {
 	}
 
 	/// Brief page index -> its article id (demo mapping). Served briefs
-	/// pass the same market-relevance gate as the listing rows.
-	static let briefArticles = ["dow-record-chips-slide", "fed-holds-rates", "oil-opec-supply", "tech-earnings-week"]
+	/// pass the same strict stock-news gate as the listing rows.
+	static let briefArticles = ["dow-record-chips-slide", "googl-ad-quarter", "oil-opec-supply", "tech-earnings-week"]
 
-	/// Market-relevance gate (user, 2026-08-25: News carries ONLY stock /
-	/// market news). The backend serves stories from a general news pool,
-	/// so every News surface filters what it renders: a story passes only
-	/// when it names a related stock or carries a market topic. The
+	/// STRICT stock-news gate (user, 2026-08-25: "strict stock market
+	/// news!!!" - macro stories like Fed minutes are out; the designer's
+	/// tile copy was placeholder). The backend serves from a general news
+	/// pool, so every News surface filters what it renders: a story
+	/// passes ONLY when it names at least one stock it is about. The
 	/// off-topic sports story in the served demo payload proves the gate -
 	/// no surface ever renders it.
-	private static let marketTopics: Set<String> = ["Markets", "Stocks", "Fed", "Energy", "Earnings", "Tech", "Tech & Ai", "Chips", "Jobs"]
-
-	static func isMarketRelated(_ article: Article) -> Bool {
-		!article.relatedTickers.isEmpty || article.ticker != nil ||
-			marketTopics.contains(article.category) || article.tags.contains { marketTopics.contains($0) }
+	static func isStockNews(_ article: Article) -> Bool {
+		!article.relatedTickers.isEmpty || article.ticker != nil
 	}
 
 	/// The For You stories the backend served, in row order (1:1228).
 	private static let forYouIds = ["nvda-lags-rally", apple, "tsla-drops-deliveries", offTopic]
 
 	/// The Markets stories the backend served, in row order (1:1228).
-	private static let marketsIds = ["jobs-miss-fed-bets", "memory-chips-soar", "oil-opec-supply"]
+	private static let marketsIds = ["amd-yearly-high", "memory-chips-soar", "oil-opec-supply"]
 
-	/// The For You rows - market-related served stories only.
-	static func forYou() -> [Article] { forYouIds.map { article($0) }.filter { isMarketRelated($0) } }
+	/// The For You rows - strict stock news only.
+	static func forYou() -> [Article] { forYouIds.map { article($0) }.filter { isStockNews($0) } }
 
-	/// The Markets rows - market-related served stories only.
-	static func markets() -> [Article] { marketsIds.map { article($0) }.filter { isMarketRelated($0) } }
+	/// The Markets rows - strict stock news only.
+	static func markets() -> [Article] { marketsIds.map { article($0) }.filter { isStockNews($0) } }
 
 	/// The article page's READ NEXT rows - two other row-presented stories.
 	static func readNext(excluding: String) -> [Article] {
-		Array(articles.filter { isMarketRelated($0) && $0.thumb != nil && $0.id != excluding }.prefix(2))
+		Array(articles.filter { isStockNews($0) && $0.thumb != nil && $0.id != excluding }.prefix(2))
 	}
 }

@@ -161,21 +161,15 @@ fun NewsScreen(onOpenArticle: (String) -> Unit) {
 				// Each brief opens ITS OWN article (user, 2026-08-25).
 				BriefCarousel(onRead = { page -> onOpenArticle(NewsArticleFeed.BRIEF_ARTICLES[page]) })
 			}
-			StoryGrid(onOpenArticle = { onOpenArticle(NewsArticleFeed.APPLE) }, query = q)
-			// Each story names the stocks it relates to; the "In your STAK"
-			// chip shows only when one of them is in the user's My STAK.
-			val forYou = listOf(
-				NewsRow(R.drawable.news_thumb_nvda, "Reuters · 2d", "Nvidia lags the chip rally it kicked off", listOf("NVDA")),
-				NewsRow(R.drawable.news_thumb_aapl, "Bloomberg · 2d", "Apple climbs 5% on foldable iPhone push", listOf("AAPL")),
-				NewsRow(R.drawable.news_thumb_tsla, "CNBC · 2d", "Tesla drops 7% even after beating deliveries", listOf("TSLA")),
-			).filter { matches(it.headline) }
-			if (forYou.isNotEmpty()) NewsSection(title = "For You", rows = forYou)
-			val markets = listOf(
-				NewsRow(R.drawable.news_thumb_jobs, "Reuters · 2d", "June jobs miss eases Fed hike bets", emptyList()),
-				NewsRow(R.drawable.news_thumb_chips, "Bloomberg · 2d", "Memory chips soar as the AI trade rotates", listOf("MU")),
-				NewsRow(R.drawable.news_thumb_oil, "Reuters · 3d", "Oil slips after positive Iran talks", listOf("XOM")),
-			).filter { matches(it.headline) }
-			if (markets.isNotEmpty()) NewsSection(title = "Markets", rows = markets)
+			StoryGrid(onOpenArticle = onOpenArticle, query = q)
+			// The rows render from the served section feeds; EVERY story
+			// opens its article (user, 2026-08-25). Each story names the
+			// stocks it relates to; the "In your STAK" chip shows only
+			// when one of them is in the user's My STAK.
+			val forYou = NewsArticleFeed.FOR_YOU.map { NewsArticleFeed.article(it) }.filter { matches(it.headline) }
+			if (forYou.isNotEmpty()) NewsSection(title = "For You", rows = forYou, onOpen = onOpenArticle)
+			val markets = NewsArticleFeed.MARKETS.map { NewsArticleFeed.article(it) }.filter { matches(it.headline) }
+			if (markets.isNotEmpty()) NewsSection(title = "Markets", rows = markets, onOpen = onOpenArticle)
 			Spacer(modifier = Modifier.height(0.dp))
 		}
 	}
@@ -311,7 +305,7 @@ private fun BriefCard(brief: NewsBriefFeed.Brief, onRead: () -> Unit) {
 
 /** The two 128dp story tiles ("Markets" / "Your stocks"). */
 @Composable
-private fun StoryGrid(onOpenArticle: () -> Unit, query: String = "") {
+private fun StoryGrid(onOpenArticle: (String) -> Unit, query: String = "") {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	val showFed = query.isEmpty() || "Fed minutes land Wednesday".contains(query, ignoreCase = true)
 	val showApple = query.isEmpty() || "Apple Climbs 5% on foldable iphone".contains(query, ignoreCase = true)
@@ -322,7 +316,9 @@ private fun StoryGrid(onOpenArticle: () -> Unit, query: String = "") {
 				tag = "Markets",
 				headline = "Fed minutes land Wednesday",
 				source = "Reuters · 2h",
-				onClick = {},
+				// Its story too (user, 2026-08-25: "this was clicked and
+				// nothing happened").
+				onClick = { onOpenArticle(NewsArticleFeed.FED_TILE) },
 				modifier = Modifier.weight(1f),
 			)
 		}
@@ -331,7 +327,7 @@ private fun StoryGrid(onOpenArticle: () -> Unit, query: String = "") {
 				tag = "Your stocks",
 				headline = "Apple Climbs 5% on foldable iphone",
 				source = "CNBC · 3h",
-				onClick = onOpenArticle,
+				onClick = { onOpenArticle(NewsArticleFeed.APPLE) },
 				modifier = Modifier.weight(1f),
 			)
 		}
@@ -391,7 +387,8 @@ internal fun NewsTag(text: String, letterSpacing: androidx.compose.ui.unit.TextU
 @Composable
 private fun NewsSection(
 	title: String,
-	rows: List<NewsRow>,
+	rows: List<NewsArticleFeed.Article>,
+	onOpen: (String) -> Unit,
 ) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Column(verticalArrangement = Arrangement.spacedBy((10 * u).dp), modifier = Modifier.fillMaxWidth()) {
@@ -401,9 +398,6 @@ private fun NewsSection(
 			color = News.HeaderGray,
 		)
 		rows.forEach { row ->
-			val thumbRes = row.thumbRes
-			val source = row.source
-			val headline = row.headline
 			Row(
 				verticalAlignment = Alignment.CenterVertically,
 				horizontalArrangement = Arrangement.spacedBy((12 * u).dp),
@@ -411,27 +405,34 @@ private fun NewsSection(
 					.fillMaxWidth()
 					.clip(RoundedCornerShape((14 * u).dp))
 					.background(News.CardBg)
+					.clickable(
+						interactionSource = remember { MutableInteractionSource() },
+						indication = null,
+						onClick = { onOpen(row.id) },
+					)
 					.padding((12 * u).dp),
 			) {
-				Image(
-					painter = painterResource(thumbRes),
-					contentDescription = null,
-					contentScale = ContentScale.Crop,
-					modifier = Modifier.size((60 * u).dp).clip(RoundedCornerShape((10 * u).dp)),
-				)
+				row.thumbRes?.let { thumbRes ->
+					Image(
+						painter = painterResource(thumbRes),
+						contentDescription = null,
+						contentScale = ContentScale.Crop,
+						modifier = Modifier.size((60 * u).dp).clip(RoundedCornerShape((10 * u).dp)),
+					)
+				}
 				Column(verticalArrangement = Arrangement.spacedBy((5 * u).dp), modifier = Modifier.weight(1f)) {
 					Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
 						Text(
-							text = source,
+							text = "${row.source} · ${row.age}",
 							style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp, lineHeight = (14 * u).sp),
 							color = News.Muted,
 						)
 						Spacer(modifier = Modifier.weight(1f))
 						// Only for stocks the user holds (user, 2026-08-23).
-						if (com.stak.demo.ui.MyStakHoldings.holdsAny(row.tickers)) NewsTag(text = "In your STAK")
+						if (com.stak.demo.ui.MyStakHoldings.holdsAny(row.relatedTickers)) NewsTag(text = "In your STAK")
 					}
 					Text(
-						text = headline,
+						text = row.headline,
 						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Light, fontSize = (14 * u).sp, lineHeight = (19 * u).sp),
 						color = Color.White,
 					)
@@ -440,6 +441,3 @@ private fun NewsSection(
 		}
 	}
 }
-
-/** One For You / Markets row; `tickers` = the stocks the story relates to. */
-internal data class NewsRow(val thumbRes: Int, val source: String, val headline: String, val tickers: List<String>)

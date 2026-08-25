@@ -217,7 +217,9 @@ private fun HeroImage(media: NewsMedia, category: String, saved: Boolean, onBook
 	) {
 		val video = media as? NewsMedia.Video
 		if (playing && video != null) {
-			NewsVideoPlayer(video = video, modifier = Modifier.matchParentSize())
+			// A failed stream returns to the poster + glyph instead of
+			// stranding a blank box (user, 2026-08-25).
+			NewsVideoPlayer(video = video, modifier = Modifier.matchParentSize(), onError = { playing = false })
 		} else {
 			val posterRes = when (media) {
 				is NewsMedia.Image -> media.posterRes
@@ -873,7 +875,7 @@ private fun SaveSuccessOverlay(facts: NewsArticleFeed.StockFacts, onViewInMyStak
  * VideoView. Both autoplay once the user tapped the play glyph.
  */
 @Composable
-private fun NewsVideoPlayer(video: NewsMedia.Video, modifier: Modifier = Modifier) {
+private fun NewsVideoPlayer(video: NewsMedia.Video, modifier: Modifier = Modifier, onError: () -> Unit = {}) {
 	val embed = video.youTubeEmbedUrl
 	if (embed != null) {
 		androidx.compose.ui.viewinterop.AndroidView(
@@ -916,15 +918,30 @@ private fun NewsVideoPlayer(video: NewsMedia.Video, modifier: Modifier = Modifie
 			},
 		)
 	} else {
+		// ExoPlayer, not VideoView: VideoView inside Compose failed
+		// silently on-device (surface never created / prepare aborted -
+		// stuck gray hero, 2026-08-25). ExoPlayer owns its surface and
+		// reports errors; a failed stream bounces back to the poster.
 		androidx.compose.ui.viewinterop.AndroidView(
 			modifier = modifier,
 			factory = { ctx ->
-				android.widget.VideoView(ctx).apply {
-					setVideoURI(android.net.Uri.parse(video.url))
-					setOnPreparedListener { mp -> mp.isLooping = false; start() }
+				val player = androidx.media3.exoplayer.ExoPlayer.Builder(ctx).build().apply {
+					setMediaItem(androidx.media3.common.MediaItem.fromUri(video.url))
+					addListener(object : androidx.media3.common.Player.Listener {
+						override fun onPlayerError(error: androidx.media3.common.PlaybackException) {
+							android.util.Log.w("NewsMedia", "direct playback error ${error.errorCodeName} for ${video.url}")
+							onError()
+						}
+					})
+					prepare()
+					playWhenReady = true
+				}
+				androidx.media3.ui.PlayerView(ctx).apply {
+					useController = false
+					this.player = player
 				}
 			},
-			onRelease = { v -> v.stopPlayback() },
+			onRelease = { v -> v.player?.release(); v.player = null },
 		)
 	}
 }

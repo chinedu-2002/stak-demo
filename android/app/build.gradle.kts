@@ -79,6 +79,10 @@ dependencies {
 
     // Images
     implementation("io.coil-kt:coil-compose:2.7.0")
+    // Direct-media playback for the article hero (VideoView proved
+    // unreliable inside Compose - silent surface/prepare failures).
+    implementation("androidx.media3:media3-exoplayer:1.4.1")
+    implementation("androidx.media3:media3-ui:1.4.1")
 
     // Local settings
     implementation("androidx.datastore:datastore-preferences:1.1.4")

@@ -35,7 +35,17 @@ struct MainTabsView: View {
 	// First run shows only in the session that signed in / created the
 	// account; a launch that resumed a saved session lands on Home Main.
 	@State private var homeFirstRun = !Session.shared.resumedSignedIn
-	@State private var pushed: [PushedPage] = []
+	@State private var pushed: [PushedEntry] = []
+
+	/// One live entry on the pushed stack. Identity is PER PUSH (a fresh
+	/// uid), not per page - an article chain can legally revisit a story
+	/// (A -> B -> A via READ NEXT), and ForEach needs distinct ids for
+	/// the twins, mirroring Android's per-push back-stack entries
+	/// (audit 2026-08-25).
+	private struct PushedEntry: Identifiable, Equatable {
+		let id = UUID()
+		let page: PushedPage
+	}
 	/// Hoisted Discover buy ticket — the sheet's scrim covers the tab bar
 	/// (frame 1:1970), so the shell owns it, mirroring Android MainShell.
 	@State private var discoverBuy: BuySpec? = nil
@@ -91,9 +101,9 @@ struct MainTabsView: View {
 			}
 			.ignoresSafeArea(edges: .bottom)
 
-			ForEach(pushed) { page in
-				pageView(page)
-					.id(page.id)
+			ForEach(pushed) { entry in
+				pageView(entry.page)
+					.id(entry.id)
 					.transition(FlowAnim.pushRight.transition)
 			}
 
@@ -118,7 +128,11 @@ struct MainTabsView: View {
 				// shell (already on the My STAK tab) is revealed.
 				onViewInMyStak: {
 					tab = .myStak
-					withAnimation(FlowAnim.pushRight.animation) { _ = pushed.popLast() }
+					// The whole article chain clears - after READ NEXT hops
+					// the stack can hold several articles, and popping one
+					// would strand the user on the previous story
+					// (audit 2026-08-25).
+					withAnimation(FlowAnim.pushRight.animation) { pushed.removeAll() }
 				},
 				// READ NEXT rows push the next story's article (user, 2026-08-25).
 				onOpenArticle: { id in pushInstant(.newsDetail(article: id)) }
@@ -147,10 +161,10 @@ struct MainTabsView: View {
 	}
 
 	private func push(_ page: PushedPage) {
-		// Double-tap during the 300ms slide would append a duplicate id and
-		// break ForEach identity (audit 2026-08-25).
-		guard pushed.last?.id != page.id else { return }
-		withAnimation(FlowAnim.pushRight.animation) { pushed.append(page) }
+		// Double-tap during the 300ms slide would stack the same page
+		// twice (audit 2026-08-25).
+		guard pushed.last?.page.id != page.id else { return }
+		withAnimation(FlowAnim.pushRight.animation) { pushed.append(PushedEntry(page: page)) }
 	}
 
 	private func pop() {
@@ -159,8 +173,8 @@ struct MainTabsView: View {
 
 	/// Appends/removes with no animation - the prototype's "Instant".
 	private func pushInstant(_ page: PushedPage) {
-		guard pushed.last?.id != page.id else { return }
-		pushed.append(page)
+		guard pushed.last?.page.id != page.id else { return }
+		pushed.append(PushedEntry(page: page))
 	}
 
 	private func popInstant() {

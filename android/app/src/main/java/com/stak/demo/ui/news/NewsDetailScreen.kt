@@ -153,7 +153,7 @@ fun NewsDetailScreen(articleId: String = NewsArticleFeed.APPLE, onBack: () -> Un
 					// article is the section's PLACEHOLDER - each block renders
 					// per story from served data; stock blocks appear whenever
 					// the story has a related ticker).
-					if (article.ticker != null) StockCard(saved = saved)
+					article.ticker?.let { StockCard(saved = saved, ticker = it) }
 					if (article.gist.isNotEmpty()) GistCard(bullets = article.gist)
 					article.paragraphs.getOrNull(0)?.let { Paragraph(it, size = 15.sp, line = 24.sp) }
 					article.paragraphs.getOrNull(1)?.let { Paragraph(it) }
@@ -392,7 +392,7 @@ private fun Divider() {
 
 /** AAPL price card — badge, Daily chip, $308.63 + sparkline; saved adds View row. */
 @Composable
-private fun StockCard(saved: Boolean) {
+private fun StockCard(saved: Boolean, ticker: String = "AAPL") {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Column(
 		verticalArrangement = Arrangement.spacedBy((13 * u).dp),
@@ -471,7 +471,9 @@ private fun StockCard(saved: Boolean) {
 			Box(modifier = Modifier.fillMaxWidth().height((1 * u).dp).background(News.Divider))
 			Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
 				Text(
-					text = "View AAPL in My STAK",
+					// Templated per story; the card's company/price figures are
+					// authored demo values until the backend serves stock data.
+					text = "View $ticker in My STAK",
 					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp, lineHeight = (17 * u).sp),
 					color = News.Teal,
 				)

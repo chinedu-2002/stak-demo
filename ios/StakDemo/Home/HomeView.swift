@@ -66,6 +66,8 @@ private let deckCards: [DeckCard] = [
 /// rest pose when the thumb leaves (user, 2026-08-22).
 private final class DeckDragState: ObservableObject {
 	@Published var offsets: [CGFloat] = [0, 0, 0]
+	/// The card kept above its siblings (during drag + the 0.3s ease-back).
+	@Published var raised: Int = -1
 	var active: Int = -1
 }
 
@@ -232,6 +234,9 @@ private struct MarketMoodCard: View {
 				.frame(maxWidth: .infinity)
 				.clipped()
 				.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+				// Decorative copy: clipped() limits drawing, not hit testing -
+				// without this the band eats the deck's drags (audit 2026-08-25).
+				.allowsHitTesting(false)
 			HStack(spacing: 0) {
 				VStack(alignment: .leading, spacing: 4 * u) {
 					Text("Market Mood")
@@ -272,6 +277,9 @@ private struct MarketMoodCard: View {
 private struct NewsDeck: View {
 	@ObservedObject var drags: DeckDragState
 	let interactive: Bool
+	/// Absolute-translation tracker so drags accumulate clamped DELTAS like
+	/// the Android build (reversing after over-drag responds immediately).
+	@State private var lastDragY: CGFloat = 0
 
 	var body: some View {
 		let u = figmaUnit
@@ -280,27 +288,37 @@ private struct NewsDeck: View {
 			ForEach(deckCards.indices, id: \.self) { i in
 				NewsDeckCard(card: deckCards[i], story: stories[i])
 					.offset(y: drags.offsets[i])
-					.zIndex(drags.offsets[i] != 0 ? 1 : 0)
+					// raised persists ~0.3s after release so the returning card
+					// keeps its lift for the whole ease-back (audit 2026-08-25).
+					.zIndex(drags.offsets[i] != 0 || drags.raised == i ? 1 : 0)
 			}
 			if interactive {
 				Color.clear
 					.contentShape(Rectangle())
-					.gesture(
+					.highPriorityGesture(
 						DragGesture(minimumDistance: 8)
 							.onChanged { value in
 								if drags.active < 0 {
 									drags.active = pickCard(at: value.startLocation, u: u)
+									lastDragY = 0
+									drags.raised = drags.active
 								}
 								let i = drags.active
 								guard i >= 0 else { return }
+								let delta = value.translation.height - lastDragY
+								lastDragY = value.translation.height
 								let maxUp = deckCards[i].maxUpU * u
-								drags.offsets[i] = min(0, max(-maxUp, value.translation.height))
+								drags.offsets[i] = min(0, max(-maxUp, drags.offsets[i] + delta))
 							}
 							.onEnded { _ in
 								let i = drags.active
 								drags.active = -1
+								lastDragY = 0
 								guard i >= 0 else { return }
 								withAnimation(.easeOut(duration: 0.3)) { drags.offsets[i] = 0 }
+								DispatchQueue.main.asyncAfter(deadline: .now() + 0.31) {
+									if drags.raised == i { drags.raised = -1 }
+								}
 							}
 					)
 			}

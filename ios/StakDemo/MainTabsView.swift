@@ -144,6 +144,9 @@ struct MainTabsView: View {
 	}
 
 	private func push(_ page: PushedPage) {
+		// Double-tap during the 300ms slide would append a duplicate id and
+		// break ForEach identity (audit 2026-08-25).
+		guard pushed.last?.id != page.id else { return }
 		withAnimation(FlowAnim.pushRight.animation) { pushed.append(page) }
 	}
 
@@ -153,6 +156,7 @@ struct MainTabsView: View {
 
 	/// Appends/removes with no animation - the prototype's "Instant".
 	private func pushInstant(_ page: PushedPage) {
+		guard pushed.last?.id != page.id else { return }
 		pushed.append(page)
 	}
 

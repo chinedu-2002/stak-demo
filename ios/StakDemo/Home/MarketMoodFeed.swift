@@ -29,7 +29,7 @@ enum MarketMoodFeed {
 	static let demoStatusRest = ", you should consider being cautious."
 
 	/// 0 = extreme fear (red, right) … 100 = greed (green, left).
-	static func angleFor(score: Double) -> Double { score / 100 * 180 }
+	static func angleFor(score: Double) -> Double { min(max(score, 0), 100) / 100 * 180 }
 
 	/// Fetches the live score and delivers the needle angle on the main
 	/// queue. No-op while `live` is false. The CNN endpoint 4xx's without

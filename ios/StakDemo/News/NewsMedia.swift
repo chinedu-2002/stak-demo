@@ -12,9 +12,9 @@ import Foundation
 /// (posterUrl) - the data phase's image loader renders those.
 enum NewsMedia {
 	/// A still image.
-	case image(posterAsset: String? = nil, url: String? = nil)
+	case image(posterAsset: String?, url: String?)
 	/// A video behind a poster: YouTube links embed, other links play directly.
-	case video(url: String, posterAsset: String? = nil, posterUrl: String? = nil)
+	case video(url: String, posterAsset: String?, posterUrl: String?)
 
 	/// YouTube watch/short links -> the embeddable player URL; nil for direct media.
 	static func youTubeEmbedURL(for url: String) -> URL? {
@@ -27,6 +27,6 @@ enum NewsMedia {
 
 	/// Demo story media: authored poster + Apple's official iPhone film on YouTube (oEmbed-verified).
 	static func demo() -> NewsMedia {
-		.video(url: "https://www.youtube.com/watch?v=_-AS5DtDeqs", posterAsset: "NewsHeroPhone")
+		.video(url: "https://www.youtube.com/watch?v=_-AS5DtDeqs", posterAsset: "NewsHeroPhone", posterUrl: nil)
 	}
 }

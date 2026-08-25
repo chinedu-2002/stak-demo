@@ -117,6 +117,7 @@ struct NewsDetailView: View {
 					onViewInMyStak: { saved = true; MyStakHoldings.shared.add("AAPL"); onViewInMyStak() },
 					onDismiss: {
 						saved = true
+						MyStakHoldings.shared.add("AAPL")
 						withAnimation(.easeOut(duration: 0.3)) { showSuccess = false }
 					}
 				)
@@ -132,6 +133,11 @@ struct NewsDetailView: View {
 /// top-left at -24,-15) — it keeps its exact authored frame (the Compose
 /// requiredSize + Crop becomes .scaledToFill + explicit .frame + .clipped)
 /// and the card's rounded clip crops the overflow.
+// CONTRACT (user, 2026-08-25): this screen is the News info page TEMPLATE.
+// The design authors exactly ONE article (1:1495, the Apple foldable
+// story), so every authored news tap lands here in the demo. In
+// production the backend serves each story's own headline, subtitle,
+// body and media into this page - same slot pattern as NewsMedia.
 private struct HeroImage: View {
 	let media: NewsMedia
 	let saved: Bool

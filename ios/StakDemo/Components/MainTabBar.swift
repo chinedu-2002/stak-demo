@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// The five CHINEDU tabs. Home and News are built; the rest land later.
+/// The five CHINEDU tabs — all built.
 /// Mirrors android/ ui/components/MainTabBar.kt (MainTab).
 enum MainTab: String, CaseIterable, Identifiable {
 	case home = "Home"
@@ -33,9 +33,6 @@ enum MainTab: String, CaseIterable, Identifiable {
 		}
 	}
 
-	var built: Bool {
-		true
-	}
 }
 
 /// CHINEDU tab bar (Home Main 1:1220 / News listing 1:1352) — 86px
@@ -50,7 +47,6 @@ enum MainTab: String, CaseIterable, Identifiable {
 /// ui/components/MainTabBar.kt; supersedes the pre-CHINEDU StakTabBar.
 struct MainTabBar: View {
 	@Binding var selected: MainTab
-	/// True only while the Discover tab is up — its 75-tall bar (1:1788).
 
 	var body: some View {
 		let u = figmaUnit
@@ -63,7 +59,7 @@ struct MainTabBar: View {
 			HStack(alignment: .top, spacing: 30 * u) {
 				ForEach(MainTab.allCases) { tab in
 					Button {
-						if tab.built { selected = tab }
+						selected = tab
 					} label: {
 						VStack(spacing: 10 * u) {
 							Image(tab == selected ? tab.activeIcon : tab.inactiveIcon)

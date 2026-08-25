@@ -18,7 +18,8 @@ object StakRoutes {
 	const val PERMISSIONS = "onboarding/permissions"
 	const val PROFILE_SETUP = "onboarding/profile-setup"
 	const val MAIN = "main" // bottom-tab shell (Home/News/Discover/My STAK/Simulate)
-	const val NEWS_DETAIL = "news/detail"
+	const val NEWS_DETAIL = "news/detail/{articleId}"
+	fun newsDetail(articleId: String) = "news/detail/$articleId"
 	const val COLLECTION = "mystak/collection"
 	const val MYSTAK_STOCK = "mystak/stock"
 	const val PROFILE = "profile"

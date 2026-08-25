@@ -66,7 +66,7 @@ internal object News {
  * bar comes from the MainShell.
  */
 @Composable
-fun NewsScreen(onOpenArticle: () -> Unit) {
+fun NewsScreen(onOpenArticle: (String) -> Unit) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	// Designer's call (2026-08-22): the search icon opens a search bar that
 	// word-matches the news content; the list is empty when nothing matches.
@@ -158,9 +158,10 @@ fun NewsScreen(onOpenArticle: () -> Unit) {
 			// Designer's call (2026-08-22): today's brief on tap leads to the
 			// News info page (the Story tile stays wired per panel 1:1228).
 			if (NewsBriefFeed.briefs().any { matches(it.title) }) {
-				BriefCarousel(onRead = onOpenArticle)
+				// Each brief opens ITS OWN article (user, 2026-08-25).
+				BriefCarousel(onRead = { page -> onOpenArticle(NewsArticleFeed.BRIEF_ARTICLES[page]) })
 			}
-			StoryGrid(onOpenArticle = onOpenArticle, query = q)
+			StoryGrid(onOpenArticle = { onOpenArticle(NewsArticleFeed.APPLE) }, query = q)
 			// Each story names the stocks it relates to; the "In your STAK"
 			// chip shows only when one of them is in the user's My STAK.
 			val forYou = listOf(
@@ -219,7 +220,7 @@ private fun MoodMiniRow() {
  * active dot follows the page. Text comes from NewsBriefFeed.
  */
 @Composable
-private fun BriefCarousel(onRead: () -> Unit) {
+private fun BriefCarousel(onRead: (Int) -> Unit) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	val briefs = NewsBriefFeed.briefs()
 	val pager = androidx.compose.foundation.pager.rememberPagerState(pageCount = { briefs.size })
@@ -228,7 +229,7 @@ private fun BriefCarousel(onRead: () -> Unit) {
 			state = pager,
 			modifier = Modifier.fillMaxWidth(),
 		) { page ->
-			BriefCard(brief = briefs[page], onRead = onRead)
+			BriefCard(brief = briefs[page], onRead = { onRead(page) })
 		}
 		// Pager dots — the active page is the 16x6 teal pill, the rest
 		// 6px #5c6b85 dots, 6px gaps: the authored 52x6 strip.

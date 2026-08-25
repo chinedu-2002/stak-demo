@@ -27,12 +27,13 @@ struct NewsDetailView: View {
 	var articleId: String = NewsArticleFeed.apple
 	let onBack: () -> Void
 	var onViewInMyStak: () -> Void = {}
+	/// READ NEXT rows push the next story's article (user, 2026-08-25).
+	var onOpenArticle: (String) -> Void = { _ in }
 
 	@State private var saved = false
 	@State private var showSuccess = false
 
 	private var article: NewsArticleFeed.Article { NewsArticleFeed.article(articleId) }
-	private var isAuthored: Bool { articleId == NewsArticleFeed.apple }
 
 	var body: some View {
 		let u = figmaUnit
@@ -74,7 +75,7 @@ struct NewsDetailView: View {
 								.font(StakFont.geist(14.3 * u))
 								.lineSpacing((22 - 14.3) * u)
 								.foregroundStyle(News.muted)
-							Byline()
+							Byline(source: article.source, meta: article.sourceMeta)
 							if !saved {
 								// Designer's call (2026-08-22): the sheet scale-ins.
 								AddToStakButton { withAnimation(.easeOut(duration: 0.3)) { showSuccess = true } }
@@ -106,7 +107,7 @@ struct NewsDetailView: View {
 									ArticleTag(text: article.tags[1])
 								}
 							}
-							ReadNext()
+							ReadNext(currentId: article.id, onOpen: onOpenArticle)
 						}
 						.frame(maxWidth: .infinity, alignment: .leading)
 						.padding(.horizontal, 20 * u)
@@ -231,22 +232,26 @@ private struct HeroImage: View {
 	}
 }
 
+/// Templated per story - the authored sample is "Bloomberg · Jul 2 · 3 min read".
 private struct Byline: View {
+	let source: String
+	let meta: String
+
 	var body: some View {
 		let u = figmaUnit
 		HStack(spacing: 8 * u) {
 			ZStack {
 				Circle().fill(News.chipBg)
-				Text("B")
+				Text(String(source.prefix(1)))
 					.font(StakFont.sora(10 * u, .semiBold))
 					.foregroundStyle(Color(argb: 0xFF9EADC7))
 			}
 			.frame(width: 24 * u, height: 24 * u)
 			HStack(spacing: 5 * u) {
-				Text("Bloomberg")
+				Text(source)
 					.font(StakFont.geist(12 * u, .medium))
 					.foregroundStyle(StakColors.textPrimary)
-				Text("· Jul 2 · 3 min read")
+				Text(meta)
 					.font(StakFont.geist(12 * u))
 					.foregroundStyle(News.faint)
 			}
@@ -558,7 +563,13 @@ private struct ArticleTag: View {
 	}
 }
 
+/// READ NEXT - the authored sample repeats the Tesla row twice as its
+/// placeholder; the served rows are two other stories, and each opens
+/// its own article (user, 2026-08-25).
 private struct ReadNext: View {
+	let currentId: String
+	let onOpen: (String) -> Void
+
 	var body: some View {
 		let u = figmaUnit
 		VStack(alignment: .leading, spacing: 10 * u) {
@@ -566,26 +577,33 @@ private struct ReadNext: View {
 				.font(StakFont.geist(10 * u, .medium))
 				.tracking(0.5 * u)
 				.foregroundStyle(News.muted)
-			ForEach(0..<2, id: \.self) { _ in
-				HStack(spacing: 12 * u) {
-					Image("NewsThumbTSLARn")
-						.resizable()
-						.scaledToFill()
-						.frame(width: 60 * u, height: 60 * u)
-						.clipShape(RoundedRectangle(cornerRadius: 10 * u))
-					VStack(alignment: .leading, spacing: 5 * u) {
-						Text("CNBC · 2d")
-							.font(StakFont.geist(11 * u))
-							.foregroundStyle(News.muted)
-						Text("Tesla drops 7% even after beating deliveries")
-							.font(StakFont.sora(14 * u))
-							.lineSpacing((19 - 14) * u)
-							.foregroundStyle(StakColors.textPrimary)
+			ForEach(NewsArticleFeed.readNext(excluding: currentId), id: \.id) { next in
+				Button {
+					onOpen(next.id)
+				} label: {
+					HStack(spacing: 12 * u) {
+						if let thumb = next.thumb {
+							Image(thumb)
+								.resizable()
+								.scaledToFill()
+								.frame(width: 60 * u, height: 60 * u)
+								.clipShape(RoundedRectangle(cornerRadius: 10 * u))
+						}
+						VStack(alignment: .leading, spacing: 5 * u) {
+							Text("\(next.source) · \(next.age)")
+								.font(StakFont.geist(11 * u))
+								.foregroundStyle(News.muted)
+							Text(next.headline)
+								.font(StakFont.sora(14 * u))
+								.lineSpacing((19 - 14) * u)
+								.foregroundStyle(StakColors.textPrimary)
+						}
+						.frame(maxWidth: .infinity, alignment: .leading)
 					}
-					.frame(maxWidth: .infinity, alignment: .leading)
+					.padding(12 * u)
+					.background(News.cardBg, in: RoundedRectangle(cornerRadius: 14 * u))
 				}
-				.padding(12 * u)
-				.background(News.cardBg, in: RoundedRectangle(cornerRadius: 14 * u))
+				.buttonStyle(.plain)
 			}
 		}
 		.padding(.top, 6 * u)

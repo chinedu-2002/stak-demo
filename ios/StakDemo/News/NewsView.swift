@@ -15,28 +15,9 @@ enum News {
 	static let divider = Color(argb: 0xFF2A3346)
 }
 
-/// One For You / Markets list row.
-private struct NewsRowModel: Identifiable {
-	let thumb: String
-	let source: String
-	let headline: String
-	/// The stocks the story relates to; the "In your STAK" chip shows
-	/// only when one of them is in the user's My STAK.
-	let tickers: [String]
-	var id: String { headline }
-}
-
-private let forYouRows: [NewsRowModel] = [
-	NewsRowModel(thumb: "NewsThumbNVDA", source: "Reuters · 2d", headline: "Nvidia lags the chip rally it kicked off", tickers: ["NVDA"]),
-	NewsRowModel(thumb: "NewsThumbAAPL", source: "Bloomberg · 2d", headline: "Apple climbs 5% on foldable iPhone push", tickers: ["AAPL"]),
-	NewsRowModel(thumb: "NewsThumbTSLA", source: "CNBC · 2d", headline: "Tesla drops 7% even after beating deliveries", tickers: ["TSLA"])
-]
-
-private let marketsRows: [NewsRowModel] = [
-	NewsRowModel(thumb: "NewsThumbJobs", source: "Reuters · 2d", headline: "June jobs miss eases Fed hike bets", tickers: []),
-	NewsRowModel(thumb: "NewsThumbChips", source: "Bloomberg · 2d", headline: "Memory chips soar as the AI trade rotates", tickers: ["MU"]),
-	NewsRowModel(thumb: "NewsThumbOil", source: "Reuters · 3d", headline: "Oil slips after positive Iran talks", tickers: ["XOM"])
-]
+// The For You / Markets rows render from the served section feeds
+// (NewsArticleFeed.forYou / .markets); EVERY story opens its article
+// (user, 2026-08-25).
 
 /// 03 · News — "News listing tab", Figma node 1:1228 (CHINEDU file; mirrors
 /// android/ NewsScreen.kt). Fixed header ("News", date, search circle),
@@ -111,14 +92,14 @@ struct NewsView: View {
 						// Each brief opens ITS OWN article (user, 2026-08-25).
 						BriefCarousel(onRead: { page in onOpenArticle(NewsArticleFeed.briefArticles[page]) })
 					}
-					StoryGrid(onOpenArticle: { onOpenArticle(NewsArticleFeed.apple) }, query: q)
-					let forYou = forYouRows.filter { matches($0.headline) }
+					StoryGrid(onOpenArticle: onOpenArticle, query: q)
+					let forYou = NewsArticleFeed.forYou.map { NewsArticleFeed.article($0) }.filter { matches($0.headline) }
 					if !forYou.isEmpty {
-						NewsSectionView(title: "For You", rows: forYou)
+						NewsSectionView(title: "For You", rows: forYou, onOpen: onOpenArticle)
 					}
-					let markets = marketsRows.filter { matches($0.headline) }
+					let markets = NewsArticleFeed.markets.map { NewsArticleFeed.article($0) }.filter { matches($0.headline) }
 					if !markets.isEmpty {
-						NewsSectionView(title: "Markets", rows: markets)
+						NewsSectionView(title: "Markets", rows: markets, onOpen: onOpenArticle)
 					}
 				}
 				.padding(.horizontal, 20 * u)
@@ -251,7 +232,7 @@ private struct BriefCard: View {
 
 /// The two 128-unit story tiles ("Markets" / "Your stocks").
 private struct StoryGrid: View {
-	let onOpenArticle: () -> Void
+	let onOpenArticle: (String) -> Void
 	var query: String = ""
 
 	private func show(_ text: String) -> Bool {
@@ -269,7 +250,9 @@ private struct StoryGrid: View {
 						tag: "Markets",
 						headline: "Fed minutes land Wednesday",
 						source: "Reuters · 2h",
-						onTap: {}
+						// Its story too (user, 2026-08-25: "this was clicked
+						// and nothing happened").
+						onTap: { onOpenArticle(NewsArticleFeed.fedTile) }
 					)
 				}
 				if apple {
@@ -277,7 +260,7 @@ private struct StoryGrid: View {
 						tag: "Your stocks",
 						headline: "Apple Climbs 5% on foldable iphone",
 						source: "CNBC · 3h",
-						onTap: onOpenArticle
+						onTap: { onOpenArticle(NewsArticleFeed.apple) }
 					)
 				}
 			}
@@ -337,7 +320,8 @@ struct NewsTag: View {
 private struct NewsSectionView: View {
 	@ObservedObject var holdings = MyStakHoldings.shared
 	let title: String
-	let rows: [NewsRowModel]
+	let rows: [NewsArticleFeed.Article]
+	let onOpen: (String) -> Void
 
 	var body: some View {
 		let u = figmaUnit
@@ -345,24 +329,27 @@ private struct NewsSectionView: View {
 			Text(title)
 				.font(StakFont.sora(16 * u, .semiBold))
 				.foregroundStyle(News.headerGray)
-			ForEach(rows) { row in
+			ForEach(rows, id: \.id) { row in
+				// Every row opens its story's article (user, 2026-08-25).
 				Button {
-					// Authored motion (1:1228): the rows have no connection.
+					onOpen(row.id)
 				} label: {
 					HStack(spacing: 12 * u) {
-						Image(row.thumb)
-							.resizable()
-							.scaledToFill()
-							.frame(width: 60 * u, height: 60 * u)
-							.clipShape(RoundedRectangle(cornerRadius: 10 * u))
+						if let thumb = row.thumb {
+							Image(thumb)
+								.resizable()
+								.scaledToFill()
+								.frame(width: 60 * u, height: 60 * u)
+								.clipShape(RoundedRectangle(cornerRadius: 10 * u))
+						}
 						VStack(alignment: .leading, spacing: 5 * u) {
 							HStack {
-								Text(row.source)
+								Text("\(row.source) · \(row.age)")
 									.font(StakFont.geist(11 * u))
 									.foregroundStyle(News.muted)
 								Spacer()
 								// Only for stocks the user holds (user, 2026-08-23).
-								if holdings.holdsAny(row.tickers) {
+								if holdings.holdsAny(row.relatedTickers) {
 									NewsTag(text: "In your STAK")
 								}
 							}

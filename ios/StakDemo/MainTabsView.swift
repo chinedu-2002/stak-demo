@@ -119,7 +119,9 @@ struct MainTabsView: View {
 				onViewInMyStak: {
 					tab = .myStak
 					withAnimation(FlowAnim.pushRight.animation) { _ = pushed.popLast() }
-				}
+				},
+				// READ NEXT rows push the next story's article (user, 2026-08-25).
+				onOpenArticle: { id in pushInstant(.newsDetail(article: id)) }
 			)
 		case .stockDetail(let fromMyStak):
 			// Discover-entry back mirrors the instant entry (provisional);

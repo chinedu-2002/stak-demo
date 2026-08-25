@@ -892,7 +892,20 @@ private fun NewsVideoPlayer(video: NewsMedia.Video, modifier: Modifier = Modifie
 							android.util.Log.w("NewsMedia", "embed error ${error?.errorCode} ${error?.description} for ${request?.url}")
 						}
 					}
-					loadUrl(embed)
+					// YouTube's player refuses embeds with no HTTP Referer -
+					// a bare loadUrl(embed) dies with "configuration error
+					// 153" (user, 2026-08-25; reproduced + fix verified in
+					// the browser). The iframe wrapper + base URL presents
+					// an embedding origin.
+					val html = """
+						<!doctype html><html><head>
+						<meta name="viewport" content="width=device-width, initial-scale=1">
+						<style>html,body{margin:0;padding:0;background:#000;height:100%;overflow:hidden}iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0}</style>
+						</head><body>
+						<iframe src="$embed" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+						</body></html>
+					""".trimIndent()
+					loadDataWithBaseURL("https://stak.app", html, "text/html", "utf-8", null)
 				}
 			},
 			// Backing out of the article must stop playback and free the

@@ -85,7 +85,7 @@ struct NewsDetailView: View {
 							// Apple article is the section's PLACEHOLDER - each
 							// block renders per story from served data; stock
 							// blocks appear whenever the story has a ticker).
-							if let ticker = article.ticker { StockCard(saved: saved, ticker: ticker) }
+							if let ticker = article.ticker { StockCard(saved: saved, ticker: ticker, facts: NewsArticleFeed.stockFacts(ticker)) }
 							if !article.gist.isEmpty { GistCard(bullets: article.gist) }
 							if let first = article.paragraphs.first {
 								Paragraph(text: first, size: 15, line: 24)
@@ -99,7 +99,7 @@ struct NewsDetailView: View {
 								Paragraph(text: text)
 							}
 							SourceRow()
-							if article.ticker != nil { KeyStatsCard() }
+							if let ticker = article.ticker { KeyStatsCard(facts: NewsArticleFeed.stockFacts(ticker)) }
 							NewsHairline()
 							HStack(spacing: 8 * u) {
 								if let first = article.tags.first { ArticleTag(text: first) }
@@ -122,6 +122,7 @@ struct NewsDetailView: View {
 			// authored animate type is still unreadable from the file).
 			if showSuccess {
 				SaveSuccessOverlay(
+					facts: NewsArticleFeed.stockFacts(article.ticker ?? "AAPL"),
 					onViewInMyStak: { saved = true; if let t = article.ticker { MyStakHoldings.shared.add(t) }; onViewInMyStak() },
 					onDismiss: {
 						saved = true
@@ -296,10 +297,14 @@ private struct NewsHairline: View {
 	}
 }
 
-/// AAPL price card — badge, Daily chip, $308.63 + sparkline; saved adds View row.
+/// The story's stock card - EVERY article renders it with its own
+/// stock's served facts (user, 2026-08-25: "use the apple features...
+/// replace the placeholder"). The sparkline stays the authored demo
+/// asset until the backend serves chart data.
 private struct StockCard: View {
 	let saved: Bool
-	var ticker: String = "AAPL"
+	let ticker: String
+	let facts: NewsArticleFeed.StockFacts
 
 	var body: some View {
 		let u = figmaUnit
@@ -307,17 +312,17 @@ private struct StockCard: View {
 			HStack(spacing: 0) {
 				ZStack {
 					Circle().fill(News.chipBg)
-					Text("A")
+					Text(String(facts.name.prefix(1)))
 						.font(StakFont.sora(18 * u, .semiBold))
 						.foregroundStyle(Color(argb: 0xFF9EADC7))
 				}
 				.frame(width: 44 * u, height: 44 * u)
 				Spacer().frame(width: 12 * u)
 				VStack(alignment: .leading, spacing: 3 * u) {
-					Text("Apple Inc.")
+					Text(facts.name)
 						.font(StakFont.sora(15 * u, .semiBold))
 						.foregroundStyle(StakColors.textPrimary)
-					Text("AAPL")
+					Text(ticker)
 						.font(StakFont.geist(12 * u))
 						.foregroundStyle(News.muted)
 				}
@@ -337,12 +342,14 @@ private struct StockCard: View {
 			}
 			HStack(alignment: .bottom) {
 				VStack(alignment: .leading, spacing: 3 * u) {
-					Text("$308.63")
+					Text(facts.price)
 						.font(StakFont.sora(26 * u, .semiBold))
 						.foregroundStyle(StakColors.textPrimary)
-					Text("+4.84% today")
+					Text(facts.change)
 						.font(StakFont.geist(13 * u, .medium))
-						.foregroundStyle(News.green)
+						// The app's authored up/down pair (green here, the
+						// My STAK / Simulate red for down moves).
+						.foregroundStyle(facts.up ? News.green : Color(argb: 0xFFFF5A6A))
 				}
 				Spacer()
 				Image("NewsSparkline")
@@ -352,8 +359,6 @@ private struct StockCard: View {
 			if saved {
 				NewsHairline()
 				HStack {
-					// Templated per story; company/price figures stay authored demo
-					// values until the backend serves stock data.
 					Text("View \(ticker) in My STAK")
 						.font(StakFont.geist(13 * u, .medium))
 						.foregroundStyle(News.teal)
@@ -494,6 +499,8 @@ private struct SourceRow: View {
 }
 
 private struct KeyStatsCard: View {
+	let facts: NewsArticleFeed.StockFacts
+
 	var body: some View {
 		let u = figmaUnit
 		VStack(alignment: .leading, spacing: 13 * u) {
@@ -505,9 +512,9 @@ private struct KeyStatsCard: View {
 					.font(StakFont.sora(14 * u, .semiBold))
 					.foregroundStyle(StakColors.textPrimary)
 			}
-			StatRow(l1: "Market cap", v1: "$4.58T", l2: "P/E ratio", v2: "34.2")
-			StatRow(l1: "Day range", v1: "$301.20–$309.80", l2: "Volume", v2: "82.4M")
-			StatRow(l1: "52-wk range", v1: "$201.50–$317.40", l2: "Div yield", v2: "0.42%")
+			StatRow(l1: "Market cap", v1: facts.marketCap, l2: "P/E ratio", v2: facts.peRatio)
+			StatRow(l1: "Day range", v1: facts.dayRange, l2: "Volume", v2: facts.volume)
+			StatRow(l1: "52-wk range", v1: facts.week52, l2: "Div yield", v2: facts.divYield)
 		}
 		.frame(maxWidth: .infinity, alignment: .leading)
 		.padding(16 * u)
@@ -610,8 +617,12 @@ private struct ReadNext: View {
 	}
 }
 
-/// Save success — rgba(12,19,32,0.55) scrim + the r24 #181f30 bottom sheet (101:1169).
+/// Save success — rgba(12,19,32,0.55) scrim + the r24 #181f30 bottom
+/// sheet (101:1169). The stock row shows the SAVED stock's served facts
+/// (user, 2026-08-25: every article = the full Apple page with the
+/// story's own content; the frame's Apple row was placeholder).
 private struct SaveSuccessOverlay: View {
+	let facts: NewsArticleFeed.StockFacts
 	let onViewInMyStak: () -> Void
 	let onDismiss: () -> Void
 
@@ -638,23 +649,24 @@ private struct SaveSuccessOverlay: View {
 				HStack(spacing: 11 * u) {
 					ZStack {
 						Circle().fill(News.chipBg)
-						Text("A")
+						Text(String(facts.shortName.prefix(1)))
 							.font(StakFont.sora(15 * u, .semiBold))
 							.foregroundStyle(Color(argb: 0xFF9EADC7))
 					}
 					.frame(width: 38 * u, height: 38 * u)
 					VStack(alignment: .leading, spacing: 2 * u) {
-						Text("Apple")
+						Text(facts.shortName)
 							.font(StakFont.geist(13 * u, .medium))
 							.foregroundStyle(StakColors.textPrimary)
-						Text("$229.35 today")
+						Text("\(facts.price) today")
 							.font(StakFont.geist(10 * u))
 							.foregroundStyle(News.muted)
 					}
 					.frame(maxWidth: .infinity, alignment: .leading)
-					Text("▲ 1.2%")
+					// "+4.84% today" -> "▲ 4.84%" (the sheet's authored format).
+					Text("\(facts.up ? "▲" : "▼") \(String(facts.change.dropFirst()).replacingOccurrences(of: " today", with: ""))")
 						.font(StakFont.geist(12 * u, .medium))
-						.foregroundStyle(News.green)
+						.foregroundStyle(facts.up ? News.green : Color(argb: 0xFFFF5A6A))
 				}
 				.padding(.horizontal, 14 * u)
 				.padding(.vertical, 12 * u)

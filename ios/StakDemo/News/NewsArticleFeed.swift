@@ -54,9 +54,9 @@ enum NewsArticleFeed {
 		/// List-row thumbnail; nil = the story has no row presentation.
 		let thumb: String?
 		/// The stocks the story relates to - gates the "In your STAK" chip
-		/// on listing rows (user, 2026-08-23). Distinct from `ticker`, which
-		/// keys the article's stock card / key stats and stays nil until
-		/// the backend serves that stock's data module (AAPL only in demo).
+		/// on listing rows (user, 2026-08-23). `ticker` is the PRIMARY one:
+		/// it keys the article's stock card / key stats (`stockFacts`) and
+		/// is the stock a save adds to My STAK.
 		let relatedTickers: [String]
 	}
 
@@ -66,10 +66,14 @@ enum NewsArticleFeed {
 			category: category,
 			headline: headline,
 			subtitle: subtitle,
-			ticker: nil,
+			// EVERY story renders the full Apple page (user, 2026-08-25:
+			// "use the apple features... replace the placeholder"): the
+			// primary related stock keys the stock card / key stats.
+			ticker: relatedTickers.first,
 			paragraphs: paragraphs,
-			// No served media yet - the hero renders its empty slot.
-			media: .image(posterAsset: nil, url: nil),
+			// The Apple demo media is the PLACEHOLDER for every story's
+			// hero until the backend serves per-story media (same ruling).
+			media: NewsMedia.demo(),
 			shareText: "\(headline) - read it on STAK: https://stak.app/news/\(id)",
 			gist: gist,
 			pullQuote: pullQuote,
@@ -370,5 +374,42 @@ enum NewsArticleFeed {
 	/// The article page's READ NEXT rows - two other row-presented stories.
 	static func readNext(excluding: String) -> [Article] {
 		Array(articles.filter { isStockNews($0) && $0.thumb != nil && $0.id != excluding }.prefix(2))
+	}
+
+	/// The story's stock module - name, quote and key stats for the
+	/// article page's stock card (authored AAPL values = the frame;
+	/// the rest are DEMO stand-ins until the backend serves quotes).
+	/// `up` picks the change color (green/red, the app's authored pair).
+	struct StockFacts {
+		let name: String
+		/// Sheet-row name ("Apple" on 101:1169).
+		let shortName: String
+		let price: String
+		let change: String
+		let up: Bool
+		let marketCap: String
+		let peRatio: String
+		let dayRange: String
+		let volume: String
+		let week52: String
+		let divYield: String
+	}
+
+	private static let stockFactsTable: [String: StockFacts] = [
+		// The AUTHORED card (1:1495) - keep these values frame-exact.
+		"AAPL": StockFacts(name: "Apple Inc.", shortName: "Apple", price: "$308.63", change: "+4.84% today", up: true, marketCap: "$4.58T", peRatio: "34.2", dayRange: "$301.20–$309.80", volume: "82.4M", week52: "$201.50–$317.40", divYield: "0.42%"),
+		"NVDA": StockFacts(name: "NVIDIA Corp.", shortName: "NVIDIA", price: "$178.42", change: "+1.12% today", up: true, marketCap: "$4.35T", peRatio: "51.8", dayRange: "$175.90–$180.10", volume: "195.7M", week52: "$98.60–$184.30", divYield: "0.03%"),
+		"TSLA": StockFacts(name: "Tesla, Inc.", shortName: "Tesla", price: "$291.30", change: "-6.95% today", up: false, marketCap: "$928.5B", peRatio: "68.4", dayRange: "$288.10–$312.60", volume: "142.3M", week52: "$182.00–$488.50", divYield: "—"),
+		"AMD": StockFacts(name: "Advanced Micro Devices", shortName: "AMD", price: "$186.75", change: "+4.10% today", up: true, marketCap: "$302.4B", peRatio: "45.6", dayRange: "$178.90–$187.40", volume: "88.1M", week52: "$76.50–$189.20", divYield: "—"),
+		"GOOGL": StockFacts(name: "Alphabet Inc.", shortName: "Alphabet", price: "$203.55", change: "+3.65% today", up: true, marketCap: "$2.47T", peRatio: "24.8", dayRange: "$196.40–$204.90", volume: "41.2M", week52: "$142.70–$207.05", divYield: "0.39%"),
+		"AMZN": StockFacts(name: "Amazon.com, Inc.", shortName: "Amazon", price: "$242.18", change: "+2.87% today", up: true, marketCap: "$2.57T", peRatio: "38.9", dayRange: "$236.50–$243.70", volume: "55.6M", week52: "$151.60–$246.30", divYield: "—"),
+		"MSFT": StockFacts(name: "Microsoft Corp.", shortName: "Microsoft", price: "$512.40", change: "+1.45% today", up: true, marketCap: "$3.81T", peRatio: "37.5", dayRange: "$505.80–$514.20", volume: "22.8M", week52: "$385.60–$518.30", divYield: "0.66%"),
+		"XOM": StockFacts(name: "Exxon Mobil Corp.", shortName: "Exxon Mobil", price: "$109.84", change: "-1.84% today", up: false, marketCap: "$472.6B", peRatio: "13.9", dayRange: "$108.90–$112.30", volume: "18.4M", week52: "$101.40–$126.30", divYield: "3.41%"),
+		"MU": StockFacts(name: "Micron Technology", shortName: "Micron", price: "$128.66", change: "+6.21% today", up: true, marketCap: "$142.8B", peRatio: "21.3", dayRange: "$120.70–$129.40", volume: "33.9M", week52: "$61.50–$131.20", divYield: "0.36%"),
+	]
+
+	/// The served stock module for a ticker - the backend resolves this in production.
+	static func stockFacts(_ ticker: String) -> StockFacts {
+		stockFactsTable[ticker] ?? stockFactsTable["AAPL"]!
 	}
 }

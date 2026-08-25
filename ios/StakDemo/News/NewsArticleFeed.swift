@@ -60,7 +60,7 @@ enum NewsArticleFeed {
 		let relatedTickers: [String]
 	}
 
-	private static func demo(_ id: String, _ category: String, _ headline: String, _ subtitle: String, _ paragraphs: [String], _ gist: [String], _ pullQuote: String, _ explainer: String, _ tags: [String], _ source: String, _ age: String, _ sourceMeta: String, _ thumb: String? = nil, _ relatedTickers: [String] = []) -> Article {
+	private static func demo(_ id: String, _ category: String, _ headline: String, _ subtitle: String, _ paragraphs: [String], _ gist: [String], _ pullQuote: String, _ explainer: String, _ tags: [String], _ source: String, _ age: String, _ sourceMeta: String, _ thumb: String? = nil, _ relatedTickers: [String] = [], media: NewsMedia = .image(posterAsset: nil, url: nil)) -> Article {
 		Article(
 			id: id,
 			category: category,
@@ -71,9 +71,10 @@ enum NewsArticleFeed {
 			// primary related stock keys the stock card / key stats.
 			ticker: relatedTickers.first,
 			paragraphs: paragraphs,
-			// The Apple demo media is the PLACEHOLDER for every story's
-			// hero until the backend serves per-story media (same ruling).
-			media: NewsMedia.demo(),
+			// PER-STORY media (user, 2026-08-25: the Tesla story must show
+			// Tesla, not Apple) - each story passes its own oEmbed-verified
+			// official video; the empty-image default is the no-media slot.
+			media: media,
 			shareText: "\(headline) - read it on STAK: https://stak.app/news/\(id)",
 			gist: gist,
 			pullQuote: pullQuote,
@@ -139,7 +140,9 @@ enum NewsArticleFeed {
 			"Reuters", "1d", "· Jul 3 · 3 min read",
 			// STRICT stock news (user, 2026-08-25): an index story counts
 			// only through the stocks it is about - the chip names.
-			nil, ["NVDA", "MU"]
+			nil, ["NVDA", "MU"],
+			// CNBC's NYSE opening-bell film.
+			media: .video(url: "https://www.youtube.com/watch?v=f5U1vLwbySw", posterAsset: nil, posterUrl: "https://i.ytimg.com/vi/f5U1vLwbySw/hqdefault.jpg")
 		),
 		// STRICT stock news (user, 2026-08-25): the old fed-holds-rates
 		// demo article was macro, not stock news - replaced with the
@@ -162,7 +165,9 @@ enum NewsArticleFeed {
 			"Alphabet is Google's parent company. Most of its profit comes from ads on search and YouTube, so ad growth is the number that moves the stock.",
 			["Alphabet", "Tech"],
 			"Reuters", "1d", "· Jul 3 · 3 min read",
-			nil, ["GOOGL"]
+			nil, ["GOOGL"],
+			// Google's official Year in Search film.
+			media: .video(url: "https://www.youtube.com/watch?v=Vv_sjpclsZ8", posterAsset: nil, posterUrl: "https://i.ytimg.com/vi/Vv_sjpclsZ8/hqdefault.jpg")
 		),
 		demo(
 			"oil-opec-supply", "Markets",
@@ -187,7 +192,9 @@ enum NewsArticleFeed {
 			// the user chose to keep it until the backend serves story
 			// images (2026-08-25). Not a loading bug.
 			"Reuters", "3d", "· Jul 1 · 2 min read",
-			"NewsThumbOil", ["XOM"]
+			"NewsThumbOil", ["XOM"],
+			// ExxonMobil's official operations film.
+			media: .video(url: "https://www.youtube.com/watch?v=sYNhUg7mmnU", posterAsset: nil, posterUrl: "https://i.ytimg.com/vi/sYNhUg7mmnU/hqdefault.jpg")
 		),
 		demo(
 			"tech-earnings-week", "Tech & Ai",
@@ -208,7 +215,9 @@ enum NewsArticleFeed {
 			["Tech", "Earnings"],
 			"Bloomberg", "1d", "· Jul 3 · 3 min read",
 			// STRICT stock news: the earnings week is about these stocks.
-			nil, ["MSFT", "GOOGL"]
+			nil, ["MSFT", "GOOGL"],
+			// Nasdaq's official MarketSite film.
+			media: .video(url: "https://www.youtube.com/watch?v=R-lVIFlHnCo", posterAsset: nil, posterUrl: "https://i.ytimg.com/vi/R-lVIFlHnCo/hqdefault.jpg")
 		),
 		// STRICT stock news (user, 2026-08-25): the old fed-minutes tile
 		// story was macro, not stock news - the Markets tile now serves
@@ -231,7 +240,9 @@ enum NewsArticleFeed {
 			"Cloud margin measures what a cloud business keeps after its costs. For big tech, small margin changes move billions in profit.",
 			["Amazon", "Tech"],
 			"Reuters", "2h", "· Jul 4 · 3 min read",
-			nil, ["AMZN"]
+			nil, ["AMZN"],
+			// AWS's official data-center tour.
+			media: .video(url: "https://www.youtube.com/watch?v=bFYDrHYDns4", posterAsset: nil, posterUrl: "https://i.ytimg.com/vi/bFYDrHYDns4/hqdefault.jpg")
 		),
 		demo(
 			"nvda-lags-rally", "Tech & Ai",
@@ -251,7 +262,9 @@ enum NewsArticleFeed {
 			"When a leader stock pauses, gains often spread to smaller related companies. Investors call this rotation, and it can signal a rally maturing rather than ending.",
 			["Nvidia", "Tech"],
 			"Reuters", "2d", "· Jul 2 · 3 min read",
-			"NewsThumbNVDA", ["NVDA"]
+			"NewsThumbNVDA", ["NVDA"],
+			// NVIDIA's official Rise of AI film.
+			media: .video(url: "https://www.youtube.com/watch?v=d24W8AqeOHM", posterAsset: nil, posterUrl: "https://i.ytimg.com/vi/d24W8AqeOHM/hqdefault.jpg")
 		),
 		demo(
 			"tsla-drops-deliveries", "Tech & Ai",
@@ -271,7 +284,9 @@ enum NewsArticleFeed {
 			"Deliveries count how many cars were handed to customers; margin is what each sale earns after costs. A company can sell more cars and still make less money.",
 			["Tesla", "Tech"],
 			"CNBC", "2d", "· Jul 2 · 3 min read",
-			"NewsThumbTSLA", ["TSLA"]
+			"NewsThumbTSLA", ["TSLA"],
+			// Tesla's official The New Model Y film.
+			media: .video(url: "https://www.youtube.com/watch?v=Jt7DqX2AlNo", posterAsset: nil, posterUrl: "https://i.ytimg.com/vi/Jt7DqX2AlNo/hqdefault.jpg")
 		),
 		// STRICT stock news (user, 2026-08-25): the old jobs-report demo
 		// row was macro, not stock news - replaced with a stock story.
@@ -294,7 +309,9 @@ enum NewsArticleFeed {
 			"When one company dominates a hot market, buyers often fund a second supplier to keep prices honest. Investors call it the challenger trade.",
 			["AMD", "Chips"],
 			"Reuters", "2d", "· Jul 2 · 2 min read",
-			"NewsThumbJobs", ["AMD"]
+			"NewsThumbJobs", ["AMD"],
+			// AMD's official Advancing AI film.
+			media: .video(url: "https://www.youtube.com/watch?v=pVl25BbczLI", posterAsset: nil, posterUrl: "https://i.ytimg.com/vi/pVl25BbczLI/hqdefault.jpg")
 		),
 		demo(
 			"memory-chips-soar", "Tech & Ai",
@@ -314,7 +331,9 @@ enum NewsArticleFeed {
 			"Memory chips store the data AI systems work on. Demand from AI data centers has turned a boom-and-bust commodity business into a growth story, at least for now.",
 			["Chips", "Tech"],
 			"Bloomberg", "2d", "· Jul 2 · 3 min read",
-			"NewsThumbChips", ["MU"]
+			"NewsThumbChips", ["MU"],
+			// Micron's official HBM3E film.
+			media: .video(url: "https://www.youtube.com/watch?v=bzwPZD1w7UY", posterAsset: nil, posterUrl: "https://i.ytimg.com/vi/bzwPZD1w7UY/hqdefault.jpg")
 		),
 		// OFF-TOPIC by design: a general-pool story with no market topic
 		// and no related stock. It is SERVED (it sits in the For You

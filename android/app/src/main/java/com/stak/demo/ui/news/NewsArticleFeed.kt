@@ -27,6 +27,9 @@ object NewsArticleFeed {
 	/** The Top Stories "Markets" tile's story (1:1228). */
 	const val FED_TILE = "fed-minutes-wednesday"
 
+	/** The served demo payload's off-topic story - see the gate below. */
+	private const val OFF_TOPIC = "wimbledon-final"
+
 	data class Article(
 		val id: String,
 		val category: String,
@@ -287,21 +290,65 @@ object NewsArticleFeed {
 			"Bloomberg", "2d", "· Jul 2 · 3 min read",
 			R.drawable.news_thumb_chips, listOf("MU"),
 		),
+		// OFF-TOPIC by design: a general-pool story with no market topic
+		// and no related stock. It is SERVED (it sits in the For You
+		// payload) but [isMarketRelated] drops it, so it never renders -
+		// the on-device proof of the filter (user, 2026-08-25).
+		demo(
+			OFF_TOPIC, "Sports",
+			"Alcaraz outlasts Sinner in five-set Wimbledon final",
+			"A four-and-a-half-hour final delivered the rivalry the sport has waited a decade for.",
+			listOf(
+				"Carlos Alcaraz won his third straight Wimbledon title on Sunday, coming from two sets to one down to beat Jannik Sinner in a final that stretched past four and a half hours.",
+				"The pair have now split the last six major titles between them, and the head-to-head is even again.",
+			),
+			listOf(
+				"Alcaraz won a third straight Wimbledon title.",
+				"The final ran past four and a half hours.",
+			),
+			"The rivalry the sport has waited a decade for.",
+			"Wimbledon is tennis's oldest major tournament, played on grass in London each July.",
+			listOf("Sports", "Tennis"),
+			"AP", "5h", "· Jul 4 · 2 min read",
+		),
 	)
 
 	/** The served article for a story - the backend resolves this in production. */
 	fun article(id: String): Article = ARTICLES.firstOrNull { it.id == id } ?: ARTICLES.first()
 
-	/** Brief page index -> its article id (demo mapping). */
+	/**
+	 * Brief page index -> its article id (demo mapping). Served briefs
+	 * pass the same market-relevance gate as the listing rows.
+	 */
 	val BRIEF_ARTICLES = listOf("dow-record-chips-slide", "fed-holds-rates", "oil-opec-supply", "tech-earnings-week")
 
-	/** The For You section's stories, in row order (1:1228). */
-	val FOR_YOU = listOf("nvda-lags-rally", APPLE, "tsla-drops-deliveries")
+	/**
+	 * Market-relevance gate (user, 2026-08-25: News carries ONLY stock /
+	 * market news). The backend serves stories from a general news pool,
+	 * so every News surface filters what it renders: a story passes only
+	 * when it names a related stock or carries a market topic. The
+	 * off-topic sports story in the served demo payload proves the gate -
+	 * no surface ever renders it.
+	 */
+	private val MARKET_TOPICS = setOf("Markets", "Stocks", "Fed", "Energy", "Earnings", "Tech", "Tech & Ai", "Chips", "Jobs")
 
-	/** The Markets section's stories, in row order (1:1228). */
-	val MARKETS = listOf("jobs-miss-fed-bets", "memory-chips-soar", "oil-opec-supply")
+	fun isMarketRelated(article: Article): Boolean =
+		article.relatedTickers.isNotEmpty() || article.ticker != null ||
+			article.category in MARKET_TOPICS || article.tags.any { it in MARKET_TOPICS }
+
+	/** The For You stories the backend served, in row order (1:1228). */
+	private val FOR_YOU = listOf("nvda-lags-rally", APPLE, "tsla-drops-deliveries", OFF_TOPIC)
+
+	/** The Markets stories the backend served, in row order (1:1228). */
+	private val MARKETS = listOf("jobs-miss-fed-bets", "memory-chips-soar", "oil-opec-supply")
+
+	/** The For You rows - market-related served stories only. */
+	fun forYou(): List<Article> = FOR_YOU.map { article(it) }.filter { isMarketRelated(it) }
+
+	/** The Markets rows - market-related served stories only. */
+	fun markets(): List<Article> = MARKETS.map { article(it) }.filter { isMarketRelated(it) }
 
 	/** The article page's READ NEXT rows - two other row-presented stories. */
 	fun readNext(excluding: String): List<Article> =
-		ARTICLES.filter { it.thumbRes != null && it.id != excluding }.take(2)
+		ARTICLES.filter { isMarketRelated(it) && it.thumbRes != null && it.id != excluding }.take(2)
 }

@@ -84,7 +84,7 @@ struct NewsDetailView: View {
 							// Apple article is the section's PLACEHOLDER - each
 							// block renders per story from served data; stock
 							// blocks appear whenever the story has a ticker).
-							if article.ticker != nil { StockCard(saved: saved) }
+							if let ticker = article.ticker { StockCard(saved: saved, ticker: ticker) }
 							if !article.gist.isEmpty { GistCard(bullets: article.gist) }
 							if let first = article.paragraphs.first {
 								Paragraph(text: first, size: 15, line: 24)
@@ -294,6 +294,7 @@ private struct NewsHairline: View {
 /// AAPL price card — badge, Daily chip, $308.63 + sparkline; saved adds View row.
 private struct StockCard: View {
 	let saved: Bool
+	var ticker: String = "AAPL"
 
 	var body: some View {
 		let u = figmaUnit
@@ -346,7 +347,9 @@ private struct StockCard: View {
 			if saved {
 				NewsHairline()
 				HStack {
-					Text("View AAPL in My STAK")
+					// Templated per story; company/price figures stay authored demo
+					// values until the backend serves stock data.
+					Text("View \(ticker) in My STAK")
 						.font(StakFont.geist(13 * u, .medium))
 						.foregroundStyle(News.teal)
 					Spacer()

@@ -162,13 +162,13 @@ fun NewsScreen(onOpenArticle: (String) -> Unit) {
 				BriefCarousel(onRead = { page -> onOpenArticle(NewsArticleFeed.BRIEF_ARTICLES[page]) })
 			}
 			StoryGrid(onOpenArticle = onOpenArticle, query = q)
-			// The rows render from the served section feeds; EVERY story
-			// opens its article (user, 2026-08-25). Each story names the
-			// stocks it relates to; the "In your STAK" chip shows only
-			// when one of them is in the user's My STAK.
-			val forYou = NewsArticleFeed.FOR_YOU.map { NewsArticleFeed.article(it) }.filter { matches(it.headline) }
+			// The rows render from the served section feeds - market-related
+			// stories only (user, 2026-08-25); EVERY story opens its article.
+			// Each story names the stocks it relates to; the "In your STAK"
+			// chip shows only when one of them is in the user's My STAK.
+			val forYou = NewsArticleFeed.forYou().filter { matches(it.headline) }
 			if (forYou.isNotEmpty()) NewsSection(title = "For You", rows = forYou, onOpen = onOpenArticle)
-			val markets = NewsArticleFeed.MARKETS.map { NewsArticleFeed.article(it) }.filter { matches(it.headline) }
+			val markets = NewsArticleFeed.markets().filter { matches(it.headline) }
 			if (markets.isNotEmpty()) NewsSection(title = "Markets", rows = markets, onOpen = onOpenArticle)
 			Spacer(modifier = Modifier.height(0.dp))
 		}

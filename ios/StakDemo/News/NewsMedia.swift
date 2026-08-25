@@ -25,8 +25,12 @@ enum NewsMedia {
 		return URL(string: "https://www.youtube.com/embed/\(url[r])?autoplay=1&playsinline=1&rel=0")
 	}
 
-	/// Demo story media: authored poster + Apple's official iPhone film on YouTube (oEmbed-verified).
+	/// Demo story media: the authored poster art over a verified
+	/// direct-stream phone b-roll (Mixkit). YouTube embeds stay the
+	/// production contract, but this environment's in-app WebViews are
+	/// refused YouTube's video streams (user, 2026-08-25 black screen),
+	/// so the demo serves direct MP4s the platform players decode.
 	static func demo() -> NewsMedia {
-		.video(url: "https://www.youtube.com/watch?v=_-AS5DtDeqs", posterAsset: "NewsHeroPhone", posterUrl: nil)
+		.video(url: "https://assets.mixkit.co/videos/4915/4915-720.mp4", posterAsset: "NewsHeroPhone", posterUrl: nil)
 	}
 }

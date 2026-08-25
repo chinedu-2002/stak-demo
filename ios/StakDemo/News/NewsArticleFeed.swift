@@ -141,8 +141,8 @@ enum NewsArticleFeed {
 			// STRICT stock news (user, 2026-08-25): an index story counts
 			// only through the stocks it is about - the chip names.
 			nil, ["NVDA", "MU"],
-			// CNBC's NYSE opening-bell film.
-			media: .video(url: "https://www.youtube.com/watch?v=f5U1vLwbySw", posterAsset: nil, posterUrl: "https://i.ytimg.com/vi/f5U1vLwbySw/hqdefault.jpg")
+			// Trading-screens b-roll (Pexels, verified direct stream).
+			media: .video(url: "https://videos.pexels.com/video-files/38168755/16204628_1280_720_25fps.mp4", posterAsset: nil, posterUrl: "https://images.pexels.com/videos/38168755/forex-38168755.jpeg?auto=compress&cs=tinysrgb&w=1280")
 		),
 		// STRICT stock news (user, 2026-08-25): the old fed-holds-rates
 		// demo article was macro, not stock news - replaced with the
@@ -166,8 +166,8 @@ enum NewsArticleFeed {
 			["Alphabet", "Tech"],
 			"Reuters", "1d", "· Jul 3 · 3 min read",
 			nil, ["GOOGL"],
-			// Google's official Year in Search film.
-			media: .video(url: "https://www.youtube.com/watch?v=Vv_sjpclsZ8", posterAsset: nil, posterUrl: "https://i.ytimg.com/vi/Vv_sjpclsZ8/hqdefault.jpg")
+			// Typing-on-laptop b-roll (Mixkit, verified direct stream).
+			media: .video(url: "https://assets.mixkit.co/videos/1808/1808-720.mp4", posterAsset: nil, posterUrl: "https://assets.mixkit.co/videos/1808/1808-thumb-720-0.jpg")
 		),
 		demo(
 			"oil-opec-supply", "Markets",
@@ -193,8 +193,8 @@ enum NewsArticleFeed {
 			// images (2026-08-25). Not a loading bug.
 			"Reuters", "3d", "· Jul 1 · 2 min read",
 			"NewsThumbOil", ["XOM"],
-			// ExxonMobil's official operations film.
-			media: .video(url: "https://www.youtube.com/watch?v=sYNhUg7mmnU", posterAsset: nil, posterUrl: "https://i.ytimg.com/vi/sYNhUg7mmnU/hqdefault.jpg")
+			// Oil-pump time-lapse b-roll (Mixkit, verified direct stream).
+			media: .video(url: "https://assets.mixkit.co/videos/48884/48884-720.mp4", posterAsset: nil, posterUrl: "https://assets.mixkit.co/videos/48884/48884-thumb-720-3.jpg")
 		),
 		demo(
 			"tech-earnings-week", "Tech & Ai",
@@ -216,8 +216,8 @@ enum NewsArticleFeed {
 			"Bloomberg", "1d", "· Jul 3 · 3 min read",
 			// STRICT stock news: the earnings week is about these stocks.
 			nil, ["MSFT", "GOOGL"],
-			// Nasdaq's official MarketSite film.
-			media: .video(url: "https://www.youtube.com/watch?v=R-lVIFlHnCo", posterAsset: nil, posterUrl: "https://i.ytimg.com/vi/R-lVIFlHnCo/hqdefault.jpg")
+			// Stock-trend-screen b-roll (Mixkit, verified direct stream).
+			media: .video(url: "https://assets.mixkit.co/videos/9607/9607-720.mp4", posterAsset: nil, posterUrl: "https://assets.mixkit.co/videos/9607/9607-thumb-720-0.jpg")
 		),
 		// STRICT stock news (user, 2026-08-25): the old fed-minutes tile
 		// story was macro, not stock news - the Markets tile now serves
@@ -241,8 +241,8 @@ enum NewsArticleFeed {
 			["Amazon", "Tech"],
 			"Reuters", "2h", "· Jul 4 · 3 min read",
 			nil, ["AMZN"],
-			// AWS's official data-center tour.
-			media: .video(url: "https://www.youtube.com/watch?v=bFYDrHYDns4", posterAsset: nil, posterUrl: "https://i.ytimg.com/vi/bFYDrHYDns4/hqdefault.jpg")
+			// Server-racks b-roll (Pexels, verified direct stream).
+			media: .video(url: "https://videos.pexels.com/video-files/5028622/5028622-hd_1280_720_25fps.mp4", posterAsset: nil, posterUrl: "https://images.pexels.com/videos/5028622/pexels-photo-5028622.jpeg?auto=compress&w=1260&h=750&dpr=1")
 		),
 		demo(
 			"nvda-lags-rally", "Tech & Ai",
@@ -263,8 +263,8 @@ enum NewsArticleFeed {
 			["Nvidia", "Tech"],
 			"Reuters", "2d", "· Jul 2 · 3 min read",
 			"NewsThumbNVDA", ["NVDA"],
-			// NVIDIA's official Rise of AI film.
-			media: .video(url: "https://www.youtube.com/watch?v=d24W8AqeOHM", posterAsset: nil, posterUrl: "https://i.ytimg.com/vi/d24W8AqeOHM/hqdefault.jpg")
+			// Circuit-board b-roll (Mixkit, verified direct stream).
+			media: .video(url: "https://assets.mixkit.co/videos/22027/22027-720.mp4", posterAsset: nil, posterUrl: "https://assets.mixkit.co/videos/22027/22027-thumb-720-0.jpg")
 		),
 		demo(
 			"tsla-drops-deliveries", "Tech & Ai",
@@ -285,8 +285,8 @@ enum NewsArticleFeed {
 			["Tesla", "Tech"],
 			"CNBC", "2d", "· Jul 2 · 3 min read",
 			"NewsThumbTSLA", ["TSLA"],
-			// Tesla's official The New Model Y film.
-			media: .video(url: "https://www.youtube.com/watch?v=Jt7DqX2AlNo", posterAsset: nil, posterUrl: "https://i.ytimg.com/vi/Jt7DqX2AlNo/hqdefault.jpg")
+			// EV-charging b-roll (Mixkit, verified direct stream).
+			media: .video(url: "https://assets.mixkit.co/videos/22982/22982-720.mp4", posterAsset: nil, posterUrl: "https://assets.mixkit.co/videos/22982/22982-thumb-720-0.jpg")
 		),
 		// STRICT stock news (user, 2026-08-25): the old jobs-report demo
 		// row was macro, not stock news - replaced with a stock story.
@@ -310,8 +310,8 @@ enum NewsArticleFeed {
 			["AMD", "Chips"],
 			"Reuters", "2d", "· Jul 2 · 2 min read",
 			"NewsThumbJobs", ["AMD"],
-			// AMD's official Advancing AI film.
-			media: .video(url: "https://www.youtube.com/watch?v=pVl25BbczLI", posterAsset: nil, posterUrl: "https://i.ytimg.com/vi/pVl25BbczLI/hqdefault.jpg")
+			// Motherboard-chips b-roll (Mixkit, verified direct stream).
+			media: .video(url: "https://assets.mixkit.co/videos/1138/1138-720.mp4", posterAsset: nil, posterUrl: "https://assets.mixkit.co/videos/1138/1138-thumb-720-0.jpg")
 		),
 		demo(
 			"memory-chips-soar", "Tech & Ai",
@@ -332,8 +332,8 @@ enum NewsArticleFeed {
 			["Chips", "Tech"],
 			"Bloomberg", "2d", "· Jul 2 · 3 min read",
 			"NewsThumbChips", ["MU"],
-			// Micron's official HBM3E film.
-			media: .video(url: "https://www.youtube.com/watch?v=bzwPZD1w7UY", posterAsset: nil, posterUrl: "https://i.ytimg.com/vi/bzwPZD1w7UY/hqdefault.jpg")
+			// Chip-fab engineer b-roll (Mixkit, verified direct stream).
+			media: .video(url: "https://assets.mixkit.co/videos/47047/47047-720.mp4", posterAsset: nil, posterUrl: "https://assets.mixkit.co/videos/47047/47047-thumb-720-3.jpg")
 		),
 		// OFF-TOPIC by design: a general-pool story with no market topic
 		// and no related stock. It is SERVED (it sits in the For You

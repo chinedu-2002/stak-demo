@@ -198,8 +198,10 @@ object NewsArticleFeed {
 			// images (2026-08-25). Not a loading bug.
 			"Reuters", "3d", "· Jul 1 · 2 min read",
 			R.drawable.news_thumb_oil, listOf("XOM"),
-			// Oil-pump time-lapse b-roll (Mixkit, verified direct stream).
-			media = NewsMedia.Video(url = "https://assets.mixkit.co/videos/48884/48884-720.mp4", posterUrl = "https://assets.mixkit.co/videos/48884/48884-thumb-720-3.jpg"),
+			// Real-time pumpjack drone b-roll (Pexels, verified direct
+			// stream) - the first pick was a TIME-LAPSE and read as
+			// racing playback (user, 2026-08-26).
+			media = NewsMedia.Video(url = "https://videos.pexels.com/video-files/10227529/10227529-hd_1280_720_30fps.mp4", posterUrl = "https://images.pexels.com/videos/10227529/enviornmental-conservation-environment-environment-protection-midland-10227529.jpeg?auto=compress&w=1260&h=750&dpr=1"),
 		),
 		demo(
 			"tech-earnings-week", "Tech & Ai",

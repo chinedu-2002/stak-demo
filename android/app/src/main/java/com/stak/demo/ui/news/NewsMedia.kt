@@ -38,7 +38,9 @@ sealed class NewsMedia {
 		 * so the demo serves direct MP4s the platform players decode.
 		 */
 		fun demo(): NewsMedia = Video(
-			url = "https://assets.mixkit.co/videos/4915/4915-720.mp4",
+			// iPhone-on-table b-roll (Pexels 4008368, real-time 25fps,
+			// verified) - recognizably an iPhone (user, 2026-08-26).
+			url = "https://videos.pexels.com/video-files/4008368/4008368-hd_2048_1080_25fps.mp4",
 			posterRes = R.drawable.news_hero_phone,
 		)
 	}

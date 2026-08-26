@@ -946,6 +946,10 @@ private fun NewsVideoPlayer(video: NewsMedia.Video, modifier: Modifier = Modifie
 						}
 					})
 					setVideoTextureView(texture)
+					// Exactly 1x (user, 2026-08-26: "put it on 1x speed" -
+					// not sluggish, not fast). Clip SOURCES must also be
+					// real-time footage; see NewsArticleFeed's media notes.
+					playbackParameters = androidx.media3.common.PlaybackParameters(1f)
 					prepare()
 					playWhenReady = true
 				}

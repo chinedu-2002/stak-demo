@@ -146,8 +146,8 @@ object NewsArticleFeed {
 			// STRICT stock news (user, 2026-08-25): an index story counts
 			// only through the stocks it is about - the chip names.
 			null, listOf("NVDA", "MU"),
-			// Trading-screens b-roll (Pexels, verified direct stream).
-			media = NewsMedia.Video(url = "https://videos.pexels.com/video-files/38168755/16204628_1280_720_25fps.mp4", posterUrl = "https://images.pexels.com/videos/38168755/forex-38168755.jpeg?auto=compress&cs=tinysrgb&w=1280"),
+			// NYSE-facade b-roll (Pexels, real-time 30fps, verified).
+			media = NewsMedia.Video(url = "https://videos.pexels.com/video-files/4319342/4319342-hd_1920_1080_30fps.mp4", posterUrl = "https://images.pexels.com/videos/4319342/finance-new-york-city-new-york-stock-exchange-nyse-4319342.jpeg?auto=compress&w=1260&h=750&dpr=1"),
 		),
 		// STRICT stock news (user, 2026-08-25): the old fed-holds-rates
 		// demo article was macro, not stock news - replaced with the
@@ -171,8 +171,8 @@ object NewsArticleFeed {
 			listOf("Alphabet", "Tech"),
 			"Reuters", "1d", "· Jul 3 · 3 min read",
 			null, listOf("GOOGL"),
-			// Typing-on-laptop b-roll (Mixkit, verified direct stream).
-			media = NewsMedia.Video(url = "https://assets.mixkit.co/videos/1808/1808-720.mp4", posterUrl = "https://assets.mixkit.co/videos/1808/1808-thumb-720-0.jpg"),
+			// Google-search-screen b-roll (Pexels, real-time 30fps, verified).
+			media = NewsMedia.Video(url = "https://videos.pexels.com/video-files/4549682/4549682-hd_1920_1080_30fps.mp4", posterUrl = "https://images.pexels.com/videos/4549682/google-search-search-engine-optimization-seo-4549682.jpeg?auto=compress&w=1260&h=750&dpr=1"),
 		),
 		demo(
 			"oil-opec-supply", "Markets",
@@ -270,8 +270,8 @@ object NewsArticleFeed {
 			listOf("Nvidia", "Tech"),
 			"Reuters", "2d", "· Jul 2 · 3 min read",
 			R.drawable.news_thumb_nvda, listOf("NVDA"),
-			// Circuit-board b-roll (Mixkit, verified direct stream).
-			media = NewsMedia.Video(url = "https://assets.mixkit.co/videos/22027/22027-720.mp4", posterUrl = "https://assets.mixkit.co/videos/22027/22027-thumb-720-0.jpg"),
+			// NVIDIA RTX graphics-card b-roll (Pexels, real-time 30fps, verified).
+			media = NewsMedia.Video(url = "https://videos.pexels.com/video-files/5466792/5466792-hd_1920_1080_30fps.mp4", posterUrl = "https://images.pexels.com/videos/5466792/gaming-case-gaming-computer-gaming-graphics-card-gaming-machine-5466792.jpeg?auto=compress&w=1260&h=750&dpr=1"),
 		),
 		demo(
 			"tsla-drops-deliveries", "Tech & Ai",
@@ -292,8 +292,8 @@ object NewsArticleFeed {
 			listOf("Tesla", "Tech"),
 			"CNBC", "2d", "· Jul 2 · 3 min read",
 			R.drawable.news_thumb_tsla, listOf("TSLA"),
-			// EV-charging b-roll (Mixkit, verified direct stream).
-			media = NewsMedia.Video(url = "https://assets.mixkit.co/videos/22982/22982-720.mp4", posterUrl = "https://assets.mixkit.co/videos/22982/22982-thumb-720-0.jpg"),
+			// Tesla Model X b-roll (Pexels, real-time 30fps, verified).
+			media = NewsMedia.Video(url = "https://videos.pexels.com/video-files/34194673/14493661_1280_720_30fps.mp4", posterUrl = "https://images.pexels.com/videos/34194673/automobile-selfi-tesla-transportation-34194673.jpeg?auto=compress&w=1260&h=750&dpr=1"),
 		),
 		// STRICT stock news (user, 2026-08-25): the old jobs-report demo
 		// row was macro, not stock news - replaced with a stock story.

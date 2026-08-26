@@ -161,7 +161,9 @@ private struct HeroImage: View {
 		ZStack {
 			Color(argb: 0xFFC4C4C4)
 			if playing, case let .video(url, _, _) = media {
-				NewsVideoPlayer(url: url)
+				// A failed OR FINISHED stream returns to the poster + glyph
+				// instead of stranding a frame (user, 2026-08-25/26).
+				NewsVideoPlayer(url: url, onDone: { playing = false })
 			} else {
 				let poster: String? = {
 					switch media {
@@ -729,18 +731,20 @@ private struct SaveSuccessOverlay: View {
 /// autoplay once the user tapped the play glyph.
 private struct NewsVideoPlayer: View {
 	let url: String
+	var onDone: () -> Void = {}
 
 	var body: some View {
 		if let embed = NewsMedia.youTubeEmbedURL(for: url) {
 			YouTubeEmbedView(url: embed)
 		} else if let direct = URL(string: url) {
-			AutoplayVideoPlayer(url: direct)
+			AutoplayVideoPlayer(url: direct, onDone: onDone)
 		}
 	}
 }
 
 private struct AutoplayVideoPlayer: View {
 	let url: URL
+	var onDone: () -> Void = {}
 	@State private var player: AVPlayer? = nil
 
 	var body: some View {
@@ -751,6 +755,10 @@ private struct AutoplayVideoPlayer: View {
 				p.play()
 			}
 			.onDisappear { player?.pause() }
+			// A finished or failed clip returns the hero to its poster +
+			// play glyph (user, 2026-08-26: "i cant see the play icon").
+			.onReceive(NotificationCenter.default.publisher(for: .AVPlayerItemDidPlayToEndTime)) { _ in onDone() }
+			.onReceive(NotificationCenter.default.publisher(for: .AVPlayerItemFailedToPlayToEndTime)) { _ in onDone() }
 	}
 }
 

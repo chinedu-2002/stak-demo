@@ -217,9 +217,9 @@ private fun HeroImage(media: NewsMedia, category: String, saved: Boolean, onBook
 	) {
 		val video = media as? NewsMedia.Video
 		if (playing && video != null) {
-			// A failed stream returns to the poster + glyph instead of
-			// stranding a blank box (user, 2026-08-25).
-			NewsVideoPlayer(video = video, modifier = Modifier.matchParentSize(), onError = { playing = false })
+			// A failed OR FINISHED stream returns to the poster + glyph
+			// instead of stranding a frame (user, 2026-08-25/26).
+			NewsVideoPlayer(video = video, modifier = Modifier.matchParentSize(), onDone = { playing = false })
 		} else {
 			val posterRes = when (media) {
 				is NewsMedia.Image -> media.posterRes
@@ -875,7 +875,7 @@ private fun SaveSuccessOverlay(facts: NewsArticleFeed.StockFacts, onViewInMyStak
  * VideoView. Both autoplay once the user tapped the play glyph.
  */
 @Composable
-private fun NewsVideoPlayer(video: NewsMedia.Video, modifier: Modifier = Modifier, onError: () -> Unit = {}) {
+private fun NewsVideoPlayer(video: NewsMedia.Video, modifier: Modifier = Modifier, onDone: () -> Unit = {}) {
 	val embed = video.youTubeEmbedUrl
 	if (embed != null) {
 		androidx.compose.ui.viewinterop.AndroidView(
@@ -936,7 +936,13 @@ private fun NewsVideoPlayer(video: NewsMedia.Video, modifier: Modifier = Modifie
 					addListener(object : androidx.media3.common.Player.Listener {
 						override fun onPlayerError(error: androidx.media3.common.PlaybackException) {
 							android.util.Log.w("NewsMedia", "direct playback error ${error.errorCodeName} for ${video.url}")
-							onError()
+							onDone()
+						}
+						// A finished clip returns to the poster + glyph so
+						// the hero reads as replayable, not a stuck frame
+						// (user, 2026-08-26: "i cant see the play icon").
+						override fun onPlaybackStateChanged(playbackState: Int) {
+							if (playbackState == androidx.media3.common.Player.STATE_ENDED) onDone()
 						}
 					})
 					setVideoTextureView(texture)

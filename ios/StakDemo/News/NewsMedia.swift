@@ -31,6 +31,8 @@ enum NewsMedia {
 	/// refused YouTube's video streams (user, 2026-08-25 black screen),
 	/// so the demo serves direct MP4s the platform players decode.
 	static func demo() -> NewsMedia {
-		.video(url: "https://assets.mixkit.co/videos/4915/4915-720.mp4", posterAsset: "NewsHeroPhone", posterUrl: nil)
+		// iPhone-on-table b-roll (Pexels 4008368, real-time 25fps,
+		// verified) - recognizably an iPhone (user, 2026-08-26).
+		.video(url: "https://videos.pexels.com/video-files/4008368/4008368-hd_2048_1080_25fps.mp4", posterAsset: "NewsHeroPhone", posterUrl: nil)
 	}
 }

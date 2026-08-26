@@ -753,6 +753,10 @@ private struct AutoplayVideoPlayer: View {
 				let p = AVPlayer(url: url)
 				player = p
 				p.play()
+				// Exactly 1x (user, 2026-08-26: "put it on 1x speed" -
+				// not sluggish, not fast). Clip SOURCES must also be
+				// real-time footage; see NewsArticleFeed's media notes.
+				p.rate = 1.0
 			}
 			.onDisappear { player?.pause() }
 			// A finished or failed clip returns the hero to its poster +

@@ -922,9 +922,15 @@ private fun NewsVideoPlayer(video: NewsMedia.Video, modifier: Modifier = Modifie
 		// silently on-device (surface never created / prepare aborted -
 		// stuck gray hero, 2026-08-25). ExoPlayer owns its surface and
 		// reports errors; a failed stream bounces back to the poster.
+		// TextureView, not SurfaceView (2026-08-26): SurfaceView frames
+		// composite OUTSIDE the app and long-running emulators stop
+		// showing them (decoder ran, screen stayed black); TextureView
+		// draws through the view pipeline and also respects the hero's
+		// r10 corner clip, which SurfaceView punches through.
 		androidx.compose.ui.viewinterop.AndroidView(
 			modifier = modifier,
 			factory = { ctx ->
+				val texture = android.view.TextureView(ctx)
 				val player = androidx.media3.exoplayer.ExoPlayer.Builder(ctx).build().apply {
 					setMediaItem(androidx.media3.common.MediaItem.fromUri(video.url))
 					addListener(object : androidx.media3.common.Player.Listener {
@@ -933,15 +939,14 @@ private fun NewsVideoPlayer(video: NewsMedia.Video, modifier: Modifier = Modifie
 							onError()
 						}
 					})
+					setVideoTextureView(texture)
 					prepare()
 					playWhenReady = true
 				}
-				androidx.media3.ui.PlayerView(ctx).apply {
-					useController = false
-					this.player = player
-				}
+				texture.tag = player
+				texture
 			},
-			onRelease = { v -> v.player?.release(); v.player = null },
+			onRelease = { v -> (v.tag as? androidx.media3.exoplayer.ExoPlayer)?.release(); v.tag = null },
 		)
 	}
 }

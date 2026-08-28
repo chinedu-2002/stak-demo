@@ -392,7 +392,13 @@ fun DiscoverScreen(onLearnMore: () -> Unit = {}, onPracticeBuy: () -> Unit = {})
 
 /** The full-size front card (350 wide) with its live Save chip. */
 @Composable
-internal fun FrontDeckCard(card: DeckCard, onSave: () -> Unit, u: Float, modifier: Modifier = Modifier) {
+internal fun FrontDeckCard(
+	card: DeckCard,
+	onSave: () -> Unit,
+	u: Float,
+	modifier: Modifier = Modifier,
+	rows: DeckRowTweaks = DeckRowTweaks(),
+) {
 	Box(
 		modifier = modifier
 			.width((350 * u).dp)
@@ -419,12 +425,25 @@ internal fun FrontDeckCard(card: DeckCard, onSave: () -> Unit, u: Float, modifie
 				}
 			},
 	) {
-		DeckCardBody(card = card, onSave = onSave, u = u)
+		DeckCardBody(card = card, onSave = onSave, u = u, rows = rows)
 	}
 }
 
+/**
+ * Per-frame row-rhythm tweaks, in card-template px added ABOVE a row.
+ * The tutorial frame (1:344) authors slightly looser text gaps than a
+ * uniform 87.4% scale of the Discover card (1:1627) — values are
+ * render-fitted against the 2x frame export. Discover uses the defaults.
+ */
+internal class DeckRowTweaks(
+	val overlay: Float = 0f,
+	val headline: Float = 0f,
+	val price: Float = 0f,
+	val tip: Float = 0f,
+)
+
 @Composable
-private fun DeckCardBody(card: DeckCard, onSave: (() -> Unit)?, u: Float) {
+private fun DeckCardBody(card: DeckCard, onSave: (() -> Unit)?, u: Float, rows: DeckRowTweaks = DeckRowTweaks()) {
 	Column(
 		horizontalAlignment = Alignment.CenterHorizontally,
 		// The authored card template (1:1740, shared by all three designs):
@@ -469,7 +488,7 @@ private fun DeckCardBody(card: DeckCard, onSave: (() -> Unit)?, u: Float) {
 		}
 		Column(
 			verticalArrangement = Arrangement.spacedBy((19 * u).dp),
-			modifier = Modifier.fillMaxWidth().padding(horizontal = (18 * u).dp).padding(bottom = (16 * u).dp),
+			modifier = Modifier.fillMaxWidth().padding(horizontal = (18 * u).dp).padding(bottom = (16 * u).dp).padding(top = (rows.overlay * u).dp),
 		) {
 			Column(verticalArrangement = Arrangement.spacedBy((8 * u).dp)) {
 				Text(
@@ -481,8 +500,13 @@ private fun DeckCardBody(card: DeckCard, onSave: (() -> Unit)?, u: Float) {
 					text = card.headline,
 					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (16 * u).sp, lineHeight = (23 * u).sp),
 					color = Color.White,
+					modifier = Modifier.padding(top = (rows.headline * u).dp),
 				)
-				Row(verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy((9 * u).dp)) {
+				Row(
+					verticalAlignment = Alignment.Bottom,
+					horizontalArrangement = Arrangement.spacedBy((9 * u).dp),
+					modifier = Modifier.padding(top = (rows.price * u).dp),
+				) {
 					Text(
 						text = card.price,
 						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (20 * u).sp, lineHeight = (25 * u).sp),
@@ -500,6 +524,7 @@ private fun DeckCardBody(card: DeckCard, onSave: (() -> Unit)?, u: Float) {
 				verticalAlignment = Alignment.CenterVertically,
 				horizontalArrangement = Arrangement.spacedBy((8 * u).dp),
 				modifier = Modifier
+					.padding(top = (rows.tip * u).dp)
 					.fillMaxWidth()
 					.clip(RoundedCornerShape((10 * u).dp))
 					.background(Disc.TipBg)

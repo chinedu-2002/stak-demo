@@ -46,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.stak.demo.R
 import com.stak.demo.ui.discover.DECK
+import com.stak.demo.ui.discover.DeckRowTweaks
 import com.stak.demo.ui.discover.FrontDeckCard
 import com.stak.demo.ui.theme.Geist
 import com.stak.demo.ui.theme.Sora
@@ -165,6 +166,10 @@ fun SwipeTutorialScreen(onBack: () -> Unit, onContinue: () -> Unit) {
 						card = DECK[swiped % 3],
 						onSave = {},
 						u = u2,
+						// This frame's card authors looser text gaps than a
+						// uniform 87.4% scale of the Discover card (1:1627) —
+						// render-fitted against the 2x export of 1:344.
+						rows = DeckRowTweaks(overlay = 0.85f, headline = 0.85f, price = 1.65f, tip = 0.4f),
 						modifier = Modifier
 							.align(Alignment.TopCenter)
 							.offset(y = (47.5 * u).dp)

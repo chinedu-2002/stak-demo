@@ -170,6 +170,7 @@ internal val DECK = listOf(
  */
 @Composable
 fun DiscoverScreen(
+	resetKey: Int = 0,
 	onLearnMore: () -> Unit = {},
 	onPracticeBuy: () -> Unit = {},
 	// B4 (1:2330 Motion): the end-of-deck CTAs hop tabs via the shell.
@@ -179,6 +180,8 @@ fun DiscoverScreen(
 	// Prototype: tapping the front card itself also opens the Stock Detail.
 	// The buy ticket itself is raised by the shell (over the tab bar).
 	var seen by rememberSaveable { mutableIntStateOf(0) }
+	// 1:2330: Discover tab re-tap from the end of the deck restarts it.
+	LaunchedEffect(resetKey) { if (resetKey > 0 && seen >= 12) seen = 0 }
 	var savedToast by remember { mutableStateOf(false) }
 	// 1:1627 vs 1:1796: the front card's Save chip disappears once its stock is saved.
 	var savedCards by remember { mutableStateOf(setOf<String>()) }

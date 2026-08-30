@@ -618,6 +618,10 @@ private fun MainShell(
 	// A1: one-shot switch style - read by the AnimatedContent spec and
 	// reset once the push settles, so plain SWAP taps stay instant.
 	var tabPushStyle by remember { mutableStateOf(TabPushStyle.INSTANT) }
+	// 1:2330 / 1:1796: tapping the Discover tab while on Discover is authored
+	// back to the fresh deck (1:1627); the deck itself resets only from the
+	// end-of-deck state (the mid-deck frame authors no self-tap).
+	var discoverResetKey by remember { mutableStateOf(0) }
 	fun switchTab(target: MainTab, style: TabPushStyle = TabPushStyle.INSTANT) {
 		tabPushStyle = style
 		tab = target
@@ -684,6 +688,7 @@ private fun MainShell(
 						)
 						MainTab.News -> NewsScreen(onOpenArticle = onOpenArticle)
 						MainTab.Discover -> DiscoverScreen(
+							resetKey = discoverResetKey,
 							onLearnMore = onOpenStock,
 							onPracticeBuy = { discoverBuyGen++; discoverBuyDissolve = false; discoverBuy = true },
 							// B4 (1:2330 Motion): the end-of-deck CTAs are
@@ -709,7 +714,7 @@ private fun MainShell(
 					// One stable bar on every tab (user, 2026-08-23: only the
 					// tabs should change when switching) - the Discover frame's
 					// compact 75 bar is a recorded standing deviation.
-					MainTabBar(selected = page, onSelect = { switchTab(it) })
+					MainTabBar(selected = page, onSelect = { if (it == MainTab.Discover && page == MainTab.Discover) discoverResetKey++ else switchTab(it) })
 				}
 			}
 			// Practice-buy flow overlays the whole shell — in frame 1:1970 the

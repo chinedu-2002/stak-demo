@@ -96,6 +96,8 @@ struct MainTabsView: View {
 	@State private var discoverBuy: BuySpec? = nil
 	/// 1:4232 / 85:895: the Simulate ticket also covers the tab bar.
 	@State private var simulateBuy = false
+	/// 1:2330: Discover tab re-tap -> the deck restarts (from its end state).
+	@State private var discoverResetKey = 0
 
 	/// One-shot style flags: how the next tab swap / pushed-stack change
 	/// moves. Committed immediately before the mutation they steer.
@@ -153,6 +155,7 @@ struct MainTabsView: View {
 						NewsView(onOpenArticle: { id in pushInstant(.newsDetail(article: id)) })
 					case .discover:
 						DiscoverView(
+							resetKey: discoverResetKey,
 							// Authored (1:1785): Learn more -> Stock Detail folded, Instant.
 							onLearnMore: { pushInstant(.stockDetail(fromMyStak: false)) },
 							onPracticeBuy: { discoverBuy = $0 },
@@ -186,7 +189,7 @@ struct MainTabsView: View {
 					// shell lets it run to the physical bottom of the screen.
 					// One stable bar on every tab (user, 2026-08-23): only the
 					// active tab changes.
-					MainTabBar(selected: Binding(get: { tab }, set: { switchTab($0) }))
+					MainTabBar(selected: Binding(get: { tab }, set: { switchTab($0) }), onReselect: { if $0 == .discover { discoverResetKey += 1 } })
 				}
 			}
 			.ignoresSafeArea(edges: .bottom)

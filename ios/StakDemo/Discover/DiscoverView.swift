@@ -106,6 +106,8 @@ struct DiscoverView: View {
 	/// saves"), raised to the shell.
 	var onReviewSaves: () -> Void = {}
 	var onPracticeBuySaves: () -> Void = {}
+	/// 1:2330: a Discover tab re-tap from the end of the deck restarts it.
+	var resetKey: Int = 0
 
 	@State private var seen = 0
 	@State private var savedToast = false
@@ -297,6 +299,7 @@ struct DiscoverView: View {
 
 		}
 		.background(StakColors.bg.ignoresSafeArea())
+		.onChange(of: resetKey) { if seen >= 12 { seen = 0 } }
 	}
 }
 

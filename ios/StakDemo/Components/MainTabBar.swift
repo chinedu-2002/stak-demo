@@ -47,6 +47,8 @@ enum MainTab: String, CaseIterable, Identifiable {
 /// ui/components/MainTabBar.kt; supersedes the pre-CHINEDU StakTabBar.
 struct MainTabBar: View {
 	@Binding var selected: MainTab
+	/// Fired when the already-selected tab is tapped (1:2330 authors Discover -> fresh deck).
+	var onReselect: ((MainTab) -> Void)? = nil
 
 	var body: some View {
 		let u = figmaUnit
@@ -59,7 +61,7 @@ struct MainTabBar: View {
 			HStack(alignment: .top, spacing: 30 * u) {
 				ForEach(MainTab.allCases) { tab in
 					Button {
-						selected = tab
+						if tab == selected { onReselect?(tab) } else { selected = tab }
 					} label: {
 						VStack(spacing: 10 * u) {
 							Image(tab == selected ? tab.activeIcon : tab.inactiveIcon)

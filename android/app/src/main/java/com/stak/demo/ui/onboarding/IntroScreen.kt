@@ -55,12 +55,12 @@ fun IntroScreen(onGetStarted: () -> Unit) {
 				Text(
 					text = "STAK turns brands you already know into simple, clear stock ideas, so you can invest with confidence.",
 					// RENDER-measured (2x ref): the authored break is after
-					// "simple," (frame line1 ink 922, line2 991). At 13.3 the
-					// build pulls "clear" up - the 318u width pin forces the
+					// "simple," (frame line1 ink 922, line2 991). At the authored 14 the
+					// build pulls "clear" up - the 342u (authored column) width pin forces the
 					// authored wrap (the earlier comment had the break backwards).
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (13.3 * u).sp, lineHeight = (21 * u).sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp, lineHeight = (21 * u).sp),
 					color = Auth.SubtitleGray,
-					modifier = Modifier.width((318 * u).dp),
+					modifier = Modifier.width((342 * u).dp),
 				)
 			}
 			// Hero — flattened Figma group (render bounds 342x488 at 1x),

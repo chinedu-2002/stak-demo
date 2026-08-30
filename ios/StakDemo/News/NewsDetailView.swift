@@ -1,4 +1,5 @@
 import SwiftUI
+import Combine
 import WebKit
 import AVKit
 
@@ -161,17 +162,42 @@ private struct HeroImage: View {
 	/// The play button toggles: tap the running clip to pause (the glyph returns
 	/// over the paused frame), tap the glyph to resume (user, 2026-08-30).
 	@State private var paused = false
+	/// Cinema-fast start (user, 2026-08-30): the player is created (and starts
+	/// buffering) when the article opens; the poster holds until playback runs.
+	@State private var heroPlayer: AVPlayer? = nil
+	@State private var firstFrame = false
 
 	var body: some View {
 		let u = figmaUnit
 		ZStack {
 			Color(argb: 0xFFC4C4C4)
+				.onAppear {
+					if case let .video(url, _, _) = media, NewsMedia.youTubeEmbedURL(for: url) == nil,
+						heroPlayer == nil, let direct = URL(string: url) {
+						let p = AVPlayer(url: direct)
+						p.currentItem?.preferredForwardBufferDuration = 5
+						heroPlayer = p
+					}
+				}
 			if playing, case let .video(url, _, _) = media {
 				// A failed OR FINISHED stream returns to the poster + glyph
 				// instead of stranding a frame (user, 2026-08-25/26).
-				NewsVideoPlayer(url: url, paused: paused, onDone: { playing = false; paused = false })
+				NewsVideoPlayer(url: url, paused: paused, prebuffered: heroPlayer, onBegan: { firstFrame = true }, onDone: { playing = false; paused = false; firstFrame = false; heroPlayer?.pause(); heroPlayer?.seek(to: .zero) })
 					.contentShape(Rectangle())
 					.onTapGesture { paused = true }
+				if !firstFrame, case let .video(_, asset, posterUrl) = media {
+					// The poster holds until the clip actually runs - no black gap.
+					if let asset {
+						Image(asset)
+							.resizable()
+							.scaledToFill()
+							.frame(width: 407 * u, height: 271.18 * u)
+							.clipped()
+							.offset(x: -0.5 * u, y: 16.59 * u)
+					} else if let posterUrl, let pu = URL(string: posterUrl) {
+						AsyncImage(url: pu) { img in img.resizable().scaledToFill() } placeholder: { Color(argb: 0xFFC4C4C4) }
+					}
+				}
 				if paused {
 					Button { paused = false } label: {
 						Image("IcHeroPlay")
@@ -750,13 +776,16 @@ private struct SaveSuccessOverlay: View {
 private struct NewsVideoPlayer: View {
 	let url: String
 	var paused: Bool = false
+	/// A player created (and buffering) before the play tap - cinema-fast start.
+	var prebuffered: AVPlayer? = nil
+	var onBegan: () -> Void = {}
 	var onDone: () -> Void = {}
 
 	var body: some View {
 		if let embed = NewsMedia.youTubeEmbedURL(for: url) {
 			YouTubeEmbedView(url: embed)
 		} else if let direct = URL(string: url) {
-			AutoplayVideoPlayer(url: direct, paused: paused, onDone: onDone)
+			AutoplayVideoPlayer(url: direct, paused: paused, prebuffered: prebuffered, onBegan: onBegan, onDone: onDone)
 		}
 	}
 }
@@ -764,13 +793,18 @@ private struct NewsVideoPlayer: View {
 private struct AutoplayVideoPlayer: View {
 	let url: URL
 	var paused: Bool = false
+	var prebuffered: AVPlayer? = nil
+	var onBegan: () -> Void = {}
 	var onDone: () -> Void = {}
 	@State private var player: AVPlayer? = nil
 
 	var body: some View {
 		VideoPlayer(player: player)
 			.onAppear {
-				let p = AVPlayer(url: url)
+				// Cinema-fast start (user, 2026-08-30): reuse the player that
+				// began buffering when the article opened.
+				let p = prebuffered ?? AVPlayer(url: url)
+				p.currentItem?.preferredForwardBufferDuration = 5
 				player = p
 				p.play()
 				// Exactly 1x (user, 2026-08-26: "put it on 1x speed" -
@@ -781,6 +815,10 @@ private struct AutoplayVideoPlayer: View {
 			// Play/pause toggle: AVPlayer.pause keeps the position, so
 			// resuming continues where the clip stopped.
 			.onChange(of: paused) { if paused { player?.pause() } else { player?.play() } }
+			// The poster in the hero holds until playback actually runs.
+			.onReceive(player?.publisher(for: \.timeControlStatus).eraseToAnyPublisher() ?? Just(.paused).eraseToAnyPublisher()) { status in
+				if status == .playing { onBegan() }
+			}
 			.onDisappear { player?.pause() }
 			// A finished or failed clip returns the hero to its poster +
 			// play glyph (user, 2026-08-26: "i cant see the play icon").

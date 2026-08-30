@@ -170,7 +170,7 @@ private struct StockTile: View {
 	}
 }
 
-/// Dashed 1.5u #2a3346 r16 add card.
+/// Dashed 1.5u #2a3346 r16 add card — 6 on / 5 off dash pattern.
 private struct AddStockTile: View {
 	var body: some View {
 		let u = figmaUnit
@@ -186,7 +186,7 @@ private struct AddStockTile: View {
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
 		.overlay(
 			RoundedRectangle(cornerRadius: 16 * u)
-				.stroke(Color(argb: 0xFF2A3346), style: StrokeStyle(lineWidth: 1.5 * u, dash: [8 * u, 8 * u]))
+				.stroke(Color(argb: 0xFF2A3346), style: StrokeStyle(lineWidth: 1.5 * u, dash: [6 * u, 5 * u]))
 		)
 	}
 }

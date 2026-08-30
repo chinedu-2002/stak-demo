@@ -32,6 +32,8 @@ struct SimulateView: View {
 	let onOpenPortfolio: () -> Void
 	let onOpenPick: () -> Void
 	let onOpenLeaderboard: () -> Void
+	/// When the shell hosts the ticket (1:4232: the sheet covers the tab bar), it raises it here.
+	var onPracticeBuy: (() -> Void)? = nil
 
 	@State private var showBuy = false
 
@@ -65,8 +67,8 @@ struct SimulateView: View {
 					VStack(spacing: 18 * u) {
 						ScoreHero(onOpenLeaderboard: onOpenLeaderboard)
 						sectionHeader("Saved staks")
-						SavedStakRow(badge: "P", ticker: "PLTR", sub: "Saved Jun 30 · not in portfolio yet", onBuy: { showBuy = true })
-						SavedStakRow(badge: "C", ticker: "COST", sub: "Saved Jul 2 · not in portfolio yet", onBuy: { showBuy = true })
+						SavedStakRow(badge: "P", ticker: "PLTR", sub: "Saved Jun 30 · not in portfolio yet", onBuy: { if let onPracticeBuy { onPracticeBuy() } else { showBuy = true } })
+						SavedStakRow(badge: "C", ticker: "COST", sub: "Saved Jul 2 · not in portfolio yet", onBuy: { if let onPracticeBuy { onPracticeBuy() } else { showBuy = true } })
 						CenterLink(text: "All saved staks", action: {})
 						InsightCard()
 						HStack(spacing: 10 * u) {
@@ -105,7 +107,8 @@ struct SimulateView: View {
 				}
 			}
 			if showBuy {
-				DiscoverBuyFlow(spec: pltrBuy, onClose: { showBuy = false })
+				// 85:895 authors "View portfolio" / "Done" on the Simulate add-success sheet.
+				DiscoverBuyFlow(spec: pltrBuy, onClose: { showBuy = false }, filledPrimary: "View portfolio", filledSecondary: "Done", ticketSecondary: "Back")
 			}
 		}
 		.background(StakColors.bg.ignoresSafeArea())

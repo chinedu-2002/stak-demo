@@ -75,6 +75,8 @@ struct NewsDetailView: View {
 								.font(StakFont.geist(14.3 * u))
 								.lineSpacing((22 - 14.3) * u)
 								.foregroundStyle(News.muted)
+								// 1:1495: 26 of ink gap under the headline (the column's 15 + 5).
+								.padding(.top, 5 * u)
 							Byline(source: article.source, meta: article.sourceMeta)
 							if !saved {
 								// Designer's call (2026-08-22): the sheet scale-ins.
@@ -111,7 +113,8 @@ struct NewsDetailView: View {
 						}
 						.frame(maxWidth: .infinity, alignment: .leading)
 						.padding(.horizontal, 20 * u)
-						.padding(.top, 22 * u)
+						// Render-measured vs 1:1495: headline cap-top 68 below the hero.
+						.padding(.top, 26 * u)
 						.padding(.bottom, 28 * u)
 					}
 				}

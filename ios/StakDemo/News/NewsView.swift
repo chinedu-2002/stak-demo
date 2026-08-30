@@ -186,6 +186,9 @@ private struct BriefCarousel: View {
 				}
 			}
 			.frame(height: 6 * u)
+			// Authored carousel block (1:1261) is 229 tall: 15 of slack under
+			// the dots (the Android 12 column gap + 3 spacer) before the section gap.
+			.padding(.bottom, 15 * u)
 		}
 	}
 }
@@ -295,8 +298,9 @@ private struct StoryTile: View {
 			VStack(alignment: .leading, spacing: 8 * u) {
 				NewsTag(text: tag, tracking: 0.4 * u)
 				Text(headline)
-					.font(StakFont.sora(14 * u, .light))
-					.lineSpacing((20 - 14) * u)
+					// Authored (1:1277): Sora Light 12 in the 20 line box.
+					.font(StakFont.sora(12 * u, .light))
+					.lineSpacing((20 - 12) * u)
 					.foregroundStyle(StakColors.textPrimary)
 				Spacer(minLength: 0)
 				Text(source)
@@ -368,8 +372,9 @@ private struct NewsSectionView: View {
 								}
 							}
 							Text(row.headline)
-								.font(StakFont.sora(14 * u, .light))
-								.lineSpacing((19 - 14) * u)
+								// Authored (1:1295): Sora Light 12 in the 19 line box.
+								.font(StakFont.sora(12 * u, .light))
+								.lineSpacing((19 - 12) * u)
 								.foregroundStyle(StakColors.textPrimary)
 								.frame(maxWidth: .infinity, alignment: .leading)
 						}

@@ -49,6 +49,8 @@ struct MainTabsView: View {
 	/// Hoisted Discover buy ticket — the sheet's scrim covers the tab bar
 	/// (frame 1:1970), so the shell owns it, mirroring Android MainShell.
 	@State private var discoverBuy: BuySpec? = nil
+	/// 1:4232 / 85:895: the Simulate ticket also covers the tab bar.
+	@State private var simulateBuy = false
 
 	var body: some View {
 		ZStack {
@@ -86,7 +88,8 @@ struct MainTabsView: View {
 						SimulateView(
 							onOpenPortfolio: { push(.simPortfolio) },
 							onOpenPick: { push(.simPick) },
-							onOpenLeaderboard: { push(.leaderboard) }
+							onOpenLeaderboard: { push(.leaderboard) },
+							onPracticeBuy: { simulateBuy = true }
 						)
 					}
 				}
@@ -109,6 +112,9 @@ struct MainTabsView: View {
 
 			if let spec = discoverBuy {
 				DiscoverBuyFlow(spec: spec, onClose: { discoverBuy = nil })
+			}
+			if simulateBuy {
+				DiscoverBuyFlow(spec: pltrBuy, onClose: { simulateBuy = false }, filledPrimary: "View portfolio", filledSecondary: "Done", ticketSecondary: "Back")
 			}
 		}
 		.background(StakColors.bg.ignoresSafeArea())

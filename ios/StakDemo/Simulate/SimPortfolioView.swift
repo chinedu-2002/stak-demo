@@ -55,15 +55,13 @@ struct SimPortfolioView: View {
 				ScrollView(showsIndicators: false) {
 					VStack(alignment: .leading, spacing: 16 * u) {
 						// 1:4496 hides the Portfolio-value/$10,240/cash layers —
-						// the visible summary is this one centered hairline chip.
+						// the visible summary is this one centered 158x32 pill,
+						// filled with the card colour (no hairline).
 						Text("12 picks · +$240.00 all time")
 							.font(StakFont.geist(10 * u))
 							.foregroundStyle(Sim.muted)
 							.frame(width: 158 * u, height: 32 * u)
-							.overlay(
-								RoundedRectangle(cornerRadius: 16 * u)
-									.strokeBorder(Color(argb: 0x54343B4F), lineWidth: 0.36 * u)
-							)
+							.background(Sim.cardBg, in: RoundedRectangle(cornerRadius: 16 * u))
 							.frame(maxWidth: .infinity)
 						HStack(spacing: 8 * u) {
 							FilterChip(label: "Top gainers", selected: true)
@@ -126,12 +124,8 @@ private struct FilterChip: View {
 			.foregroundStyle(selected ? Sim.teal : Sim.muted)
 			.padding(.horizontal, 12 * u)
 			.padding(.vertical, 6 * u)
+			// Selected chip is fill-only (1:4519) — no teal hairline.
 			.background(selected ? Sim.tealTint : Sim.cardBg, in: RoundedRectangle(cornerRadius: 14 * u))
-			.overlay(
-				selected
-					? RoundedRectangle(cornerRadius: 14 * u).strokeBorder(Color(argb: 0x662C9DBC), lineWidth: 0.75 * u)
-					: nil
-			)
 	}
 }
 
@@ -199,18 +193,21 @@ private struct SimSheet<Content: View>: View {
 	var body: some View {
 		let u = figmaUnit
 		ZStack(alignment: .bottom) {
-			Color(argb: 0x730A1020)
+			// Authored scrim: near-black at ~62%.
+			Color(argb: 0x9E02050E)
 				.ignoresSafeArea()
 				.onTapGesture(perform: onDismiss)
 			VStack(spacing: 0) {
+				// Handle at y10–14, content at y32 → 18 below the rect.
 				RoundedRectangle(cornerRadius: 2 * u)
 					.fill(Sim.track)
 					.frame(width: 40 * u, height: 4 * u)
-					.padding(.bottom, 4 * u)
+					.padding(.bottom, 18 * u)
 				content
 			}
 			.padding(.horizontal, 20 * u)
 			.padding(.top, 10 * u)
+			// Authored 30 to the screen edge — no extra home-indicator inset.
 			.padding(.bottom, 30 * u)
 			.frame(maxWidth: .infinity)
 			.background(Sim.cardBg, in: UnevenRoundedRectangle(topLeadingRadius: 24 * u, topTrailingRadius: 24 * u))
@@ -332,7 +329,8 @@ struct SellConfirmSheet: View {
 	}
 }
 
-/// h52 hairline secondary button used inside the sell sheets.
+/// h52 secondary button used inside the sell sheets — faint 4% white
+/// fill under the app's 0.36 hairline.
 private struct SimSheetSecondary: View {
 	let text: String
 	let action: () -> Void
@@ -345,6 +343,7 @@ private struct SimSheetSecondary: View {
 				.foregroundStyle(Sim.muted)
 				.frame(maxWidth: .infinity)
 				.frame(height: 52 * u)
+				.background(Color(argb: 0x0AFFFFFF), in: RoundedRectangle(cornerRadius: 6 * u))
 				.overlay(
 					RoundedRectangle(cornerRadius: 6 * u)
 						.strokeBorder(Color(argb: 0x54343B4F), lineWidth: 0.36 * u)
@@ -384,7 +383,9 @@ struct PositionClosedSheet: View {
 						.foregroundStyle(Sim.bright)
 					Spacer()
 				}
+				// 73:855 centres the Returned line (Proceeds above stays left-aligned).
 				HStack(alignment: .top, spacing: 6 * u) {
+					Spacer()
 					Text("Returned")
 						.font(StakFont.geist(12 * u))
 						.foregroundStyle(Sim.muted)
@@ -403,6 +404,15 @@ struct PositionClosedSheet: View {
 							.foregroundStyle(Color.white)
 							.frame(maxWidth: .infinity)
 							.frame(height: 52 * u)
+							// Authored teal drop shadow — same glow as the Discover
+							// deck CTA: #52AAC7 at 9% (23/255), blur 12.28, dy 12.28.
+							.background {
+								RoundedRectangle(cornerRadius: 6 * u)
+									.fill(Color(argb: 0xFF52AAC7))
+									.opacity(0.09)
+									.blur(radius: 12.28 * u)
+									.offset(y: 12.28 * u)
+							}
 							.background(discCtaGradient, in: RoundedRectangle(cornerRadius: 6 * u))
 							.overlay(
 								RoundedRectangle(cornerRadius: 6 * u)

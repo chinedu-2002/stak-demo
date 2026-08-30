@@ -35,73 +35,93 @@ struct PickDetailView: View {
 				.padding(.vertical, 8 * u)
 
 				ScrollView(showsIndicators: false) {
-					VStack(alignment: .leading, spacing: 14 * u) {
-						HStack(spacing: 10 * u) {
-							ZStack {
-								Circle().fill(Sim.chipBg)
-								Text("N")
-									.font(StakFont.sora(15 * u, .semiBold))
-									.foregroundStyle(Sim.badgeInk)
+					VStack(alignment: .leading, spacing: 16 * u) {
+						// Authored hero card (1:4654): 350x307 r24 with 18 padding - avatar row,
+						// +$24 in a 48-tall box with the .00 at 16/20, subtitle, the 343x73.5 chart
+						// line bleeding 14.5 past the padding, range tabs 40 below the line.
+						VStack(alignment: .leading, spacing: 0) {
+							HStack(spacing: 9 * u) {
+								ZStack {
+									Circle().fill(Sim.chipBg)
+									Text("N")
+										.font(StakFont.sora(15 * u, .semiBold))
+										.foregroundStyle(Sim.badgeInk)
+								}
+								.frame(width: 38 * u, height: 38 * u)
+								Text("Picked May 8 at $98.50")
+									.font(StakFont.geist(12 * u))
+									.foregroundStyle(Sim.muted)
 							}
-							.frame(width: 38 * u, height: 38 * u)
-							Text("Picked May 8 at $98.50")
-								.font(StakFont.geist(12 * u))
-								.foregroundStyle(Sim.muted)
-						}
-						VStack(alignment: .leading, spacing: 4 * u) {
 							HStack(alignment: .bottom, spacing: 0) {
 								Text("+$24")
-									.font(StakFont.sora(44 * u, .semiBold))
-									.tracking(-0.44 * u)
+									.font(StakFont.sora(38 * u, .semiBold))
+									.tracking(-0.38 * u)
 									.foregroundStyle(Color.white)
 								Text(".00")
-									.font(StakFont.sora(18 * u, .semiBold))
+									.font(StakFont.sora(16 * u, .semiBold))
 									.foregroundStyle(Sim.muted)
-									// Same authored offsets as the Simulate hero: 8 gap, 8 up.
-									.padding(.leading, 8 * u)
-									.padding(.bottom, 8 * u)
+									.padding(.leading, 7 * u)
+									.padding(.bottom, 6 * u)
 							}
+							.frame(height: 48 * u, alignment: .bottom)
+							.padding(.top, 11 * u)
 							Text("That is up 24.0% on a $100 paper stake")
 								.font(StakFont.geist(12 * u))
 								.foregroundStyle(Sim.muted)
-						}
-						Image("SimChartLine")
-							.resizable()
-							.scaledToFit()
-							.frame(width: 345 * u, height: 76 * u)
-							.frame(maxWidth: .infinity)
-						HStack(spacing: 37 * u) {
-							ForEach(["1D", "1W", "1M", "3M", "YTD", "1Y"], id: \.self) { label in
-								if label == "3M" {
-									Text(label)
-										.font(StakFont.geist(12 * u, .medium))
-										.foregroundStyle(Sim.teal)
-										.frame(width: 39 * u, height: 22.5 * u)
-										.background(Color(argb: 0x292C9DBC), in: RoundedRectangle(cornerRadius: 11.25 * u))
-										.overlay(
-											RoundedRectangle(cornerRadius: 11.25 * u)
-												.strokeBorder(Color(argb: 0x662C9DBC), lineWidth: 0.75 * u)
-										)
-								} else {
-									Text(label)
-										.font(StakFont.geist(12 * u))
-										.foregroundStyle(Sim.muted)
+								.frame(height: 16 * u) // Authored line box is 16 — pin it so the card sums to 271
+								.padding(.top, 11 * u)
+							// Compose `requiredSize`: the line measures as the 314-wide content
+							// row but draws its full 343x73.5, bleeding 14.5 past each side.
+							Color.clear
+								.frame(maxWidth: .infinity)
+								.frame(height: 73.5 * u)
+								.overlay(
+									Image("SimChartLine")
+										.resizable()
+										.scaledToFit()
+										.frame(width: 343 * u, height: 73.5 * u)
+								)
+								.padding(.top, 11 * u)
+							HStack(spacing: 37 * u) {
+								ForEach(["1D", "1W", "1M", "3M", "YTD", "1Y"], id: \.self) { label in
+									if label == "3M" {
+										Text(label)
+											.font(StakFont.geist(12 * u, .medium))
+											.foregroundStyle(Sim.teal)
+											.frame(width: 39 * u, height: 22.5 * u)
+											.background(Color(argb: 0x292C9DBC), in: RoundedRectangle(cornerRadius: 11.25 * u))
+											.overlay(
+												RoundedRectangle(cornerRadius: 11.25 * u)
+													.strokeBorder(Color(argb: 0x662C9DBC), lineWidth: 0.75 * u)
+											)
+									} else {
+										Text(label)
+											.font(StakFont.geist(12 * u))
+											.foregroundStyle(Sim.muted)
+									}
 								}
 							}
+							.frame(maxWidth: .infinity)
+							.padding(.top, 40 * u)
 						}
-						.frame(maxWidth: .infinity)
-						.padding(.top, 12 * u)
-						HStack(spacing: 10 * u) {
-							StatBox(label: "This week", value: "+$3.80", valueColor: Sim.green)
-							StatBox(label: "vs the market", value: "+20.8% ahead", valueColor: Sim.green)
-						}
-						.padding(.top, 6 * u)
-						HStack(spacing: 10 * u) {
-							StatBox(label: "Price then", value: "$98.50", valueColor: Sim.bright)
-							StatBox(label: "Price now", value: "$122.10", valueColor: Sim.bright)
+						.padding(18 * u)
+						.frame(maxWidth: .infinity, alignment: .leading)
+						.frame(height: 307 * u, alignment: .top)
+						.background(Sim.cardBg, in: RoundedRectangle(cornerRadius: 24 * u))
+						.clipShape(RoundedRectangle(cornerRadius: 24 * u))
+						// Stats (1:4673): two 61-tall rows, 10 apart, 170-wide cells.
+						VStack(alignment: .leading, spacing: 10 * u) {
+							HStack(spacing: 10 * u) {
+								StatBox(label: "This week", value: "+$3.80", valueColor: Sim.green)
+								StatBox(label: "vs the market", value: "+20.8% ahead", valueColor: Sim.green)
+							}
+							HStack(spacing: 10 * u) {
+								StatBox(label: "Price then", value: "$98.50", valueColor: Sim.bright)
+								StatBox(label: "Price now", value: "$122.10", valueColor: Sim.bright)
+							}
 						}
 						// WHY / insight card — teal-tinted like the deck tips.
-						VStack(alignment: .leading, spacing: 8 * u) {
+						VStack(alignment: .leading, spacing: 9 * u) {
 							HStack(spacing: 7 * u) {
 								Image("IcGistSparkle")
 									.resizable()
@@ -113,20 +133,20 @@ struct PickDetailView: View {
 							}
 							Text("Your stake tracks the move live. If NVDA gives back gains, the dollars follow it down.")
 								.font(StakFont.geist(12 * u))
-								.lineSpacing((20 - 12) * u)
+								.lineSpacing((17 - 12) * u)
 								.foregroundStyle(Sim.body)
 						}
-						.padding(.horizontal, 16 * u)
-						.padding(.vertical, 15 * u)
+						// Live note (1:4688): 83 tall, x14, kicker row at 12, body at 37.
+						.padding(.horizontal, 14 * u)
+						.padding(.vertical, 12 * u)
 						.frame(maxWidth: .infinity, alignment: .leading)
 						.background(Sim.tealTint, in: RoundedRectangle(cornerRadius: 16 * u))
-						Spacer().frame(height: 4 * u)
 						Button { showSell = true } label: {
 							Text("Sell")
 								.font(StakFont.geist(14 * u, .medium))
 								.foregroundStyle(Color.white)
 								.frame(maxWidth: .infinity)
-								.frame(height: 52 * u)
+								.frame(height: 51 * u)
 								.background(Sim.darkCta, in: RoundedRectangle(cornerRadius: 6 * u))
 						}
 						.buttonStyle(.plain)
@@ -144,7 +164,7 @@ struct PickDetailView: View {
 						.buttonStyle(.plain)
 					}
 					.padding(.horizontal, 20 * u)
-					.padding(.top, 10 * u)
+					.padding(.top, 6 * u)
 					.padding(.bottom, 20 * u)
 				}
 			}
@@ -166,15 +186,18 @@ private struct StatBox: View {
 		let u = figmaUnit
 		VStack(alignment: .leading, spacing: 4 * u) {
 			Text(label)
-				.font(StakFont.geist(11 * u))
+				.font(StakFont.geist(10 * u))
 				.foregroundStyle(Sim.faint)
+				.frame(height: 13 * u) // Authored 10/13 line box — pin so the cell sums to 35
 			Text(value)
 				.font(StakFont.sora(15 * u, .semiBold))
 				.foregroundStyle(valueColor)
+				.frame(height: 18 * u) // Authored 15/18 line box
 		}
 		.padding(.horizontal, 14 * u)
-		.padding(.vertical, 12 * u)
+		.padding(.vertical, 13 * u)
 		.frame(maxWidth: .infinity, alignment: .leading)
+		.frame(height: 61 * u, alignment: .top)
 		.background(Sim.cardBg, in: RoundedRectangle(cornerRadius: 12 * u))
 	}
 }

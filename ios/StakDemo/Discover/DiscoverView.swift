@@ -116,11 +116,14 @@ struct DiscoverView: View {
 			VStack(spacing: 0) {
 				// Header — Discover + progress ring, kicker below.
 				VStack(alignment: .leading, spacing: 5 * u) {
+					// 1:1627 centres the 33-tall title in the 44-tall ring row (measured exact);
+					// the end-of-deck frame (1:2330) authors the title 7 higher against the ring.
 					HStack {
 						Text("Discover")
 							.font(StakFont.sora(26 * u, .semiBold))
 							.lineSpacing((33 - 26) * u)
 							.foregroundStyle(Color.white)
+							.offset(y: seen >= 12 ? -7 * u : 0)
 						Spacer()
 						let count = min(seen + 1, 12)
 						ZStack {
@@ -134,8 +137,7 @@ struct DiscoverView: View {
 					Text("TODAY · AI & CHIPS")
 						.font(StakFont.geist(10 * u, .medium))
 						.tracking(0.9 * u)
-						.foregroundStyle(Disc.faint)
-						.padding(.horizontal, 2 * u)
+						.foregroundStyle(Disc.muted)
 				}
 				.padding(.horizontal, 20 * u)
 				.padding(.top, 10 * u)
@@ -261,17 +263,19 @@ struct DiscoverView: View {
 			// Saved toast (frame 1:1796) — centered pill under the header.
 			if savedToast {
 				VStack {
-					HStack(spacing: 6 * u) {
+					HStack(spacing: 13.5 * u) {
 						Image("IcSavedBookmark")
 							.resizable()
-							.frame(width: 12 * u, height: 12 * u)
+							.frame(width: 14 * u, height: 14 * u)
 						Text("Saved to My STAK")
 							.font(StakFont.geist(12 * u, .medium))
 							.foregroundStyle(Color.white)
 					}
-					.padding(.horizontal, 14 * u)
-					.padding(.vertical, 10 * u)
-					.background(Disc.chipBg, in: RoundedRectangle(cornerRadius: 19.5 * u))
+					.padding(.leading, 14 * u)
+					.padding(.trailing, 12 * u)
+					.frame(height: 39 * u)
+					// Authored (1:1796): 148.5x39 translucent pill — the peek slab shows through.
+					.background(Disc.chipBg.opacity(0.5), in: RoundedRectangle(cornerRadius: 19.5 * u))
 					.padding(.top, 78 * u)
 					Spacer()
 				}
@@ -550,13 +554,12 @@ struct SheetScaffold<Content: View>: View {
 				.ignoresSafeArea()
 				.onTapGesture(perform: onDismiss)
 			VStack(spacing: 0) {
-				// Authored (1:2159): handle at y12–16, title at y32 — so 2
-				// above the rect and 16 below it after the 10 top padding.
+				// Authored (1:2159): handle at y10–14, title at y32 — 18 below
+				// the rect after the 10 top padding.
 				RoundedRectangle(cornerRadius: 2 * u)
 					.fill(Disc.divider)
 					.frame(width: 40 * u, height: 4 * u)
-					.padding(.top, 2 * u)
-					.padding(.bottom, 16 * u)
+					.padding(.bottom, 18 * u)
 				content
 			}
 			.padding(.horizontal, 20 * u)
@@ -614,6 +617,15 @@ struct SheetCta: View {
 				.foregroundStyle(Color.white)
 				.frame(maxWidth: .infinity)
 				.frame(height: 52 * u)
+				// Authored drop shadow (85:1394 Inspect): dy 12.28, blur 12.28,
+				// #52AAC7 at 9% — the same glow the deck's Practice buy carries.
+				.background {
+					RoundedRectangle(cornerRadius: 6 * u)
+						.fill(Color(argb: 0xFF52AAC7))
+						.opacity(0.09)
+						.blur(radius: 12.28 * u)
+						.offset(y: 12.28 * u)
+				}
 				.background(discCtaGradient, in: RoundedRectangle(cornerRadius: 6 * u))
 				.overlay(RoundedRectangle(cornerRadius: 6 * u).strokeBorder(Disc.ctaBorder, lineWidth: 0.36 * u))
 		}
@@ -633,6 +645,8 @@ struct SheetSecondary: View {
 				.foregroundStyle(Disc.muted)
 				.frame(maxWidth: .infinity)
 				.frame(height: 52 * u)
+				// Authored (1:1970): faint 4% white fill under the hairline.
+				.background(RoundedRectangle(cornerRadius: 6 * u).fill(Color.white.opacity(0.04)))
 				.overlay(RoundedRectangle(cornerRadius: 6 * u).strokeBorder(Color(argb: 0x54343B4F), lineWidth: 0.36 * u))
 		}
 		.buttonStyle(.plain)
@@ -644,6 +658,8 @@ struct PracticeBuySheet: View {
 	let spec: BuySpec
 	let onConfirm: () -> Void
 	let onDismiss: () -> Void
+	/// 1:1970 authors "Not yet"; the Simulate ticket (1:4232) authors "Back".
+	var secondary: String = "Not yet"
 
 	@State private var selected = 1
 
@@ -703,7 +719,7 @@ struct PracticeBuySheet: View {
 				.padding(.top, 10 * u)
 				VStack(spacing: 16 * u) {
 					SheetCta(text: "Confirm practice buy", action: onConfirm)
-					SheetSecondary(text: "Not yet", action: onDismiss)
+					SheetSecondary(text: secondary, action: onDismiss)
 				}
 			}
 		}
@@ -714,6 +730,8 @@ struct PracticeBuySheet: View {
 struct OrderFilledSheet: View {
 	let spec: BuySpec
 	let onDismiss: () -> Void
+	var primary: String = "View in My STAK"
+	var secondary: String = "Keep exploring"
 
 	var body: some View {
 		let u = figmaUnit
@@ -726,6 +744,12 @@ struct OrderFilledSheet: View {
 					.font(StakFont.sora(18 * u, .semiBold))
 					.foregroundStyle(Color.white)
 				SheetStockRow(spec: spec)
+				// Authored status line (85:1407): 18-tall, left-aligned, 14 below the stock row.
+				Text("Filled instantly · paper order")
+					.font(StakFont.geist(14 * u))
+					.lineSpacing((18 - 14) * u)
+					.foregroundStyle(Disc.body)
+					.frame(maxWidth: .infinity, alignment: .leading)
 				HStack(spacing: 6 * u) {
 					Text("Cash available")
 						.font(StakFont.geist(12 * u))
@@ -747,9 +771,11 @@ struct OrderFilledSheet: View {
 						.foregroundStyle(Disc.muted)
 				}
 				.frame(maxWidth: .infinity)
+				// Authored ticket (85:1408): Cash row 0-16, Shares line at 40 -> a 24 gap.
+				.padding(.top, 10 * u)
 				VStack(spacing: 16 * u) {
-					SheetCta(text: "View in My STAK", action: onDismiss)
-					SheetSecondary(text: "Keep exploring", action: onDismiss)
+					SheetCta(text: primary, action: onDismiss)
+					SheetSecondary(text: secondary, action: onDismiss)
 				}
 			}
 		}
@@ -760,14 +786,17 @@ struct OrderFilledSheet: View {
 struct DiscoverBuyFlow: View {
 	let spec: BuySpec
 	let onClose: () -> Void
+	var filledPrimary: String = "View in My STAK"
+	var filledSecondary: String = "Keep exploring"
+	var ticketSecondary: String = "Not yet"
 
 	@State private var filled = false
 
 	var body: some View {
 		if !filled {
-			PracticeBuySheet(spec: spec, onConfirm: { filled = true }, onDismiss: onClose)
+			PracticeBuySheet(spec: spec, onConfirm: { filled = true }, onDismiss: onClose, secondary: ticketSecondary)
 		} else {
-			OrderFilledSheet(spec: spec, onDismiss: onClose)
+			OrderFilledSheet(spec: spec, onDismiss: onClose, primary: filledPrimary, secondary: filledSecondary)
 		}
 	}
 }

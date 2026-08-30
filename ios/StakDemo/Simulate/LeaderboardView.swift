@@ -114,7 +114,9 @@ struct LeaderboardView: View {
 						.font(StakFont.geist(11 * u))
 						.lineSpacing((16 - 11) * u)
 						.foregroundStyle(Sim.faint)
-						.frame(maxWidth: .infinity, alignment: .leading)
+						// 1:4124 centres the explainer across the full column width.
+						.multilineTextAlignment(.center)
+						.frame(maxWidth: .infinity)
 				}
 				.padding(.horizontal, 20 * u)
 				.padding(.top, 6 * u)

@@ -150,7 +150,7 @@ struct StockDetailView: View {
 				DetailSavedSheet(onDone: { showSuccess = false; saved = true })
 			}
 			if showBuy {
-				DiscoverBuyFlow(spec: aaplBuy, onClose: { showBuy = false })
+				DiscoverBuyFlow(spec: aaplBuy, onClose: { showBuy = false }, filledSecondary: "Done")
 			}
 		}
 		.background(StakColors.bg.ignoresSafeArea())
@@ -223,14 +223,13 @@ private struct RiskFitCard: View {
 					.padding(.vertical, 4 * u)
 					.background(Color(argb: 0x1F5DA8BF), in: Capsule())
 			}
+			// Authored (1:2382): a lone 14x8 pill indicator - the frame draws no track.
 			ZStack(alignment: .topLeading) {
+				Color.clear.frame(height: 8 * u)
 				RoundedRectangle(cornerRadius: 4 * u)
-					.fill(wellBg)
-					.frame(height: 8 * u)
-				Image("IcSdMarker")
-					.resizable()
-					.frame(width: 14 * u, height: 14 * u)
-					.offset(x: 88 * u, y: -3 * u)
+					.fill(Color(argb: 0xFFA6E4F7))
+					.frame(width: 14 * u, height: 8 * u)
+					.offset(x: 88 * u)
 			}
 			HStack {
 				Text("Low").font(StakFont.geist(10 * u)).foregroundStyle(muted)
@@ -318,15 +317,16 @@ private struct AnalystCard: View {
 					.foregroundStyle(green)
 			} else {
 				Kicker(text: "PRICE TARGET RANGE")
+				// Authored (16:1253): 180-wide teal fill plus a 13x8 end cap - no track.
 				ZStack(alignment: .topLeading) {
-					RoundedRectangle(cornerRadius: 4 * u).fill(wellBg).frame(height: 8 * u)
+					Color.clear.frame(height: 8 * u)
 					RoundedRectangle(cornerRadius: 4 * u)
 						.fill(Color(argb: 0x8C5DA8BF))
 						.frame(width: 180 * u, height: 8 * u)
-					Image("IcSdMarker")
-						.resizable()
-						.frame(width: 14 * u, height: 14 * u)
-						.offset(x: 173 * u, y: -3 * u)
+					RoundedRectangle(cornerRadius: 4 * u)
+						.fill(Color(argb: 0xFFA6E4F7))
+						.frame(width: 13 * u, height: 8 * u)
+						.offset(x: 167 * u)
 				}
 				HStack {
 					VStack(alignment: .leading, spacing: 1 * u) {
@@ -527,7 +527,6 @@ private struct SinceYouSavedCard: View {
 					.font(StakFont.geist(10 * u, .medium))
 					.tracking(0.8 * u)
 					.foregroundStyle(muted)
-				Spacer().frame(width: 8 * u)
 				Text("+4.6%")
 					.font(StakFont.geist(12 * u, .medium))
 					.foregroundStyle(green)

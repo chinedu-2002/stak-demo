@@ -736,12 +736,15 @@ private fun PracticeBuySheet(onConfirm: () -> Unit, onDismiss: () -> Unit, spec:
 				color = Color.White,
 			)
 			NvdaStockRow(spec)
+			// Ink-measured against 1:1970 / 1:4232: the paragraph sits 1 lower and
+			// the cash block 1.5 lower than the 14 column gap alone gives.
 			Text(
 				text = "Your paper stake starts at today’s price and tracks the real move live, in either direction.",
 				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (18 * u).sp),
 				color = Disc.Body,
+				modifier = Modifier.padding(top = (1 * u).dp),
 			)
-			Column(verticalArrangement = Arrangement.spacedBy((12 * u).dp), modifier = Modifier.fillMaxWidth()) {
+			Column(verticalArrangement = Arrangement.spacedBy((12 * u).dp), modifier = Modifier.fillMaxWidth().padding(top = (1.5 * u).dp)) {
 				Row(horizontalArrangement = Arrangement.spacedBy((6 * u).dp)) {
 					Text(
 						text = "Cash available",

@@ -39,6 +39,8 @@ import com.stak.demo.ui.theme.Geist
 import com.stak.demo.ui.theme.Sora
 import com.stak.demo.ui.theme.StakColors
 import kotlinx.coroutines.delay
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.offset
 
 /**
  * Onboarding · 06 Preparing deck — Figma node 1554:8998.
@@ -55,9 +57,11 @@ fun PreparingDeckScreen(onDone: () -> Unit) {
 		delay(1800) // prototype: "After delay 1800ms" → 07 Taste reveal
 		onDone()
 	}
-	Column(
-		horizontalAlignment = Alignment.CenterHorizontally,
-		verticalArrangement = Arrangement.spacedBy((18 * u).dp, Alignment.CenterVertically),
+	// Authored rhythm (1:634, frame y minus the 44 status bar): the frame is
+	// TOP-anchored — illustration ink top 245, headline box 648 h28, caption
+	// row 694. The flattened hero render carries 66u of baked background
+	// above its ink inside the 488u box, so the box tops out at 135.
+	Box(
 		modifier = Modifier
 			.fillMaxSize()
 			.background(StakColors.Bg)
@@ -68,22 +72,31 @@ fun PreparingDeckScreen(onDone: () -> Unit) {
 			painter = painterResource(R.drawable.intro_hero_box),
 			contentDescription = null,
 			contentScale = ContentScale.Fit,
-			modifier = Modifier.size((342 * u).dp, (488 * u).dp),
+			modifier = Modifier
+				.align(Alignment.TopCenter)
+				.offset(y = (135 * u).dp)
+				.size((342 * u).dp, (488 * u).dp),
 		)
 		Text(
 			text = "Building your first deck...",
-			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (22 * u).sp, textAlign = TextAlign.Center),
+			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (22 * u).sp, lineHeight = (28 * u).sp, textAlign = TextAlign.Center),
 			color = StakColors.TextPrimary,
-			modifier = Modifier.fillMaxWidth(),
+			modifier = Modifier
+				.align(Alignment.TopCenter)
+				.offset(y = (604 * u).dp)
+				.fillMaxWidth(),
 		)
 		Row(
 			verticalAlignment = Alignment.CenterVertically,
 			horizontalArrangement = Arrangement.spacedBy((5 * u).dp),
+			modifier = Modifier
+				.align(Alignment.TopCenter)
+				.offset(y = (650 * u).dp),
 		) {
 			Spinner()
 			Text(
 				text = "Reading your brand picks",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (15 * u).sp),
 				color = Auth.FaintText,
 			)
 		}
@@ -102,7 +115,7 @@ private fun Spinner() {
 		label = "spinnerAngle",
 	)
 	Canvas(modifier = Modifier.size((14 * u).dp).rotate(angle)) {
-		val stroke = (1.6 * u).dp.toPx()
+		val stroke = (2.94 * u).dp.toPx()
 		drawArc(
 			color = Auth.FaintText,
 			startAngle = 0f,
@@ -110,7 +123,7 @@ private fun Spinner() {
 			useCenter = false,
 			topLeft = Offset(stroke / 2f, stroke / 2f),
 			size = Size(size.width - stroke, size.height - stroke),
-			style = Stroke(width = stroke, cap = StrokeCap.Round),
+			style = Stroke(width = stroke, cap = StrokeCap.Butt),
 		)
 	}
 }

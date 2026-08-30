@@ -121,13 +121,13 @@ fun TasteRevealScreen(onBack: () -> Unit, onLetsGo: () -> Unit) {
 						Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
 							Text(
 								text = bar.label,
-								style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp),
+								style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
 								color = StakColors.TextPrimary,
 								modifier = Modifier.weight(1f),
 							)
 							Text(
 								text = bar.strength,
-								style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp),
+								style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, lineHeight = (16 * u).sp),
 								color = bar.strengthColor,
 							)
 						}

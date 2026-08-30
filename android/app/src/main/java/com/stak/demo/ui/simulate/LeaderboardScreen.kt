@@ -143,8 +143,10 @@ fun LeaderboardScreen(onBack: () -> Unit) {
 			NEAR.forEach { LeaderRow(it) }
 			Text(
 				text = "Percentage return, not dollar size, so everyone competes on the same scale. This week ranks the trailing 7 days.",
-				style = TextStyle(fontFamily = Geist, fontSize = (11 * u).sp, lineHeight = (16 * u).sp),
+				// 1:4124 centres the explainer.
+				style = TextStyle(fontFamily = Geist, fontSize = (11 * u).sp, lineHeight = (16 * u).sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center),
 				color = Sim.Faint,
+				modifier = Modifier.fillMaxWidth(),
 			)
 		}
 	}

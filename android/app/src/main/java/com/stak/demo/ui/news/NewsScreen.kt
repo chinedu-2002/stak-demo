@@ -242,6 +242,8 @@ private fun BriefCarousel(onRead: (Int) -> Unit) {
 				}
 			}
 		}
+		// Authored carousel block (1:1261) is 229 tall: 15 of slack under the dots.
+		Spacer(modifier = Modifier.height((3 * u).dp))
 	}
 }
 
@@ -364,7 +366,7 @@ private fun StoryTile(tag: String, headline: String, source: String, onClick: ()
 		NewsTag(text = tag, letterSpacing = (0.4 * u + ADVANCE_ROUNDING.value).sp)
 		Text(
 			text = headline,
-			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Light, fontSize = (14 * u).sp, lineHeight = (20 * u).sp),
+			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Light, fontSize = (12 * u).sp, lineHeight = (20 * u).sp),
 			color = Color.White,
 		)
 		Spacer(modifier = Modifier.weight(1f))
@@ -444,7 +446,7 @@ private fun NewsSection(
 					}
 					Text(
 						text = row.headline,
-						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Light, fontSize = (14 * u).sp, lineHeight = (19 * u).sp),
+						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Light, fontSize = (12 * u).sp, lineHeight = (19 * u).sp),
 						color = Color.White,
 					)
 				}

@@ -43,6 +43,7 @@ import com.stak.demo.ui.theme.Geist
 import com.stak.demo.ui.theme.Sora
 import com.stak.demo.ui.theme.StakColors
 import com.stak.demo.ui.theme.ADVANCE_ROUNDING
+import androidx.compose.foundation.layout.requiredSize
 
 /**
  * 07 · Simulate — "Pick detail · paper" (CHINEDU 1:4631). The NVDA
@@ -81,89 +82,103 @@ fun PickDetailScreen(onBack: () -> Unit) {
 				}
 			}
 			Column(
-				verticalArrangement = Arrangement.spacedBy((14 * u).dp),
+				verticalArrangement = Arrangement.spacedBy((16 * u).dp),
 				modifier = Modifier
 					.weight(1f)
 					.fillMaxWidth()
 					.verticalScroll(rememberScrollState())
 					.padding(horizontal = (20 * u).dp)
-					.padding(top = (10 * u).dp, bottom = (20 * u).dp),
+					.padding(top = (6 * u).dp, bottom = (20 * u).dp),
 			) {
-				Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy((10 * u).dp)) {
-					Box(contentAlignment = Alignment.Center, modifier = Modifier.size((38 * u).dp).background(Sim.ChipBg, CircleShape)) {
-						Text("N", style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp), color = Sim.BadgeInk)
+				// Authored hero card (1:4654): 350x307 r24 with 18 padding - avatar row,
+				// +$24 in a 48-tall box with the .00 at 16/20, subtitle, the 343x73.5 chart
+				// line bleeding 14.5 past the padding, range tabs 40 below the line.
+				Column(
+					modifier = Modifier
+						.fillMaxWidth()
+						.height((307 * u).dp)
+						.clip(RoundedCornerShape((24 * u).dp))
+						.background(Sim.CardBg)
+						.padding((18 * u).dp),
+				) {
+					Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy((9 * u).dp)) {
+						Box(contentAlignment = Alignment.Center, modifier = Modifier.size((38 * u).dp).background(Sim.ChipBg, CircleShape)) {
+							Text("N", style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp, lineHeight = (19 * u).sp), color = Sim.BadgeInk)
+						}
+						Text(
+							"Picked May 8 at $98.50",
+							style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
+							color = Sim.Muted,
+						)
 					}
-					Text(
-						"Picked May 8 at $98.50",
-						style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp),
-						color = Sim.Muted,
-					)
-				}
-				Column(verticalArrangement = Arrangement.spacedBy((4 * u).dp)) {
-					Row(verticalAlignment = Alignment.Bottom) {
+					Row(verticalAlignment = Alignment.Bottom, modifier = Modifier.padding(top = (11 * u).dp).height((48 * u).dp)) {
 						Text(
 							"+$24",
-							style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (44 * u).sp, letterSpacing = (-0.44 * u).sp),
+							style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (38 * u).sp, lineHeight = (48 * u).sp, letterSpacing = (-0.38 * u).sp),
 							color = Color.White,
 						)
 						Text(
 							".00",
-							style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (18 * u).sp),
+							style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp, lineHeight = (20 * u).sp),
 							color = Sim.Muted,
-							// Same authored offsets as the Simulate hero: 8 gap, 8 up.
-							modifier = Modifier.padding(start = (8 * u).dp, bottom = (8 * u).dp),
+							modifier = Modifier.padding(start = (7 * u).dp, bottom = (6 * u).dp),
 						)
 					}
 					Text(
 						"That is up 24.0% on a $100 paper stake",
-						style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp),
+						style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
 						color = Sim.Muted,
+						modifier = Modifier.padding(top = (11 * u).dp),
 					)
-				}
-				Image(
-					painter = painterResource(R.drawable.sim_chart_line),
-					contentDescription = null,
-					contentScale = ContentScale.Fit,
-					modifier = Modifier.align(Alignment.CenterHorizontally).size((345 * u).dp, (76 * u).dp),
-				)
-				Row(
-					verticalAlignment = Alignment.CenterVertically,
-					horizontalArrangement = Arrangement.spacedBy((37 * u).dp),
-					modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = (12 * u).dp),
-				) {
-					listOf("1D", "1W", "1M", "3M", "YTD", "1Y").forEach { label ->
-						if (label == "3M") {
-							Box(
-								contentAlignment = Alignment.Center,
-								modifier = Modifier
-									.size((39 * u).dp, (22.5 * u).dp)
-									.clip(RoundedCornerShape((11.25 * u).dp))
-									.background(Color(0x292C9DBC))
-									.border((0.75 * u).dp, Color(0x662C9DBC), RoundedCornerShape((11.25 * u).dp)),
-							) {
-								Text(label, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp), color = Sim.Teal)
+					Image(
+						painter = painterResource(R.drawable.sim_chart_line),
+						contentDescription = null,
+						contentScale = ContentScale.Fit,
+						modifier = Modifier.padding(top = (11 * u).dp).requiredSize((343 * u).dp, (73.5 * u).dp),
+					)
+					Row(
+						verticalAlignment = Alignment.CenterVertically,
+						horizontalArrangement = Arrangement.spacedBy((37 * u).dp),
+						modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = (40 * u).dp),
+					) {
+						listOf("1D", "1W", "1M", "3M", "YTD", "1Y").forEach { label ->
+							if (label == "3M") {
+								Box(
+									contentAlignment = Alignment.Center,
+									modifier = Modifier
+										.size((39 * u).dp, (22.5 * u).dp)
+										.clip(RoundedCornerShape((11.25 * u).dp))
+										.background(Color(0x292C9DBC))
+										.border((0.75 * u).dp, Color(0x662C9DBC), RoundedCornerShape((11.25 * u).dp)),
+								) {
+									Text(label, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp), color = Sim.Teal)
+								}
+							} else {
+								Text(label, style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp), color = Sim.Muted)
 							}
-						} else {
-							Text(label, style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp), color = Sim.Muted)
 						}
 					}
 				}
-				Row(horizontalArrangement = Arrangement.spacedBy((10 * u).dp), modifier = Modifier.padding(top = (6 * u).dp)) {
-					StatBox("This week", "+$3.80", Sim.Green, Modifier.weight(1f))
-					StatBox("vs the market", "+20.8% ahead", Sim.Green, Modifier.weight(1f))
-				}
-				Row(horizontalArrangement = Arrangement.spacedBy((10 * u).dp)) {
-					StatBox("Price then", "$98.50", Sim.Bright, Modifier.weight(1f))
-					StatBox("Price now", "$122.10", Sim.Bright, Modifier.weight(1f))
+				// Stats (1:4673): two 61-tall rows, 10 apart, 170-wide cells.
+				Column(verticalArrangement = Arrangement.spacedBy((10 * u).dp)) {
+					Row(horizontalArrangement = Arrangement.spacedBy((10 * u).dp)) {
+						StatBox("This week", "+$3.80", Sim.Green, Modifier.weight(1f))
+						StatBox("vs the market", "+20.8% ahead", Sim.Green, Modifier.weight(1f))
+					}
+					Row(horizontalArrangement = Arrangement.spacedBy((10 * u).dp)) {
+						StatBox("Price then", "$98.50", Sim.Bright, Modifier.weight(1f))
+						StatBox("Price now", "$122.10", Sim.Bright, Modifier.weight(1f))
+					}
 				}
 				// WHY / insight card — teal-tinted like the deck tips.
 				Column(
-					verticalArrangement = Arrangement.spacedBy((8 * u).dp),
+					verticalArrangement = Arrangement.spacedBy((9 * u).dp),
 					modifier = Modifier
 						.fillMaxWidth()
 						.clip(RoundedCornerShape((16 * u).dp))
 						.background(Sim.TealTint)
-						.padding(horizontal = (16 * u).dp, vertical = (15 * u).dp),
+						// Live note (1:4688): 83 tall, x14, kicker row at 12, body at 37.
+						.padding(horizontal = (14 * u).dp, vertical = (12 * u).dp),
 				) {
 					Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy((7 * u).dp)) {
 						Image(painterResource(R.drawable.ic_gist_sparkle), null, modifier = Modifier.size((16 * u).dp))
@@ -175,16 +190,15 @@ fun PickDetailScreen(onBack: () -> Unit) {
 					}
 					Text(
 						"Your stake tracks the move live. If NVDA gives back gains, the dollars follow it down.",
-						style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp, lineHeight = (20 * u).sp),
+						style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp, lineHeight = (17 * u).sp),
 						color = Sim.Body,
 					)
 				}
-				Spacer(modifier = Modifier.height((4 * u).dp))
 				Box(
 					contentAlignment = Alignment.Center,
 					modifier = Modifier
 						.fillMaxWidth()
-						.height((52 * u).dp)
+						.height((51 * u).dp)
 						.background(Sim.DarkCta, RoundedCornerShape((6 * u).dp))
 						.clickable(
 							interactionSource = remember { MutableInteractionSource() },
@@ -227,14 +241,15 @@ private fun StatBox(label: String, value: String, valueColor: Color, modifier: M
 	Column(
 		verticalArrangement = Arrangement.spacedBy((4 * u).dp),
 		modifier = modifier
+			.height((61 * u).dp)
 			.clip(RoundedCornerShape((12 * u).dp))
 			.background(Sim.CardBg)
-			.padding(horizontal = (14 * u).dp, vertical = (12 * u).dp),
+			.padding(horizontal = (14 * u).dp, vertical = (13 * u).dp),
 	) {
-		Text(label, style = TextStyle(fontFamily = Geist, fontSize = (11 * u).sp), color = Sim.Faint)
+		Text(label, style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp, lineHeight = (13 * u).sp), color = Sim.Faint)
 		Text(
 			value,
-			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp),
+			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp, lineHeight = (18 * u).sp),
 			color = valueColor,
 		)
 	}

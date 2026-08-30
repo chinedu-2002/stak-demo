@@ -178,7 +178,8 @@ fun SimulateScreen(
 			}
 		}
 		if (showBuy) {
-			DiscoverBuyFlow(onClose = { showBuy = false }, spec = PLTR_BUY)
+			// 85:895 authors "View portfolio" / "Done" on the Simulate add-success sheet.
+			DiscoverBuyFlow(onClose = { showBuy = false }, spec = PLTR_BUY, filledPrimary = "View portfolio", filledSecondary = "Done")
 		}
 	}
 }

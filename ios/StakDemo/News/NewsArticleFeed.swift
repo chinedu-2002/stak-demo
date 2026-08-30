@@ -142,7 +142,7 @@ enum NewsArticleFeed {
 			// only through the stocks it is about - the chip names.
 			nil, ["NVDA", "MU"],
 			// NYSE-facade b-roll (Pexels, real-time 30fps, verified).
-			media: .video(url: "https://videos.pexels.com/video-files/4319342/4319342-hd_1920_1080_30fps.mp4", posterAsset: nil, posterUrl: "https://images.pexels.com/videos/4319342/finance-new-york-city-new-york-stock-exchange-nyse-4319342.jpeg?auto=compress&w=1260&h=750&dpr=1")
+			media: .video(url: "https://videos.pexels.com/video-files/4319342/4319342-hd_1920_1080_30fps.mp4", posterAsset: nil, posterUrl: "https://images.pexels.com/videos/4319342/finance-new-york-city-new-york-stock-exchange-nyse-4319342.jpeg?auto=compress&w=1260&h=750&dpr=1", sourceLink: nil)
 		),
 		// STRICT stock news (user, 2026-08-25): the old fed-holds-rates
 		// demo article was macro, not stock news - replaced with the
@@ -167,7 +167,7 @@ enum NewsArticleFeed {
 			"Reuters", "1d", "· Jul 3 · 3 min read",
 			nil, ["GOOGL"],
 			// Google-search-screen b-roll (Pexels, real-time 30fps, verified).
-			media: .video(url: "https://videos.pexels.com/video-files/4549682/4549682-hd_1920_1080_30fps.mp4", posterAsset: nil, posterUrl: "https://images.pexels.com/videos/4549682/google-search-search-engine-optimization-seo-4549682.jpeg?auto=compress&w=1260&h=750&dpr=1")
+			media: .video(url: "https://videos.pexels.com/video-files/4549682/4549682-hd_1920_1080_30fps.mp4", posterAsset: nil, posterUrl: "https://images.pexels.com/videos/4549682/google-search-search-engine-optimization-seo-4549682.jpeg?auto=compress&w=1260&h=750&dpr=1", sourceLink: nil)
 		),
 		demo(
 			"oil-opec-supply", "Markets",
@@ -196,7 +196,7 @@ enum NewsArticleFeed {
 			// Real-time pumpjack drone b-roll (Pexels, verified direct
 			// stream) - the first pick was a TIME-LAPSE and read as
 			// racing playback (user, 2026-08-26).
-			media: .video(url: "https://videos.pexels.com/video-files/10227529/10227529-hd_1280_720_30fps.mp4", posterAsset: nil, posterUrl: "https://images.pexels.com/videos/10227529/enviornmental-conservation-environment-environment-protection-midland-10227529.jpeg?auto=compress&w=1260&h=750&dpr=1")
+			media: .video(url: "https://videos.pexels.com/video-files/10227529/10227529-hd_1280_720_30fps.mp4", posterAsset: nil, posterUrl: "https://images.pexels.com/videos/10227529/enviornmental-conservation-environment-environment-protection-midland-10227529.jpeg?auto=compress&w=1260&h=750&dpr=1", sourceLink: nil)
 		),
 		demo(
 			"tech-earnings-week", "Tech & Ai",
@@ -219,7 +219,7 @@ enum NewsArticleFeed {
 			// STRICT stock news: the earnings week is about these stocks.
 			nil, ["MSFT", "GOOGL"],
 			// Stock-trend-screen b-roll (Mixkit, verified direct stream).
-			media: .video(url: "https://assets.mixkit.co/videos/9607/9607-720.mp4", posterAsset: nil, posterUrl: "https://assets.mixkit.co/videos/9607/9607-thumb-720-0.jpg")
+			media: .video(url: "https://assets.mixkit.co/videos/9607/9607-720.mp4", posterAsset: nil, posterUrl: "https://assets.mixkit.co/videos/9607/9607-thumb-720-0.jpg", sourceLink: nil)
 		),
 		// STRICT stock news (user, 2026-08-25): the old fed-minutes tile
 		// story was macro, not stock news - the Markets tile now serves
@@ -244,7 +244,7 @@ enum NewsArticleFeed {
 			"Reuters", "2h", "· Jul 4 · 3 min read",
 			nil, ["AMZN"],
 			// Server-racks b-roll (Pexels, verified direct stream).
-			media: .video(url: "https://videos.pexels.com/video-files/5028622/5028622-hd_1280_720_25fps.mp4", posterAsset: nil, posterUrl: "https://images.pexels.com/videos/5028622/pexels-photo-5028622.jpeg?auto=compress&w=1260&h=750&dpr=1")
+			media: .video(url: "https://videos.pexels.com/video-files/5028622/5028622-hd_1280_720_25fps.mp4", posterAsset: nil, posterUrl: "https://images.pexels.com/videos/5028622/pexels-photo-5028622.jpeg?auto=compress&w=1260&h=750&dpr=1", sourceLink: nil)
 		),
 		demo(
 			"nvda-lags-rally", "Tech & Ai",
@@ -266,7 +266,7 @@ enum NewsArticleFeed {
 			"Reuters", "2d", "· Jul 2 · 3 min read",
 			"NewsThumbNVDA", ["NVDA"],
 			// NVIDIA RTX graphics-card b-roll (Pexels, real-time 30fps, verified).
-			media: .video(url: "https://videos.pexels.com/video-files/5466792/5466792-hd_1920_1080_30fps.mp4", posterAsset: nil, posterUrl: "https://images.pexels.com/videos/5466792/gaming-case-gaming-computer-gaming-graphics-card-gaming-machine-5466792.jpeg?auto=compress&w=1260&h=750&dpr=1")
+			media: .video(url: "https://videos.pexels.com/video-files/5466792/5466792-hd_1920_1080_30fps.mp4", posterAsset: nil, posterUrl: "https://images.pexels.com/videos/5466792/gaming-case-gaming-computer-gaming-graphics-card-gaming-machine-5466792.jpeg?auto=compress&w=1260&h=750&dpr=1", sourceLink: nil)
 		),
 		demo(
 			"tsla-drops-deliveries", "Tech & Ai",
@@ -288,7 +288,7 @@ enum NewsArticleFeed {
 			"CNBC", "2d", "· Jul 2 · 3 min read",
 			"NewsThumbTSLA", ["TSLA"],
 			// Tesla Model X b-roll (Pexels, real-time 30fps, verified).
-			media: .video(url: "https://videos.pexels.com/video-files/34194673/14493661_1280_720_30fps.mp4", posterAsset: nil, posterUrl: "https://images.pexels.com/videos/34194673/automobile-selfi-tesla-transportation-34194673.jpeg?auto=compress&w=1260&h=750&dpr=1")
+			media: .video(url: "https://videos.pexels.com/video-files/34194673/14493661_1280_720_30fps.mp4", posterAsset: nil, posterUrl: "https://images.pexels.com/videos/34194673/automobile-selfi-tesla-transportation-34194673.jpeg?auto=compress&w=1260&h=750&dpr=1", sourceLink: nil)
 		),
 		// STRICT stock news (user, 2026-08-25): the old jobs-report demo
 		// row was macro, not stock news - replaced with a stock story.
@@ -313,7 +313,7 @@ enum NewsArticleFeed {
 			"Reuters", "2d", "· Jul 2 · 2 min read",
 			"NewsThumbJobs", ["AMD"],
 			// Motherboard-chips b-roll (Mixkit, verified direct stream).
-			media: .video(url: "https://assets.mixkit.co/videos/1138/1138-720.mp4", posterAsset: nil, posterUrl: "https://assets.mixkit.co/videos/1138/1138-thumb-720-0.jpg")
+			media: .video(url: "https://assets.mixkit.co/videos/1138/1138-720.mp4", posterAsset: nil, posterUrl: "https://assets.mixkit.co/videos/1138/1138-thumb-720-0.jpg", sourceLink: nil)
 		),
 		demo(
 			"memory-chips-soar", "Tech & Ai",
@@ -335,7 +335,7 @@ enum NewsArticleFeed {
 			"Bloomberg", "2d", "· Jul 2 · 3 min read",
 			"NewsThumbChips", ["MU"],
 			// Chip-fab engineer b-roll (Mixkit, verified direct stream).
-			media: .video(url: "https://assets.mixkit.co/videos/47047/47047-720.mp4", posterAsset: nil, posterUrl: "https://assets.mixkit.co/videos/47047/47047-thumb-720-3.jpg")
+			media: .video(url: "https://assets.mixkit.co/videos/47047/47047-720.mp4", posterAsset: nil, posterUrl: "https://assets.mixkit.co/videos/47047/47047-thumb-720-3.jpg", sourceLink: nil)
 		),
 		// OFF-TOPIC by design: a general-pool story with no market topic
 		// and no related stock. It is SERVED (it sits in the For You

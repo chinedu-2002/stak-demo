@@ -7,14 +7,22 @@ import Foundation
 /// the authored 360x208 r10 hero box; a video shows its poster with the
 /// play glyph and plays IN PLACE on tap. Mirrors android ui/news/NewsMedia.kt.
 ///
+/// SERVING CONTRACT (user, 2026-08-30): every story/stock update MUST
+/// arrive with a visual pulled from the company's OFFICIAL sources - a
+/// relevant video from its YouTube channel when one exists, otherwise a
+/// representative image - each item with its own dynamic embed link
+/// (sourceLink: an image hero opens it on tap; a video's tap plays),
+/// refreshed as news changes. Content may stay static for a period,
+/// but it is never one fixed asset.
+///
 /// Demo = the authored hero art as the poster with a sample video link,
 /// so the rest state matches the frame. Served posters arrive as URLs
 /// (posterUrl) - the data phase's image loader renders those.
 enum NewsMedia {
 	/// A still image.
-	case image(posterAsset: String?, url: String?)
+	case image(posterAsset: String?, url: String?, sourceLink: String? = nil)
 	/// A video behind a poster: YouTube links embed, other links play directly.
-	case video(url: String, posterAsset: String?, posterUrl: String?)
+	case video(url: String, posterAsset: String?, posterUrl: String?, sourceLink: String? = nil)
 
 	/// YouTube watch/short links -> the embeddable player URL; nil for direct media.
 	static func youTubeEmbedURL(for url: String) -> URL? {

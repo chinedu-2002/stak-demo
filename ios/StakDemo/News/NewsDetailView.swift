@@ -166,26 +166,27 @@ private struct HeroImage: View {
 	/// buffering) when the article opens; the poster holds until playback runs.
 	@State private var heroPlayer: AVPlayer? = nil
 	@State private var firstFrame = false
+	@Environment(\.openURL) private var openURL
 
 	var body: some View {
 		let u = figmaUnit
 		ZStack {
 			Color(argb: 0xFFC4C4C4)
 				.onAppear {
-					if case let .video(url, _, _) = media, NewsMedia.youTubeEmbedURL(for: url) == nil,
+					if case let .video(url, _, _, _) = media, NewsMedia.youTubeEmbedURL(for: url) == nil,
 						heroPlayer == nil, let direct = URL(string: url) {
 						let p = AVPlayer(url: direct)
 						p.currentItem?.preferredForwardBufferDuration = 5
 						heroPlayer = p
 					}
 				}
-			if playing, case let .video(url, _, _) = media {
+			if playing, case let .video(url, _, _, _) = media {
 				// A failed OR FINISHED stream returns to the poster + glyph
 				// instead of stranding a frame (user, 2026-08-25/26).
 				NewsVideoPlayer(url: url, paused: paused, prebuffered: heroPlayer, onBegan: { firstFrame = true }, onDone: { playing = false; paused = false; firstFrame = false; heroPlayer?.pause(); heroPlayer?.seek(to: .zero) })
 					.contentShape(Rectangle())
 					.onTapGesture { paused = true }
-				if !firstFrame, case let .video(_, asset, posterUrl) = media {
+				if !firstFrame, case let .video(_, asset, posterUrl, _) = media {
 					// The poster holds until the clip actually runs - no black gap.
 					if let asset {
 						Image(asset)
@@ -211,8 +212,8 @@ private struct HeroImage: View {
 			} else {
 				let poster: String? = {
 					switch media {
-					case let .image(asset, _): return asset
-					case let .video(_, asset, _): return asset
+					case let .image(asset, _, _): return asset
+					case let .video(_, asset, _, _): return asset
 					}
 				}()
 				if let poster {
@@ -232,6 +233,13 @@ private struct HeroImage: View {
 					}
 					.buttonStyle(.plain)
 					.offset(x: -0.5 * u, y: 12.5 * u)
+				}
+				// An image with an embedded link (served contract): tapping
+				// the hero opens the story's own dynamic link.
+				if case let .image(_, _, link) = media, let link, let linkURL = URL(string: link) {
+					Color.clear
+						.contentShape(Rectangle())
+						.onTapGesture { openURL(linkURL) }
 				}
 			}
 			Text(category)

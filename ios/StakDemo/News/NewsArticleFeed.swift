@@ -60,7 +60,7 @@ enum NewsArticleFeed {
 		let relatedTickers: [String]
 	}
 
-	private static func demo(_ id: String, _ category: String, _ headline: String, _ subtitle: String, _ paragraphs: [String], _ gist: [String], _ pullQuote: String, _ explainer: String, _ tags: [String], _ source: String, _ age: String, _ sourceMeta: String, _ thumb: String? = nil, _ relatedTickers: [String] = [], media: NewsMedia = .image(posterAsset: nil, url: nil)) -> Article {
+	private static func demo(_ id: String, _ category: String, _ headline: String, _ subtitle: String, _ paragraphs: [String], _ gist: [String], _ pullQuote: String, _ explainer: String, _ tags: [String], _ source: String, _ age: String, _ sourceMeta: String, _ thumb: String? = nil, _ relatedTickers: [String] = [], media: NewsMedia = .image(posterAsset: nil, url: nil, sourceLink: nil)) -> Article {
 		Article(
 			id: id,
 			category: category,

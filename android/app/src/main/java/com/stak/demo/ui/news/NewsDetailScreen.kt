@@ -213,6 +213,33 @@ private fun HeroImage(media: NewsMedia, category: String, saved: Boolean, onBook
 	// The play button toggles: tap the running clip to pause (the glyph returns
 	// over the paused frame), tap the glyph to resume (user, 2026-08-30).
 	var paused by remember { mutableStateOf(false) }
+	// Cinema-fast start (user, 2026-08-30): the clip starts buffering the
+	// moment the article opens (playWhenReady=false), streams through a
+	// disk cache so replays begin instantly, and the poster holds until
+	// the first real frame is rendered - never a gray box. Rate stays 1x.
+	val heroVideo = media as? NewsMedia.Video
+	val directUrl = if (heroVideo != null && heroVideo.youTubeEmbedUrl == null) heroVideo.url else null
+	val heroCtx = androidx.compose.ui.platform.LocalContext.current
+	val exo = remember(directUrl) { if (directUrl != null) NewsVideoCache.preparedPlayer(heroCtx, directUrl) else null }
+	var firstFrame by remember { mutableStateOf(false) }
+	androidx.compose.runtime.DisposableEffect(exo) {
+		val listener = object : androidx.media3.common.Player.Listener {
+			override fun onRenderedFirstFrame() { firstFrame = true }
+			override fun onPlayerError(error: androidx.media3.common.PlaybackException) {
+				android.util.Log.w("NewsMedia", "direct playback error " + error.errorCodeName + " for " + directUrl)
+				playing = false; paused = false
+			}
+			override fun onPlaybackStateChanged(playbackState: Int) {
+				if (playbackState == androidx.media3.common.Player.STATE_ENDED) {
+					playing = false; paused = false; firstFrame = false
+					exo?.seekTo(0); exo?.playWhenReady = false
+				}
+			}
+		}
+		exo?.addListener(listener)
+		onDispose { exo?.removeListener(listener); exo?.release() }
+	}
+	androidx.compose.runtime.LaunchedEffect(playing, paused) { exo?.playWhenReady = playing && !paused }
 	Box(
 		modifier = Modifier
 			.padding(horizontal = (15 * u).dp)
@@ -226,17 +253,54 @@ private fun HeroImage(media: NewsMedia, category: String, saved: Boolean, onBook
 		if (playing && video != null) {
 			// A failed OR FINISHED stream returns to the poster + glyph
 			// instead of stranding a frame (user, 2026-08-25/26).
-			NewsVideoPlayer(
-				video = video,
-				paused = paused,
-				modifier = Modifier
-					.matchParentSize()
-					.clickable(
-						interactionSource = remember { MutableInteractionSource() },
-						indication = null,
-					) { paused = true },
-				onDone = { playing = false; paused = false },
-			)
+			if (exo != null) {
+				// Direct clip: the pre-buffered cached player, already
+				// prepared while the article was being read.
+				androidx.compose.ui.viewinterop.AndroidView(
+					modifier = Modifier
+						.matchParentSize()
+						.clickable(
+							interactionSource = remember { MutableInteractionSource() },
+							indication = null,
+						) { paused = true },
+					factory = { c -> android.view.TextureView(c).also { exo.setVideoTextureView(it) } },
+					onRelease = { exo.clearVideoSurface() },
+				)
+				if (!firstFrame) {
+					// Poster holds until onRenderedFirstFrame.
+				val posterRes2 = (media as NewsMedia.Video).posterRes
+				if (posterRes2 != null) {
+					Image(
+						painter = painterResource(posterRes2),
+						contentDescription = null,
+						contentScale = ContentScale.Crop,
+						modifier = Modifier
+							.align(Alignment.Center)
+							.offset(x = (-0.5 * u).dp, y = (16.59 * u).dp)
+							.requiredSize((407 * u).dp, (271.18 * u).dp),
+					)
+				} else if (media.posterUrl != null) {
+					coil.compose.AsyncImage(
+						model = media.posterUrl,
+						contentDescription = null,
+						contentScale = ContentScale.Crop,
+						modifier = Modifier.matchParentSize(),
+					)
+				}
+				}
+			} else {
+				NewsVideoPlayer(
+					video = video,
+					paused = paused,
+					modifier = Modifier
+						.matchParentSize()
+						.clickable(
+							interactionSource = remember { MutableInteractionSource() },
+							indication = null,
+						) { paused = true },
+					onDone = { playing = false; paused = false },
+				)
+			}
 			if (paused) {
 				Image(
 					painter = painterResource(R.drawable.ic_hero_play),
@@ -993,5 +1057,46 @@ private fun NewsVideoPlayer(video: NewsMedia.Video, modifier: Modifier = Modifie
 			update = { v -> (v.tag as? androidx.media3.exoplayer.ExoPlayer)?.playWhenReady = !paused },
 			onRelease = { v -> (v.tag as? androidx.media3.exoplayer.ExoPlayer)?.release(); v.tag = null },
 		)
+	}
+}
+
+
+/**
+ * Disk-cached, pre-buffered hero clips (user, 2026-08-30: "the speed
+ * should look like watching a movie"): a clip streams through a 200MB
+ * LRU cache so a replay starts instantly, playback may begin once 300ms
+ * is buffered, and players are prepared before the play tap.
+ */
+@androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
+private object NewsVideoCache {
+	private var cache: androidx.media3.datasource.cache.SimpleCache? = null
+
+	@Synchronized
+	private fun cache(ctx: android.content.Context): androidx.media3.datasource.cache.SimpleCache =
+		cache ?: androidx.media3.datasource.cache.SimpleCache(
+			java.io.File(ctx.applicationContext.cacheDir, "news_video"),
+			androidx.media3.datasource.cache.LeastRecentlyUsedCacheEvictor(200L * 1024 * 1024),
+			androidx.media3.database.StandaloneDatabaseProvider(ctx.applicationContext),
+		).also { cache = it }
+
+	fun preparedPlayer(ctx: android.content.Context, url: String): androidx.media3.exoplayer.ExoPlayer {
+		val dataSources = androidx.media3.datasource.cache.CacheDataSource.Factory()
+			.setCache(cache(ctx))
+			.setUpstreamDataSourceFactory(androidx.media3.datasource.DefaultDataSource.Factory(ctx))
+			.setFlags(androidx.media3.datasource.cache.CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
+		return androidx.media3.exoplayer.ExoPlayer.Builder(ctx)
+			.setMediaSourceFactory(androidx.media3.exoplayer.source.DefaultMediaSourceFactory(dataSources))
+			.setLoadControl(
+				androidx.media3.exoplayer.DefaultLoadControl.Builder()
+					.setBufferDurationsMs(2000, 30000, 300, 1000)
+					.build(),
+			)
+			.build().apply {
+				setMediaItem(androidx.media3.common.MediaItem.fromUri(url))
+				// Exactly 1x (user, 2026-08-26).
+				playbackParameters = androidx.media3.common.PlaybackParameters(1f)
+				prepare()
+				playWhenReady = false
+			}
 	}
 }

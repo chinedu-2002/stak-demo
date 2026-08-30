@@ -4,11 +4,19 @@ import com.stak.demo.R
 
 /**
  * The article hero is a MEDIA SLOT, not a fixed picture (user,
- * 2026-08-23): the backend sends a link with each story - a video
- * (YouTube or any other source) or an image - so viewers get a view of
- * what the stock is about. The app renders whatever is served inside
- * the authored 360x208 r10 hero box; a video shows its poster with the
- * play glyph and plays IN PLACE on tap.
+ * 2026-08-23 + 2026-08-30): every story/stock update MUST arrive with a
+ * visual - a video (YouTube or any other source) or an image - so
+ * viewers get a social-media-feel view of what the stock is about,
+ * like a news channel's picture-then-write-up. SERVING CONTRACT for the
+ * backend: pull live content from the company's OFFICIAL sources - a
+ * relevant video from its YouTube channel when one exists, otherwise a
+ * representative image; each item carries its own dynamic embed link,
+ * refreshed as news changes (content may stay static for a period, but
+ * it is never one fixed asset). An optional sourceLink rides with the
+ * media: an image hero opens it on tap; a video's tap plays the clip.
+ * The app renders whatever is served inside the authored 360x208 r10
+ * hero box; a video shows its poster with the play glyph and plays IN
+ * PLACE on tap.
  *
  * Demo = the authored hero art as the poster with a sample video link,
  * so the rest state matches the frame. Served posters arrive as URLs
@@ -16,10 +24,10 @@ import com.stak.demo.R
  */
 sealed class NewsMedia {
 	/** A still image. */
-	data class Image(val posterRes: Int? = null, val url: String? = null) : NewsMedia()
+	data class Image(val posterRes: Int? = null, val url: String? = null, val sourceLink: String? = null) : NewsMedia()
 
 	/** A video behind a poster: YouTube links embed, other links play directly. */
-	data class Video(val url: String, val posterRes: Int? = null, val posterUrl: String? = null) : NewsMedia() {
+	data class Video(val url: String, val posterRes: Int? = null, val posterUrl: String? = null, val sourceLink: String? = null) : NewsMedia() {
 		/** YouTube watch/short links -> the embeddable player URL; null for direct media. */
 		val youTubeEmbedUrl: String?
 			get() {

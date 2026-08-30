@@ -158,6 +158,9 @@ private struct HeroImage: View {
 	/// The hero is a media slot: poster + play glyph at rest (frame-exact),
 	/// the served video playing IN PLACE once tapped (user, 2026-08-23).
 	@State private var playing = false
+	/// The play button toggles: tap the running clip to pause (the glyph returns
+	/// over the paused frame), tap the glyph to resume (user, 2026-08-30).
+	@State private var paused = false
 
 	var body: some View {
 		let u = figmaUnit
@@ -166,7 +169,19 @@ private struct HeroImage: View {
 			if playing, case let .video(url, _, _) = media {
 				// A failed OR FINISHED stream returns to the poster + glyph
 				// instead of stranding a frame (user, 2026-08-25/26).
-				NewsVideoPlayer(url: url, onDone: { playing = false })
+				NewsVideoPlayer(url: url, paused: paused, onDone: { playing = false; paused = false })
+					.contentShape(Rectangle())
+					.onTapGesture { paused = true }
+				if paused {
+					Button { paused = false } label: {
+						Image("IcHeroPlay")
+							.resizable()
+							.frame(width: 59.92 * u, height: 53.75 * u)
+							.rotationEffect(.degrees(90))
+					}
+					.buttonStyle(.plain)
+					.offset(x: -0.5 * u, y: 12.5 * u)
+				}
 			} else {
 				let poster: String? = {
 					switch media {
@@ -183,7 +198,7 @@ private struct HeroImage: View {
 						.offset(x: -0.5 * u, y: 16.59 * u)
 				}
 				if case .video = media {
-					Button { playing = true } label: {
+					Button { playing = true; paused = false } label: {
 						Image("IcHeroPlay")
 							.resizable()
 							.frame(width: 59.92 * u, height: 53.75 * u)
@@ -734,19 +749,21 @@ private struct SaveSuccessOverlay: View {
 /// autoplay once the user tapped the play glyph.
 private struct NewsVideoPlayer: View {
 	let url: String
+	var paused: Bool = false
 	var onDone: () -> Void = {}
 
 	var body: some View {
 		if let embed = NewsMedia.youTubeEmbedURL(for: url) {
 			YouTubeEmbedView(url: embed)
 		} else if let direct = URL(string: url) {
-			AutoplayVideoPlayer(url: direct, onDone: onDone)
+			AutoplayVideoPlayer(url: direct, paused: paused, onDone: onDone)
 		}
 	}
 }
 
 private struct AutoplayVideoPlayer: View {
 	let url: URL
+	var paused: Bool = false
 	var onDone: () -> Void = {}
 	@State private var player: AVPlayer? = nil
 
@@ -761,6 +778,9 @@ private struct AutoplayVideoPlayer: View {
 				// real-time footage; see NewsArticleFeed's media notes.
 				p.rate = 1.0
 			}
+			// Play/pause toggle: AVPlayer.pause keeps the position, so
+			// resuming continues where the clip stopped.
+			.onChange(of: paused) { if paused { player?.pause() } else { player?.play() } }
 			.onDisappear { player?.pause() }
 			// A finished or failed clip returns the hero to its poster +
 			// play glyph (user, 2026-08-26: "i cant see the play icon").

@@ -34,6 +34,7 @@ import com.stak.demo.ui.onboarding.AuthBackCircle
 import com.stak.demo.ui.theme.Geist
 import com.stak.demo.ui.theme.Sora
 import com.stak.demo.ui.theme.StakColors
+import androidx.compose.foundation.layout.requiredSize
 
 private val CardBg = Color(0xFF10182B)
 private val Muted = Color(0xFF819ABB)
@@ -137,7 +138,7 @@ fun ProfileScreen(onBack: () -> Unit, onLogOut: () -> Unit = {}) {
 					Box(
 						contentAlignment = Alignment.Center,
 						modifier = Modifier
-							.size((w * u).dp, (28 * u).dp)
+							.requiredSize((w * u).dp, (28 * u).dp)
 							.clip(RoundedCornerShape((14 * u).dp))
 							.background(ChipBg)
 							.border((1 * u).dp, ChipBorder, RoundedCornerShape((14 * u).dp)),

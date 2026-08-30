@@ -213,7 +213,7 @@ private fun AddStockTile(modifier: Modifier = Modifier) {
 					style = Stroke(
 						width = (1.5 * u).dp.toPx(),
 						pathEffect = PathEffect.dashPathEffect(
-							floatArrayOf((8 * u).dp.toPx(), (8 * u).dp.toPx()),
+							floatArrayOf((6 * u).dp.toPx(), (5 * u).dp.toPx()),
 						),
 					),
 				)

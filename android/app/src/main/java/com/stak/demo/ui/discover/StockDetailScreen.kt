@@ -246,11 +246,9 @@ private fun RiskFitCard() {
 				)
 			}
 		}
-		Box(modifier = Modifier.fillMaxWidth().height((8 * u).dp).clip(RoundedCornerShape((4 * u).dp)).background(Color(0xFF10182B))) {
-			Image(
-				painterResource(R.drawable.ic_sd_marker), null,
-				modifier = Modifier.offset(x = (88 * u).dp, y = (-3 * u).dp).size((14 * u).dp),
-			)
+		// Authored (1:2382): a lone 14x8 pill indicator - the frame draws no track.
+		Box(modifier = Modifier.fillMaxWidth().height((8 * u).dp)) {
+			Box(modifier = Modifier.offset(x = (88 * u).dp).size((14 * u).dp, (8 * u).dp).background(Color(0xFFA6E4F7), RoundedCornerShape((4 * u).dp)))
 		}
 		Row(modifier = Modifier.fillMaxWidth()) {
 			Text("Low", style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp), color = Muted)
@@ -524,7 +522,7 @@ private fun DetailSavedSheet(onDone: () -> Unit) {
 /** The practice-buy ticket reused from the deck (public host wrapper). */
 @Composable
 private fun DetailBuyHost(onClose: () -> Unit) {
-	DiscoverBuyFlow(onClose = onClose, spec = AAPL_BUY)
+	DiscoverBuyFlow(onClose = onClose, spec = AAPL_BUY, filledSecondary = "Done")
 }
 
 /** Kicker label — Geist Medium 10, tracking 0.8, muted. */
@@ -571,9 +569,9 @@ private fun AnalystCard() {
 			)
 		} else {
 			Kicker("PRICE TARGET RANGE")
-			Box(modifier = Modifier.fillMaxWidth().height((8 * u).dp).clip(RoundedCornerShape((4 * u).dp)).background(Color(0xFF10182B))) {
+			Box(modifier = Modifier.fillMaxWidth().height((8 * u).dp)) {
 				Box(modifier = Modifier.width((180 * u).dp).height((8 * u).dp).background(Color(0x8C5DA8BF), RoundedCornerShape((4 * u).dp)))
-				Image(painterResource(R.drawable.ic_sd_marker), null, modifier = Modifier.offset(x = (173 * u).dp, y = (-3 * u).dp).size((14 * u).dp))
+				Box(modifier = Modifier.offset(x = (167 * u).dp).size((13 * u).dp, (8 * u).dp).background(Color(0xFFA6E4F7), RoundedCornerShape((4 * u).dp)))
 			}
 			Row(modifier = Modifier.fillMaxWidth()) {
 				Column(verticalArrangement = Arrangement.spacedBy((1 * u).dp)) {
@@ -749,7 +747,6 @@ private fun SinceYouSavedCard() {
 				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, letterSpacing = (0.8 * u + ADVANCE_ROUNDING.value).sp),
 				color = Muted,
 			)
-			Spacer(modifier = Modifier.width((8 * u).dp))
 			Text(
 				"+4.6%",
 				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp),

@@ -191,11 +191,14 @@ fun DiscoverScreen(onLearnMore: () -> Unit = {}, onPracticeBuy: () -> Unit = {})
 				verticalArrangement = Arrangement.spacedBy((5 * u).dp),
 				modifier = Modifier.fillMaxWidth().padding(horizontal = (20 * u).dp).padding(top = (10 * u).dp),
 			) {
+				// 1:1627 centres the 33-tall title in the 44-tall ring row (measured exact);
+				// the end-of-deck frame (1:2330) authors the title 7 higher against the ring.
 				Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
 					Text(
 						text = "Discover",
 						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (26 * u).sp, lineHeight = (33 * u).sp),
 						color = Color.White,
+						modifier = Modifier.offset(y = if (seen >= 12) (-7 * u).dp else 0.dp),
 					)
 					Spacer(modifier = Modifier.weight(1f))
 					val count = (seen + 1).coerceAtMost(12)
@@ -211,8 +214,7 @@ fun DiscoverScreen(onLearnMore: () -> Unit = {}, onPracticeBuy: () -> Unit = {})
 				Text(
 					text = "TODAY · AI & CHIPS",
 					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, lineHeight = (13 * u).sp, letterSpacing = (0.9 * u + ADVANCE_ROUNDING.value).sp),
-					color = Disc.Faint,
-					modifier = Modifier.padding(horizontal = (2 * u).dp),
+					color = Disc.Muted,
 				)
 			}
 			Spacer(modifier = Modifier.height((27 * u).dp))
@@ -371,16 +373,18 @@ fun DiscoverScreen(onLearnMore: () -> Unit = {}, onPracticeBuy: () -> Unit = {})
 		if (savedToast) {
 			Row(
 				verticalAlignment = Alignment.CenterVertically,
-				horizontalArrangement = Arrangement.spacedBy((6 * u).dp),
+				horizontalArrangement = Arrangement.spacedBy((13.5 * u).dp),
 				modifier = Modifier
 					.align(Alignment.TopCenter)
 					.statusBarsPadding()
 					.padding(top = (78 * u).dp)
 					.clip(RoundedCornerShape((19.5 * u).dp))
-					.background(Disc.ChipBg)
-					.padding(horizontal = (14 * u).dp, vertical = (10 * u).dp),
+					// Authored (1:1796): translucent pill - the peek slab shows through.
+					.background(Disc.ChipBg.copy(alpha = 0.5f))
+					.padding(start = (14 * u).dp, end = (12 * u).dp)
+					.height((39 * u).dp),
 			) {
-				Image(painterResource(R.drawable.ic_saved_bookmark), null, modifier = Modifier.size((12 * u).dp))
+				Image(painterResource(R.drawable.ic_saved_bookmark), null, modifier = Modifier.size((14 * u).dp))
 				Text(
 					text = "Saved to My STAK",
 					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp),
@@ -613,7 +617,7 @@ private fun SheetScaffold(onDismiss: () -> Unit, content: @Composable () -> Unit
 					.align(Alignment.CenterHorizontally)
 					// Authored (1:2159): handle at y12–16, title at y32 — so 2
 					// above the rect and 16 below it after the 10 top padding.
-					.padding(top = (2 * u).dp, bottom = (16 * u).dp)
+					.padding(bottom = (18 * u).dp)
 					.size((40 * u).dp, (4 * u).dp)
 					.background(Disc.Divider, RoundedCornerShape((2 * u).dp)),
 			)
@@ -670,6 +674,13 @@ private fun SheetCta(text: String, onClick: () -> Unit) {
 		modifier = Modifier
 			.fillMaxWidth()
 			.height((52 * u).dp)
+			.drawBehind {
+				val r = (6 * u).dp.toPx()
+				val paint = android.graphics.Paint().apply { isAntiAlias = true }
+				paint.color = android.graphics.Color.argb(23, 82, 170, 199)
+				paint.maskFilter = android.graphics.BlurMaskFilter((12.28f * u).dp.toPx(), android.graphics.BlurMaskFilter.Blur.NORMAL)
+				drawContext.canvas.nativeCanvas.drawRoundRect(0f, (12.28f * u).dp.toPx(), size.width, (12.28f * u).dp.toPx() + size.height, r, r, paint)
+			}
 			.background(CtaGradient, RoundedCornerShape((6 * u).dp))
 			.border((0.36 * u).dp, CtaBorder, RoundedCornerShape((6 * u).dp))
 			.clickable(
@@ -801,7 +812,7 @@ private fun PracticeBuySheet(onConfirm: () -> Unit, onDismiss: () -> Unit, spec:
 
 /** "Order filled" sheet (frame 85:1205, sheet 85:1394). */
 @Composable
-private fun OrderFilledSheet(onDismiss: () -> Unit, spec: BuySpec = NVDA_BUY) {
+private fun OrderFilledSheet(onDismiss: () -> Unit, spec: BuySpec = NVDA_BUY, primary: String = "View in My STAK", secondary: String = "Keep exploring") {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	SheetScaffold(onDismiss = onDismiss) {
 		Column(
@@ -816,6 +827,13 @@ private fun OrderFilledSheet(onDismiss: () -> Unit, spec: BuySpec = NVDA_BUY) {
 				color = Color.White,
 			)
 			NvdaStockRow(spec)
+			// Authored status line (85:1407): 18-tall, left-aligned, 14 below the stock row.
+			Text(
+				text = "Filled instantly · paper order",
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp, lineHeight = (18 * u).sp),
+				color = Disc.Body,
+				modifier = Modifier.fillMaxWidth(),
+			)
 			Row(horizontalArrangement = Arrangement.spacedBy((6 * u).dp), modifier = Modifier.fillMaxWidth()) {
 				Text(
 					text = "Cash available",
@@ -831,7 +849,8 @@ private fun OrderFilledSheet(onDismiss: () -> Unit, spec: BuySpec = NVDA_BUY) {
 			Row(
 				horizontalArrangement = Arrangement.spacedBy((6 * u).dp, Alignment.CenterHorizontally),
 				verticalAlignment = Alignment.Bottom,
-				modifier = Modifier.fillMaxWidth(),
+				// Authored ticket (85:1408): Cash row 0-16, Shares line at 40 -> a 24 gap.
+				modifier = Modifier.fillMaxWidth().padding(top = (10 * u).dp),
 			) {
 				Text(
 					text = "You now hold",
@@ -850,8 +869,8 @@ private fun OrderFilledSheet(onDismiss: () -> Unit, spec: BuySpec = NVDA_BUY) {
 				)
 			}
 			Column(verticalArrangement = Arrangement.spacedBy((16 * u).dp), modifier = Modifier.fillMaxWidth()) {
-				SheetCta(text = "View in My STAK", onClick = onDismiss)
-				SheetSecondary(text = "Keep exploring", onClick = onDismiss)
+				SheetCta(text = primary, onClick = onDismiss)
+				SheetSecondary(text = secondary, onClick = onDismiss)
 			}
 		}
 	}
@@ -976,11 +995,11 @@ private fun EndOfDeck(onPracticeBuySaves: () -> Unit, onSwipeAgain: () -> Unit) 
 
 /** Buy → Order-filled flow, reused by the Stock Detail page. */
 @Composable
-internal fun DiscoverBuyFlow(onClose: () -> Unit, spec: BuySpec = NVDA_BUY) {
+internal fun DiscoverBuyFlow(onClose: () -> Unit, spec: BuySpec = NVDA_BUY, filledPrimary: String = "View in My STAK", filledSecondary: String = "Keep exploring") {
 	var filled by rememberSaveable { mutableStateOf(false) }
 	if (!filled) {
 		PracticeBuySheet(onConfirm = { filled = true }, onDismiss = onClose, spec = spec)
 	} else {
-		OrderFilledSheet(onDismiss = onClose, spec = spec)
+		OrderFilledSheet(onDismiss = onClose, spec = spec, primary = filledPrimary, secondary = filledSecondary)
 	}
 }

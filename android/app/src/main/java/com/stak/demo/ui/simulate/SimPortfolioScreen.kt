@@ -44,6 +44,8 @@ import com.stak.demo.ui.theme.Geist
 import com.stak.demo.ui.theme.Sora
 import com.stak.demo.ui.theme.StakColors
 import com.stak.demo.ui.theme.ADVANCE_ROUNDING
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.graphics.nativeCanvas
 
 private data class SimPick(
 	val badge: String, val ticker: String, val sub: String,
@@ -108,7 +110,7 @@ fun SimPortfolioScreen(onBack: () -> Unit, onOpenPick: () -> Unit) {
 					modifier = Modifier
 						.align(Alignment.CenterHorizontally)
 						.size((158 * u).dp, (32 * u).dp)
-						.border((0.36 * u).dp, Color(0x54343B4F), RoundedCornerShape((16 * u).dp)),
+						.background(Sim.CardBg, RoundedCornerShape((16 * u).dp)),
 				) {
 					Text(
 						"12 picks · +$240.00 all time",
@@ -171,7 +173,6 @@ private fun FilterChip(label: String, selected: Boolean) {
 		modifier = Modifier
 			.clip(RoundedCornerShape((14 * u).dp))
 			.background(if (selected) Sim.TealTint else Sim.CardBg)
-			.then(if (selected) Modifier.border((0.75 * u).dp, Color(0x662C9DBC), RoundedCornerShape((14 * u).dp)) else Modifier)
 			.padding(horizontal = (12 * u).dp, vertical = (6 * u).dp),
 	) {
 		Text(
@@ -240,7 +241,7 @@ private fun SimSheet(onDismiss: () -> Unit, content: @Composable () -> Unit) {
 		Box(
 			modifier = Modifier
 				.fillMaxSize()
-				.background(Color(0x730A1020))
+				.background(Color(0x9E02050E))
 				.clickable(
 					interactionSource = remember { MutableInteractionSource() },
 					indication = null,
@@ -255,13 +256,12 @@ private fun SimSheet(onDismiss: () -> Unit, content: @Composable () -> Unit) {
 				.background(Sim.CardBg)
 				.padding(horizontal = (20 * u).dp)
 				.padding(top = (10 * u).dp)
-				.navigationBarsPadding()
 				.padding(bottom = (30 * u).dp),
 		) {
 			Box(
 				modifier = Modifier
 					.align(Alignment.CenterHorizontally)
-					.padding(bottom = (4 * u).dp)
+					.padding(bottom = (18 * u).dp)
 					.size((40 * u).dp, (4 * u).dp)
 					.background(Sim.Track, RoundedCornerShape((2 * u).dp)),
 			)
@@ -386,6 +386,7 @@ private fun SellConfirmSheet(onConfirm: () -> Unit, onDismiss: () -> Unit) {
 					modifier = Modifier
 						.fillMaxWidth()
 						.height((52 * u).dp)
+						.background(Color(0x0AFFFFFF), RoundedCornerShape((6 * u).dp))
 						.border((0.36 * u).dp, Color(0x54343B4F), RoundedCornerShape((6 * u).dp))
 						.clickable(
 							interactionSource = remember { MutableInteractionSource() },
@@ -431,7 +432,8 @@ private fun PositionClosedSheet(onBackToSimulate: () -> Unit, onViewPortfolio: (
 					color = Sim.Bright,
 				)
 			}
-			Row(horizontalArrangement = Arrangement.spacedBy((6 * u).dp), modifier = Modifier.fillMaxWidth()) {
+			// 73:855 centres the Returned line (the Proceeds line above stays left-aligned).
+			Row(horizontalArrangement = Arrangement.spacedBy((6 * u).dp, Alignment.CenterHorizontally), modifier = Modifier.fillMaxWidth()) {
 				Text("Returned", style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp), color = Sim.Muted)
 				Text(
 					"$124.00",
@@ -446,6 +448,13 @@ private fun PositionClosedSheet(onBackToSimulate: () -> Unit, onViewPortfolio: (
 					modifier = Modifier
 						.fillMaxWidth()
 						.height((52 * u).dp)
+						.drawBehind {
+							val r = (6 * u).dp.toPx()
+							val paint = android.graphics.Paint().apply { isAntiAlias = true }
+							paint.color = android.graphics.Color.argb(23, 82, 170, 199)
+							paint.maskFilter = android.graphics.BlurMaskFilter((12.28f * u).dp.toPx(), android.graphics.BlurMaskFilter.Blur.NORMAL)
+							drawContext.canvas.nativeCanvas.drawRoundRect(0f, (12.28f * u).dp.toPx(), size.width, (12.28f * u).dp.toPx() + size.height, r, r, paint)
+						}
 						.background(
 							androidx.compose.ui.graphics.Brush.verticalGradient(
 								0.0889f to Color(0xFFA6E4F7),
@@ -473,6 +482,7 @@ private fun PositionClosedSheet(onBackToSimulate: () -> Unit, onViewPortfolio: (
 					modifier = Modifier
 						.fillMaxWidth()
 						.height((52 * u).dp)
+						.background(Color(0x0AFFFFFF), RoundedCornerShape((6 * u).dp))
 						.border((0.36 * u).dp, Color(0x54343B4F), RoundedCornerShape((6 * u).dp))
 						.clickable(
 							interactionSource = remember { MutableInteractionSource() },

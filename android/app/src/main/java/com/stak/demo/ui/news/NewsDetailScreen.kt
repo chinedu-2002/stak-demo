@@ -129,7 +129,8 @@ fun NewsDetailScreen(articleId: String = NewsArticleFeed.APPLE, onBack: () -> Un
 					modifier = Modifier
 						.fillMaxWidth()
 						.padding(horizontal = (20 * u).dp)
-						.padding(top = (22 * u).dp, bottom = (28 * u).dp),
+						// Render-measured vs 1:1495: headline cap-top 68 below the hero.
+						.padding(top = (26 * u).dp, bottom = (28 * u).dp),
 				) {
 					Text(
 						text = article.headline,
@@ -144,6 +145,8 @@ fun NewsDetailScreen(articleId: String = NewsArticleFeed.APPLE, onBack: () -> Un
 						// breaks after "lineup" (authored 3-line shape, lh22).
 						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (14.3 * u).sp, lineHeight = (22 * u).sp),
 						color = News.Muted,
+						// 1:1495: 26 of ink gap under the headline (the column's 15 + 5).
+						modifier = Modifier.padding(top = (5 * u).dp),
 					)
 					Byline(source = article.source, meta = article.sourceMeta)
 					if (!saved) {

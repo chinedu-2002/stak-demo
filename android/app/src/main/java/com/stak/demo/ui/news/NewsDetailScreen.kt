@@ -53,6 +53,7 @@ import com.stak.demo.ui.onboarding.AuthBackCircle
 import com.stak.demo.ui.theme.Geist
 import com.stak.demo.ui.theme.Sora
 import com.stak.demo.ui.theme.StakColors
+import com.stak.demo.ui.theme.ADVANCE_ROUNDING
 
 /** The CHINEDU CTA gradient (Add to STAK / View in My STAK). */
 private val CtaGradient = Brush.verticalGradient(
@@ -446,7 +447,7 @@ private fun StockCard(saved: Boolean, ticker: String, facts: NewsArticleFeed.Sto
 			) {
 				Text(
 					text = "Daily",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (8 * u).sp, lineHeight = (10 * u).sp, letterSpacing = (0.4 * u).sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (8 * u).sp, lineHeight = (10 * u).sp, letterSpacing = (0.4 * u + ADVANCE_ROUNDING.value).sp),
 					color = Color.White,
 				)
 				Image(
@@ -694,7 +695,7 @@ private fun ReadNext(currentId: String, onOpen: (String) -> Unit) {
 	Column(verticalArrangement = Arrangement.spacedBy((10 * u).dp), modifier = Modifier.fillMaxWidth().padding(top = (6 * u).dp)) {
 		Text(
 			text = "READ NEXT",
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, lineHeight = (13 * u).sp, letterSpacing = (0.5 * u).sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, lineHeight = (13 * u).sp, letterSpacing = (0.5 * u + ADVANCE_ROUNDING.value).sp),
 			color = News.Muted,
 		)
 		NewsArticleFeed.readNext(excluding = currentId).forEach { next ->

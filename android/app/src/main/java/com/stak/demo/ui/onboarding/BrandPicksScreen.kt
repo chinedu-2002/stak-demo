@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -36,6 +35,7 @@ import com.stak.demo.R
 import com.stak.demo.ui.theme.Geist
 import com.stak.demo.ui.theme.Sora
 import com.stak.demo.ui.theme.StakColors
+import com.stak.demo.ui.theme.ADVANCE_ROUNDING
 
 private data class Brand(val name: String, val iconRes: Int)
 
@@ -69,7 +69,7 @@ fun BrandPicksScreen(onBack: () -> Unit, onContinue: () -> Unit) {
 	val u = figmaUnit()
 	var picked by rememberSaveable { mutableStateOf(setOf<String>()) }
 
-	Column(modifier = Modifier.fillMaxSize().background(StakColors.Bg).systemBarsPadding()) {
+	Artboard(modifier = Modifier.background(StakColors.Bg)) {
 		// Nav row — back circle + step label.
 		Row(
 			verticalAlignment = Alignment.CenterVertically,
@@ -79,7 +79,7 @@ fun BrandPicksScreen(onBack: () -> Unit, onContinue: () -> Unit) {
 			androidx.compose.foundation.layout.Spacer(modifier = Modifier.weight(1f))
 			Text(
 				text = "STEP 2 OF 6",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, letterSpacing = (0.9 * u).sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, letterSpacing = (0.9 * u + ADVANCE_ROUNDING.value).sp),
 				color = Auth.FaintText,
 			)
 		}

@@ -46,6 +46,7 @@ import com.stak.demo.ui.onboarding.AuthBackCircle
 import com.stak.demo.ui.theme.Geist
 import com.stak.demo.ui.theme.Sora
 import com.stak.demo.ui.theme.StakColors
+import com.stak.demo.ui.theme.ADVANCE_ROUNDING
 
 private val Card = Color(0xFF181F30)
 private val Bright = Color(0xFFF2F6FC)
@@ -532,7 +533,7 @@ private fun Kicker(text: String) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Text(
 		text,
-		style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, letterSpacing = (0.8 * u).sp),
+		style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, letterSpacing = (0.8 * u + ADVANCE_ROUNDING.value).sp),
 		color = Muted,
 	)
 }
@@ -745,7 +746,7 @@ private fun SinceYouSavedCard() {
 			Image(painterResource(R.drawable.ic_saved_bookmark), null, modifier = Modifier.size((12 * u).dp))
 			Text(
 				"SINCE YOU SAVED",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, letterSpacing = (0.8 * u).sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, letterSpacing = (0.8 * u + ADVANCE_ROUNDING.value).sp),
 				color = Muted,
 			)
 			Spacer(modifier = Modifier.width((8 * u).dp))

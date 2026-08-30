@@ -71,6 +71,7 @@ import com.stak.demo.ui.theme.StakColors
 import kotlin.math.roundToInt
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import com.stak.demo.ui.theme.ADVANCE_ROUNDING
 
 /** Palette of the CHINEDU "04 · Discover" frames. */
 private object Disc {
@@ -209,7 +210,7 @@ fun DiscoverScreen(onLearnMore: () -> Unit = {}, onPracticeBuy: () -> Unit = {})
 				}
 				Text(
 					text = "TODAY · AI & CHIPS",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, lineHeight = (13 * u).sp, letterSpacing = (0.9 * u).sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, lineHeight = (13 * u).sp, letterSpacing = (0.9 * u + ADVANCE_ROUNDING.value).sp),
 					color = Disc.Faint,
 					modifier = Modifier.padding(horizontal = (2 * u).dp),
 				)
@@ -532,7 +533,7 @@ private fun DeckCardBody(card: DeckCard, onSave: (() -> Unit)?, u: Float, rows: 
 			) {
 				Text(
 					text = "TIP",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, letterSpacing = (0.9 * u).sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, letterSpacing = (0.9 * u + ADVANCE_ROUNDING.value).sp),
 					color = Disc.Teal,
 				)
 				Text(

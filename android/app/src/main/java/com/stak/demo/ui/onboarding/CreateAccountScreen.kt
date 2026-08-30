@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -70,7 +69,7 @@ fun CreateAccountScreen(onBack: () -> Unit, onCreateAccount: () -> Unit, onSignI
 	Box(modifier = Modifier.fillMaxSize().background(StakColors.Bg)) {
 		AuthWatermark()
 
-		Column(modifier = Modifier.fillMaxSize().systemBarsPadding()) {
+		Artboard {
 			Row(modifier = Modifier.fillMaxWidth().padding(start = (20 * u).dp, top = (10 * u).dp, bottom = (4 * u).dp)) {
 				AuthBackCircle(onClick = onBack)
 			}

@@ -34,6 +34,7 @@ import com.stak.demo.ui.onboarding.AuthBackCircle
 import com.stak.demo.ui.theme.Geist
 import com.stak.demo.ui.theme.Sora
 import com.stak.demo.ui.theme.StakColors
+import com.stak.demo.ui.theme.ADVANCE_ROUNDING
 
 private data class Rank(
 	val rank: String, val initial: String, val name: String,
@@ -100,7 +101,7 @@ fun LeaderboardScreen(onBack: () -> Unit) {
 			Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
 				Text(
 					text = "RANKED BY RETURN",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, lineHeight = (13 * u).sp, letterSpacing = (0.9 * u).sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, lineHeight = (13 * u).sp, letterSpacing = (0.9 * u + ADVANCE_ROUNDING.value).sp),
 					color = Sim.Faint,
 					modifier = Modifier.padding(start = (2 * u).dp),
 				)

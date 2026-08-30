@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -46,6 +45,7 @@ import androidx.compose.ui.unit.sp
 import com.stak.demo.ui.theme.Geist
 import com.stak.demo.ui.theme.Sora
 import com.stak.demo.ui.theme.StakColors
+import com.stak.demo.ui.theme.ADVANCE_ROUNDING
 
 private const val NAME_MAX = 20
 
@@ -88,7 +88,7 @@ fun ProfileSetupScreen(onBack: () -> Unit, onProceed: () -> Unit) {
 		if (uri != null) photoUri = uri.toString()
 	}
 
-	Column(modifier = Modifier.fillMaxSize().background(StakColors.Bg).systemBarsPadding()) {
+	Artboard(modifier = Modifier.background(StakColors.Bg)) {
 		Row(modifier = Modifier.fillMaxWidth().padding(horizontal = (20 * u).dp).padding(top = (10 * u).dp, bottom = (4 * u).dp)) {
 			AuthBackCircle(onClick = onBack)
 		}
@@ -165,7 +165,7 @@ fun ProfileSetupScreen(onBack: () -> Unit, onProceed: () -> Unit) {
 
 			Text(
 				text = "DISPLAY NAME",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, letterSpacing = (1.2 * u).sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, letterSpacing = (1.2 * u + ADVANCE_ROUNDING.value).sp),
 				color = Auth.FaintText,
 			)
 

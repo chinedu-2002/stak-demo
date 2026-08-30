@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -53,6 +52,7 @@ import com.stak.demo.ui.theme.Sora
 import com.stak.demo.ui.theme.StakColors
 import kotlin.math.roundToInt
 import kotlinx.coroutines.launch
+import com.stak.demo.ui.theme.ADVANCE_ROUNDING
 
 // The tutorial deck (1:344) is the Discover deck at 87.4% — the same
 // authored queue slabs behind a live front card built from the shared
@@ -81,7 +81,7 @@ fun SwipeTutorialScreen(onBack: () -> Unit, onContinue: () -> Unit) {
 	val u = figmaUnit()
 	val u2 = u * DECK_SCALE
 
-	Column(modifier = Modifier.fillMaxSize().background(StakColors.Bg).systemBarsPadding()) {
+	Artboard(modifier = Modifier.background(StakColors.Bg)) {
 		Row(
 			verticalAlignment = Alignment.CenterVertically,
 			modifier = Modifier.fillMaxWidth().padding(horizontal = (20 * u).dp).padding(top = (10 * u).dp, bottom = (4 * u).dp),
@@ -90,7 +90,7 @@ fun SwipeTutorialScreen(onBack: () -> Unit, onContinue: () -> Unit) {
 			Spacer(modifier = Modifier.weight(1f))
 			Text(
 				text = "STEP 3 OF 6",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, letterSpacing = (0.9 * u).sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, letterSpacing = (0.9 * u + ADVANCE_ROUNDING.value).sp),
 				color = Auth.FaintText,
 			)
 		}

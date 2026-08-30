@@ -39,6 +39,11 @@ import androidx.compose.ui.unit.sp
 import com.stak.demo.R
 import com.stak.demo.ui.theme.Geist
 import com.stak.demo.ui.theme.StakColors
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.statusBarsPadding
 
 /**
  * Shared pieces of the Figma "Auth ·" screens (Sign up 1554:9126,
@@ -63,8 +68,33 @@ internal object Auth {
  * the screen. Text/paddings stay plain dp.
  */
 @Composable
-internal fun figmaUnit(): Float =
-	androidx.compose.ui.platform.LocalConfiguration.current.screenWidthDp / 390f
+internal fun figmaUnit(): Float {
+	// Configuration.screenWidthDp is an INTEGER (411 on a 1080/2.625 Pixel 7
+	// whose true width is 411.43dp) — that 0.1% shortfall compounds to a
+	// few px over a full-height artboard. Derive u from the real pixel width.
+	val dm = androidx.compose.ui.platform.LocalContext.current.resources.displayMetrics
+	return dm.widthPixels / dm.density / 390f
+}
+
+/**
+ * Frame-exact vertical composition (user ruling 2026-08-30, "just what's
+ * on the Figma design"): every onboarding/auth frame is a 390x844
+ * artboard whose bottom-anchored CTA block is authored against the
+ * frame's bottom edge (the 44 status bar + 800 of content, the home
+ * indicator zone INSIDE the authored bottom padding). Taller phones
+ * used to stretch that column to the screen, pushing the CTA ~22 frame
+ * px below its authored spot; this pins the column to the authored 800u
+ * below the real status bar and leaves the surplus (the gesture zone)
+ * under it. Screens shorter than the artboard fall back to filling.
+ */
+@Composable
+internal fun Artboard(modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
+	val u = figmaUnit()
+	BoxWithConstraints(modifier = modifier.fillMaxSize().statusBarsPadding()) {
+		val h = if ((800 * u).dp < maxHeight) (800 * u).dp else maxHeight
+		Column(modifier = Modifier.fillMaxWidth().height(h), content = content)
+	}
+}
 
 /** 10%-alpha glass ball rotated 174.3°, centered 10dp left / 159.8dp below screen center. */
 @Composable

@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -40,6 +39,7 @@ import androidx.compose.ui.unit.sp
 import com.stak.demo.ui.theme.Geist
 import com.stak.demo.ui.theme.Sora
 import com.stak.demo.ui.theme.StakColors
+import com.stak.demo.ui.theme.ADVANCE_ROUNDING
 
 /** One 2x2 matrix option — icon in a #242b3d circle, Geist title/subtitle.
  * Icon glyphs keep their native Figma frame size (21.06 for the goal set,
@@ -73,7 +73,7 @@ internal fun MatrixQuizScreen(
 	val u = figmaUnit()
 	var selected by rememberSaveable { mutableIntStateOf(-1) }
 
-	Column(modifier = Modifier.fillMaxSize().background(StakColors.Bg).systemBarsPadding()) {
+	Artboard(modifier = Modifier.background(StakColors.Bg)) {
 		Row(
 			verticalAlignment = Alignment.CenterVertically,
 			modifier = Modifier.fillMaxWidth().padding(horizontal = (20 * u).dp).padding(top = (10 * u).dp, bottom = (4 * u).dp),
@@ -82,7 +82,7 @@ internal fun MatrixQuizScreen(
 			Spacer(modifier = Modifier.weight(1f))
 			Text(
 				text = stepLabel,
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, letterSpacing = (0.9 * u).sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, letterSpacing = (0.9 * u + ADVANCE_ROUNDING.value).sp),
 				color = Auth.FaintText,
 			)
 		}

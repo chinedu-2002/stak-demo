@@ -11,24 +11,35 @@ struct PreparingDeckView: View {
 
 	var body: some View {
 		let u = figmaUnit
-		VStack(spacing: 18 * u) {
+		// Authored rhythm (1:634, frame y minus the 44 status bar): the frame is
+		// TOP-anchored — illustration ink top 245, headline box 648 h28, caption
+		// row 694. The flattened hero render carries 66u of baked background
+		// above its ink inside the 488u box, so the box tops out at 135.
+		// Mirrors android (PreparingDeckScreen).
+		ZStack(alignment: .top) {
 			Image("IntroHeroBox")
 				.resizable()
 				.scaledToFit()
 				.frame(width: 342 * u, height: 488 * u)
+				.offset(y: 135 * u)
 			Text("Building your first deck...")
 				.font(StakFont.sora(22 * u, .semiBold))
+				.lineSpacing((28 - 22) * u)
 				.multilineTextAlignment(.center)
 				.foregroundStyle(StakColors.textPrimary)
+				.frame(maxWidth: .infinity)
+				.offset(y: 604 * u)
 			HStack(spacing: 5 * u) {
 				Spinner()
 				Text("Reading your brand picks")
 					.font(StakFont.geist(12 * u))
+					.lineSpacing((15 - 12) * u)
 					.foregroundStyle(Auth.faintText)
 			}
+			.offset(y: 650 * u)
 		}
 		.padding(.horizontal, 24 * u)
-		.frame(maxWidth: .infinity, maxHeight: .infinity)
+		.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
 		.background(StakColors.bg.ignoresSafeArea())
 		.task {
 			// Prototype: "After delay 1800ms" → 07 Taste reveal (dissolve).
@@ -46,7 +57,7 @@ private struct Spinner: View {
 		let u = figmaUnit
 		Circle()
 			.trim(from: 0, to: 0.75)
-			.stroke(Auth.faintText, style: StrokeStyle(lineWidth: 1.6 * u, lineCap: .round))
+			.stroke(Auth.faintText, style: StrokeStyle(lineWidth: 2.94 * u, lineCap: .butt))
 			.frame(width: 14 * u, height: 14 * u)
 			.rotationEffect(.degrees(spinning ? 360 : 0))
 			.animation(.linear(duration: 0.9).repeatForever(autoreverses: false), value: spinning)

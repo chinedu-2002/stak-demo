@@ -22,11 +22,11 @@ struct IntroView: View {
 						// Wrap-true 14x0.95: the rendered Geist shapes ~5% wider
 						// than authored, and the authored break is
 						// "...into simple, clear / stock ideas...".
-						.font(StakFont.geist(13.3 * u))
-						.lineSpacing((21 - 13.3) * u)
+						.font(StakFont.geist(14 * u))
+						.lineSpacing((21 - 14) * u)
 					// RENDER-measured: the authored break is after "simple," -
-					// the 318u width pin forces the authored wrap (mirrors android).
-					.frame(width: 318 * u, alignment: .leading)
+					// the 342u (authored column) width pin forces the authored wrap (mirrors android).
+					.frame(width: 342 * u, alignment: .leading)
 						.foregroundStyle(Auth.subtitleGray)
 				}
 				.frame(maxWidth: .infinity, alignment: .leading)

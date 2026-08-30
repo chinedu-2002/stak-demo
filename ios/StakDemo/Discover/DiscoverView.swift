@@ -109,6 +109,8 @@ struct DiscoverView: View {
 
 	@State private var seen = 0
 	@State private var savedToast = false
+	// 1:1627 vs 1:1796: the front card's Save chip disappears once its stock is saved.
+	@State private var savedCards: Set<String> = []
 	@State private var dragOffset: CGFloat = 0
 	@State private var frontOpacity: Double = 1
 	@State private var frontScale: CGFloat = 1
@@ -176,7 +178,7 @@ struct DiscoverView: View {
 								.frame(width: 313.14 * u, height: 352.87 * u)
 								.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
 								.offset(x: 18 * u, y: 24 * u)
-							FrontDeckCard(card: deck[seen % 3], onSave: { MyStakHoldings.shared.add(deck[seen % 3].ticker); savedToast = true }, u: u)
+							FrontDeckCard(card: deck[seen % 3], onSave: { savedCards.insert(deck[seen % 3].ticker); MyStakHoldings.shared.add(deck[seen % 3].ticker); savedToast = true }, u: u, saved: savedCards.contains(deck[seen % 3].ticker))
 								.scaleEffect(frontScale)
 								.opacity(frontOpacity)
 								.offset(y: 54.65 * u + dragOffset)
@@ -326,10 +328,11 @@ struct ProgressRing: View {
 private struct FrontDeckCard: View {
 	let card: DeckCard
 	let onSave: () -> Void
+	var saved: Bool = false
 	let u: CGFloat
 
 	var body: some View {
-		DeckCardBody(card: card, onSave: onSave, u: u)
+		DeckCardBody(card: card, onSave: onSave, u: u, saved: saved)
 			.frame(width: 350 * u)
 			.background { CardSeam(u: u) }
 	}
@@ -358,6 +361,7 @@ private struct DeckCardBody: View {
 	let card: DeckCard
 	let onSave: (() -> Void)?
 	let u: CGFloat
+	var saved: Bool = false
 
 	var body: some View {
 		// The authored card template (1:1740, shared by all three designs):
@@ -370,14 +374,15 @@ private struct DeckCardBody: View {
 					.frame(width: 340 * u, height: 229 * u)
 					.background(card.artBg)
 					.clipShape(RoundedRectangle(cornerRadius: 18 * u))
-				if card.art != "DiscCardNVDA" {
-					// NVDA's chip is baked into its art; the others draw it live
-					// at the template's authored spot (art x264 y6, 340-264-72=4).
+				if !saved {
+					// Every card draws the chip live at the template's authored
+					// spot (art x264 y6); the saved deck (1:1796) has none. The
+					// NVDA art is the chip-less export of 1:1910.
 					SaveChip(u: u)
 						.padding(.top, 6 * u)
 						.padding(.trailing, 4 * u)
 				}
-				if let onSave {
+				if let onSave, !saved {
 					Button(action: onSave) {
 						Color.clear.frame(width: 86 * u, height: 38 * u)
 					}

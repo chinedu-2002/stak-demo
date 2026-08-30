@@ -362,6 +362,25 @@ private fun HeroImage(media: NewsMedia, category: String, saved: Boolean, onBook
 						) { playing = true; paused = false },
 				)
 			}
+			// An image with an embedded link (served contract): tapping the
+			// hero opens the story's own dynamic link.
+			val imageLink = (media as? NewsMedia.Image)?.sourceLink
+			if (imageLink != null) {
+				Box(
+					modifier = Modifier
+						.matchParentSize()
+						.clickable(
+							interactionSource = remember { MutableInteractionSource() },
+							indication = null,
+						) {
+							runCatching {
+								heroCtx.startActivity(
+									android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(imageLink)),
+								)
+							}
+						},
+				)
+			}
 		}
 		Box(
 			modifier = Modifier

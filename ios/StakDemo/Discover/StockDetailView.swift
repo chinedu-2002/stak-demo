@@ -210,7 +210,7 @@ struct StockDetailView: View {
 				DiscoverBuyFlow(
 					spec: aaplBuy,
 					onClose: { showBuy = false },
-					filledSecondary: "Done",
+					filledSecondary: "Done", ticketSecondary: "Back",
 					// Authored (71:949 / 71:994): View in My STAK -> Overview,
 					// the forward push.
 					onFilledPrimary: {

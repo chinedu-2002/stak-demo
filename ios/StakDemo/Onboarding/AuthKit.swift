@@ -14,6 +14,30 @@ var figmaUnit: CGFloat {
 	UIScreen.main.bounds.width / 390
 }
 
+/// Frame-exact vertical composition (user ruling 2026-08-30, "just what's
+/// on the Figma design"; mirrors android `Artboard`): every onboarding/auth
+/// frame is a 390x844 artboard whose bottom-anchored CTA block is authored
+/// against the frame's bottom edge (44 status bar + 800 of content, with
+/// the home indicator INSIDE the authored bottom padding). SwiftUI's
+/// default safe-area layout used to stretch the column to the screen and
+/// stack the home-indicator inset under the authored padding, pushing the
+/// CTA off its authored spot. This pins the column to the authored 800u
+/// below the top safe-area edge, ignores the bottom inset (the indicator
+/// overlays the authored padding, as in the frame) and leaves any surplus
+/// below. Screens shorter than the artboard fall back to filling.
+struct Artboard<Content: View>: View {
+	@ViewBuilder let content: () -> Content
+
+	var body: some View {
+		let u = figmaUnit
+		GeometryReader { proxy in
+			VStack(spacing: 0, content: content)
+				.frame(width: proxy.size.width, height: min(800 * u, proxy.size.height), alignment: .top)
+		}
+		.ignoresSafeArea(edges: .bottom)
+	}
+}
+
 /// 10%-alpha glass ball behind the lower half of the auth screens.
 struct AuthWatermark: View {
 	var body: some View {

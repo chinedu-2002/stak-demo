@@ -19,7 +19,7 @@ struct SignInView: View {
 		ZStack {
 			AuthWatermark()
 
-			VStack(spacing: 0) {
+			Artboard {
 				HStack {
 					AuthBackCircle(action: onBack)
 					Spacer()

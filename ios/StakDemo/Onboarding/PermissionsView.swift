@@ -16,7 +16,7 @@ struct PermissionsView: View {
 
 	var body: some View {
 		let u = figmaUnit
-		VStack(spacing: 0) {
+		Artboard {
 			HStack {
 				AuthBackCircle(action: onBack)
 				Spacer()

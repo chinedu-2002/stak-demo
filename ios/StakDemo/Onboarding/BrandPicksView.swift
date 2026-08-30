@@ -36,7 +36,7 @@ struct BrandPicksView: View {
 
 	var body: some View {
 		let u = figmaUnit
-		VStack(spacing: 0) {
+		Artboard {
 			// Nav row — back circle + step label.
 			HStack {
 				AuthBackCircle(action: onBack)

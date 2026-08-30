@@ -11,7 +11,7 @@ struct IntroView: View {
 
 	var body: some View {
 		let u = figmaUnit
-		VStack(spacing: 0) {
+		Artboard {
 			VStack(alignment: .leading, spacing: 16 * u) {
 				VStack(alignment: .leading, spacing: 12 * u) {
 					Text("Find stocks you actually understand.")
@@ -55,7 +55,6 @@ struct IntroView: View {
 			.padding(.top, 8 * u)
 			.padding(.bottom, 26 * u)
 		}
-		.frame(maxWidth: .infinity, maxHeight: .infinity)
 		.background(StakColors.bg.ignoresSafeArea())
 	}
 }

@@ -180,6 +180,8 @@ fun DiscoverScreen(
 	// The buy ticket itself is raised by the shell (over the tab bar).
 	var seen by rememberSaveable { mutableIntStateOf(0) }
 	var savedToast by remember { mutableStateOf(false) }
+	// 1:1627 vs 1:1796: the front card's Save chip disappears once its stock is saved.
+	var savedCards by remember { mutableStateOf(setOf<String>()) }
 	val topOffset = remember(seen) { Animatable(0f) }
 	val promote = remember(seen) { Animatable(0f) }
 	val enter = remember(seen) { Animatable(if (seen == 0) 1f else 0f) }
@@ -296,7 +298,8 @@ fun DiscoverScreen(
 					)
 					FrontDeckCard(
 						card = DECK[seen % 3],
-						onSave = { com.stak.demo.ui.MyStakHoldings.add(DECK[seen % 3].ticker); savedToast = true },
+						onSave = { savedCards = savedCards + DECK[seen % 3].ticker; com.stak.demo.ui.MyStakHoldings.add(DECK[seen % 3].ticker); savedToast = true },
+						saved = DECK[seen % 3].ticker in savedCards,
 						u = u,
 						modifier = Modifier
 							.align(Alignment.TopCenter)
@@ -413,6 +416,7 @@ fun DiscoverScreen(
 internal fun FrontDeckCard(
 	card: DeckCard,
 	onSave: () -> Unit,
+	saved: Boolean = false,
 	u: Float,
 	modifier: Modifier = Modifier,
 	rows: DeckRowTweaks = DeckRowTweaks(),
@@ -443,7 +447,7 @@ internal fun FrontDeckCard(
 				}
 			},
 	) {
-		DeckCardBody(card = card, onSave = onSave, u = u, rows = rows)
+		DeckCardBody(card = card, onSave = onSave, u = u, rows = rows, saved = saved)
 	}
 }
 
@@ -461,7 +465,7 @@ internal class DeckRowTweaks(
 )
 
 @Composable
-private fun DeckCardBody(card: DeckCard, onSave: (() -> Unit)?, u: Float, rows: DeckRowTweaks = DeckRowTweaks()) {
+private fun DeckCardBody(card: DeckCard, onSave: (() -> Unit)?, u: Float, rows: DeckRowTweaks = DeckRowTweaks(), saved: Boolean = false) {
 	Column(
 		horizontalAlignment = Alignment.CenterHorizontally,
 		// The authored card template (1:1740, shared by all three designs):
@@ -485,12 +489,13 @@ private fun DeckCardBody(card: DeckCard, onSave: (() -> Unit)?, u: Float, rows: 
 				contentScale = ContentScale.Crop,
 				modifier = Modifier.size((340 * u).dp, (229 * u).dp),
 			)
-			if (card.artRes != R.drawable.disc_card_nvda) {
-				// NVDA's chip is baked into its art; the others draw it live
-				// at the template's authored spot (art x264 y6, 340-264-72=4).
+			if (!saved) {
+				// Every card draws the chip live at the template's authored spot
+				// (art x264 y6); the saved deck (1:1796) has none. The NVDA art
+				// is the chip-less export of 1:1910.
 				SaveChip(u = u, modifier = Modifier.align(Alignment.TopEnd).padding(top = (6 * u).dp, end = (4 * u).dp))
 			}
-			if (onSave != null) {
+			if (onSave != null && !saved) {
 				Box(
 					modifier = Modifier
 						.align(Alignment.TopEnd)

@@ -402,6 +402,7 @@ private fun MainShell(
 	// account; a launch that resumed a saved session lands on Home Main.
 	var homeFirstRun by rememberSaveable { mutableStateOf(!com.stak.demo.ui.Session.resumedSignedIn) }
 	var discoverBuy by rememberSaveable { mutableStateOf(false) }
+	var simulateBuy by rememberSaveable { mutableStateOf(false) }
 	Box(modifier = Modifier.fillMaxSize()) {
 		Column(modifier = Modifier.fillMaxSize()) {
 			Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
@@ -424,6 +425,7 @@ private fun MainShell(
 						onPracticeBuy = { discoverBuy = true },
 					)
 					MainTab.Simulate -> SimulateScreen(
+						onPracticeBuy = { simulateBuy = true },
 						onOpenPortfolio = onOpenSimPortfolio,
 						onOpenPick = onOpenSimPick,
 						onOpenLeaderboard = onOpenLeaderboard,
@@ -446,6 +448,16 @@ private fun MainShell(
 		// bottom, so it cannot live inside the tab content area.
 		if (discoverBuy) {
 			DiscoverBuyFlow(onClose = { discoverBuy = false })
+		}
+		// 1:4232 / 85:895: the Simulate ticket also covers the tab bar.
+		if (simulateBuy) {
+			DiscoverBuyFlow(
+				onClose = { simulateBuy = false },
+				spec = com.stak.demo.ui.simulate.PLTR_BUY,
+				filledPrimary = "View portfolio",
+				filledSecondary = "Done",
+				ticketSecondary = "Back",
+			)
 		}
 	}
 }

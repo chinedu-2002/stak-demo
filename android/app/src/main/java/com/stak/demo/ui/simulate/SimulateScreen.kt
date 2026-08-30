@@ -85,6 +85,8 @@ fun SimulateScreen(
 	onOpenPortfolio: () -> Unit,
 	onOpenPick: () -> Unit,
 	onOpenLeaderboard: () -> Unit,
+	// When the shell hosts the ticket (1:4232: the sheet covers the tab bar), it raises it here.
+	onPracticeBuy: (() -> Unit)? = null,
 ) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	var showBuy by rememberSaveable { mutableStateOf(false) }
@@ -131,8 +133,8 @@ fun SimulateScreen(
 			) {
 				ScoreHero(onOpenLeaderboard = onOpenLeaderboard)
 				SectionHeader("Saved staks")
-				SavedStakRow("P", "PLTR", "Saved Jun 30 · not in portfolio yet", onBuy = { showBuy = true })
-				SavedStakRow("C", "COST", "Saved Jul 2 · not in portfolio yet", onBuy = { showBuy = true })
+				SavedStakRow("P", "PLTR", "Saved Jun 30 · not in portfolio yet", onBuy = { if (onPracticeBuy != null) onPracticeBuy() else showBuy = true })
+				SavedStakRow("C", "COST", "Saved Jul 2 · not in portfolio yet", onBuy = { if (onPracticeBuy != null) onPracticeBuy() else showBuy = true })
 				CenterLink("All saved staks")
 				InsightCard()
 				Row(horizontalArrangement = Arrangement.spacedBy((10 * u).dp)) {
@@ -179,7 +181,7 @@ fun SimulateScreen(
 		}
 		if (showBuy) {
 			// 85:895 authors "View portfolio" / "Done" on the Simulate add-success sheet.
-			DiscoverBuyFlow(onClose = { showBuy = false }, spec = PLTR_BUY, filledPrimary = "View portfolio", filledSecondary = "Done")
+			DiscoverBuyFlow(onClose = { showBuy = false }, spec = PLTR_BUY, filledPrimary = "View portfolio", filledSecondary = "Done", ticketSecondary = "Back")
 		}
 	}
 }

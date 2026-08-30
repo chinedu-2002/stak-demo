@@ -213,7 +213,8 @@ fun DiscoverScreen(onLearnMore: () -> Unit = {}, onPracticeBuy: () -> Unit = {})
 				}
 				Text(
 					text = "TODAY · AI & CHIPS",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, lineHeight = (13 * u).sp, letterSpacing = (0.9 * u + ADVANCE_ROUNDING.value).sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, lineHeight = (13 * u).sp, letterSpacing = (0.9 * u).sp),
+					// Measured: this tracked caps run needs no advance-rounding compensation (it ran 4 wide with it).
 					color = Disc.Muted,
 				)
 			}
@@ -705,6 +706,8 @@ private fun SheetSecondary(text: String, onClick: () -> Unit) {
 		modifier = Modifier
 			.fillMaxWidth()
 			.height((52 * u).dp)
+			// Authored (1:1970): faint 4% white fill under the hairline.
+			.background(Color(0x0AFFFFFF), RoundedCornerShape((6 * u).dp))
 			.border((0.36 * u).dp, Color(0x54343B4F), RoundedCornerShape((6 * u).dp))
 			.clickable(
 				interactionSource = remember { MutableInteractionSource() },
@@ -722,7 +725,7 @@ private fun SheetSecondary(text: String, onClick: () -> Unit) {
 
 /** "Buy NVDA?" practice ticket (frame 1:1970, sheet 1:2159). */
 @Composable
-private fun PracticeBuySheet(onConfirm: () -> Unit, onDismiss: () -> Unit, spec: BuySpec = NVDA_BUY) {
+private fun PracticeBuySheet(onConfirm: () -> Unit, onDismiss: () -> Unit, spec: BuySpec = NVDA_BUY, secondary: String = "Not yet") {
 	var selected by rememberSaveable { mutableIntStateOf(1) }
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	SheetScaffold(onDismiss = onDismiss) {
@@ -804,7 +807,7 @@ private fun PracticeBuySheet(onConfirm: () -> Unit, onDismiss: () -> Unit, spec:
 			}
 			Column(verticalArrangement = Arrangement.spacedBy((16 * u).dp), modifier = Modifier.fillMaxWidth()) {
 				SheetCta(text = "Confirm practice buy", onClick = onConfirm)
-				SheetSecondary(text = "Not yet", onClick = onDismiss)
+				SheetSecondary(text = secondary, onClick = onDismiss)
 			}
 		}
 	}
@@ -995,10 +998,10 @@ private fun EndOfDeck(onPracticeBuySaves: () -> Unit, onSwipeAgain: () -> Unit) 
 
 /** Buy → Order-filled flow, reused by the Stock Detail page. */
 @Composable
-internal fun DiscoverBuyFlow(onClose: () -> Unit, spec: BuySpec = NVDA_BUY, filledPrimary: String = "View in My STAK", filledSecondary: String = "Keep exploring") {
+internal fun DiscoverBuyFlow(onClose: () -> Unit, spec: BuySpec = NVDA_BUY, filledPrimary: String = "View in My STAK", filledSecondary: String = "Keep exploring", ticketSecondary: String = "Not yet") {
 	var filled by rememberSaveable { mutableStateOf(false) }
 	if (!filled) {
-		PracticeBuySheet(onConfirm = { filled = true }, onDismiss = onClose, spec = spec)
+		PracticeBuySheet(onConfirm = { filled = true }, onDismiss = onClose, spec = spec, secondary = ticketSecondary)
 	} else {
 		OrderFilledSheet(onDismiss = onClose, spec = spec, primary = filledPrimary, secondary = filledSecondary)
 	}

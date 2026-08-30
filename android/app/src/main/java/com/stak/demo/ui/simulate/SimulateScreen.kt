@@ -87,6 +87,8 @@ fun SimulateScreen(
 	onOpenLeaderboard: () -> Unit,
 	// When the shell hosts the ticket (1:4232: the sheet covers the tab bar), it raises it here.
 	onPracticeBuy: (() -> Unit)? = null,
+	// B14 (1:3964 Motion): "All saved staks ›" hops to the My STAK tab.
+	onOpenMyStak: () -> Unit = {},
 ) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	var showBuy by rememberSaveable { mutableStateOf(false) }
@@ -135,7 +137,7 @@ fun SimulateScreen(
 				SectionHeader("Saved staks")
 				SavedStakRow("P", "PLTR", "Saved Jun 30 · not in portfolio yet", onBuy = { if (onPracticeBuy != null) onPracticeBuy() else showBuy = true })
 				SavedStakRow("C", "COST", "Saved Jul 2 · not in portfolio yet", onBuy = { if (onPracticeBuy != null) onPracticeBuy() else showBuy = true })
-				CenterLink("All saved staks")
+				CenterLink("All saved staks", onClick = onOpenMyStak)
 				InsightCard()
 				Row(horizontalArrangement = Arrangement.spacedBy((10 * u).dp)) {
 					PickDuo("BEST PICK", "+24.0%", Sim.Green, "N", "NVDA", "+$24 on $100", Modifier.weight(1f), onOpenPick)

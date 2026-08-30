@@ -52,7 +52,13 @@ import androidx.compose.foundation.layout.requiredSize
  * insight and the dark Sell CTA (raises the sell flow from here too).
  */
 @Composable
-fun PickDetailScreen(onBack: () -> Unit) {
+fun PickDetailScreen(
+	onBack: () -> Unit,
+	// B19 (73:855 Motion): the sell-success CTAs leave the page with
+	// their own styles - wired by the nav host.
+	onBackToSimulate: (() -> Unit)? = null,
+	onViewPortfolio: (() -> Unit)? = null,
+) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	var showSell by rememberSaveable { mutableStateOf(false) }
 
@@ -228,9 +234,14 @@ fun PickDetailScreen(onBack: () -> Unit) {
 			}
 		}
 		if (showSell) {
-			// The sell flow is hosted by the portfolio screen's sheets; from
-			// here selling routes back through the portfolio page.
-			SellFlowHost(onClose = { showSell = false; onBack() })
+			// Sell confirm (1:4698 Motion): "Back" just drops the sheet,
+			// Instant; the success CTAs route through the nav host (B19) so
+			// the sheet rides the page's own transition out.
+			SellFlowHost(
+				onClose = { showSell = false },
+				onBackToSimulate = { if (onBackToSimulate != null) onBackToSimulate() else { showSell = false; onBack() } },
+				onViewPortfolio = { if (onViewPortfolio != null) onViewPortfolio() else { showSell = false; onBack() } },
+			)
 		}
 	}
 }

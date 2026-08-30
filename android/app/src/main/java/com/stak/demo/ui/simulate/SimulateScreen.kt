@@ -45,6 +45,7 @@ import com.stak.demo.ui.discover.DiscoverBuyFlow
 import com.stak.demo.ui.theme.Geist
 import com.stak.demo.ui.theme.Sora
 import com.stak.demo.ui.theme.StakColors
+import com.stak.demo.ui.theme.ADVANCE_ROUNDING
 
 internal object Sim {
 	val CardBg = Color(0xFF181F30)
@@ -206,7 +207,7 @@ private fun ScoreHero(onOpenLeaderboard: () -> Unit) {
 	) {
 		Text(
 			text = "PORTFOLIO VALUE",
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, lineHeight = (13 * u).sp, letterSpacing = (0.9 * u).sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, lineHeight = (13 * u).sp, letterSpacing = (0.9 * u + ADVANCE_ROUNDING.value).sp),
 			color = Sim.Faint,
 			modifier = Modifier.padding(horizontal = (20 * u).dp),
 		)
@@ -387,7 +388,7 @@ private fun InsightCard() {
 			Image(painterResource(R.drawable.ic_gist_sparkle), null, modifier = Modifier.size((16 * u).dp))
 			Text(
 				text = "INSIGHT",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, letterSpacing = (0.9 * u).sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, letterSpacing = (0.9 * u + ADVANCE_ROUNDING.value).sp),
 				color = Sim.Faint,
 			)
 		}
@@ -421,7 +422,7 @@ private fun PickDuo(
 		Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
 			Text(
 				text = kicker,
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, letterSpacing = (0.9 * u).sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, letterSpacing = (0.9 * u + ADVANCE_ROUNDING.value).sp),
 				color = Sim.Faint,
 			)
 			Spacer(modifier = Modifier.weight(1f))
@@ -452,7 +453,7 @@ private fun HowItWorksCard() {
 	) {
 		Text(
 			text = "HOW PAPER TRADING WORKS",
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, letterSpacing = (0.9 * u).sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, letterSpacing = (0.9 * u + ADVANCE_ROUNDING.value).sp),
 			color = Sim.Faint,
 		)
 		listOf(
@@ -575,7 +576,7 @@ private fun BoardCard(onOpenLeaderboard: () -> Unit) {
 		Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
 			Text(
 				text = "THIS WEEK’S BOARD",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, letterSpacing = (0.9 * u).sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, letterSpacing = (0.9 * u + ADVANCE_ROUNDING.value).sp),
 				color = Sim.Faint,
 			)
 			Spacer(modifier = Modifier.weight(1f))

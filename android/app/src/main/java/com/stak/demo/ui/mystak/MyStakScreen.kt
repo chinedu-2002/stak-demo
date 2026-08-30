@@ -41,6 +41,7 @@ import com.stak.demo.R
 import com.stak.demo.ui.theme.Geist
 import com.stak.demo.ui.theme.Sora
 import com.stak.demo.ui.theme.StakColors
+import com.stak.demo.ui.theme.ADVANCE_ROUNDING
 
 private val CardBg = Color(0xFF181F30)
 private val Muted = Color(0xFF819ABB)
@@ -183,7 +184,7 @@ fun MyStakScreen(onOpenCollection: () -> Unit, onStartSwiping: () -> Unit) {
 			) {
 				Text(
 					text = "DISCOVER",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, lineHeight = (13 * u).sp, letterSpacing = (0.6 * u).sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, lineHeight = (13 * u).sp, letterSpacing = (0.6 * u + ADVANCE_ROUNDING.value).sp),
 					color = Ink,
 				)
 				Text(

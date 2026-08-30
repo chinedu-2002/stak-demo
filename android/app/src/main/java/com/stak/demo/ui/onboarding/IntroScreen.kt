@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -37,7 +36,7 @@ import com.stak.demo.ui.theme.StakColors
 @Composable
 fun IntroScreen(onGetStarted: () -> Unit) {
 	val u = figmaUnit()
-	Column(modifier = Modifier.fillMaxSize().background(StakColors.Bg).systemBarsPadding()) {
+	Artboard(modifier = Modifier.background(StakColors.Bg)) {
 		Column(
 			verticalArrangement = Arrangement.spacedBy((16 * u).dp),
 			modifier = Modifier

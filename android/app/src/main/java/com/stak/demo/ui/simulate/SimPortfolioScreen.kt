@@ -43,6 +43,7 @@ import com.stak.demo.ui.onboarding.AuthBackCircle
 import com.stak.demo.ui.theme.Geist
 import com.stak.demo.ui.theme.Sora
 import com.stak.demo.ui.theme.StakColors
+import com.stak.demo.ui.theme.ADVANCE_ROUNDING
 
 private data class SimPick(
 	val badge: String, val ticker: String, val sub: String,
@@ -134,7 +135,7 @@ fun SimPortfolioScreen(onBack: () -> Unit, onOpenPick: () -> Unit) {
 				) {
 					Text(
 						text = "SOLD · REALIZED",
-						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, lineHeight = (13 * u).sp, letterSpacing = (0.9 * u).sp),
+						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, lineHeight = (13 * u).sp, letterSpacing = (0.9 * u + ADVANCE_ROUNDING.value).sp),
 						color = Sim.Faint,
 					)
 				}

@@ -42,6 +42,7 @@ import com.stak.demo.R
 import com.stak.demo.ui.theme.Geist
 import com.stak.demo.ui.theme.Sora
 import com.stak.demo.ui.theme.StakColors
+import com.stak.demo.ui.theme.ADVANCE_ROUNDING
 
 /** Palette of the CHINEDU "03 · News" frames. */
 internal object News {
@@ -263,7 +264,7 @@ private fun BriefCard(brief: NewsBriefFeed.Brief, onRead: () -> Unit) {
 	) {
 		Text(
 			text = "TODAY\u2019S BRIEF",
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, lineHeight = (13 * u).sp, letterSpacing = (0.6 * u).sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, lineHeight = (13 * u).sp, letterSpacing = (0.6 * u + ADVANCE_ROUNDING.value).sp),
 			color = News.Ink,
 		)
 		Text(
@@ -360,7 +361,7 @@ private fun StoryTile(tag: String, headline: String, source: String, onClick: ()
 			)
 			.padding((14 * u).dp),
 	) {
-		NewsTag(text = tag, letterSpacing = (0.4 * u).sp)
+		NewsTag(text = tag, letterSpacing = (0.4 * u + ADVANCE_ROUNDING.value).sp)
 		Text(
 			text = headline,
 			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Light, fontSize = (14 * u).sp, lineHeight = (20 * u).sp),

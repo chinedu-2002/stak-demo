@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -35,6 +34,7 @@ import androidx.compose.ui.unit.sp
 import com.stak.demo.ui.theme.Geist
 import com.stak.demo.ui.theme.Sora
 import com.stak.demo.ui.theme.StakColors
+import com.stak.demo.ui.theme.ADVANCE_ROUNDING
 
 /**
  * Onboarding · 08 Permissions — Figma node 1:749 (CHINEDU file,
@@ -51,7 +51,7 @@ fun PermissionsScreen(onBack: () -> Unit, onContinue: () -> Unit) {
 	var notifications by rememberSaveable { mutableStateOf(true) }
 	var accountSecurity by rememberSaveable { mutableStateOf(true) }
 
-	Column(modifier = Modifier.fillMaxSize().background(StakColors.Bg).systemBarsPadding()) {
+	Artboard(modifier = Modifier.background(StakColors.Bg)) {
 		Row(modifier = Modifier.fillMaxWidth().padding(horizontal = (20 * u).dp).padding(top = (10 * u).dp, bottom = (4 * u).dp)) {
 			AuthBackCircle(onClick = onBack)
 		}
@@ -115,7 +115,7 @@ internal fun OnboardingKicker(text: String) {
 	val u = figmaUnit()
 	Text(
 		text = text,
-		style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, letterSpacing = (1.2 * u).sp),
+		style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, letterSpacing = (1.2 * u + ADVANCE_ROUNDING.value).sp),
 		color = Auth.FaintText,
 		modifier = Modifier.padding(horizontal = (20 * u).dp).padding(top = (6 * u).dp),
 	)

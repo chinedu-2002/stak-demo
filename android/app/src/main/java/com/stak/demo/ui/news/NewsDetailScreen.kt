@@ -210,6 +210,9 @@ private fun HeroImage(media: NewsMedia, category: String, saved: Boolean, onBook
 	// The hero is a media slot: poster + play glyph at rest (frame-exact),
 	// the served video playing IN PLACE once tapped (user, 2026-08-23).
 	var playing by remember { mutableStateOf(false) }
+	// The play button toggles: tap the running clip to pause (the glyph returns
+	// over the paused frame), tap the glyph to resume (user, 2026-08-30).
+	var paused by remember { mutableStateOf(false) }
 	Box(
 		modifier = Modifier
 			.padding(horizontal = (15 * u).dp)
@@ -223,7 +226,32 @@ private fun HeroImage(media: NewsMedia, category: String, saved: Boolean, onBook
 		if (playing && video != null) {
 			// A failed OR FINISHED stream returns to the poster + glyph
 			// instead of stranding a frame (user, 2026-08-25/26).
-			NewsVideoPlayer(video = video, modifier = Modifier.matchParentSize(), onDone = { playing = false })
+			NewsVideoPlayer(
+				video = video,
+				paused = paused,
+				modifier = Modifier
+					.matchParentSize()
+					.clickable(
+						interactionSource = remember { MutableInteractionSource() },
+						indication = null,
+					) { paused = true },
+				onDone = { playing = false; paused = false },
+			)
+			if (paused) {
+				Image(
+					painter = painterResource(R.drawable.ic_hero_play),
+					contentDescription = "Play",
+					modifier = Modifier
+						.align(Alignment.Center)
+						.offset(x = (-0.5 * u).dp, y = (12.5 * u).dp)
+						.rotate(90f)
+						.size((59.92 * u).dp, (53.75 * u).dp)
+						.clickable(
+							interactionSource = remember { MutableInteractionSource() },
+							indication = null,
+						) { paused = false },
+				)
+			}
 		} else {
 			val posterRes = when (media) {
 				is NewsMedia.Image -> media.posterRes
@@ -267,7 +295,7 @@ private fun HeroImage(media: NewsMedia, category: String, saved: Boolean, onBook
 						.clickable(
 							interactionSource = remember { MutableInteractionSource() },
 							indication = null,
-						) { playing = true },
+						) { playing = true; paused = false },
 				)
 			}
 		}
@@ -879,7 +907,7 @@ private fun SaveSuccessOverlay(facts: NewsArticleFeed.StockFacts, onViewInMyStak
  * VideoView. Both autoplay once the user tapped the play glyph.
  */
 @Composable
-private fun NewsVideoPlayer(video: NewsMedia.Video, modifier: Modifier = Modifier, onDone: () -> Unit = {}) {
+private fun NewsVideoPlayer(video: NewsMedia.Video, modifier: Modifier = Modifier, paused: Boolean = false, onDone: () -> Unit = {}) {
 	val embed = video.youTubeEmbedUrl
 	if (embed != null) {
 		androidx.compose.ui.viewinterop.AndroidView(
@@ -960,6 +988,9 @@ private fun NewsVideoPlayer(video: NewsMedia.Video, modifier: Modifier = Modifie
 				texture.tag = player
 				texture
 			},
+			// Play/pause toggle: ExoPlayer.pause keeps the position, so
+			// resuming continues where the clip stopped.
+			update = { v -> (v.tag as? androidx.media3.exoplayer.ExoPlayer)?.playWhenReady = !paused },
 			onRelease = { v -> (v.tag as? androidx.media3.exoplayer.ExoPlayer)?.release(); v.tag = null },
 		)
 	}

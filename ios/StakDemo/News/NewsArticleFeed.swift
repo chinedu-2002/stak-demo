@@ -142,7 +142,7 @@ enum NewsArticleFeed {
 			// only through the stocks it is about - the chip names.
 			nil, ["NVDA", "MU"],
 			// NYSE-facade b-roll (Pexels, real-time 30fps, verified).
-			media: .video(url: "https://videos.pexels.com/video-files/4319342/4319342-hd_1920_1080_30fps.mp4", posterAsset: nil, posterUrl: "https://images.pexels.com/videos/4319342/finance-new-york-city-new-york-stock-exchange-nyse-4319342.jpeg?auto=compress&w=1260&h=750&dpr=1", sourceLink: nil)
+			media: .video(url: "https://cf.cdn.uplynk.com/ause2/slices/423/e63aadb6928b4cd6ab0dec6fb3cddabd/4236296d369c45d7933912de59a60dae/4236296d369c45d7933912de59a60dae_e.mp4", posterAsset: nil, posterUrl: "https://ewscripps.brightspotcdn.com/dims4/default/b9c04ed/2147483647/strip/true/crop/1280x672+0+24/resize/1200x630!/quality/90/?url=https%3A%2F%2Fcf.cdn.uplynk.com%2Fause2%2Fslices%2F423%2Fe63aadb6928b4cd6ab0dec6fb3cddabd%2F4236296d369c45d7933912de59a60dae%2Fposter_d6c48a894a10437185742c2153a540f1.jpg", sourceLink: "https://www.scrippsnews.com/videos/politics/economy/dow-jones-nears-50-000-points")
 		),
 		// STRICT stock news (user, 2026-08-25): the old fed-holds-rates
 		// demo article was macro, not stock news - replaced with the
@@ -167,7 +167,7 @@ enum NewsArticleFeed {
 			"Reuters", "1d", "· Jul 3 · 3 min read",
 			nil, ["GOOGL"],
 			// Google-search-screen b-roll (Pexels, real-time 30fps, verified).
-			media: .video(url: "https://videos.pexels.com/video-files/4549682/4549682-hd_1920_1080_30fps.mp4", posterAsset: nil, posterUrl: "https://images.pexels.com/videos/4549682/google-search-search-engine-optimization-seo-4549682.jpeg?auto=compress&w=1260&h=750&dpr=1", sourceLink: nil)
+			media: .video(url: "https://pdl-iphone-cnbc-com.akamaized.net/7000419539/ece420f0-8608-11f1-a1f3-a9f987e334ee/1784750819-47326244087-hd_MBR_4500.mp4", posterAsset: nil, posterUrl: "https://image.cnbcfm.com/api/v1/image/108338938-cbot_googl_earnings_1.jpg?v=1784767875&w=1280&h=720", sourceLink: "https://www.cnbc.com/video/2026/07/22/alphabet-beats-on-q2-revenue-posts-82-percent-year-over-year-jump-in-google-cloud-revenue.html")
 		),
 		demo(
 			"oil-opec-supply", "Markets",
@@ -196,7 +196,7 @@ enum NewsArticleFeed {
 			// Real-time pumpjack drone b-roll (Pexels, verified direct
 			// stream) - the first pick was a TIME-LAPSE and read as
 			// racing playback (user, 2026-08-26).
-			media: .video(url: "https://videos.pexels.com/video-files/10227529/10227529-hd_1280_720_30fps.mp4", posterAsset: nil, posterUrl: "https://images.pexels.com/videos/10227529/enviornmental-conservation-environment-environment-protection-midland-10227529.jpeg?auto=compress&w=1260&h=750&dpr=1", sourceLink: nil)
+			media: .video(url: "https://video.twimg.com/amplify_video/1699284608536248320/vid/avc1/1280x720/fF0HarT7NB5rsr05.mp4?tag=16", posterAsset: nil, posterUrl: "https://pbs.twimg.com/amplify_video_thumb/1699284608536248320/img/FYIKCy2RrRRIaOEG.jpg", sourceLink: "https://x.com/BloombergTV/status/1699393999142879621")
 		),
 		demo(
 			"tech-earnings-week", "Tech & Ai",
@@ -219,7 +219,7 @@ enum NewsArticleFeed {
 			// STRICT stock news: the earnings week is about these stocks.
 			nil, ["MSFT", "GOOGL"],
 			// Stock-trend-screen b-roll (Mixkit, verified direct stream).
-			media: .video(url: "https://assets.mixkit.co/videos/9607/9607-720.mp4", posterAsset: nil, posterUrl: "https://assets.mixkit.co/videos/9607/9607-thumb-720-0.jpg", sourceLink: nil)
+			media: .video(url: "https://edgecast-cf-prod.yahoo.net/cp-video-transcode/production/8b8ced7f-142e-3da6-bd6e-ab5a48f76d4a/2023-01-27/22-05-53/48a26972-13c3-5ccb-97c2-17ba2fc67a29/stream_1280x720x856_v2.mp4", posterAsset: nil, posterUrl: "https://s.yimg.com/lo/mysterio/api/878652fcfbe020be39989399af3b1293ddf55bbe1341d7cdb22598ac2a08f141/lightyear_networkapi/resizefill_w1200%3Bquality_80%3Bformat_webp/https%3A%2F%2Fs.yimg.com%2Fos%2Fcreatr-uploaded-images%2F2023-01%2Fc2867610-9e8e-11ed-baff-01c8cc812dc5", sourceLink: "https://finance.yahoo.com/video/tech-earnings-fed-decision-economic-220553748.html")
 		),
 		// STRICT stock news (user, 2026-08-25): the old fed-minutes tile
 		// story was macro, not stock news - the Markets tile now serves
@@ -266,7 +266,7 @@ enum NewsArticleFeed {
 			"Reuters", "2d", "· Jul 2 · 3 min read",
 			"NewsThumbNVDA", ["NVDA"],
 			// NVIDIA RTX graphics-card b-roll (Pexels, real-time 30fps, verified).
-			media: .video(url: "https://videos.pexels.com/video-files/5466792/5466792-hd_1920_1080_30fps.mp4", posterAsset: nil, posterUrl: "https://images.pexels.com/videos/5466792/gaming-case-gaming-computer-gaming-graphics-card-gaming-machine-5466792.jpeg?auto=compress&w=1260&h=750&dpr=1", sourceLink: nil)
+			media: .video(url: "https://pdl-iphone-cnbc-com.akamaized.net/7000396229/a2927310-c652-11f0-afc8-d79487fce04e/1763671856-42633094871-hd_H264_1M_720x405.mp4", posterAsset: nil, posterUrl: "https://image.cnbcfm.com/api/v1/image/108229488-17636718631763671856-42633094871-1080pnbcnews.jpg?v=1763671862&w=1280&h=720", sourceLink: "https://www.cnbc.com/video/2025/11/20/dan-ives-nvidia-put-up-a-masterpiece-quarter-and-threw-ai-bubble-out-the-window.html")
 		),
 		demo(
 			"tsla-drops-deliveries", "Tech & Ai",
@@ -288,7 +288,7 @@ enum NewsArticleFeed {
 			"CNBC", "2d", "· Jul 2 · 3 min read",
 			"NewsThumbTSLA", ["TSLA"],
 			// Tesla Model X b-roll (Pexels, real-time 30fps, verified).
-			media: .video(url: "https://videos.pexels.com/video-files/34194673/14493661_1280_720_30fps.mp4", posterAsset: nil, posterUrl: "https://images.pexels.com/videos/34194673/automobile-selfi-tesla-transportation-34194673.jpeg?auto=compress&w=1260&h=750&dpr=1", sourceLink: nil)
+			media: .video(url: "https://video.twimg.com/amplify_video/1477968621418823684/vid/1280x720/sHusOTE6TWR5mUN4.mp4?tag=14", posterAsset: nil, posterUrl: "https://pbs.twimg.com/media/FILMuTvXMAAk1hK.jpg", sourceLink: "https://x.com/SquawkCNBC/status/1477968728969072641")
 		),
 		// STRICT stock news (user, 2026-08-25): the old jobs-report demo
 		// row was macro, not stock news - replaced with a stock story.
@@ -313,7 +313,7 @@ enum NewsArticleFeed {
 			"Reuters", "2d", "· Jul 2 · 2 min read",
 			"NewsThumbJobs", ["AMD"],
 			// Motherboard-chips b-roll (Mixkit, verified direct stream).
-			media: .video(url: "https://assets.mixkit.co/videos/1138/1138-720.mp4", posterAsset: nil, posterUrl: "https://assets.mixkit.co/videos/1138/1138-thumb-720-0.jpg", sourceLink: nil)
+			media: .video(url: "https://pdl-iphone-cnbc-com.akamaized.net/7000412105/899c3ab0-494e-11f1-8d98-6dd8be25c276/1778073695-45746068381-hd_H264_1M_720x405.mp4", posterAsset: nil, posterUrl: "https://image.cnbcfm.com/api/v1/image/108302924-1778073838912-1778073695-45746068381-hd.jpg?v=1778073840&w=1280&h=720", sourceLink: "https://www.cnbc.com/video/2026/05/06/amd-ceo-lisa-su-agents-are-driving-tremendous-demand-in-the-ai-cycle.html")
 		),
 		demo(
 			"memory-chips-soar", "Tech & Ai",
@@ -335,7 +335,7 @@ enum NewsArticleFeed {
 			"Bloomberg", "2d", "· Jul 2 · 3 min read",
 			"NewsThumbChips", ["MU"],
 			// Chip-fab engineer b-roll (Mixkit, verified direct stream).
-			media: .video(url: "https://assets.mixkit.co/videos/47047/47047-720.mp4", posterAsset: nil, posterUrl: "https://assets.mixkit.co/videos/47047/47047-thumb-720-3.jpg", sourceLink: nil)
+			media: .video(url: "https://cf.cdn.uplynk.com/ause1/slices/f04/e63aadb6928b4cd6ab0dec6fb3cddabd/f042632e0ae94ef0918ce27ec923f4a1/f042632e0ae94ef0918ce27ec923f4a1_h.mp4", posterAsset: nil, posterUrl: "https://ewscripps.brightspotcdn.com/dims4/default/87681e8/2147483647/strip/true/crop/1024x538+0+73/resize/1200x630!/quality/90/?url=http%3A%2F%2Fewscripps-brightspot.s3.amazonaws.com%2Ffd%2F2e%2Ffa6a2abf4dee9eba89790b50f159%2Fap25324733939338.jpg", sourceLink: "https://www.scrippsnews.com/politics/economy/gadget-prices-are-rising-as-chip-shortages-squeeze-the-tech-industry")
 		),
 		// OFF-TOPIC by design: a general-pool story with no market topic
 		// and no related stock. It is SERVED (it sits in the For You
@@ -356,7 +356,8 @@ enum NewsArticleFeed {
 			"The rivalry the sport has waited a decade for.",
 			"Wimbledon is tennis's oldest major tournament, played on grass in London each July.",
 			["Sports", "Tennis"],
-			"AP", "5h", "· Jul 4 · 2 min read"
+			"AP", "5h", "· Jul 4 · 2 min read",
+			media: .video(url: "https://archive.org/download/BBCNEWS_20250713_200000_BBC_News/BBCNEWS_20250713_200000_BBC_News.mp4?t=706/838&ignore=x.mp4", posterAsset: nil, posterUrl: "https://archive.org/download/BBCNEWS_20250713_200000_BBC_News/BBCNEWS_20250713_200000_BBC_News.thumbs/BBCNEWS_20250713_200000_BBC_News_000777.jpg", sourceLink: "https://archive.org/details/BBCNEWS_20250713_200000_BBC_News")
 		),
 	]
 

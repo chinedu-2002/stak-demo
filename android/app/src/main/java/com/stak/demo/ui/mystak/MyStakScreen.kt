@@ -104,17 +104,19 @@ fun MyStakScreen(onOpenCollection: () -> Unit, onStartSwiping: () -> Unit) {
 		) {
 			SectionHeader("Collections")
 			Column(verticalArrangement = Arrangement.spacedBy((10 * u).dp), modifier = Modifier.fillMaxWidth()) {
+				// B10 (1:3180 Motion): the sample card's edge is the TEMPLATE -
+				// every collection opens the authored Collection page, Instant.
 				Row(horizontalArrangement = Arrangement.spacedBy((10 * u).dp), modifier = Modifier.fillMaxWidth()) {
 					CollectionChip("AI & Tech", "5 stocks", imageRes = R.drawable.ms_coll_aitech, onClick = onOpenCollection, modifier = Modifier.weight(1f))
-					CollectionChip("Finance", "3 stocks", imageRes = R.drawable.ms_coll_finance, modifier = Modifier.weight(1f))
+					CollectionChip("Finance", "3 stocks", imageRes = R.drawable.ms_coll_finance, onClick = onOpenCollection, modifier = Modifier.weight(1f))
 				}
 				Row(horizontalArrangement = Arrangement.spacedBy((10 * u).dp), modifier = Modifier.fillMaxWidth()) {
-					CollectionChip("Green Energy", "3 stocks", iconRes = R.drawable.ic_cat_green, modifier = Modifier.weight(1f))
-					CollectionChip("Real Estate", "2 stocks", iconRes = R.drawable.ic_cat_realestate, modifier = Modifier.weight(1f))
+					CollectionChip("Green Energy", "3 stocks", iconRes = R.drawable.ic_cat_green, onClick = onOpenCollection, modifier = Modifier.weight(1f))
+					CollectionChip("Real Estate", "2 stocks", iconRes = R.drawable.ic_cat_realestate, onClick = onOpenCollection, modifier = Modifier.weight(1f))
 				}
 				Row(horizontalArrangement = Arrangement.spacedBy((10 * u).dp), modifier = Modifier.fillMaxWidth()) {
-					CollectionChip("Healthcare", "4 stocks", iconRes = R.drawable.ic_cat_health, modifier = Modifier.weight(1f))
-					CollectionChip("Consumer", "2 stocks", iconRes = R.drawable.ic_cat_consumer, modifier = Modifier.weight(1f))
+					CollectionChip("Healthcare", "4 stocks", iconRes = R.drawable.ic_cat_health, onClick = onOpenCollection, modifier = Modifier.weight(1f))
+					CollectionChip("Consumer", "2 stocks", iconRes = R.drawable.ic_cat_consumer, onClick = onOpenCollection, modifier = Modifier.weight(1f))
 				}
 			}
 			Row(

@@ -34,9 +34,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ContentTransform
+import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.EaseOut
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -164,7 +169,13 @@ internal val DECK = listOf(
  * paper order.
  */
 @Composable
-fun DiscoverScreen(onLearnMore: () -> Unit = {}, onPracticeBuy: () -> Unit = {}) {
+fun DiscoverScreen(
+	onLearnMore: () -> Unit = {},
+	onPracticeBuy: () -> Unit = {},
+	// B4 (1:2330 Motion): the end-of-deck CTAs hop tabs via the shell.
+	onPracticeBuySaves: () -> Unit = {},
+	onReviewSaves: () -> Unit = {},
+) {
 	// Prototype: tapping the front card itself also opens the Stock Detail.
 	// The buy ticket itself is raised by the shell (over the tab bar).
 	var seen by rememberSaveable { mutableIntStateOf(0) }
@@ -221,8 +232,9 @@ fun DiscoverScreen(onLearnMore: () -> Unit = {}, onPracticeBuy: () -> Unit = {})
 			Spacer(modifier = Modifier.height((27 * u).dp))
 			if (seen >= 12) {
 				EndOfDeck(
-					onPracticeBuySaves = onPracticeBuy,
+					onPracticeBuySaves = onPracticeBuySaves,
 					onSwipeAgain = { seen = 0 },
+					onReviewSaves = onReviewSaves,
 				)
 			} else {
 			// Deck — a fixed composition: every dimension scales by the 390dp
@@ -723,161 +735,157 @@ private fun SheetSecondary(text: String, onClick: () -> Unit) {
 	}
 }
 
-/** "Buy NVDA?" practice ticket (frame 1:1970, sheet 1:2159). */
+/** "Buy NVDA?" practice ticket content (frame 1:1970, sheet 1:2159). */
 @Composable
-private fun PracticeBuySheet(onConfirm: () -> Unit, onDismiss: () -> Unit, spec: BuySpec = NVDA_BUY, secondary: String = "Not yet") {
+private fun PracticeBuyContent(onConfirm: () -> Unit, onDismiss: () -> Unit, spec: BuySpec = NVDA_BUY, secondary: String = "Not yet") {
 	var selected by rememberSaveable { mutableIntStateOf(1) }
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
-	SheetScaffold(onDismiss = onDismiss) {
-		Column(verticalArrangement = Arrangement.spacedBy((14 * u).dp), modifier = Modifier.fillMaxWidth()) {
-			Text(
-				text = spec.title,
-				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (18 * u).sp, lineHeight = (23 * u).sp),
-				color = Color.White,
-			)
-			NvdaStockRow(spec)
-			// Ink-measured against 1:1970 / 1:4232: the paragraph sits 1 lower and
-			// the cash block 1.5 lower than the 14 column gap alone gives.
-			Text(
-				text = "Your paper stake starts at today’s price and tracks the real move live, in either direction.",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (18 * u).sp),
-				color = Disc.Body,
-				modifier = Modifier.padding(top = (1 * u).dp),
-			)
-			Column(verticalArrangement = Arrangement.spacedBy((12 * u).dp), modifier = Modifier.fillMaxWidth().padding(top = (1.5 * u).dp)) {
-				Row(horizontalArrangement = Arrangement.spacedBy((6 * u).dp)) {
-					Text(
-						text = "Cash available",
-						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
-						color = Disc.Muted,
-					)
-					Text(
-						text = spec.cashBefore,
-						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
-						color = Disc.BrightInk,
-					)
-				}
-				Row(horizontalArrangement = Arrangement.spacedBy((8 * u).dp), modifier = Modifier.fillMaxWidth()) {
-					listOf("$10", "$25", "$50", "$100", "Custom").forEachIndexed { i, label ->
-						val sel = i == selected
-						Box(
-							contentAlignment = Alignment.Center,
-							modifier = Modifier
-								.weight(1f)
-								.clip(RoundedCornerShape((10 * u).dp))
-								.background(if (sel) Disc.AmountSelBg else Disc.AmountBg)
-								.border(
-									if (sel) (0.5 * u).dp else (1 * u).dp,
-									if (sel) Disc.AmountSelBorder else Disc.AmountBorder,
-									RoundedCornerShape((10 * u).dp),
-								)
-								.clickable(
-									interactionSource = remember { MutableInteractionSource() },
-									indication = null,
-								) { selected = i }
-								.padding(vertical = (8 * u).dp),
-						) {
-							Text(
-								text = label,
-								style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
-								color = if (sel) Disc.AmountSelInk else Disc.AmountInk,
-							)
-						}
-					}
-				}
-			}
-			Row(
-				horizontalArrangement = Arrangement.spacedBy((6 * u).dp, Alignment.CenterHorizontally),
-				verticalAlignment = Alignment.Bottom,
-				// Authored: chips → shares line is a 24 gap (14 + 10).
-				modifier = Modifier.fillMaxWidth().padding(top = (10 * u).dp),
-			) {
-				Text(
-					text = "You get",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
-					color = Disc.Muted,
-				)
-				Text(
-					text = spec.shares,
-					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp, lineHeight = (19 * u).sp),
-					color = Disc.BrightInk,
-				)
-				Text(
-					text = "shares of ${spec.symbol}",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
-					color = Disc.Muted,
-				)
-			}
-			Column(verticalArrangement = Arrangement.spacedBy((16 * u).dp), modifier = Modifier.fillMaxWidth()) {
-				SheetCta(text = "Confirm practice buy", onClick = onConfirm)
-				SheetSecondary(text = secondary, onClick = onDismiss)
-			}
-		}
-	}
-}
-
-/** "Order filled" sheet (frame 85:1205, sheet 85:1394). */
-@Composable
-private fun OrderFilledSheet(onDismiss: () -> Unit, spec: BuySpec = NVDA_BUY, primary: String = "View in My STAK", secondary: String = "Keep exploring") {
-	val u = com.stak.demo.ui.onboarding.figmaUnit()
-	SheetScaffold(onDismiss = onDismiss) {
-		Column(
-			horizontalAlignment = Alignment.CenterHorizontally,
-			verticalArrangement = Arrangement.spacedBy((14 * u).dp),
-			modifier = Modifier.fillMaxWidth(),
-		) {
-			Image(painterResource(R.drawable.ic_sheet_check), null, modifier = Modifier.size((47 * u).dp))
-			Text(
-				text = "Order filled",
-				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (18 * u).sp, lineHeight = (23 * u).sp),
-				color = Color.White,
-			)
-			NvdaStockRow(spec)
-			// Authored status line (85:1407): 18-tall, left-aligned, 14 below the stock row.
-			Text(
-				text = "Filled instantly · paper order",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp, lineHeight = (18 * u).sp),
-				color = Disc.Body,
-				modifier = Modifier.fillMaxWidth(),
-			)
-			Row(horizontalArrangement = Arrangement.spacedBy((6 * u).dp), modifier = Modifier.fillMaxWidth()) {
+	Column(verticalArrangement = Arrangement.spacedBy((14 * u).dp), modifier = Modifier.fillMaxWidth()) {
+		Text(
+			text = spec.title,
+			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (18 * u).sp, lineHeight = (23 * u).sp),
+			color = Color.White,
+		)
+		NvdaStockRow(spec)
+		// Ink-measured against 1:1970 / 1:4232: the paragraph sits 1 lower and
+		// the cash block 1.5 lower than the 14 column gap alone gives.
+		Text(
+			text = "Your paper stake starts at today’s price and tracks the real move live, in either direction.",
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (18 * u).sp),
+			color = Disc.Body,
+			modifier = Modifier.padding(top = (1 * u).dp),
+		)
+		Column(verticalArrangement = Arrangement.spacedBy((12 * u).dp), modifier = Modifier.fillMaxWidth().padding(top = (1.5 * u).dp)) {
+			Row(horizontalArrangement = Arrangement.spacedBy((6 * u).dp)) {
 				Text(
 					text = "Cash available",
 					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
 					color = Disc.Muted,
 				)
 				Text(
-					text = spec.cashAfter,
+					text = spec.cashBefore,
 					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
 					color = Disc.BrightInk,
 				)
 			}
-			Row(
-				horizontalArrangement = Arrangement.spacedBy((6 * u).dp, Alignment.CenterHorizontally),
-				verticalAlignment = Alignment.Bottom,
-				// Authored ticket (85:1408): Cash row 0-16, Shares line at 40 -> a 24 gap.
-				modifier = Modifier.fillMaxWidth().padding(top = (10 * u).dp),
-			) {
-				Text(
-					text = "You now hold",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
-					color = Disc.Muted,
-				)
-				Text(
-					text = spec.shares,
-					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp, lineHeight = (19 * u).sp),
-					color = Disc.BrightInk,
-				)
-				Text(
-					text = "shares of ${spec.symbol}",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
-					color = Disc.Muted,
-				)
+			Row(horizontalArrangement = Arrangement.spacedBy((8 * u).dp), modifier = Modifier.fillMaxWidth()) {
+				listOf("$10", "$25", "$50", "$100", "Custom").forEachIndexed { i, label ->
+					val sel = i == selected
+					Box(
+						contentAlignment = Alignment.Center,
+						modifier = Modifier
+							.weight(1f)
+							.clip(RoundedCornerShape((10 * u).dp))
+							.background(if (sel) Disc.AmountSelBg else Disc.AmountBg)
+							.border(
+								if (sel) (0.5 * u).dp else (1 * u).dp,
+								if (sel) Disc.AmountSelBorder else Disc.AmountBorder,
+								RoundedCornerShape((10 * u).dp),
+							)
+							.clickable(
+								interactionSource = remember { MutableInteractionSource() },
+								indication = null,
+							) { selected = i }
+							.padding(vertical = (8 * u).dp),
+					) {
+						Text(
+							text = label,
+							style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
+							color = if (sel) Disc.AmountSelInk else Disc.AmountInk,
+						)
+					}
+				}
 			}
-			Column(verticalArrangement = Arrangement.spacedBy((16 * u).dp), modifier = Modifier.fillMaxWidth()) {
-				SheetCta(text = primary, onClick = onDismiss)
-				SheetSecondary(text = secondary, onClick = onDismiss)
-			}
+		}
+		Row(
+			horizontalArrangement = Arrangement.spacedBy((6 * u).dp, Alignment.CenterHorizontally),
+			verticalAlignment = Alignment.Bottom,
+			// Authored: chips → shares line is a 24 gap (14 + 10).
+			modifier = Modifier.fillMaxWidth().padding(top = (10 * u).dp),
+		) {
+			Text(
+				text = "You get",
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
+				color = Disc.Muted,
+			)
+			Text(
+				text = spec.shares,
+				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp, lineHeight = (19 * u).sp),
+				color = Disc.BrightInk,
+			)
+			Text(
+				text = "shares of ${spec.symbol}",
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
+				color = Disc.Muted,
+			)
+		}
+		Column(verticalArrangement = Arrangement.spacedBy((16 * u).dp), modifier = Modifier.fillMaxWidth()) {
+			SheetCta(text = "Confirm practice buy", onClick = onConfirm)
+			SheetSecondary(text = secondary, onClick = onDismiss)
+		}
+	}
+}
+
+/** "Order filled" sheet content (frame 85:1205, sheet 85:1394). */
+@Composable
+private fun OrderFilledContent(onPrimary: () -> Unit, onSecondary: () -> Unit, spec: BuySpec = NVDA_BUY, primary: String = "View in My STAK", secondary: String = "Keep exploring") {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
+	Column(
+		horizontalAlignment = Alignment.CenterHorizontally,
+		verticalArrangement = Arrangement.spacedBy((14 * u).dp),
+		modifier = Modifier.fillMaxWidth(),
+	) {
+		Image(painterResource(R.drawable.ic_sheet_check), null, modifier = Modifier.size((47 * u).dp))
+		Text(
+			text = "Order filled",
+			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (18 * u).sp, lineHeight = (23 * u).sp),
+			color = Color.White,
+		)
+		NvdaStockRow(spec)
+		// Authored status line (85:1407): 18-tall, left-aligned, 14 below the stock row.
+		Text(
+			text = "Filled instantly · paper order",
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp, lineHeight = (18 * u).sp),
+			color = Disc.Body,
+			modifier = Modifier.fillMaxWidth(),
+		)
+		Row(horizontalArrangement = Arrangement.spacedBy((6 * u).dp), modifier = Modifier.fillMaxWidth()) {
+			Text(
+				text = "Cash available",
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
+				color = Disc.Muted,
+			)
+			Text(
+				text = spec.cashAfter,
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
+				color = Disc.BrightInk,
+			)
+		}
+		Row(
+			horizontalArrangement = Arrangement.spacedBy((6 * u).dp, Alignment.CenterHorizontally),
+			verticalAlignment = Alignment.Bottom,
+			// Authored ticket (85:1408): Cash row 0-16, Shares line at 40 -> a 24 gap.
+			modifier = Modifier.fillMaxWidth().padding(top = (10 * u).dp),
+		) {
+			Text(
+				text = "You now hold",
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
+				color = Disc.Muted,
+			)
+			Text(
+				text = spec.shares,
+				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp, lineHeight = (19 * u).sp),
+				color = Disc.BrightInk,
+			)
+			Text(
+				text = "shares of ${spec.symbol}",
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
+				color = Disc.Muted,
+			)
+		}
+		Column(verticalArrangement = Arrangement.spacedBy((16 * u).dp), modifier = Modifier.fillMaxWidth()) {
+			SheetCta(text = primary, onClick = onPrimary)
+			SheetSecondary(text = secondary, onClick = onSecondary)
 		}
 	}
 }
@@ -906,7 +914,7 @@ private fun ProgressRing(progress: Float, u: Float) {
 
 /** Discover · End of deck (CHINEDU 1:2330) — receipt stats + CTAs. */
 @Composable
-private fun EndOfDeck(onPracticeBuySaves: () -> Unit, onSwipeAgain: () -> Unit) {
+private fun EndOfDeck(onPracticeBuySaves: () -> Unit, onSwipeAgain: () -> Unit, onReviewSaves: () -> Unit) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Column(
 		horizontalAlignment = Alignment.CenterHorizontally,
@@ -963,7 +971,9 @@ private fun EndOfDeck(onPracticeBuySaves: () -> Unit, onSwipeAgain: () -> Unit) 
 				.clickable(
 					interactionSource = remember { MutableInteractionSource() },
 					indication = null,
-				) { /* My STAK lands in a later phase. */ },
+					// B4 (1:2330 Motion): Review saves -> the My STAK tab, Instant.
+					onClick = onReviewSaves,
+				),
 		) {
 			Text(
 				text = "Review saves in My STAK",
@@ -999,13 +1009,44 @@ private fun EndOfDeck(onPracticeBuySaves: () -> Unit, onSwipeAgain: () -> Unit) 
 	}
 }
 
-/** Buy → Order-filled flow, reused by the Stock Detail page. */
+/**
+ * Buy → Order-filled flow, reused by the Stock Detail page. Confirming
+ * morphs the ticket into the success sheet IN PLACE - the authored
+ * SMART_ANIMATE 350 ease-out (1:1970 -> 85:1205): content cross-fades
+ * while the sheet height animates, nothing clipped (B1).
+ */
 @Composable
-internal fun DiscoverBuyFlow(onClose: () -> Unit, spec: BuySpec = NVDA_BUY, filledPrimary: String = "View in My STAK", filledSecondary: String = "Keep exploring", ticketSecondary: String = "Not yet") {
+internal fun DiscoverBuyFlow(
+	onClose: () -> Unit,
+	spec: BuySpec = NVDA_BUY,
+	filledPrimary: String = "View in My STAK",
+	filledSecondary: String = "Keep exploring",
+	ticketSecondary: String = "Not yet",
+	// Hosts route the success CTAs to their authored edges (B2/B3/B13/
+	// B20); left alone they fall back to a plain close.
+	onFilledPrimary: () -> Unit = onClose,
+	onFilledSecondary: () -> Unit = onClose,
+) {
 	var filled by rememberSaveable { mutableStateOf(false) }
-	if (!filled) {
-		PracticeBuySheet(onConfirm = { filled = true }, onDismiss = onClose, spec = spec, secondary = ticketSecondary)
-	} else {
-		OrderFilledSheet(onDismiss = onClose, spec = spec, primary = filledPrimary, secondary = filledSecondary)
+	// The scrim tap is unauthored - it keeps the per-state plain dismiss.
+	SheetScaffold(onDismiss = { if (filled) onFilledSecondary() else onClose() }) {
+		AnimatedContent(
+			targetState = filled,
+			transitionSpec = {
+				ContentTransform(
+					fadeIn(tween(350, easing = EaseOut)),
+					fadeOut(tween(350, easing = EaseOut)),
+					sizeTransform = SizeTransform(clip = false) { _, _ -> tween(350, easing = EaseOut) },
+				)
+			},
+			contentAlignment = Alignment.BottomCenter,
+			label = "buyMorph",
+		) { isFilled ->
+			if (!isFilled) {
+				PracticeBuyContent(onConfirm = { filled = true }, onDismiss = onClose, spec = spec, secondary = ticketSecondary)
+			} else {
+				OrderFilledContent(onPrimary = onFilledPrimary, onSecondary = onFilledSecondary, spec = spec, primary = filledPrimary, secondary = filledSecondary)
+			}
+		}
 	}
 }

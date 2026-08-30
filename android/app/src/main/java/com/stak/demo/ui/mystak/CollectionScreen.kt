@@ -66,8 +66,8 @@ private val STOCKS = listOf(
 /**
  * 06 · My STAK — "Collection · Cards A · corrected" (CHINEDU 1:3333).
  * The AI & Tech collection: hero (glass art, title, meta, blurb) and
- * the stock-tile grid with the dashed Add-stock card. Tapping AAPL
- * opens the saved Stock Detail.
+ * the stock-tile grid with the dashed Add-stock card. Every stock card
+ * opens the saved Stock Detail - 1:3375's edge is the template (B11).
  */
 @Composable
 fun CollectionScreen(onBack: () -> Unit, onOpenStock: () -> Unit) {
@@ -138,7 +138,7 @@ fun CollectionScreen(onBack: () -> Unit, onOpenStock: () -> Unit) {
 						row.forEach { stock ->
 							StockTile(
 								stock = stock,
-								onClick = { if (stock.ticker == "AAPL") onOpenStock() },
+								onClick = onOpenStock,
 								modifier = Modifier.weight(1f).fillMaxSize(),
 							)
 						}

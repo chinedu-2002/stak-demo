@@ -1,5 +1,13 @@
 package com.stak.demo.ui.discover
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.EaseOut
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -42,6 +50,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.stak.demo.R
+import com.stak.demo.ui.components.MainTab
+import com.stak.demo.ui.components.MainTabBar
 import com.stak.demo.ui.onboarding.AuthBackCircle
 import com.stak.demo.ui.theme.Geist
 import com.stak.demo.ui.theme.Sora
@@ -63,11 +73,27 @@ private val Teal = Color(0xFF69B3CA)
  * sheet and flips the CTA area to the saved state.
  */
 @Composable
-fun StockDetailScreen(onBack: () -> Unit, fromMyStak: Boolean = false) {
+fun StockDetailScreen(
+	onBack: () -> Unit,
+	fromMyStak: Boolean = false,
+	// B5 (1:2382 Motion): the Discover entry's Practice buy leaves the
+	// detail for the Simulate tab; null keeps the in-page ticket.
+	onPracticeBuy: (() -> Unit)? = null,
+	// B7/B13: the success sheets' "View in My STAK" pop (92:969/71:949).
+	onViewInMyStak: (() -> Unit)? = null,
+	// B8 (92:969 Motion): "Keep exploring" dissolves back to the deck.
+	onKeepExploring: (() -> Unit)? = null,
+	// B9 (1:2579): the Discover-entry OPEN state composes the shell tab
+	// bar; each tab pops the detail Instant and lands on that tab.
+	onTab: ((MainTab) -> Unit)? = null,
+) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	var saved by rememberSaveable { mutableStateOf(fromMyStak) }
 	var showSuccess by rememberSaveable { mutableStateOf(false) }
 	var showBuy by rememberSaveable { mutableStateOf(false) }
+	// B9/B13: hoisted Analyst state - the open state carries the tab bar
+	// (Discover entry) and the buy-success "Done" folds the section.
+	var analystOpen by rememberSaveable { mutableStateOf(false) }
 
 	Box(modifier = Modifier.fillMaxSize().background(StakColors.Bg)) {
 		Column(modifier = Modifier.fillMaxSize()) {
@@ -153,7 +179,7 @@ fun StockDetailScreen(onBack: () -> Unit, fromMyStak: Boolean = false) {
 					}
 					RiskFitCard()
 					NumbersCard()
-					AnalystCard()
+					AnalystCard(open = analystOpen, onToggle = { analystOpen = !analystOpen })
 					NewsSignalCard()
 					CompareCard()
 					Row(
@@ -201,19 +227,58 @@ fun StockDetailScreen(onBack: () -> Unit, fromMyStak: Boolean = false) {
 								)
 							}
 						}
-						DetailSecondary("Practice buy") { showBuy = true }
+						DetailSecondary("Practice buy") { if (onPracticeBuy != null) onPracticeBuy() else showBuy = true }
 					} else {
 						DetailCta("Save") { showSuccess = true }
-						DetailSecondary("Practice buy") { showBuy = true }
+						DetailSecondary("Practice buy") { if (onPracticeBuy != null) onPracticeBuy() else showBuy = true }
 					}
 				}
 			}
+			if (!fromMyStak && analystOpen && onTab != null) {
+				// B9: ONLY the Discover-entry OPEN frame (1:2579) authors the
+				// 86 shell bar pinned at the bottom - SWAP taps pop the detail.
+				MainTabBar(selected = MainTab.Discover, onSelect = onTab)
+			}
 		}
-		if (showSuccess) {
-			DetailSavedSheet(onDone = { showSuccess = false; saved = true })
+		// B6: the save-success sheet enters like the News one - scale
+		// 0.92 -> 1 + fade - at the authored 350 ease-out (92:969).
+		AnimatedVisibility(
+			visible = showSuccess,
+			enter = scaleIn(initialScale = 0.92f, animationSpec = tween(350, easing = EaseOut)) +
+				fadeIn(tween(350, easing = EaseOut)),
+			// The scrim dismiss is unauthored - it stays instant.
+			exit = ExitTransition.None,
+		) {
+			DetailSavedSheet(
+				onDone = { showSuccess = false; saved = true },
+				// B7/B8: both CTAs mark the stock saved, then leave the page
+				// (forward push to My STAK / dissolve back to the deck).
+				onViewInMyStak = {
+					saved = true
+					com.stak.demo.ui.MyStakHoldings.add("AAPL")
+					if (onViewInMyStak != null) onViewInMyStak() else { showSuccess = false }
+				},
+				onKeepExploring = {
+					saved = true
+					com.stak.demo.ui.MyStakHoldings.add("AAPL")
+					if (onKeepExploring != null) onKeepExploring() else { showSuccess = false }
+				},
+			)
 		}
-		if (showBuy) {
-			DetailBuyHost(onClose = { showBuy = false })
+		// B13 (1:3423 Motion): the buy sheet's Back and the success "Done"
+		// both dismiss with a 300 dissolve over the detail.
+		AnimatedVisibility(
+			visible = showBuy,
+			enter = EnterTransition.None,
+			exit = fadeOut(tween(300, easing = EaseOut)),
+		) {
+			DetailBuyHost(
+				onClose = { showBuy = false },
+				onViewInMyStak = { if (onViewInMyStak != null) onViewInMyStak() else { showBuy = false } },
+				// B13: "Done" also folds the Analyst section - the authored
+				// destination is the FOLDED detail (16:1012).
+				onDone = { analystOpen = false; showBuy = false },
+			)
 		}
 	}
 }
@@ -449,7 +514,7 @@ private fun DetailSecondary(text: String, onClick: () -> Unit) {
 
 /** Saved-to-My-STAK sheet over the detail (92:969) — Apple row variant. */
 @Composable
-private fun DetailSavedSheet(onDone: () -> Unit) {
+private fun DetailSavedSheet(onDone: () -> Unit, onViewInMyStak: () -> Unit = onDone, onKeepExploring: () -> Unit = onDone) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Box(modifier = Modifier.fillMaxSize()) {
 		Box(
@@ -512,8 +577,8 @@ private fun DetailSavedSheet(onDone: () -> Unit) {
 				modifier = Modifier.fillMaxWidth(),
 			)
 			Column(verticalArrangement = Arrangement.spacedBy((16 * u).dp), modifier = Modifier.fillMaxWidth()) {
-				DetailCta("View in My STAK", onClick = onDone)
-				DetailSecondary("Keep exploring", onClick = onDone)
+				DetailCta("View in My STAK", onClick = onViewInMyStak)
+				DetailSecondary("Keep exploring", onClick = onKeepExploring)
 			}
 		}
 	}
@@ -521,8 +586,17 @@ private fun DetailSavedSheet(onDone: () -> Unit) {
 
 /** The practice-buy ticket reused from the deck (public host wrapper). */
 @Composable
-private fun DetailBuyHost(onClose: () -> Unit) {
-	DiscoverBuyFlow(onClose = onClose, spec = AAPL_BUY, filledSecondary = "Done")
+private fun DetailBuyHost(onClose: () -> Unit, onViewInMyStak: () -> Unit, onDone: () -> Unit) {
+	DiscoverBuyFlow(
+		onClose = onClose,
+		spec = AAPL_BUY,
+		filledSecondary = "Done",
+		// 1:3460: the My STAK ticket's secondary is authored "Back".
+		ticketSecondary = "Back",
+		// B13 (71:949/71:994 Motion): the success CTAs leave the sheet.
+		onFilledPrimary = onViewInMyStak,
+		onFilledSecondary = onDone,
+	)
 }
 
 /** Kicker label — Geist Medium 10, tracking 0.8, muted. */
@@ -536,18 +610,17 @@ private fun Kicker(text: String) {
 	)
 }
 
-/** Analyst view (collapsed 1:2454 / open 1:2651) — caret toggles. */
+/** Analyst view (collapsed 1:2454 / open 1:2651) — caret toggles; state hoisted for B9/B13. */
 @Composable
-private fun AnalystCard() {
+private fun AnalystCard(open: Boolean, onToggle: () -> Unit) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
-	var open by rememberSaveable { mutableStateOf(false) }
 	Column(
 		verticalArrangement = Arrangement.spacedBy((12 * u).dp),
 		modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape((16 * u).dp)).background(Card)
 			.clickable(
 				interactionSource = remember { MutableInteractionSource() },
 				indication = null,
-			) { open = !open }
+			) { onToggle() }
 			.padding(horizontal = (16 * u).dp, vertical = (14 * u).dp),
 	) {
 		Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {

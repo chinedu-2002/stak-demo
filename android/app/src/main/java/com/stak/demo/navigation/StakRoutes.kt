@@ -14,7 +14,9 @@ object StakRoutes {
 	const val PREPARING_DECK = "onboarding/preparing-deck"
 	const val TASTE_REVEAL = "onboarding/taste-reveal"
 	const val SIGN_IN = "auth/sign-in"
-	const val CREATE_ACCOUNT = "onboarding/create-account"
+	/** Sign up — `via` = "back" when sign-in's post-logout back circle re-opens it (B21). */
+	const val CREATE_ACCOUNT = "onboarding/create-account?via={via}"
+	fun createAccount(via: String) = "onboarding/create-account?via=$via"
 	const val PERMISSIONS = "onboarding/permissions"
 	const val PROFILE_SETUP = "onboarding/profile-setup"
 	const val MAIN = "main" // bottom-tab shell (Home/News/Discover/My STAK/Simulate)

@@ -101,6 +101,11 @@ struct DiscoverView: View {
 	/// 1:1970), so MainTabsView owns the overlay, mirroring Android's
 	/// MainShell `discoverBuy` hoist.
 	var onPracticeBuy: (BuySpec) -> Void = { _ in }
+	/// Authored (1:2330): the end-of-deck receipt's cross-tab CTAs - instant
+	/// SWAPs to My STAK ("Review saves") and Simulate ("Practice buy your
+	/// saves"), raised to the shell.
+	var onReviewSaves: () -> Void = {}
+	var onPracticeBuySaves: () -> Void = {}
 
 	@State private var seen = 0
 	@State private var savedToast = false
@@ -146,7 +151,8 @@ struct DiscoverView: View {
 
 				if seen >= 12 {
 					EndOfDeck(
-						onPracticeBuySaves: { onPracticeBuy(nvdaBuy) },
+						onPracticeBuySaves: onPracticeBuySaves,
+						onReviewSaves: onReviewSaves,
 						onSwipeAgain: { seen = 0 }
 					)
 					Spacer(minLength: 0)
@@ -474,6 +480,7 @@ private struct ChevronShape: Shape {
 /// Discover · End of deck (CHINEDU 1:2330) — receipt stats + CTAs.
 private struct EndOfDeck: View {
 	let onPracticeBuySaves: () -> Void
+	let onReviewSaves: () -> Void
 	let onSwipeAgain: () -> Void
 
 	var body: some View {
@@ -497,7 +504,8 @@ private struct EndOfDeck: View {
 			Spacer().frame(height: 52 * u)
 			SheetCta(text: "Practice buy your saves", action: onPracticeBuySaves)
 			Spacer().frame(height: 9 * u)
-			Button(action: { /* My STAK lands in a later phase. */ }) {
+			// Authored (1:2330): Review saves -> My STAK Overview, Instant.
+			Button(action: onReviewSaves) {
 				Text("Review saves in My STAK")
 					.font(StakFont.sora(13 * u))
 					.foregroundStyle(Disc.muted)
@@ -653,7 +661,8 @@ struct SheetSecondary: View {
 	}
 }
 
-/// "Buy …?" practice ticket (frame 1:1970, sheet 1:2159).
+/// "Buy …?" practice ticket (frame 1:1970, sheet 1:2159) — content only;
+/// DiscoverBuyFlow hosts the ONE scaffold both ticket and receipt share.
 struct PracticeBuySheet: View {
 	let spec: BuySpec
 	let onConfirm: () -> Void
@@ -665,7 +674,7 @@ struct PracticeBuySheet: View {
 
 	var body: some View {
 		let u = figmaUnit
-		SheetScaffold(onDismiss: onDismiss) {
+		Group {
 			VStack(alignment: .leading, spacing: 14 * u) {
 				Text(spec.title)
 					.font(StakFont.sora(18 * u, .semiBold))
@@ -730,16 +739,20 @@ struct PracticeBuySheet: View {
 	}
 }
 
-/// "Order filled" sheet (frame 85:1205, sheet 85:1394).
+/// "Order filled" receipt (frame 85:1205, sheet 85:1394) — content only;
+/// DiscoverBuyFlow hosts the ONE scaffold both ticket and receipt share.
 struct OrderFilledSheet: View {
 	let spec: BuySpec
 	let onDismiss: () -> Void
 	var primary: String = "View in My STAK"
 	var secondary: String = "Keep exploring"
+	/// Authored per-CTA exits (85:1205); nil falls back to onDismiss.
+	var onPrimary: (() -> Void)? = nil
+	var onSecondary: (() -> Void)? = nil
 
 	var body: some View {
 		let u = figmaUnit
-		SheetScaffold(onDismiss: onDismiss) {
+		Group {
 			VStack(spacing: 14 * u) {
 				Image("IcSheetCheck")
 					.resizable()
@@ -778,29 +791,43 @@ struct OrderFilledSheet: View {
 				// Authored ticket (85:1408): Cash row 0-16, Shares line at 40 -> a 24 gap.
 				.padding(.top, 10 * u)
 				VStack(spacing: 16 * u) {
-					SheetCta(text: primary, action: onDismiss)
-					SheetSecondary(text: secondary, action: onDismiss)
+					SheetCta(text: primary, action: onPrimary ?? onDismiss)
+					SheetSecondary(text: secondary, action: onSecondary ?? onDismiss)
 				}
 			}
 		}
 	}
 }
 
-/// Buy → Order-filled flow, reused by the Stock Detail page.
+/// Buy → Order-filled flow, reused by the Stock Detail page. Authored
+/// SMART_ANIMATE 350 (ticket 1:1970 -> receipt 85:1205; the same component
+/// backs 1:3423 -> 71:949 and 1:4232 -> 85:895): ONE sheet stays put while
+/// its content cross-fades and its height eases to the receipt's.
 struct DiscoverBuyFlow: View {
 	let spec: BuySpec
 	let onClose: () -> Void
 	var filledPrimary: String = "View in My STAK"
 	var filledSecondary: String = "Keep exploring"
 	var ticketSecondary: String = "Not yet"
+	/// Authored per-CTA exits; nil falls back to onClose.
+	var onFilledPrimary: (() -> Void)? = nil
+	var onFilledSecondary: (() -> Void)? = nil
+	var onTicketSecondary: (() -> Void)? = nil
 
 	@State private var filled = false
 
 	var body: some View {
-		if !filled {
-			PracticeBuySheet(spec: spec, onConfirm: { filled = true }, onDismiss: onClose, secondary: ticketSecondary)
-		} else {
-			OrderFilledSheet(spec: spec, onDismiss: onClose, primary: filledPrimary, secondary: filledSecondary)
+		SheetScaffold(onDismiss: onClose) {
+			ZStack(alignment: .top) {
+				if !filled {
+					PracticeBuySheet(spec: spec, onConfirm: { filled = true }, onDismiss: onTicketSecondary ?? onClose, secondary: ticketSecondary)
+						.transition(.opacity)
+				} else {
+					OrderFilledSheet(spec: spec, onDismiss: onClose, primary: filledPrimary, secondary: filledSecondary, onPrimary: onFilledPrimary, onSecondary: onFilledSecondary)
+						.transition(.opacity)
+				}
+			}
+			.animation(.easeOut(duration: 0.35), value: filled)
 		}
 	}
 }

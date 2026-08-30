@@ -9,6 +9,10 @@ import SwiftUI
 /// the Android build's `u` scaling.
 struct PickDetailView: View {
 	let onBack: () -> Void
+	/// Authored (73:855): the sell receipt's exits, raised to the shell -
+	/// Back to Simulate (the forward push) and View portfolio (dissolve 300).
+	var onSellBackToSimulate: (() -> Void)? = nil
+	var onSellViewPortfolio: (() -> Void)? = nil
 
 	@State private var showSell = false
 
@@ -169,8 +173,12 @@ struct PickDetailView: View {
 				}
 			}
 			if showSell {
-				// Selling from here routes back through the portfolio page.
-				SellFlowHost(onClose: { showSell = false; onBack() })
+				SellFlowHost(
+					// Authored (1:4698): the confirm's Back -> Pick detail, Instant.
+					onClose: { showSell = false },
+					onBackToSimulate: { if let onSellBackToSimulate { onSellBackToSimulate() } else { showSell = false; onBack() } },
+					onViewPortfolio: { if let onSellViewPortfolio { onSellViewPortfolio() } else { showSell = false; onBack() } }
+				)
 			}
 		}
 		.background(StakColors.bg.ignoresSafeArea())

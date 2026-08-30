@@ -32,6 +32,8 @@ struct SimulateView: View {
 	let onOpenPortfolio: () -> Void
 	let onOpenPick: () -> Void
 	let onOpenLeaderboard: () -> Void
+	/// Authored (1:3964): "All saved staks ›" -> My STAK Overview (tab SWAP, Instant).
+	var onOpenMyStak: () -> Void = {}
 	/// When the shell hosts the ticket (1:4232: the sheet covers the tab bar), it raises it here.
 	var onPracticeBuy: (() -> Void)? = nil
 
@@ -69,7 +71,7 @@ struct SimulateView: View {
 						sectionHeader("Saved staks")
 						SavedStakRow(badge: "P", ticker: "PLTR", sub: "Saved Jun 30 · not in portfolio yet", onBuy: { if let onPracticeBuy { onPracticeBuy() } else { showBuy = true } })
 						SavedStakRow(badge: "C", ticker: "COST", sub: "Saved Jul 2 · not in portfolio yet", onBuy: { if let onPracticeBuy { onPracticeBuy() } else { showBuy = true } })
-						CenterLink(text: "All saved staks", action: {})
+						CenterLink(text: "All saved staks", action: onOpenMyStak)
 						InsightCard()
 						HStack(spacing: 10 * u) {
 							PickDuo(kicker: "BEST PICK", pct: "+24.0%", pctColor: Sim.green, badge: "N", ticker: "NVDA", sub: "+$24 on $100", action: onOpenPick)

@@ -72,18 +72,21 @@ struct MyStakView: View {
 
 	private var collectionsGrid: some View {
 		let u = figmaUnit
+		// Authored (1:3180 template): EVERY collection card opens the
+		// Collection screen, Instant - its content stays the authored
+		// AI & Tech sample.
 		return VStack(spacing: 10 * u) {
 			HStack(spacing: 10 * u) {
 				CollectionChip(name: "AI & Tech", count: "5 stocks", image: "MsCollAITech", action: onOpenCollection)
-				CollectionChip(name: "Finance", count: "3 stocks", image: "MsCollFinance")
+				CollectionChip(name: "Finance", count: "3 stocks", image: "MsCollFinance", action: onOpenCollection)
 			}
 			HStack(spacing: 10 * u) {
-				CollectionChip(name: "Green Energy", count: "3 stocks", icon: "IcCatGreen")
-				CollectionChip(name: "Real Estate", count: "2 stocks", icon: "IcCatRealEstate")
+				CollectionChip(name: "Green Energy", count: "3 stocks", icon: "IcCatGreen", action: onOpenCollection)
+				CollectionChip(name: "Real Estate", count: "2 stocks", icon: "IcCatRealEstate", action: onOpenCollection)
 			}
 			HStack(spacing: 10 * u) {
-				CollectionChip(name: "Healthcare", count: "4 stocks", icon: "IcCatHealth")
-				CollectionChip(name: "Consumer", count: "2 stocks", icon: "IcCatConsumer")
+				CollectionChip(name: "Healthcare", count: "4 stocks", icon: "IcCatHealth", action: onOpenCollection)
+				CollectionChip(name: "Consumer", count: "2 stocks", icon: "IcCatConsumer", action: onOpenCollection)
 			}
 		}
 	}

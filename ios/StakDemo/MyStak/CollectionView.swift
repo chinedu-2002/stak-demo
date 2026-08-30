@@ -114,8 +114,10 @@ struct CollectionView: View {
 				// row share the tallest tile's height, so the Add card stretches to match.
 				HStack(spacing: 10 * u) {
 					ForEach(row) { stock in
+						// Authored (1:3375 template): EVERY card opens the saved
+						// Stock Detail, Instant (the authored AAPL sample content).
 						StockTile(stock: stock) {
-							if stock.ticker == "AAPL" { onOpenStock() }
+							onOpenStock()
 						}
 					}
 					if row.count == 1 {

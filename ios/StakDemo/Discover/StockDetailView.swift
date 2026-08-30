@@ -16,19 +16,45 @@ private let wellBg = Color(argb: 0xFF10182B)
 struct StockDetailView: View {
 	let onBack: () -> Void
 	var fromMyStak: Bool = false
+	/// Authored exits raised to the shell (nil keeps the local fallback):
+	/// success "View in My STAK" (92:969 / 71:949, the forward push), "Keep
+	/// exploring" (deck dissolve 300), the Discover entry's "Practice buy"
+	/// (1:2382, to the Simulate tab, Instant) and the open state's tab-bar
+	/// SWAPs (1:2579).
+	var onViewInMyStak: (() -> Void)? = nil
+	var onKeepExploring: (() -> Void)? = nil
+	var onPracticeBuyToSimulate: (() -> Void)? = nil
+	var onTab: ((MainTab) -> Void)? = nil
 
 	@State private var saved: Bool
 	@State private var showSuccess = false
 	@State private var showBuy = false
+	/// Hoisted from AnalystCard - drives the 1:2579 tab bar and the fold
+	/// back to 16:1012 when the buy receipt's Done fires.
+	@State private var analystOpen = false
 
-	init(onBack: @escaping () -> Void, fromMyStak: Bool = false) {
+	init(
+		onBack: @escaping () -> Void,
+		fromMyStak: Bool = false,
+		onViewInMyStak: (() -> Void)? = nil,
+		onKeepExploring: (() -> Void)? = nil,
+		onPracticeBuyToSimulate: (() -> Void)? = nil,
+		onTab: ((MainTab) -> Void)? = nil
+	) {
 		self.onBack = onBack
 		self.fromMyStak = fromMyStak
+		self.onViewInMyStak = onViewInMyStak
+		self.onKeepExploring = onKeepExploring
+		self.onPracticeBuyToSimulate = onPracticeBuyToSimulate
+		self.onTab = onTab
 		self._saved = State(initialValue: fromMyStak)
 	}
 
 	var body: some View {
 		let u = figmaUnit
+		// Authored (1:2579): ONLY the Discover-entry open state composes the
+		// shell tab bar (an authored inconsistency - matched per frame).
+		let showsBar = !fromMyStak && analystOpen && onTab != nil
 		ZStack {
 			VStack(spacing: 0) {
 				HStack {
@@ -98,7 +124,7 @@ struct StockDetailView: View {
 							}
 							RiskFitCard()
 							NumbersCard()
-							AnalystCard()
+							AnalystCard(open: $analystOpen)
 							NewsSignalCard()
 							CompareCard()
 							HStack(alignment: .top, spacing: 8 * u) {
@@ -134,10 +160,12 @@ struct StockDetailView: View {
 								.frame(maxWidth: .infinity)
 								.frame(height: 52 * u)
 								.overlay(RoundedRectangle(cornerRadius: 6 * u).strokeBorder(StakColors.ctaBorderGradient, lineWidth: 0.36 * u))
-								DetailSecondary(text: "Practice buy") { showBuy = true }
+								DetailSecondary(text: "Practice buy", action: practiceBuy)
 							} else {
-								DetailCta(text: "Save") { showSuccess = true }
-								DetailSecondary(text: "Practice buy") { showBuy = true }
+								// Authored (1:2382 -> 92:969, SMART_ANIMATE 350): the
+								// save-success sheet scale-fades in like the News one.
+								DetailCta(text: "Save") { withAnimation(.easeOut(duration: 0.35)) { showSuccess = true } }
+								DetailSecondary(text: "Practice buy", action: practiceBuy)
 							}
 						}
 						.padding(.horizontal, 20 * u)
@@ -145,15 +173,74 @@ struct StockDetailView: View {
 						.padding(.bottom, 16 * u)
 					}
 				}
+				if showsBar {
+					// Authored (1:2579): the 86-tall shell bar sits fixed at
+					// the bottom of the viewport; its taps SWAP - pop the
+					// detail instantly and land on the tapped tab.
+					MainTabBar(selected: Binding<MainTab>(
+						get: { .discover },
+						set: { tapped in onTab?(tapped) }
+					))
+				}
 			}
+			.ignoresSafeArea(edges: showsBar ? .bottom : [])
 			if showSuccess {
-				DetailSavedSheet(onDone: { showSuccess = false; saved = true })
+				DetailSavedSheet(
+					// Unauthored scrim tap - keeps its instant dismiss-and-mark.
+					onDismiss: { showSuccess = false; saved = true },
+					// Authored (92:969): View in My STAK -> Overview, the
+					// forward push; Keep exploring -> deck, dissolve 300 -
+					// the stock is marked saved before the page leaves.
+					onViewInMyStak: {
+						saved = true
+						MyStakHoldings.shared.add("AAPL")
+						if let onViewInMyStak { onViewInMyStak() } else { showSuccess = false }
+					},
+					onKeepExploring: {
+						saved = true
+						MyStakHoldings.shared.add("AAPL")
+						if let onKeepExploring { onKeepExploring() } else { showSuccess = false }
+					}
+				)
+				// Authored entry (SMART_ANIMATE 350): the News sheet's
+				// scale-in - 0.92 -> 1 + fade, 350 ease-out.
+				.transition(.asymmetric(insertion: .scale(scale: 0.92).combined(with: .opacity), removal: .opacity))
 			}
 			if showBuy {
-				DiscoverBuyFlow(spec: aaplBuy, onClose: { showBuy = false }, filledSecondary: "Done")
+				DiscoverBuyFlow(
+					spec: aaplBuy,
+					onClose: { showBuy = false },
+					filledSecondary: "Done",
+					// Authored (71:949 / 71:994): View in My STAK -> Overview,
+					// the forward push.
+					onFilledPrimary: {
+						if let onViewInMyStak { onViewInMyStak() } else { showBuy = false }
+					},
+					// Authored: Done -> the FOLDED detail (16:1012) - the
+					// sheet fades 300 and the Analyst section closes.
+					onFilledSecondary: {
+						analystOpen = false
+						withAnimation(.easeOut(duration: 0.3)) { showBuy = false }
+					},
+					// Authored (1:3423): the ticket's secondary -> detail,
+					// DISSOLVE 300.
+					onTicketSecondary: { withAnimation(.easeOut(duration: 0.3)) { showBuy = false } }
+				)
+				.transition(.opacity)
 			}
 		}
 		.background(StakColors.bg.ignoresSafeArea())
+	}
+
+	/// Authored (1:2382): the Discover entry's Practice buy leaves the
+	/// detail for the Simulate tab, Instant - not a ticket; only the
+	/// My STAK entry raises the in-page ticket (16:1012).
+	private func practiceBuy() {
+		if !fromMyStak, let onPracticeBuyToSimulate {
+			onPracticeBuyToSimulate()
+		} else {
+			showBuy = true
+		}
 	}
 }
 
@@ -293,9 +380,11 @@ private struct StatCell: View {
 	}
 }
 
-/// Analyst view (collapsed 1:2454 / open 1:2651) — caret toggles.
+/// Analyst view (collapsed 1:2454 / open 1:2651) — caret toggles; the open
+/// flag is hoisted so the page can compose the 1:2579 tab bar and fold the
+/// section when the buy receipt's Done lands on the folded frame (16:1012).
 private struct AnalystCard: View {
-	@State private var open = false
+	@Binding var open: Bool
 
 	var body: some View {
 		let u = figmaUnit
@@ -546,7 +635,9 @@ private struct SinceYouSavedCard: View {
 /// Built inline (not on SheetScaffold) to pin the Android geometry: 14u
 /// item spacing, 11u stock-row spacing, and the Detail CTAs (sora 13).
 private struct DetailSavedSheet: View {
-	let onDone: () -> Void
+	let onDismiss: () -> Void
+	let onViewInMyStak: () -> Void
+	let onKeepExploring: () -> Void
 
 	var body: some View {
 		let u = figmaUnit
@@ -554,7 +645,7 @@ private struct DetailSavedSheet: View {
 			// Authored scrim rgba(12,19,32,0.55) (106:1037).
 			Color(argb: 0x8C0C1320)
 				.ignoresSafeArea()
-				.onTapGesture(perform: onDone)
+				.onTapGesture(perform: onDismiss)
 			VStack(spacing: 14 * u) {
 				RoundedRectangle(cornerRadius: 2 * u)
 					.fill(Color(argb: 0xFF2A3346))
@@ -596,8 +687,8 @@ private struct DetailSavedSheet: View {
 					.foregroundStyle(Color(argb: 0xFFC8D2E0))
 					.frame(maxWidth: .infinity, alignment: .leading)
 				VStack(spacing: 16 * u) {
-					DetailCta(text: "View in My STAK", action: onDone)
-					DetailSecondary(text: "Keep exploring", action: onDone)
+					DetailCta(text: "View in My STAK", action: onViewInMyStak)
+					DetailSecondary(text: "Keep exploring", action: onKeepExploring)
 				}
 			}
 			.padding(.horizontal, 20 * u)

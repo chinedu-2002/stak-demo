@@ -73,7 +73,10 @@ struct SimPortfolioView: View {
 								badge: p.badge, ticker: p.ticker, sub: p.sub,
 								amount: p.amount, pct: p.pct, up: p.up,
 								action: onOpenPick,
-								trailing: { SellPill(action: { showSell = true }) }
+								// Authored (1:4548 template): every Sell pill opens
+								// the Pick detail, Instant - the authored sell flow
+								// lives there; this page's sheets stay unwired.
+								trailing: { SellPill(action: onOpenPick) }
 							)
 						}
 						Text("SOLD · REALIZED")
@@ -97,16 +100,20 @@ struct SimPortfolioView: View {
 				}
 			}
 			if showSell {
-				SellConfirmSheet(
-					onConfirm: { showSell = false; showClosed = true },
-					onDismiss: { showSell = false }
-				)
+				SimSheet(onDismiss: { showSell = false }) {
+					SellConfirmSheet(
+						onConfirm: { showSell = false; showClosed = true },
+						onDismiss: { showSell = false }
+					)
+				}
 			}
 			if showClosed {
-				PositionClosedSheet(
-					onBackToSimulate: { showClosed = false; onBack() },
-					onViewPortfolio: { showClosed = false }
-				)
+				SimSheet(onDismiss: { showClosed = false }) {
+					PositionClosedSheet(
+						onBackToSimulate: { showClosed = false; onBack() },
+						onViewPortfolio: { showClosed = false }
+					)
+				}
 			}
 		}
 		.background(StakColors.bg.ignoresSafeArea())
@@ -247,7 +254,8 @@ private struct NvdaSellRow: View {
 	}
 }
 
-/// "Sell NVDA?" confirm sheet (1:4698).
+/// "Sell NVDA?" confirm ticket (1:4698) — content only; its host (the
+/// SellFlowHost morph or a bare SimSheet) provides scrim + sheet.
 struct SellConfirmSheet: View {
 	let onConfirm: () -> Void
 	let onDismiss: () -> Void
@@ -256,7 +264,7 @@ struct SellConfirmSheet: View {
 
 	var body: some View {
 		let u = figmaUnit
-		SimSheet(onDismiss: onDismiss) {
+		Group {
 			VStack(alignment: .leading, spacing: 14 * u) {
 				Text("Sell NVDA?")
 					.font(StakFont.sora(18 * u, .semiBold))
@@ -353,14 +361,15 @@ private struct SimSheetSecondary: View {
 	}
 }
 
-/// "Position closed" success sheet (73:855).
+/// "Position closed" receipt (73:855) — content only; its host (the
+/// SellFlowHost morph or a bare SimSheet) provides scrim + sheet.
 struct PositionClosedSheet: View {
 	let onBackToSimulate: () -> Void
 	let onViewPortfolio: () -> Void
 
 	var body: some View {
 		let u = figmaUnit
-		SimSheet(onDismiss: onViewPortfolio) {
+		Group {
 			VStack(spacing: 14 * u) {
 				Image("IcSheetCheck")
 					.resizable()
@@ -427,17 +436,34 @@ struct PositionClosedSheet: View {
 	}
 }
 
-/// Sell → Position-closed flow, reused by the pick detail.
+/// Sell → Position-closed flow, reused by the pick detail. Authored
+/// SMART_ANIMATE 350 (1:4698 -> 73:855): ONE sheet stays put while the
+/// confirm cross-fades into the receipt and the height eases along.
 struct SellFlowHost: View {
 	let onClose: () -> Void
+	/// Authored exits for the receipt CTAs (73:855); nil falls back to onClose.
+	var onBackToSimulate: (() -> Void)? = nil
+	var onViewPortfolio: (() -> Void)? = nil
 
 	@State private var closed = false
 
 	var body: some View {
-		if !closed {
-			SellConfirmSheet(onConfirm: { closed = true }, onDismiss: onClose)
-		} else {
-			PositionClosedSheet(onBackToSimulate: onClose, onViewPortfolio: onClose)
+		SimSheet(onDismiss: {
+			if closed { (onViewPortfolio ?? onClose)() } else { onClose() }
+		}) {
+			ZStack(alignment: .top) {
+				if !closed {
+					SellConfirmSheet(onConfirm: { closed = true }, onDismiss: onClose)
+						.transition(.opacity)
+				} else {
+					PositionClosedSheet(
+						onBackToSimulate: onBackToSimulate ?? onClose,
+						onViewPortfolio: onViewPortfolio ?? onClose
+					)
+					.transition(.opacity)
+				}
+			}
+			.animation(.easeOut(duration: 0.35), value: closed)
 		}
 	}
 }

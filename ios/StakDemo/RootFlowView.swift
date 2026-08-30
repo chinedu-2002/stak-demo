@@ -78,10 +78,14 @@ struct RootFlowView: View {
 				.transition(.opacity)
 			case .main:
 				MainTabsView(onLogOut: {
+					// Authored (171:995): Log out -> Sign in, the authored
+					// PUSH RIGHT 300 = the house back push (FlowAnim.pushLeft),
+					// with the session stack cleared. Sign up sits beneath so
+					// Sign in's authored Back edge (-> Sign up) still works.
 					Session.shared.signOut()
-					anim = .dissolve
-					stack = [.createAccount]
-					withAnimation(FlowAnim.dissolve.animation) { phase = .flow }
+					anim = .pushLeft
+					stack = [.createAccount, .signIn]
+					withAnimation(FlowAnim.pushLeft.animation) { phase = .flow }
 				})
 				.transition(anim.transition)
 			case .flow:

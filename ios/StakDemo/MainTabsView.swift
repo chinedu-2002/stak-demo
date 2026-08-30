@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// A page pushed over the tab shell (the house Push Right transition).
+/// A page pushed over the tab shell.
 private enum PushedPage: Identifiable, Equatable {
 	case newsDetail(article: String)
 	case stockDetail(fromMyStak: Bool)
@@ -23,12 +23,57 @@ private enum PushedPage: Identifiable, Equatable {
 	}
 }
 
+/// The prototype's transition vocabulary for shell navigation: forwardPush
+/// = the authored "PUSH LEFT 300 ease-out" (FlowAnim.pushRight — in from
+/// the leading edge, out to the trailing); houseBack = the authored "PUSH
+/// RIGHT 300 ease-out" (FlowAnim.pushLeft — in from the trailing edge, out
+/// to the leading); dissolve = the authored 300ms cross-fade; instant = no
+/// animation at all.
+private enum NavStyle {
+	case houseBack
+	case forwardPush
+	case dissolve
+	case instant
+
+	var transition: AnyTransition {
+		switch self {
+		case .houseBack: FlowAnim.pushLeft.transition
+		case .forwardPush: FlowAnim.pushRight.transition
+		case .dissolve: .opacity
+		case .instant: .identity
+		}
+	}
+
+	/// Pushes ride the house 300 ease-out; the shell's dissolves are the
+	/// authored 300 (not the auth flow's 350).
+	var animation: Animation {
+		switch self {
+		case .dissolve: .easeOut(duration: 0.3)
+		default: FlowAnim.pushRight.animation
+		}
+	}
+
+	/// While a page covers it, the content below parks one screen toward
+	/// the edge it must re-enter from when this style pops: the trailing
+	/// side for the house back push, the leading side for a forward push,
+	/// in place for dissolves and instant cuts.
+	func parkedShift(_ width: CGFloat) -> CGFloat {
+		switch self {
+		case .houseBack: width
+		case .forwardPush: -width
+		case .dissolve, .instant: 0
+		}
+	}
+}
+
 /// The bottom-tab shell — mirrors android/ MainShell (StakNavHost.kt).
 /// The bar hides while Home is in its first-run state (the scrim + pill
 /// own the bottom). Tab switches are the prototype's "Swap overlay ·
-/// Instant"; pushed pages (article, stock detail, collection, profile,
-/// the Simulate portfolio/pick/leaderboard) slide in with the house
-/// Push Right.
+/// Instant" unless an authored PUSH LEFT edge lands on a tab — then the
+/// whole tab page, bar and hoisted ticket included, plays the forward
+/// push. Pushed pages keep the house Push Right entry; every pop picks
+/// its authored style (house back, forward push, dissolve or instant),
+/// and cross-tab edges retarget `tab` before the pop reveals the shell.
 struct MainTabsView: View {
 	var onLogOut: () -> Void = {}
 	@State private var tab = MainTab.home
@@ -52,7 +97,40 @@ struct MainTabsView: View {
 	/// 1:4232 / 85:895: the Simulate ticket also covers the tab bar.
 	@State private var simulateBuy = false
 
+	/// One-shot style flags: how the next tab swap / pushed-stack change
+	/// moves. Committed immediately before the mutation they steer.
+	@State private var tabStyle = NavStyle.instant
+	@State private var navStyle = NavStyle.forwardPush
+	/// Where covered content parks — see NavStyle.parkedShift.
+	@State private var parkedShift: CGFloat = UIScreen.main.bounds.width
+
+	private var pageWidth: CGFloat { UIScreen.main.bounds.width }
+
 	var body: some View {
+		ZStack {
+			tabShell
+				// While a page covers it the shell waits one screen toward
+				// the active pop style's entry side, so a house back pop
+				// reveals it sliding in from the trailing edge exactly like
+				// the authored PUSH RIGHT (a forward-push pop from leading).
+				.offset(x: pushed.isEmpty ? 0 : parkedShift)
+				.id(tab)
+				.transition(tabStyle.transition)
+
+			ForEach(pushed) { entry in
+				pageView(entry.page)
+					.offset(x: entry.id == pushed.last?.id ? 0 : parkedShift)
+					.id(entry.id)
+					.transition(navStyle.transition)
+			}
+		}
+		.background(StakColors.bg.ignoresSafeArea())
+	}
+
+	/// One tab page — content, the stable bar and any hoisted ticket. The
+	/// whole container carries .id(tab) so a forward-push tab switch slides
+	/// page + bar + ticket out as one, while SWAP taps stay instant.
+	private var tabShell: some View {
 		ZStack {
 			VStack(spacing: 0) {
 				Group {
@@ -64,11 +142,11 @@ struct MainTabsView: View {
 							// banner jump to the Discover deck ("first run" frame),
 							// the mood card to News, the why-card to My STAK — all
 							// Instant; first-run ends once the pick is seen.
-							onSeeTodaysPick: { homeFirstRun = false; tab = .discover },
+							onSeeTodaysPick: { homeFirstRun = false; switchTab(.discover) },
 							onProfile: { push(.profile) },
-							onOpenNews: { tab = .news },
-							onOpenMyStak: { tab = .myStak },
-							onOpenDeck: { homeFirstRun = false; tab = .discover }
+							onOpenNews: { switchTab(.news) },
+							onOpenMyStak: { switchTab(.myStak) },
+							onOpenDeck: { homeFirstRun = false; switchTab(.discover) }
 						)
 					case .news:
 						// Authored (1:1228): Story tile -> News detail unsaved, Instant.
@@ -77,18 +155,27 @@ struct MainTabsView: View {
 						DiscoverView(
 							// Authored (1:1785): Learn more -> Stock Detail folded, Instant.
 							onLearnMore: { pushInstant(.stockDetail(fromMyStak: false)) },
-							onPracticeBuy: { discoverBuy = $0 }
+							onPracticeBuy: { discoverBuy = $0 },
+							// Authored (1:2330): the receipt's cross-tab CTAs are
+							// instant SWAPs to My STAK / Simulate.
+							onReviewSaves: { switchTab(.myStak) },
+							onPracticeBuySaves: { switchTab(.simulate) }
 						)
 					case .myStak:
 						MyStakView(
-							onOpenCollection: { push(.collection) },
-							onStartSwiping: { tab = .discover }
+							// Authored (1:3180 template): every collection card ->
+							// Collection, Instant.
+							onOpenCollection: { pushInstant(.collection) },
+							onStartSwiping: { switchTab(.discover) }
 						)
 					case .simulate:
 						SimulateView(
-							onOpenPortfolio: { push(.simPortfolio) },
-							onOpenPick: { push(.simPick) },
-							onOpenLeaderboard: { push(.leaderboard) },
+							// Authored (1:3898): every listed edge is Instant.
+							onOpenPortfolio: { pushInstant(.simPortfolio) },
+							onOpenPick: { pushInstant(.simPick) },
+							onOpenLeaderboard: { pushInstant(.leaderboard) },
+							// Authored (1:3964): All saved staks -> the My STAK tab.
+							onOpenMyStak: { switchTab(.myStak) },
 							onPracticeBuy: { simulateBuy = true }
 						)
 					}
@@ -99,91 +186,204 @@ struct MainTabsView: View {
 					// shell lets it run to the physical bottom of the screen.
 					// One stable bar on every tab (user, 2026-08-23): only the
 					// active tab changes.
-					MainTabBar(selected: $tab)
+					MainTabBar(selected: Binding(get: { tab }, set: { switchTab($0) }))
 				}
 			}
 			.ignoresSafeArea(edges: .bottom)
 
-			ForEach(pushed) { entry in
-				pageView(entry.page)
-					.id(entry.id)
-					.transition(FlowAnim.pushRight.transition)
+			// Hoisted tickets — their scrims cover the tab bar, and living
+			// inside the tab page they ride any forward-push tab switch out
+			// with it.
+			if tab == .discover, let spec = discoverBuy {
+				DiscoverBuyFlow(
+					spec: spec,
+					onClose: { discoverBuy = nil },
+					// Authored (85:1205): View in My STAK -> Overview, PUSH
+					// LEFT 300 — deck + sheet leave together as the tab
+					// switches; Keep exploring -> deck, DISSOLVE 300.
+					onFilledPrimary: { switchTab(.myStak, .forwardPush) { discoverBuy = nil } },
+					onFilledSecondary: { withAnimation(.easeOut(duration: 0.3)) { discoverBuy = nil } }
+				)
+				.transition(.opacity)
 			}
-
-			if let spec = discoverBuy {
-				DiscoverBuyFlow(spec: spec, onClose: { discoverBuy = nil })
-			}
-			if simulateBuy {
-				DiscoverBuyFlow(spec: pltrBuy, onClose: { simulateBuy = false }, filledPrimary: "View portfolio", filledSecondary: "Done", ticketSecondary: "Back")
+			if tab == .simulate, simulateBuy {
+				DiscoverBuyFlow(
+					spec: pltrBuy,
+					onClose: { simulateBuy = false },
+					filledPrimary: "View portfolio",
+					filledSecondary: "Done",
+					ticketSecondary: "Back",
+					// Authored (85:895): View portfolio -> Portfolio, PUSH LEFT
+					// 300, the ticket leaving with the Simulate page beneath
+					// it; Done -> home, DISSOLVE 300.
+					onFilledPrimary: { push(.simPortfolio) { simulateBuy = false } },
+					onFilledSecondary: { withAnimation(.easeOut(duration: 0.3)) { simulateBuy = false } }
+				)
+				.transition(.opacity)
 			}
 		}
-		.background(StakColors.bg.ignoresSafeArea())
 	}
 
 	@ViewBuilder
 	private func pageView(_ page: PushedPage) -> some View {
 		switch page {
 		case .newsDetail(let article):
-			// The article's back motion is not yet authored - it mirrors the
-			// instant entry until its panel says otherwise.
+			// The article's back motion is not authored - it mirrors the
+			// instant entry.
 			NewsDetailView(
 				articleId: article,
-				onBack: { popInstant() },
+				onBack: { pop(.instant) },
 				// Authored (101:1005): View in My STAK -> My STAK Overview,
-				// Push Right 300 - the article slides out trailing while the
-				// shell (already on the My STAK tab) is revealed.
-				onViewInMyStak: {
-					tab = .myStak
-					// The whole article chain clears - after READ NEXT hops
-					// the stack can hold several articles, and popping one
-					// would strand the user on the previous story
-					// (audit 2026-08-25).
-					withAnimation(FlowAnim.pushRight.animation) { pushed.removeAll() }
-				},
+				// PUSH LEFT 300 - the article chain leaves trailing while the
+				// shell, already retargeted to My STAK, enters from leading.
+				onViewInMyStak: { pop(.forwardPush, all: true, landing: .myStak) },
 				// READ NEXT rows push the next story's article (user, 2026-08-25).
 				onOpenArticle: { id in pushInstant(.newsDetail(article: id)) }
 			)
 		case .stockDetail(let fromMyStak):
-			// Discover-entry back mirrors the instant entry (provisional);
-			// the My STAK entry keeps the house pop until its panel.
-			StockDetailView(onBack: { if fromMyStak { pop() } else { popInstant() } }, fromMyStak: fromMyStak)
+			StockDetailView(
+				// The My STAK entry's authored Back -> Collection is Instant
+				// (16:1012); the Discover entry's back is unauthored and
+				// keeps its instant pop.
+				onBack: { pop(.instant) },
+				fromMyStak: fromMyStak,
+				// Authored (92:969 / 71:949): success "View in My STAK" ->
+				// Overview, PUSH LEFT 300.
+				onViewInMyStak: { pop(.forwardPush, all: true, landing: .myStak) },
+				// Authored (92:969): "Keep exploring" -> deck, DISSOLVE 300.
+				onKeepExploring: { pop(.dissolve, all: true, landing: .discover) },
+				// Authored (1:2382): the Discover entry's Practice buy lands
+				// on the Simulate tab, Instant.
+				onPracticeBuyToSimulate: { pop(.instant, all: true, landing: .simulate) },
+				// Authored (1:2579): the open state's tab bar SWAPs - pop the
+				// detail instantly and land on the tapped tab.
+				onTab: { pop(.instant, all: true, landing: $0) }
+			)
 		case .collection:
 			CollectionView(
-				onBack: { pop() },
-				onOpenStock: { push(.stockDetail(fromMyStak: true)) }
+				// Authored (1:3333): Back -> Overview Instant; every stock
+				// card -> the saved Stock Detail, Instant.
+				onBack: { pop(.instant) },
+				onOpenStock: { pushInstant(.stockDetail(fromMyStak: true)) }
 			)
 		case .profile:
+			// Authored (171:995): Back = BACK action - the house back pop.
 			ProfileView(onBack: { pop() }, onLogOut: onLogOut)
 		case .simPortfolio:
 			SimPortfolioView(
-				onBack: { pop() },
-				onOpenPick: { push(.simPick) }
+				// Authored (1:4496): Back -> Simulate home, Instant; Sell
+				// pills open the Pick detail, Instant.
+				onBack: { pop(.instant) },
+				onOpenPick: { pushInstant(.simPick) }
 			)
 		case .simPick:
-			PickDetailView(onBack: { pop() })
+			PickDetailView(
+				// Authored (1:4631): both Backs land on Portfolio, Instant,
+				// however the pick was opened.
+				onBack: { backToPortfolio() },
+				// Authored (73:855): Back to Simulate -> home, PUSH LEFT 300;
+				// View portfolio -> Portfolio, DISSOLVE 300.
+				onSellBackToSimulate: { pop(.forwardPush, all: true, landing: .simulate) },
+				onSellViewPortfolio: { dissolveToPortfolio() }
+			)
 		case .leaderboard:
-			LeaderboardView(onBack: { pop() })
+			// Authored (1:4124): Back -> Simulate home, Instant.
+			LeaderboardView(onBack: { pop(.instant) })
 		}
 	}
 
-	private func push(_ page: PushedPage) {
+	/// SWAP taps stay instant; an authored PUSH LEFT edge that lands on a
+	/// tab passes .forwardPush and the whole tab page slides out trailing
+	/// while the target enters from leading, 300 ease-out. `also` runs in
+	/// the same transaction (e.g. dismissing a hoisted ticket with it).
+	private func switchTab(_ target: MainTab, _ style: NavStyle = .instant, also: () -> Void = {}) {
+		tabStyle = style
+		if style == .instant {
+			tab = target
+			also()
+		} else {
+			withAnimation(style.animation) {
+				tab = target
+				also()
+			}
+		}
+	}
+
+	/// The house forward push. `also` runs inside the same animation (e.g.
+	/// the Simulate ticket leaving with the page it scrims, 85:895).
+	private func push(_ page: PushedPage, also: () -> Void = {}) {
 		// Double-tap during the 300ms slide would stack the same page
 		// twice (audit 2026-08-25).
 		guard pushed.last?.page.id != page.id else { return }
-		withAnimation(FlowAnim.pushRight.animation) { pushed.append(PushedEntry(page: page)) }
+		navStyle = .forwardPush
+		parkedShift = pageWidth
+		withAnimation(FlowAnim.pushRight.animation) {
+			pushed.append(PushedEntry(page: page))
+			also()
+		}
 	}
 
-	private func pop() {
-		withAnimation(FlowAnim.pushLeft.animation) { _ = pushed.popLast() }
-	}
-
-	/// Appends/removes with no animation - the prototype's "Instant".
+	/// Appends with no animation - the prototype's "Instant".
 	private func pushInstant(_ page: PushedPage) {
 		guard pushed.last?.page.id != page.id else { return }
+		parkedShift = pageWidth
 		pushed.append(PushedEntry(page: page))
 	}
 
-	private func popInstant() {
-		_ = pushed.popLast()
+	/// Every pop chooses its authored style. The style flag, the parking
+	/// side and any tab retarget are committed one frame ahead - hidden
+	/// under the opaque top page - so the outgoing page leaves on the
+	/// style's exit edge while the revealed content enters from the
+	/// opposite one. `all` clears the whole chain: pages sandwiched between
+	/// the top and the shell go silently in that hidden frame, and only the
+	/// top plays the pop transition.
+	private func pop(_ style: NavStyle = .houseBack, all: Bool = false, landing: MainTab? = nil) {
+		guard !pushed.isEmpty else { return }
+		if let landing {
+			tabStyle = .instant
+			tab = landing
+		}
+		if style == .instant {
+			if all { pushed.removeAll() } else { pushed.removeLast() }
+			return
+		}
+		if all, pushed.count > 1 { pushed.removeFirst(pushed.count - 1) }
+		navStyle = style
+		parkedShift = style.parkedShift(pageWidth)
+		DispatchQueue.main.async {
+			withAnimation(style.animation) {
+				if !pushed.isEmpty { pushed.removeLast() }
+			}
+		}
+	}
+
+	/// Pick detail's Backs always land on Portfolio (1:4631): pop when it
+	/// sits directly below, else swap the pick for Portfolio - Instant
+	/// either way - so Portfolio's own Back still returns to Simulate home.
+	private func backToPortfolio() {
+		if case .simPortfolio? = pushed.dropLast().last?.page {
+			pop(.instant)
+		} else if !pushed.isEmpty {
+			pushed[pushed.count - 1] = PushedEntry(page: .simPortfolio)
+		}
+	}
+
+	/// Sell success "View portfolio" (73:855): dissolve-pop to the
+	/// Portfolio below, or cross-fade the pick into Portfolio when the
+	/// pick was opened straight from Simulate home - 300 ease-out.
+	private func dissolveToPortfolio() {
+		if case .simPortfolio? = pushed.dropLast().last?.page {
+			pop(.dissolve)
+		} else {
+			navStyle = .dissolve
+			parkedShift = 0
+			DispatchQueue.main.async {
+				withAnimation(NavStyle.dissolve.animation) {
+					if !pushed.isEmpty {
+						pushed[pushed.count - 1] = PushedEntry(page: .simPortfolio)
+					}
+				}
+			}
+		}
 	}
 }

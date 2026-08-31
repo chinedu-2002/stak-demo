@@ -1137,7 +1137,7 @@ private object NewsVideoCache {
 			.setMediaSourceFactory(androidx.media3.exoplayer.source.DefaultMediaSourceFactory(dataSources))
 			.setLoadControl(
 				androidx.media3.exoplayer.DefaultLoadControl.Builder()
-					.setBufferDurationsMs(2000, 30000, 300, 1000)
+					.setBufferDurationsMs(20000, 60000, 600, 1500)
 					.build(),
 			)
 			.build().apply {

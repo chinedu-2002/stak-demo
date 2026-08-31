@@ -147,7 +147,7 @@ object NewsArticleFeed {
 			// only through the stocks it is about - the chip names.
 			null, listOf("NVDA", "MU"),
 			// NYSE-facade b-roll (Pexels, real-time 30fps, verified).
-			media = NewsMedia.Video(url = "https://cf.cdn.uplynk.com/ause2/slices/423/e63aadb6928b4cd6ab0dec6fb3cddabd/4236296d369c45d7933912de59a60dae/4236296d369c45d7933912de59a60dae_e.mp4", posterUrl = "https://ewscripps.brightspotcdn.com/dims4/default/b9c04ed/2147483647/strip/true/crop/1280x672+0+24/resize/1200x630!/quality/90/?url=https%3A%2F%2Fcf.cdn.uplynk.com%2Fause2%2Fslices%2F423%2Fe63aadb6928b4cd6ab0dec6fb3cddabd%2F4236296d369c45d7933912de59a60dae%2Fposter_d6c48a894a10437185742c2153a540f1.jpg", sourceLink = "https://www.scrippsnews.com/videos/politics/economy/dow-jones-nears-50-000-points"),
+			media = NewsMedia.Video(url = "https://video.twimg.com/amplify_video/1407070844472508418/vid/1280x720/00MqVlMOkWZgag2l.mp4?tag=14", posterUrl = "https://pbs.twimg.com/media/E4brjWsXoAAF3gP.jpg", sourceLink = "https://x.com/CNBCClosingBell/status/1407070932716474374"),
 		),
 		// STRICT stock news (user, 2026-08-25): the old fed-holds-rates
 		// demo article was macro, not stock news - replaced with the
@@ -172,7 +172,7 @@ object NewsArticleFeed {
 			"Reuters", "1d", "· Jul 3 · 3 min read",
 			null, listOf("GOOGL"),
 			// Google-search-screen b-roll (Pexels, real-time 30fps, verified).
-			media = NewsMedia.Video(url = "https://pdl-iphone-cnbc-com.akamaized.net/7000419539/ece420f0-8608-11f1-a1f3-a9f987e334ee/1784750819-47326244087-hd_MBR_4500.mp4", posterUrl = "https://image.cnbcfm.com/api/v1/image/108338938-cbot_googl_earnings_1.jpg?v=1784767875&w=1280&h=720", sourceLink = "https://www.cnbc.com/video/2026/07/22/alphabet-beats-on-q2-revenue-posts-82-percent-year-over-year-jump-in-google-cloud-revenue.html"),
+			media = NewsMedia.Video(url = "https://pdl-iphone-cnbc-com.akamaized.net/7000419539/ece420f0-8608-11f1-a1f3-a9f987e334ee/1784750819-47326244087-hd_L.mp4", posterUrl = "https://image.cnbcfm.com/api/v1/image/108338938-cbot_googl_earnings_1.jpg?v=1784767875&w=1280&h=720", sourceLink = "https://www.cnbc.com/video/2026/07/22/alphabet-beats-on-q2-revenue-posts-82-percent-year-over-year-jump-in-google-cloud-revenue.html"),
 		),
 		demo(
 			"oil-opec-supply", "Markets",
@@ -340,7 +340,7 @@ object NewsArticleFeed {
 			"Bloomberg", "2d", "· Jul 2 · 3 min read",
 			R.drawable.news_thumb_chips, listOf("MU"),
 			// Chip-fab engineer b-roll (Mixkit, verified direct stream).
-			media = NewsMedia.Video(url = "https://cf.cdn.uplynk.com/ause1/slices/f04/e63aadb6928b4cd6ab0dec6fb3cddabd/f042632e0ae94ef0918ce27ec923f4a1/f042632e0ae94ef0918ce27ec923f4a1_h.mp4", posterUrl = "https://ewscripps.brightspotcdn.com/dims4/default/87681e8/2147483647/strip/true/crop/1024x538+0+73/resize/1200x630!/quality/90/?url=http%3A%2F%2Fewscripps-brightspot.s3.amazonaws.com%2Ffd%2F2e%2Ffa6a2abf4dee9eba89790b50f159%2Fap25324733939338.jpg", sourceLink = "https://www.scrippsnews.com/politics/economy/gadget-prices-are-rising-as-chip-shortages-squeeze-the-tech-industry"),
+			media = NewsMedia.Video(url = "https://voa-video-ns.akamaized.net/pangeavideo/2024/04/0/01/01000000-0aff-0242-4978-08dc5a5cdef2_480p.mp4?cb=eddaa30b3", posterUrl = "https://gdb.voanews.com/89efc172-826e-45dd-ad20-df3a903817f7_w1080_h608.jpg", sourceLink = "https://www.voanews.com/a/7566533.html"),
 		),
 		// OFF-TOPIC by design: a general-pool story with no market topic
 		// and no related stock. It is SERVED (it sits in the For You

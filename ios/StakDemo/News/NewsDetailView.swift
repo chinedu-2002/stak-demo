@@ -178,7 +178,8 @@ private struct HeroImage: View {
 					if case let .video(url, _, _, _) = media, NewsMedia.youTubeEmbedURL(for: url) == nil,
 						heroPlayer == nil, let direct = URL(string: url) {
 						let p = AVPlayer(url: direct)
-						p.currentItem?.preferredForwardBufferDuration = 5
+						// Deep buffer so playback never stall-cycles (user, 2026-08-30).
+				p.currentItem?.preferredForwardBufferDuration = 30
 						heroPlayer = p
 					}
 				}
@@ -831,7 +832,8 @@ private struct AutoplayVideoPlayer: View {
 				// Cinema-fast start (user, 2026-08-30): reuse the player that
 				// began buffering when the article opened.
 				let p = prebuffered ?? AVPlayer(url: url)
-				p.currentItem?.preferredForwardBufferDuration = 5
+				// Deep buffer so playback never stall-cycles (user, 2026-08-30).
+				p.currentItem?.preferredForwardBufferDuration = 30
 				player = p
 				p.play()
 				// Exactly 1x (user, 2026-08-26: "put it on 1x speed" -

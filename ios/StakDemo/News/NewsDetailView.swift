@@ -2,6 +2,7 @@ import SwiftUI
 import Combine
 import WebKit
 import AVKit
+import AVFoundation
 
 /// The CHINEDU CTA gradient (Add to STAK / View in My STAK).
 private let ctaGradient = LinearGradient(
@@ -166,6 +167,7 @@ private struct HeroImage: View {
 	/// buffering) when the article opens; the poster holds until playback runs.
 	@State private var heroPlayer: AVPlayer? = nil
 	@State private var firstFrame = false
+	@State private var muted = false
 	@Environment(\.openURL) private var openURL
 
 	var body: some View {
@@ -183,9 +185,22 @@ private struct HeroImage: View {
 			if playing, case let .video(url, _, _, _) = media {
 				// A failed OR FINISHED stream returns to the poster + glyph
 				// instead of stranding a frame (user, 2026-08-25/26).
+				// Full player (user, 2026-08-30): VideoPlayer's native controls give
+				// play/pause, the seek bar, elapsed/remaining time and buffering;
+				// our tap-blocker is gone so they receive touches. Mute chip below.
 				NewsVideoPlayer(url: url, paused: paused, prebuffered: heroPlayer, onBegan: { firstFrame = true }, onDone: { playing = false; paused = false; firstFrame = false; heroPlayer?.pause(); heroPlayer?.seek(to: .zero) })
-					.contentShape(Rectangle())
-					.onTapGesture { paused = true }
+				Button {
+					muted.toggle()
+					heroPlayer?.isMuted = muted
+				} label: {
+					Text(muted ? "🔇" : "🔊")
+						.font(.system(size: 11 * u))
+						.frame(width: 26 * u, height: 26 * u)
+						.background(Color.black.opacity(0.4), in: Circle())
+				}
+				.buttonStyle(.plain)
+				.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+				.padding(8 * u)
 				if !firstFrame, case let .video(_, asset, posterUrl, _) = media {
 					// The poster holds until the clip actually runs - no black gap.
 					if let asset {
@@ -809,6 +824,10 @@ private struct AutoplayVideoPlayer: View {
 	var body: some View {
 		VideoPlayer(player: player)
 			.onAppear {
+				// Audible even with the silent switch on (user, 2026-08-30
+				// "no audio?"): playback category routes through the media channel.
+				try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .moviePlayback)
+				try? AVAudioSession.sharedInstance().setActive(true)
 				// Cinema-fast start (user, 2026-08-30): reuse the player that
 				// began buffering when the article opened.
 				let p = prebuffered ?? AVPlayer(url: url)

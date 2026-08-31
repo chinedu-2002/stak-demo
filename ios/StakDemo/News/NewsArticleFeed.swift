@@ -244,7 +244,7 @@ enum NewsArticleFeed {
 			"Reuters", "2h", "· Jul 4 · 3 min read",
 			nil, ["AMZN"],
 			// Server-racks b-roll (Pexels, verified direct stream).
-			media: .video(url: "https://videos.pexels.com/video-files/5028622/5028622-hd_1280_720_25fps.mp4", posterAsset: nil, posterUrl: "https://images.pexels.com/videos/5028622/pexels-photo-5028622.jpeg?auto=compress&w=1260&h=750&dpr=1", sourceLink: nil)
+			media: .video(url: "https://pdl-iphone-cnbc-com.akamaized.net/7000402916/0a2a7740-0215-11f1-8ce3-3d87008d7586/1770242470-43852144172-hd_L.mp4", posterAsset: nil, posterUrl: "https://image.cnbcfm.com/api/v1/image/108261644-17702424741770242470-43852144172-1080pnbcnews.jpg?v=1770242473", sourceLink: "https://www.cnbc.com/video/2026/02/04/aws-in-focus-for-amazon-earnings.html")
 		),
 		demo(
 			"nvda-lags-rally", "Tech & Ai",

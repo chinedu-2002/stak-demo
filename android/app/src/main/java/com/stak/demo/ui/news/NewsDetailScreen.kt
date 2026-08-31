@@ -34,6 +34,9 @@ import androidx.compose.material.icons.filled.Fullscreen
 import androidx.compose.material.icons.filled.FullscreenExit
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
@@ -405,19 +408,23 @@ private fun HeroImage(media: NewsMedia, category: String, saved: Boolean, onBook
 				)
 			}
 		}
-		Box(
-			modifier = Modifier
-				.align(Alignment.BottomStart)
-				.padding(start = (9 * u).dp, bottom = (10 * u).dp)
-				.clip(RoundedCornerShape((7.88 * u).dp))
-				.background(Color(0x40242B3D))
-				.padding(horizontal = (7 * u).dp, vertical = (5 * u).dp),
-		) {
-			Text(
-				text = category,
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, lineHeight = (13 * u).sp),
-				color = Color.White,
-			)
+		// The category chip is the REST state's (frame-authored); the playing
+		// canvas stays clean for the controls (user, 2026-08-30 sleek bar).
+		if (!(playing && video != null)) {
+			Box(
+				modifier = Modifier
+					.align(Alignment.BottomStart)
+					.padding(start = (9 * u).dp, bottom = (10 * u).dp)
+					.clip(RoundedCornerShape((7.88 * u).dp))
+					.background(Color(0x40242B3D))
+					.padding(horizontal = (7 * u).dp, vertical = (5 * u).dp),
+			) {
+				Text(
+					text = category,
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, lineHeight = (13 * u).sp),
+					color = Color.White,
+				)
+			}
 		}
 		if (saved) {
 			Row(
@@ -1235,7 +1242,9 @@ private fun HeroControls(
 					)
 				}
 			}
-			// Bottom bar: elapsed · slider · total · mute · fullscreen.
+			// Sleek bottom bar (user, 2026-08-30): one compact "0:12 / 1:06"
+			// time pill in Geist, a hairline scrubber flush with the bottom
+			// edge, and two small quiet icons. No stock Material slider.
 			Row(
 				verticalAlignment = Alignment.CenterVertically,
 				modifier = Modifier
@@ -1243,32 +1252,27 @@ private fun HeroControls(
 					.fillMaxWidth()
 					.background(
 						androidx.compose.ui.graphics.Brush.verticalGradient(
-							listOf(Color.Transparent, Color(0xB3000000)),
+							listOf(Color.Transparent, Color(0x99000000)),
 						),
 					)
-					.padding(horizontal = (10 * u).dp, vertical = (2 * u).dp),
+					.padding(start = (10 * u).dp, end = (10 * u).dp, bottom = (7 * u).dp, top = (10 * u).dp),
 			) {
-				Text(text = ts(if (scrubbing) scrubTo.toLong() else position), style = TextStyle(fontFamily = Geist, fontSize = (9 * u).sp), color = Color.White)
-				androidx.compose.material3.Slider(
-					value = (if (scrubbing) scrubTo else position.toFloat()).coerceIn(0f, duration.toFloat().coerceAtLeast(1f)),
-					onValueChange = { v -> scrubbing = true; scrubTo = v; interactedAt = android.os.SystemClock.elapsedRealtime() },
-					onValueChangeFinished = { exo.seekTo(scrubTo.toLong()); position = scrubTo.toLong(); scrubbing = false },
-					valueRange = 0f..duration.toFloat().coerceAtLeast(1f),
-					colors = androidx.compose.material3.SliderDefaults.colors(
-						thumbColor = Color.White,
-						activeTrackColor = Color(0xFF69B3CA),
-						inactiveTrackColor = Color(0x59FFFFFF),
-					),
-					modifier = Modifier.weight(1f).padding(horizontal = (6 * u).dp).height((22 * u).dp),
+				Text(
+					text = ts(if (scrubbing) scrubTo.toLong() else position) + " / " + ts(duration),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (8.5f * u).sp, letterSpacing = (0.3f * u).sp),
+					color = Color(0xE6FFFFFF),
+					modifier = Modifier
+						.clip(RoundedCornerShape((7 * u).dp))
+						.background(Color(0x59000000))
+						.padding(horizontal = (6 * u).dp, vertical = (2.5f * u).dp),
 				)
-				Text(text = ts(duration), style = TextStyle(fontFamily = Geist, fontSize = (9 * u).sp), color = Color.White)
+				Spacer(modifier = Modifier.weight(1f))
 				androidx.compose.material3.Icon(
 					imageVector = if (muted) Icons.AutoMirrored.Filled.VolumeOff else Icons.AutoMirrored.Filled.VolumeUp,
 					contentDescription = if (muted) "Unmute" else "Mute",
-					tint = Color.White,
+					tint = Color(0xE6FFFFFF),
 					modifier = Modifier
-						.padding(start = (8 * u).dp)
-						.size((15 * u).dp)
+						.size((14 * u).dp)
 						.clickable(
 							interactionSource = remember { MutableInteractionSource() },
 							indication = null,
@@ -1277,16 +1281,83 @@ private fun HeroControls(
 				androidx.compose.material3.Icon(
 					imageVector = if (fullscreen) Icons.Filled.FullscreenExit else Icons.Filled.Fullscreen,
 					contentDescription = if (fullscreen) "Exit fullscreen" else "Fullscreen",
-					tint = Color.White,
+					tint = Color(0xE6FFFFFF),
 					modifier = Modifier
-						.padding(start = (8 * u).dp)
-						.size((16 * u).dp)
+						.padding(start = (10 * u).dp)
+						.size((15 * u).dp)
 						.clickable(
 							interactionSource = remember { MutableInteractionSource() },
 							indication = null,
 						) { onFullscreen() },
 				)
 			}
+			// Hairline scrubber flush with the bottom edge: 2px track, teal
+			// progress, a thumb that grows while dragging. Tap or drag to seek.
+			SleekScrubber(
+				fraction = if (duration > 0) ((if (scrubbing) scrubTo else position.toFloat()) / duration.toFloat()).coerceIn(0f, 1f) else 0f,
+				scrubbing = scrubbing,
+				u = u,
+				onScrub = { f ->
+					scrubbing = true
+					scrubTo = (f * duration.toFloat()).coerceIn(0f, duration.toFloat())
+					interactedAt = android.os.SystemClock.elapsedRealtime()
+				},
+				onCommit = {
+					exo.seekTo(scrubTo.toLong()); position = scrubTo.toLong(); scrubbing = false
+				},
+				modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth(),
+			)
 		}
+	}
+}
+
+
+/** Hairline seek bar: 2px rounded track, teal progress, thumb grows on touch. */
+@Composable
+private fun SleekScrubber(
+	fraction: Float,
+	scrubbing: Boolean,
+	u: Float,
+	onScrub: (Float) -> Unit,
+	onCommit: () -> Unit,
+	modifier: Modifier = Modifier,
+) {
+	androidx.compose.foundation.Canvas(
+		modifier = modifier
+			.height((16 * u).dp)
+			.pointerInput(Unit) {
+				detectHorizontalDragGestures(
+					onDragStart = { o -> onScrub((o.x / size.width).coerceIn(0f, 1f)) },
+					onHorizontalDrag = { change, _ -> change.consume(); onScrub((change.position.x / size.width).coerceIn(0f, 1f)) },
+					onDragEnd = { onCommit() },
+					onDragCancel = { onCommit() },
+				)
+			}
+			.pointerInput(Unit) {
+				detectTapGestures { o ->
+					onScrub((o.x / size.width).coerceIn(0f, 1f)); onCommit()
+				}
+			},
+	) {
+		val y = size.height - (4 * u).dp.toPx()
+		val trackH = (2 * u).dp.toPx()
+		val r = androidx.compose.ui.geometry.CornerRadius(trackH / 2f)
+		drawRoundRect(
+			color = Color(0x40FFFFFF),
+			topLeft = androidx.compose.ui.geometry.Offset(0f, y - trackH / 2f),
+			size = androidx.compose.ui.geometry.Size(size.width, trackH),
+			cornerRadius = r,
+		)
+		drawRoundRect(
+			color = Color(0xFF69B3CA),
+			topLeft = androidx.compose.ui.geometry.Offset(0f, y - trackH / 2f),
+			size = androidx.compose.ui.geometry.Size(size.width * fraction, trackH),
+			cornerRadius = r,
+		)
+		drawCircle(
+			color = Color.White,
+			radius = (if (scrubbing) 4.5f else 2.8f) * u.dp.toPx(),
+			center = androidx.compose.ui.geometry.Offset(size.width * fraction, y),
+		)
 	}
 }

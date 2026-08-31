@@ -27,6 +27,13 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.VolumeOff
+import androidx.compose.material.icons.automirrored.filled.VolumeUp
+import androidx.compose.material.icons.filled.Fullscreen
+import androidx.compose.material.icons.filled.FullscreenExit
+import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
@@ -239,7 +246,9 @@ private fun HeroImage(media: NewsMedia, category: String, saved: Boolean, onBook
 		exo?.addListener(listener)
 		onDispose { exo?.removeListener(listener); exo?.release() }
 	}
-	androidx.compose.runtime.LaunchedEffect(playing, paused) { exo?.playWhenReady = playing && !paused }
+	// The controls own pause/seek once playing; this starts playback on the
+	// play-glyph tap and stops it when the hero returns to the poster.
+	androidx.compose.runtime.LaunchedEffect(playing) { exo?.playWhenReady = playing }
 	Box(
 		modifier = Modifier
 			.padding(horizontal = (15 * u).dp)
@@ -254,18 +263,32 @@ private fun HeroImage(media: NewsMedia, category: String, saved: Boolean, onBook
 			// A failed OR FINISHED stream returns to the poster + glyph
 			// instead of stranding a frame (user, 2026-08-25/26).
 			if (exo != null) {
-				// Direct clip: the pre-buffered cached player, already
-				// prepared while the article was being read.
-				androidx.compose.ui.viewinterop.AndroidView(
-					modifier = Modifier
-						.matchParentSize()
-						.clickable(
-							interactionSource = remember { MutableInteractionSource() },
-							indication = null,
-						) { paused = true },
-					factory = { c -> android.view.TextureView(c).also { exo.setVideoTextureView(it) } },
-					onRelease = { exo.clearVideoSurface() },
-				)
+				// Direct clip: the pre-buffered cached player with the full
+				// Compose controller (user, 2026-08-30: play/pause, seek bar,
+				// times, buffering, mute, fullscreen).
+				var fullscreen by remember { mutableStateOf(false) }
+				if (!fullscreen) {
+					androidx.compose.ui.viewinterop.AndroidView(
+						modifier = Modifier.matchParentSize(),
+						factory = { c -> android.view.TextureView(c).also { exo.setVideoTextureView(it) } },
+						onRelease = { exo.clearVideoSurface() },
+					)
+					HeroControls(exo = exo, u = u, onFullscreen = { fullscreen = true }, modifier = Modifier.matchParentSize())
+				} else {
+					androidx.compose.ui.window.Dialog(
+						onDismissRequest = { fullscreen = false },
+						properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false),
+					) {
+						Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
+							androidx.compose.ui.viewinterop.AndroidView(
+								modifier = Modifier.matchParentSize(),
+								factory = { c -> android.view.TextureView(c).also { exo.setVideoTextureView(it) } },
+								onRelease = { exo.clearVideoSurface() },
+							)
+							HeroControls(exo = exo, u = u, onFullscreen = { fullscreen = false }, fullscreen = true, modifier = Modifier.matchParentSize())
+						}
+					}
+				}
 				if (!firstFrame) {
 					// Poster holds until onRenderedFirstFrame.
 				val posterRes2 = (media as NewsMedia.Video).posterRes
@@ -301,7 +324,7 @@ private fun HeroImage(media: NewsMedia, category: String, saved: Boolean, onBook
 					onDone = { playing = false; paused = false },
 				)
 			}
-			if (paused) {
+			if (exo == null && paused) {
 				Image(
 					painter = painterResource(R.drawable.ic_hero_play),
 					contentDescription = "Play",
@@ -1111,11 +1134,159 @@ private object NewsVideoCache {
 					.build(),
 			)
 			.build().apply {
+				// Audible by default: media usage + audio focus (user,
+				// 2026-08-30 "no audio?").
+				setAudioAttributes(
+					androidx.media3.common.AudioAttributes.Builder()
+						.setUsage(androidx.media3.common.C.USAGE_MEDIA)
+						.setContentType(androidx.media3.common.C.AUDIO_CONTENT_TYPE_MOVIE)
+						.build(),
+					true,
+				)
+				volume = 1f
 				setMediaItem(androidx.media3.common.MediaItem.fromUri(url))
 				// Exactly 1x (user, 2026-08-26).
 				playbackParameters = androidx.media3.common.PlaybackParameters(1f)
 				prepare()
 				playWhenReady = false
 			}
+	}
+}
+
+
+/**
+ * Full player controls, pure Compose (user, 2026-08-30 "all the features a
+ * video player should have"): tap the video to show/hide them (auto-hide 3s);
+ * center play/pause; bottom bar = elapsed time, seek slider, total time, mute,
+ * fullscreen; buffering spinner while the stream stalls. Rate stays 1x.
+ */
+@Composable
+private fun HeroControls(
+	exo: androidx.media3.exoplayer.ExoPlayer,
+	u: Float,
+	onFullscreen: () -> Unit,
+	modifier: Modifier = Modifier,
+	fullscreen: Boolean = false,
+) {
+	var visible by remember { mutableStateOf(true) }
+	var playing by remember { mutableStateOf(exo.playWhenReady) }
+	var buffering by remember { mutableStateOf(exo.playbackState == androidx.media3.common.Player.STATE_BUFFERING) }
+	var muted by remember { mutableStateOf(exo.volume == 0f) }
+	var position by remember { mutableStateOf(0L) }
+	var duration by remember { mutableStateOf(0L) }
+	var scrubbing by remember { mutableStateOf(false) }
+	var scrubTo by remember { mutableStateOf(0f) }
+	androidx.compose.runtime.DisposableEffect(exo) {
+		val l = object : androidx.media3.common.Player.Listener {
+			override fun onPlayWhenReadyChanged(p: Boolean, reason: Int) { playing = p }
+			override fun onPlaybackStateChanged(state: Int) { buffering = state == androidx.media3.common.Player.STATE_BUFFERING }
+		}
+		exo.addListener(l)
+		onDispose { exo.removeListener(l) }
+	}
+	androidx.compose.runtime.LaunchedEffect(Unit) {
+		while (true) {
+			if (!scrubbing) position = exo.currentPosition.coerceAtLeast(0L)
+			duration = if (exo.duration > 0) exo.duration else 0L
+			kotlinx.coroutines.delay(250)
+		}
+	}
+	// Auto-hide 3s after the last interaction while playing.
+	var interactedAt by remember { mutableStateOf(0L) }
+	androidx.compose.runtime.LaunchedEffect(visible, playing, interactedAt) {
+		if (visible && playing) { kotlinx.coroutines.delay(3000); visible = false }
+	}
+	fun ts(ms: Long): String {
+		val t = ms / 1000; return "%d:%02d".format(t / 60, t % 60)
+	}
+	Box(
+		modifier = modifier.clickable(
+			interactionSource = remember { MutableInteractionSource() },
+			indication = null,
+		) { visible = !visible; interactedAt = android.os.SystemClock.elapsedRealtime() },
+	) {
+		if (buffering) {
+			androidx.compose.material3.CircularProgressIndicator(
+				color = Color.White,
+				strokeWidth = (2.5f * u).dp,
+				modifier = Modifier.align(Alignment.Center).size((34 * u).dp),
+			)
+		}
+		if (visible) {
+			// Center play/pause.
+			if (!buffering) {
+				Box(
+					contentAlignment = Alignment.Center,
+					modifier = Modifier
+						.align(Alignment.Center)
+						.clip(CircleShape)
+						.background(Color(0x8C000000))
+						.size((44 * u).dp)
+						.clickable(
+							interactionSource = remember { MutableInteractionSource() },
+							indication = null,
+						) { exo.playWhenReady = !playing; interactedAt = android.os.SystemClock.elapsedRealtime() },
+				) {
+					androidx.compose.material3.Icon(
+						imageVector = if (playing) Icons.Filled.Pause else Icons.Filled.PlayArrow,
+						contentDescription = if (playing) "Pause" else "Play",
+						tint = Color.White,
+						modifier = Modifier.size((26 * u).dp),
+					)
+				}
+			}
+			// Bottom bar: elapsed · slider · total · mute · fullscreen.
+			Row(
+				verticalAlignment = Alignment.CenterVertically,
+				modifier = Modifier
+					.align(Alignment.BottomCenter)
+					.fillMaxWidth()
+					.background(
+						androidx.compose.ui.graphics.Brush.verticalGradient(
+							listOf(Color.Transparent, Color(0xB3000000)),
+						),
+					)
+					.padding(horizontal = (10 * u).dp, vertical = (2 * u).dp),
+			) {
+				Text(text = ts(if (scrubbing) scrubTo.toLong() else position), style = TextStyle(fontFamily = Geist, fontSize = (9 * u).sp), color = Color.White)
+				androidx.compose.material3.Slider(
+					value = (if (scrubbing) scrubTo else position.toFloat()).coerceIn(0f, duration.toFloat().coerceAtLeast(1f)),
+					onValueChange = { v -> scrubbing = true; scrubTo = v; interactedAt = android.os.SystemClock.elapsedRealtime() },
+					onValueChangeFinished = { exo.seekTo(scrubTo.toLong()); position = scrubTo.toLong(); scrubbing = false },
+					valueRange = 0f..duration.toFloat().coerceAtLeast(1f),
+					colors = androidx.compose.material3.SliderDefaults.colors(
+						thumbColor = Color.White,
+						activeTrackColor = Color(0xFF69B3CA),
+						inactiveTrackColor = Color(0x59FFFFFF),
+					),
+					modifier = Modifier.weight(1f).padding(horizontal = (6 * u).dp).height((22 * u).dp),
+				)
+				Text(text = ts(duration), style = TextStyle(fontFamily = Geist, fontSize = (9 * u).sp), color = Color.White)
+				androidx.compose.material3.Icon(
+					imageVector = if (muted) Icons.AutoMirrored.Filled.VolumeOff else Icons.AutoMirrored.Filled.VolumeUp,
+					contentDescription = if (muted) "Unmute" else "Mute",
+					tint = Color.White,
+					modifier = Modifier
+						.padding(start = (8 * u).dp)
+						.size((15 * u).dp)
+						.clickable(
+							interactionSource = remember { MutableInteractionSource() },
+							indication = null,
+						) { muted = !muted; exo.volume = if (muted) 0f else 1f; interactedAt = android.os.SystemClock.elapsedRealtime() },
+				)
+				androidx.compose.material3.Icon(
+					imageVector = if (fullscreen) Icons.Filled.FullscreenExit else Icons.Filled.Fullscreen,
+					contentDescription = if (fullscreen) "Exit fullscreen" else "Fullscreen",
+					tint = Color.White,
+					modifier = Modifier
+						.padding(start = (8 * u).dp)
+						.size((16 * u).dp)
+						.clickable(
+							interactionSource = remember { MutableInteractionSource() },
+							indication = null,
+						) { onFullscreen() },
+				)
+			}
+		}
 	}
 }

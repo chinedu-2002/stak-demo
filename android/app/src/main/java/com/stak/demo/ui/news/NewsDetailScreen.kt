@@ -243,6 +243,7 @@ fun NewsDetailScreen(articleId: String = NewsArticleFeed.APPLE, onBack: () -> Un
 				val article = NewsArticleFeed.article(pages[page])
 				key(article.id) {
 					NewsArticlePage(
+						active = pagerState.settledPage == page,
 						article = article,
 						saved = article.id in savedIds,
 						onSave = { save(article) },
@@ -288,6 +289,7 @@ fun NewsDetailScreen(articleId: String = NewsArticleFeed.APPLE, onBack: () -> Un
  */
 @Composable
 private fun NewsArticlePage(
+	active: Boolean,
 	article: NewsArticleFeed.Article,
 	saved: Boolean,
 	onSave: () -> Unit,
@@ -297,7 +299,10 @@ private fun NewsArticlePage(
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	// The hero clip's player lives at page level: the in-app PiP window
 	// floats over the WHOLE article (reference image 3), not just the hero.
-	val hero = rememberHeroPlayer(article.media)
+	// Only the SETTLED page owns a player (user, 2026-09-01 "sluggish"):
+	// a neighbour composed mid-drag must not prepare/buffer a second
+	// ExoPlayer and fight the playing clip for network and decoder.
+	val hero = rememberHeroPlayer(article.media, enabled = active)
 
 	Box(modifier = Modifier.fillMaxSize()) {
 		Column(
@@ -1402,12 +1407,15 @@ private class HeroPlayer(val exo: ExoPlayer?) {
  * (the pager disposes it) - so an off-screen page can never keep playing.
  */
 @Composable
-private fun rememberHeroPlayer(media: NewsMedia): HeroPlayer {
+private fun rememberHeroPlayer(media: NewsMedia, enabled: Boolean = true): HeroPlayer {
 	val video = media as? NewsMedia.Video
 	val directUrl = if (video != null && video.youTubeEmbedUrl == null) video.url else null
 	val ctx = LocalContext.current
-	val player = remember(directUrl) {
-		HeroPlayer(if (directUrl != null) NewsVideoCache.preparedPlayer(ctx, directUrl) else null)
+	// Keyed on `enabled` too: the page settling creates (and pre-buffers)
+	// the player; swiping away recreates an empty holder, and the old
+	// player is released by this DisposableEffect's key change.
+	val player = remember(directUrl, enabled) {
+		HeroPlayer(if (enabled && directUrl != null) NewsVideoCache.preparedPlayer(ctx, directUrl) else null)
 	}
 	val exo = player.exo
 	DisposableEffect(player) {

@@ -167,7 +167,6 @@ private struct HeroImage: View {
 	/// buffering) when the article opens; the poster holds until playback runs.
 	@State private var heroPlayer: AVPlayer? = nil
 	@State private var firstFrame = false
-	@State private var muted = false
 	@Environment(\.openURL) private var openURL
 
 	var body: some View {
@@ -186,22 +185,13 @@ private struct HeroImage: View {
 			if playing, case let .video(url, _, _, _) = media {
 				// A failed OR FINISHED stream returns to the poster + glyph
 				// instead of stranding a frame (user, 2026-08-25/26).
-				// Full player (user, 2026-08-30): VideoPlayer's native controls give
-				// play/pause, the seek bar, elapsed/remaining time and buffering;
-				// our tap-blocker is gone so they receive touches. Mute chip below.
+				// Full player (user, 2026-08-31, video_app reference: native
+				// AVPlayerViewController = the reference player: +/-15s skips,
+				// rates menu, PiP): the native chrome carries play/pause, the
+				// seek bar, elapsed/total time, subtitles, fullscreen, the "..."
+				// menu and system PiP - the custom mute chip drew over that
+				// chrome, so it is gone; volume lives in the native controls.
 				NewsVideoPlayer(url: url, paused: paused, prebuffered: heroPlayer, onBegan: { firstFrame = true }, onDone: { playing = false; paused = false; firstFrame = false; heroPlayer?.pause(); heroPlayer?.seek(to: .zero) })
-				Button {
-					muted.toggle()
-					heroPlayer?.isMuted = muted
-				} label: {
-					Text(muted ? "🔇" : "🔊")
-						.font(.system(size: 11 * u))
-						.frame(width: 26 * u, height: 26 * u)
-						.background(Color.black.opacity(0.4), in: Circle())
-				}
-				.buttonStyle(.plain)
-				.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-				.padding(8 * u)
 				if !firstFrame, case let .video(_, asset, posterUrl, _) = media {
 					// The poster holds until the clip actually runs - no black gap.
 					if let asset {
@@ -823,7 +813,10 @@ private struct AutoplayVideoPlayer: View {
 	@State private var player: AVPlayer? = nil
 
 	var body: some View {
-		VideoPlayer(player: player)
+		// Native player chrome (user, 2026-08-31, video_app reference: native
+		// AVPlayerViewController = the reference player: +/-15s skips, rates
+		// menu, PiP) in place of SwiftUI's bare VideoPlayer.
+		HeroAVPlayerController(player: player, paused: paused)
 			.onAppear {
 				// Audible even with the silent switch on (user, 2026-08-30
 				// "no audio?"): playback category routes through the media channel.
@@ -853,6 +846,53 @@ private struct AutoplayVideoPlayer: View {
 			// play glyph (user, 2026-08-26: "i cant see the play icon").
 			.onReceive(NotificationCenter.default.publisher(for: .AVPlayerItemDidPlayToEndTime)) { _ in onDone() }
 			.onReceive(NotificationCenter.default.publisher(for: .AVPlayerItemFailedToPlayToEndTime)) { _ in onDone() }
+	}
+}
+
+/// The reference player (user, 2026-08-31, video_app reference: native
+/// AVPlayerViewController = the reference player: +/-15s skips, rates menu,
+/// PiP): AVPlayerViewController's own chrome provides the center pause +
+/// ±15s skip buttons, elapsed/total time, the seek bar, the subtitles
+/// button, fullscreen and the "..." overflow (Audio & Subtitles, Playback
+/// Rates, Quality, AirPlay) — plus true system picture-in-picture, where
+/// the video floats and the hero shows the "playing in picture in
+/// picture" placeholder.
+private struct HeroAVPlayerController: UIViewControllerRepresentable {
+	var player: AVPlayer? = nil
+	var paused: Bool = false
+
+	/// Tracks the last-applied pause state so unrelated SwiftUI re-renders
+	/// never fight the native chrome's own play/pause button.
+	final class Coordinator {
+		var lastPaused: Bool? = nil
+	}
+
+	func makeCoordinator() -> Coordinator { Coordinator() }
+
+	func makeUIViewController(context: Context) -> AVPlayerViewController {
+		let vc = AVPlayerViewController()
+		vc.player = player
+		// System PiP exactly like the reference: the clip floats in its own
+		// window while the article stays scrollable underneath.
+		vc.allowsPictureInPicturePlayback = true
+		vc.canStartPictureInPictureAutomaticallyFromInline = true
+		vc.updatesNowPlayingInfoCenter = false
+		// "Playback Rates · Normal" in the native "..." menu — the
+		// reference's overflow set (iOS 16+ API; the project targets 17.0).
+		vc.speeds = [0.5, 0.75, 1.0, 1.25, 1.5, 2.0].map {
+			AVPlaybackSpeed(rate: $0, localizedName: $0 == 1.0 ? "Normal" : String(format: "%gx", $0))
+		}
+		return vc
+	}
+
+	func updateUIViewController(_ vc: AVPlayerViewController, context: Context) {
+		if vc.player !== player { vc.player = player }
+		// AVPlayer.pause keeps the position, so resuming continues where
+		// the clip stopped — applied only when the binding itself changes.
+		if context.coordinator.lastPaused != paused {
+			context.coordinator.lastPaused = paused
+			if paused { player?.pause() } else { player?.play() }
+		}
 	}
 }
 

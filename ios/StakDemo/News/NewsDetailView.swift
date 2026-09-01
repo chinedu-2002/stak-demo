@@ -159,10 +159,9 @@ private struct HeroImage: View {
 	let onBookmark: () -> Void
 	/// The hero is a media slot: poster + play glyph at rest (frame-exact),
 	/// the served video playing IN PLACE once tapped (user, 2026-08-23).
+	/// Once playing, the native chrome owns pause/resume (2026-08-31), so the
+	/// 2026-08-30 tap-to-pause glyph and its `paused` state are gone.
 	@State private var playing = false
-	/// The play button toggles: tap the running clip to pause (the glyph returns
-	/// over the paused frame), tap the glyph to resume (user, 2026-08-30).
-	@State private var paused = false
 	/// Cinema-fast start (user, 2026-08-30): the player is created (and starts
 	/// buffering) when the article opens; the poster holds until playback runs.
 	@State private var heroPlayer: AVPlayer? = nil
@@ -185,13 +184,15 @@ private struct HeroImage: View {
 			if playing, case let .video(url, _, _, _) = media {
 				// A failed OR FINISHED stream returns to the poster + glyph
 				// instead of stranding a frame (user, 2026-08-25/26).
-				// Full player (user, 2026-08-31, video_app reference: native
-				// AVPlayerViewController = the reference player: +/-15s skips,
-				// rates menu, PiP): the native chrome carries play/pause, the
-				// seek bar, elapsed/total time, subtitles, fullscreen, the "..."
-				// menu and system PiP - the custom mute chip drew over that
-				// chrome, so it is gone; volume lives in the native controls.
-				NewsVideoPlayer(url: url, paused: paused, prebuffered: heroPlayer, onBegan: { firstFrame = true }, onDone: { playing = false; paused = false; firstFrame = false; heroPlayer?.pause(); heroPlayer?.seek(to: .zero) })
+				// Full player (user, 2026-08-31, video_app reference): the
+				// native AVPlayerViewController chrome carries play/pause with
+				// the +/-10s skips, the scrubber with elapsed/total time,
+				// subtitles, fullscreen, the "..." menu (playback speed,
+				// AirPlay) and system PiP - see NativePlayerView. The custom
+				// mute chip and the tap-to-pause glyph drew over that chrome,
+				// so both are gone; volume lives in the hardware buttons and
+				// the fullscreen chrome's slider.
+				NewsVideoPlayer(url: url, prebuffered: heroPlayer, onBegan: { firstFrame = true }, onDone: { playing = false; firstFrame = false; heroPlayer?.pause(); heroPlayer?.seek(to: .zero) })
 				if !firstFrame, case let .video(_, asset, posterUrl, _) = media {
 					// The poster holds until the clip actually runs - no black gap.
 					if let asset {
@@ -204,16 +205,6 @@ private struct HeroImage: View {
 					} else if let posterUrl, let pu = URL(string: posterUrl) {
 						AsyncImage(url: pu) { img in img.resizable().scaledToFill() } placeholder: { Color(argb: 0xFFC4C4C4) }
 					}
-				}
-				if paused {
-					Button { paused = false } label: {
-						Image("IcHeroPlay")
-							.resizable()
-							.frame(width: 59.92 * u, height: 53.75 * u)
-							.rotationEffect(.degrees(90))
-					}
-					.buttonStyle(.plain)
-					.offset(x: -0.5 * u, y: 12.5 * u)
 				}
 			} else {
 				let poster: String? = {
@@ -231,7 +222,7 @@ private struct HeroImage: View {
 						.offset(x: -0.5 * u, y: 16.59 * u)
 				}
 				if case .video = media {
-					Button { playing = true; paused = false } label: {
+					Button { playing = true } label: {
 						Image("IcHeroPlay")
 							.resizable()
 							.frame(width: 59.92 * u, height: 53.75 * u)
@@ -248,41 +239,50 @@ private struct HeroImage: View {
 						.onTapGesture { openURL(linkURL) }
 				}
 			}
-			Text(category)
-				.font(StakFont.geist(10 * u, .medium))
-				.foregroundStyle(StakColors.textPrimary)
-				.padding(.horizontal, 7 * u)
-				.padding(.vertical, 5 * u)
-				.background(Color(argb: 0x40242B3D), in: RoundedRectangle(cornerRadius: 7.88 * u))
-				.padding(.leading, 9 * u)
-				.padding(.bottom, 10 * u)
-				.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
-			if saved {
-				HStack(spacing: 4 * u) {
-					Image("IcSavedBookmark")
-						.resizable()
-						.frame(width: 11 * u, height: 11 * u)
-					Text("Saved to My STAK")
-						.font(StakFont.geist(10 * u, .medium))
-						.foregroundStyle(StakColors.textPrimary)
+			// The category chip is the REST state's (frame-authored); while
+			// playing the canvas belongs to the native controls (mirrors
+			// android's HeroImage, 2026-08-31).
+			if !playing {
+				Text(category)
+					.font(StakFont.geist(10 * u, .medium))
+					.foregroundStyle(StakColors.textPrimary)
+					.padding(.horizontal, 7 * u)
+					.padding(.vertical, 5 * u)
+					.background(Color(argb: 0x40242B3D), in: RoundedRectangle(cornerRadius: 7.88 * u))
+					.padding(.leading, 9 * u)
+					.padding(.bottom, 10 * u)
+					.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
+				// The bookmark/saved chip is rest-state chrome too: while
+				// playing, the hero's top-right corner belongs to the native
+				// chrome's PiP button (android, 2026-08-31: the chip sat OVER
+				// it and swallowed the tap).
+				if saved {
+					HStack(spacing: 4 * u) {
+						Image("IcSavedBookmark")
+							.resizable()
+							.frame(width: 11 * u, height: 11 * u)
+						Text("Saved to My STAK")
+							.font(StakFont.geist(10 * u, .medium))
+							.foregroundStyle(StakColors.textPrimary)
+					}
+					.padding(.horizontal, 7 * u)
+					// Authored toast is 21 tall (1:1386): 13 text + 4/4 pads.
+					.padding(.vertical, 4 * u)
+					.background(Color(argb: 0x40242B3D), in: RoundedRectangle(cornerRadius: 7.88 * u))
+					.padding(.top, 8 * u)
+					.padding(.trailing, 7 * u)
+					.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
+				} else {
+					Button(action: onBookmark) {
+						Image("IcHeroBookmark")
+							.resizable()
+							.frame(width: 17.79 * u, height: 18.27 * u)
+					}
+					.buttonStyle(.plain)
+					.padding(.top, 8 * u)
+					.padding(.trailing, 11 * u)
+					.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
 				}
-				.padding(.horizontal, 7 * u)
-				// Authored toast is 21 tall (1:1386): 13 text + 4/4 pads.
-				.padding(.vertical, 4 * u)
-				.background(Color(argb: 0x40242B3D), in: RoundedRectangle(cornerRadius: 7.88 * u))
-				.padding(.top, 8 * u)
-				.padding(.trailing, 7 * u)
-				.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
-			} else {
-				Button(action: onBookmark) {
-					Image("IcHeroBookmark")
-						.resizable()
-						.frame(width: 17.79 * u, height: 18.27 * u)
-				}
-				.buttonStyle(.plain)
-				.padding(.top, 8 * u)
-				.padding(.trailing, 11 * u)
-				.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
 			}
 		}
 		.frame(maxWidth: .infinity)
@@ -789,7 +789,6 @@ private struct SaveSuccessOverlay: View {
 /// autoplay once the user tapped the play glyph.
 private struct NewsVideoPlayer: View {
 	let url: String
-	var paused: Bool = false
 	/// A player created (and buffering) before the play tap - cinema-fast start.
 	var prebuffered: AVPlayer? = nil
 	var onBegan: () -> Void = {}
@@ -799,24 +798,33 @@ private struct NewsVideoPlayer: View {
 		if let embed = NewsMedia.youTubeEmbedURL(for: url) {
 			YouTubeEmbedView(url: embed)
 		} else if let direct = URL(string: url) {
-			AutoplayVideoPlayer(url: direct, paused: paused, prebuffered: prebuffered, onBegan: onBegan, onDone: onDone)
+			AutoplayVideoPlayer(url: direct, prebuffered: prebuffered, onBegan: onBegan, onDone: onDone)
 		}
 	}
 }
 
 private struct AutoplayVideoPlayer: View {
 	let url: URL
-	var paused: Bool = false
 	var prebuffered: AVPlayer? = nil
 	var onBegan: () -> Void = {}
 	var onDone: () -> Void = {}
 	@State private var player: AVPlayer? = nil
+	/// The native chrome's fullscreen presentation is up (reported by
+	/// NativePlayerView's delegate). An end-of-clip that lands while it is
+	/// up parks in `donePending` until AVKit's dismissal has completed.
+	@State private var inFullScreen = false
+	@State private var donePending = false
 
 	var body: some View {
-		// Native player chrome (user, 2026-08-31, video_app reference: native
-		// AVPlayerViewController = the reference player: +/-15s skips, rates
-		// menu, PiP) in place of SwiftUI's bare VideoPlayer.
-		HeroAVPlayerController(player: player, paused: paused)
+		// Native player chrome (user, 2026-08-31, video_app reference) in
+		// place of SwiftUI's bare VideoPlayer - see NativePlayerView.
+		NativePlayerView(player: player, onFullScreenChange: { full in
+			inFullScreen = full
+			if !full, donePending {
+				donePending = false
+				onDone()
+			}
+		})
 			.onAppear {
 				// Audible even with the silent switch on (user, 2026-08-30
 				// "no audio?"): playback category routes through the media channel.
@@ -827,72 +835,135 @@ private struct AutoplayVideoPlayer: View {
 				let p = prebuffered ?? AVPlayer(url: url)
 				// Deep buffer so playback never stall-cycles (user, 2026-08-30).
 				p.currentItem?.preferredForwardBufferDuration = 30
+				// Exactly 1x (user, 2026-08-26: "put it on 1x speed" - not
+				// sluggish, not fast). defaultRate is the rate play() restores
+				// AND what the native "Playback Speed" menu shows as selected,
+				// so the menu opens on Normal. Clip SOURCES must also be
+				// real-time footage; see NewsArticleFeed's media notes.
+				p.defaultRate = 1.0
 				player = p
 				p.play()
-				// Exactly 1x (user, 2026-08-26: "put it on 1x speed" -
-				// not sluggish, not fast). Clip SOURCES must also be
-				// real-time footage; see NewsArticleFeed's media notes.
-				p.rate = 1.0
 			}
-			// Play/pause toggle: AVPlayer.pause keeps the position, so
-			// resuming continues where the clip stopped.
-			.onChange(of: paused) { if paused { player?.pause() } else { player?.play() } }
 			// The poster in the hero holds until playback actually runs.
-			.onReceive(player?.publisher(for: \.timeControlStatus).eraseToAnyPublisher() ?? Just(.paused).eraseToAnyPublisher()) { status in
+			.onReceive(player?.publisher(for: \.timeControlStatus).eraseToAnyPublisher() ?? Just(AVPlayer.TimeControlStatus.paused).eraseToAnyPublisher()) { status in
 				if status == .playing { onBegan() }
 			}
 			.onDisappear { player?.pause() }
 			// A finished or failed clip returns the hero to its poster +
 			// play glyph (user, 2026-08-26: "i cant see the play icon").
-			.onReceive(NotificationCenter.default.publisher(for: .AVPlayerItemDidPlayToEndTime)) { _ in onDone() }
-			.onReceive(NotificationCenter.default.publisher(for: .AVPlayerItemFailedToPlayToEndTime)) { _ in onDone() }
+			// Scoped to THIS player's item so no other clip's end resets the hero.
+			.onReceive(NotificationCenter.default.publisher(for: .AVPlayerItemDidPlayToEndTime, object: player?.currentItem)) { _ in clipEnded() }
+			.onReceive(NotificationCenter.default.publisher(for: .AVPlayerItemFailedToPlayToEndTime, object: player?.currentItem)) { _ in clipEnded() }
+			// FailedToPlayToEndTime covers MID-STREAM failures only. An item that
+			// fails to LOAD (404, expired CDN link, offline) posts nothing - just
+			// its status flips - so watch that too, or the poster would hold
+			// forever with the chips hidden.
+			.onReceive(player?.currentItem?.publisher(for: \.status).eraseToAnyPublisher() ?? Just(AVPlayerItem.Status.unknown).eraseToAnyPublisher()) { status in
+				if status == .failed { clipEnded() }
+			}
+	}
+
+	/// exitsFullScreenWhenPlaybackEnds and the receivers above fire off the
+	/// same end-of-clip notification, so a clip that ends in fullscreen defers
+	/// onDone until the fullscreen dismissal completes (via onFullScreenChange)
+	/// - tearing the embedded controller down mid-transition could strand
+	/// the presentation.
+	private func clipEnded() {
+		if inFullScreen { donePending = true } else { onDone() }
 	}
 }
 
-/// The reference player (user, 2026-08-31, video_app reference: native
-/// AVPlayerViewController = the reference player: +/-15s skips, rates menu,
-/// PiP): AVPlayerViewController's own chrome provides the center pause +
-/// ±15s skip buttons, elapsed/total time, the seek bar, the subtitles
-/// button, fullscreen and the "..." overflow (Audio & Subtitles, Playback
-/// Rates, Quality, AirPlay) — plus true system picture-in-picture, where
-/// the video floats and the hero shows the "playing in picture in
-/// picture" placeholder.
-private struct HeroAVPlayerController: UIViewControllerRepresentable {
+/// The reference player (user, 2026-08-31, video_app reference - the Chelsea
+/// FC app's player): AVPlayerViewController's own inline chrome supplies the
+/// centre play/pause with a skip button either side (the system's 10s, the
+/// same interval its PiP window shows), the scrubber with elapsed/total
+/// time, the subtitles/audio button whenever the asset carries tracks,
+/// fullscreen, the "..." menu (Playback Speed, AirPlay) and true system
+/// picture-in-picture: the clip floats in its own window with mini controls
+/// while the hero shows the system's "This video is playing in picture in
+/// picture" placeholder. Its colours, fonts and skip interval are the
+/// system's - not restylable to teal/Geist. Chromecast is not a system
+/// control on iOS, so it is not offered.
+///
+/// PiP requires Info.plist UIBackgroundModes = ["audio"] (present in
+/// StakDemo/Info.plist) plus the .playback audio session that
+/// AutoplayVideoPlayer sets before play.
+private struct NativePlayerView: UIViewControllerRepresentable {
 	var player: AVPlayer? = nil
-	var paused: Bool = false
+	/// true when the native chrome's fullscreen presentation begins, false
+	/// once its dismissal has COMPLETED (a cancelled interactive dismissal
+	/// keeps it true). AutoplayVideoPlayer gates its end-of-clip teardown on it.
+	var onFullScreenChange: (Bool) -> Void = { _ in }
 
-	/// Tracks the last-applied pause state so unrelated SwiftUI re-renders
-	/// never fight the native chrome's own play/pause button.
-	final class Coordinator {
-		var lastPaused: Bool? = nil
+	/// AVPlayerViewControllerDelegate: tracks the fullscreen presentation for
+	/// `onFullScreenChange`, and answers the PiP window's restore button - the
+	/// hero never leaves the hierarchy while its player is attached (see
+	/// dismantleUIViewController), so there is nothing to re-present.
+	final class Coordinator: NSObject, AVPlayerViewControllerDelegate {
+		var onFullScreenChange: (Bool) -> Void = { _ in }
+
+		func playerViewController(_ playerViewController: AVPlayerViewController, willBeginFullScreenPresentationWithAnimationCoordinator coordinator: UIViewControllerTransitionCoordinator) {
+			onFullScreenChange(true)
+			coordinator.animate(alongsideTransition: nil) { [weak self] context in
+				if context.isCancelled { self?.onFullScreenChange(false) }
+			}
+		}
+
+		func playerViewController(_ playerViewController: AVPlayerViewController, willEndFullScreenPresentationWithAnimationCoordinator coordinator: UIViewControllerTransitionCoordinator) {
+			// Reported once the dismissal has actually completed, so a pending
+			// end-of-clip tears the player down onto a hero that is back inline.
+			coordinator.animate(alongsideTransition: nil) { [weak self] context in
+				if !context.isCancelled { self?.onFullScreenChange(false) }
+			}
+		}
+
+		func playerViewController(_ playerViewController: AVPlayerViewController, restoreUserInterfaceForPictureInPictureStopWithCompletionHandler completionHandler: @escaping (Bool) -> Void) {
+			completionHandler(true)
+		}
 	}
 
 	func makeCoordinator() -> Coordinator { Coordinator() }
 
 	func makeUIViewController(context: Context) -> AVPlayerViewController {
 		let vc = AVPlayerViewController()
+		context.coordinator.onFullScreenChange = onFullScreenChange
+		vc.delegate = context.coordinator
 		vc.player = player
 		// System PiP exactly like the reference: the clip floats in its own
-		// window while the article stays scrollable underneath.
+		// window while the article stays scrollable underneath, and
+		// backgrounding the app mid-clip pops it out automatically.
 		vc.allowsPictureInPicturePlayback = true
 		vc.canStartPictureInPictureAutomaticallyFromInline = true
+		// A clip that ends in fullscreen drops back inline first: AVKit
+		// dismisses the presentation, and AutoplayVideoPlayer holds the hero's
+		// return to poster + glyph until that dismissal has completed (its
+		// clipEnded / onFullScreenChange pairing).
+		vc.exitsFullScreenWhenPlaybackEnds = true
 		vc.updatesNowPlayingInfoCenter = false
-		// "Playback Rates · Normal" in the native "..." menu — the
-		// reference's overflow set (iOS 16+ API; the project targets 17.0).
-		vc.speeds = [0.5, 0.75, 1.0, 1.25, 1.5, 2.0].map {
-			AVPlaybackSpeed(rate: $0, localizedName: $0 == 1.0 ? "Normal" : String(format: "%gx", $0))
+		// "Playback Rates · Normal": the system's speed set, with the 1x entry
+		// named "Normal" like the reference. The selected entry mirrors
+		// AVPlayer.defaultRate, pinned to 1.0 in AutoplayVideoPlayer.
+		vc.speeds = AVPlaybackSpeed.systemDefaultSpeeds.map { speed in
+			speed.rate == 1.0 ? AVPlaybackSpeed(rate: 1.0, localizedName: "Normal") : speed
 		}
 		return vc
 	}
 
 	func updateUIViewController(_ vc: AVPlayerViewController, context: Context) {
+		context.coordinator.onFullScreenChange = onFullScreenChange
+		// Only the player identity is synced - the controller is never
+		// rebuilt, so the native chrome's play/pause, seek, speed and PiP
+		// state survive unrelated SwiftUI re-renders.
 		if vc.player !== player { vc.player = player }
-		// AVPlayer.pause keeps the position, so resuming continues where
-		// the clip stopped — applied only when the binding itself changes.
-		if context.coordinator.lastPaused != paused {
-			context.coordinator.lastPaused = paused
-			if paused { player?.pause() } else { player?.play() }
-		}
+	}
+
+	static func dismantleUIViewController(_ vc: AVPlayerViewController, coordinator: Coordinator) {
+		// Detaching the player ends any PiP window and releases the surface
+		// when SwiftUI drops the view (article popped mid-PiP, clip ended in
+		// PiP): no ownerless PiP window outliving its delegate, no second
+		// controller attaching to the same AVPlayer on the next play tap. The
+		// hero returns to poster + glyph exactly like android's HeroPlayer.stop().
+		vc.player = nil
 	}
 }
 

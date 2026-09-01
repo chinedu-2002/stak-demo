@@ -23,6 +23,14 @@ private let ctaBorder = StakColors.ctaBorderGradient
 /// hero toast, View-in-My-STAK row on the stock card, Apple + Tech tags).
 /// Mirrors android/ NewsDetailScreen.kt. Every metric is scaled by the
 /// 390pt artboard unit (`figmaUnit`), exactly like the Android build.
+///
+/// The screen is a PAGER (user, 2026-08-31: "swipe to get the previous/next
+/// news - social media vibes"): the fixed top bar stays put while, under it,
+/// one NewsArticlePage per feed story rides a horizontal .page TabView -
+/// exactly the pre-pager article content per page, only the container
+/// changed. It opens on the tapped story's page (NewsArticleFeed.pageOrder),
+/// share uses the CURRENT page's story, and only the current page owns a
+/// live hero player (HeroImage.isActive).
 struct NewsDetailView: View {
 	/// The served article for the tapped story (user, 2026-08-25); the
 	/// Apple article is the authored one and renders frame-exact.
@@ -32,23 +40,54 @@ struct NewsDetailView: View {
 	/// READ NEXT rows push the next story's article (user, 2026-08-25).
 	var onOpenArticle: (String) -> Void = { _ in }
 
-	@State private var saved = false
-	@State private var showSuccess = false
+	/// SWIPE DIRECTION - the one place to flip it. `true` is the standard
+	/// pager convention: a finger swipe to the LEFT snaps to the NEXT story,
+	/// a swipe to the RIGHT to the PREVIOUS one. `false` reverses the page
+	/// list, so the same pager runs the other way round.
+	static let swipeLeftIsNext = true
 
-	private var article: NewsArticleFeed.Article { NewsArticleFeed.article(articleId) }
+	/// The story ids this screen pages through, in swipe order.
+	private let pages: [String]
+	/// The current page - starts on the tapped story.
+	@State private var index: Int
+	/// Saved is PER STORY and lives here rather than in the page: it survives
+	/// the pager recycling far-off pages, and the save-success sheet (whose
+	/// authored scrim, 101:1168, dims the top bar too) keeps drawing over the
+	/// whole screen exactly as it did before the pager.
+	@State private var savedIds: Set<String> = []
+	/// The story whose save-success sheet is up (nil = none).
+	@State private var successId: String? = nil
+
+	init(articleId: String = NewsArticleFeed.apple, onBack: @escaping () -> Void, onViewInMyStak: @escaping () -> Void = {}, onOpenArticle: @escaping (String) -> Void = { _ in }) {
+		self.articleId = articleId
+		self.onBack = onBack
+		self.onViewInMyStak = onViewInMyStak
+		self.onOpenArticle = onOpenArticle
+		// The feed's canonical order; a story outside it (never, in the demo)
+		// still opens - as the only page.
+		let order = NewsArticleFeed.pageOrder
+		let base = order.contains(articleId) ? order : [articleId]
+		let pages = Self.swipeLeftIsNext ? base : Array(base.reversed())
+		self.pages = pages
+		_index = State(initialValue: pages.firstIndex(of: articleId) ?? 0)
+	}
+
+	/// The story on the current page - the top bar's share link uses it.
+	private var currentArticle: NewsArticleFeed.Article {
+		NewsArticleFeed.article(pages[min(max(index, 0), pages.count - 1)])
+	}
 
 	var body: some View {
 		let u = figmaUnit
-		let article = self.article
 		ZStack {
 			VStack(spacing: 0) {
-				// Fixed top bar — back circle + share.
+				// Fixed top bar — back circle + share; it stays put above the pager.
 				HStack {
 					AuthBackCircle(action: onBack)
 					Spacer()
 					// Designer's call (2026-08-22): share creates a link that
-					// takes a co-app user to the shared info.
-					ShareLink(item: article.shareText) {
+					// takes a co-app user to the shared info - the CURRENT page's.
+					ShareLink(item: currentArticle.shareText) {
 						Image("IcNewsShare")
 							.resizable()
 							.frame(width: 24 * u, height: 24 * u)
@@ -61,84 +100,128 @@ struct NewsDetailView: View {
 				.padding(.top, 10 * u)
 				.padding(.bottom, 12 * u)
 
-				ScrollView {
-					VStack(spacing: 0) {
-						// Authored motion (1:1495): the hero bookmark -> News detail
-						// page saved, Instant - a direct save that skips the sheet.
-						HeroImage(media: article.media, category: article.category, saved: saved, onBookmark: { saved = true; if let t = article.ticker { MyStakHoldings.shared.add(t) } })
-						VStack(alignment: .leading, spacing: 15 * u) {
-							Text(article.headline)
-								// RENDER-measured 20sp (the metadata's 24 lied); lh32 box stands.
-								.font(StakFont.sora(20 * u, .semiBold))
-								.lineSpacing((32 - 20) * u)
-								.foregroundStyle(StakColors.textPrimary)
-							Text(article.subtitle)
-								// 14.3 keeps the authored line-1 break after "lineup".
-								.font(StakFont.geist(14.3 * u))
-								.lineSpacing((22 - 14.3) * u)
-								.foregroundStyle(News.muted)
-								// 1:1495: 26 of ink gap under the headline (the column's 15 + 5).
-								.padding(.top, 5 * u)
-							Byline(source: article.source, meta: article.sourceMeta)
-							if !saved {
-								// Designer's call (2026-08-22): the sheet scale-ins.
-								AddToStakButton { withAnimation(.easeOut(duration: 0.3)) { showSuccess = true } }
-							}
-						NewsHairline()
-							// ONE template for every story (user, 2026-08-25: the
-							// Apple article is the section's PLACEHOLDER - each
-							// block renders per story from served data; stock
-							// blocks appear whenever the story has a ticker).
-							if let ticker = article.ticker { StockCard(saved: saved, ticker: ticker, facts: NewsArticleFeed.stockFacts(ticker)) }
-							if !article.gist.isEmpty { GistCard(bullets: article.gist) }
-							if let first = article.paragraphs.first {
-								Paragraph(text: first, size: 15, line: 24)
-							}
-							if article.paragraphs.count > 1 {
-								Paragraph(text: article.paragraphs[1])
-							}
-							if let quote = article.pullQuote { PullQuote(text: quote) }
-							if let explainer = article.explainer { NewToThisCard(body_: explainer) }
-							ForEach(Array(article.paragraphs.dropFirst(2).enumerated()), id: \.offset) { _, text in
-								Paragraph(text: text)
-							}
-							SourceRow()
-							if let ticker = article.ticker { KeyStatsCard(facts: NewsArticleFeed.stockFacts(ticker)) }
-							NewsHairline()
-							HStack(spacing: 8 * u) {
-								if let first = article.tags.first { ArticleTag(text: first) }
-								if saved, article.tags.count > 1 {
-									ArticleTag(text: article.tags[1])
-								}
-							}
-							ReadNext(currentId: article.id, onOpen: onOpenArticle)
-						}
-						.frame(maxWidth: .infinity, alignment: .leading)
-						.padding(.horizontal, 20 * u)
-						// Render-measured vs 1:1495: headline cap-top 68 below the hero.
-						.padding(.top, 26 * u)
-						.padding(.bottom, 28 * u)
+				// The pager: iOS's standard horizontal page style (swipe left =
+				// next, see swipeLeftIsNext). It owns horizontal drags only -
+				// each page's vertical ScrollView scrolls exactly as before.
+				TabView(selection: $index) {
+					ForEach(pages.indices, id: \.self) { i in
+						let id = pages[i]
+						NewsArticlePage(
+							article: NewsArticleFeed.article(id),
+							isActive: index == i,
+							saved: savedIds.contains(id),
+							onSave: { save(id) },
+							// Designer's call (2026-08-22): the sheet scale-ins.
+							onAddToStak: { withAnimation(.easeOut(duration: 0.3)) { successId = id } },
+							onOpenArticle: onOpenArticle
+						)
+						.tag(i)
 					}
 				}
+				.tabViewStyle(.page(indexDisplayMode: .never))
 			}
 			// Authored (101:1005 Motion): Back -> News detail page saved,
 			// DISSOLVE 300 EaseOut; View in My STAK -> My STAK Overview,
 			// Push Right 300 (hoisted to the shell). Entry stays instant (its
 			// authored animate type is still unreadable from the file).
-			if showSuccess {
+			if let sheetId = successId {
 				SaveSuccessOverlay(
-					facts: NewsArticleFeed.stockFacts(article.ticker ?? "AAPL"),
-					onViewInMyStak: { saved = true; if let t = article.ticker { MyStakHoldings.shared.add(t) }; onViewInMyStak() },
+					facts: NewsArticleFeed.stockFacts(NewsArticleFeed.article(sheetId).ticker ?? "AAPL"),
+					onViewInMyStak: { save(sheetId); onViewInMyStak() },
 					onDismiss: {
-						saved = true
-						if let t = article.ticker { MyStakHoldings.shared.add(t) }
-						withAnimation(.easeOut(duration: 0.3)) { showSuccess = false }
+						save(sheetId)
+						withAnimation(.easeOut(duration: 0.3)) { successId = nil }
 					}
 				)
 				.transition(.asymmetric(insertion: .scale(scale: 0.92).combined(with: .opacity), removal: .opacity))
 			}
 		}
 		.background(StakColors.bg.ignoresSafeArea())
+	}
+
+	/// The save itself - the hero bookmark's direct save, the sheet's Back
+	/// and its View in My STAK all land here: the story is saved and its
+	/// stock joins My STAK.
+	private func save(_ id: String) {
+		savedIds.insert(id)
+		if let t = NewsArticleFeed.article(id).ticker { MyStakHoldings.shared.add(t) }
+	}
+}
+
+/// ONE story's page under the fixed top bar - the hero and the article
+/// column, exactly the pre-pager content; NewsDetailView pages a row of these.
+private struct NewsArticlePage: View {
+	let article: NewsArticleFeed.Article
+	/// true while this is the pager's current page (see HeroImage.isActive).
+	let isActive: Bool
+	let saved: Bool
+	/// The hero bookmark's direct save (authored 1:1495: skips the sheet).
+	let onSave: () -> Void
+	/// Add to STAK - the shell puts up the save-success sheet.
+	let onAddToStak: () -> Void
+	/// READ NEXT rows push the next story's article (user, 2026-08-25).
+	let onOpenArticle: (String) -> Void
+
+	var body: some View {
+		let u = figmaUnit
+		ScrollView {
+			VStack(spacing: 0) {
+				// Authored motion (1:1495): the hero bookmark -> News detail
+				// page saved, Instant - a direct save that skips the sheet.
+				HeroImage(media: article.media, category: article.category, saved: saved, isActive: isActive, onBookmark: onSave)
+				VStack(alignment: .leading, spacing: 15 * u) {
+					Text(article.headline)
+						// RENDER-measured 20sp (the metadata's 24 lied); lh32 box stands.
+						.font(StakFont.sora(20 * u, .semiBold))
+						.lineSpacing((32 - 20) * u)
+						.foregroundStyle(StakColors.textPrimary)
+					Text(article.subtitle)
+						// 14.3 keeps the authored line-1 break after "lineup".
+						.font(StakFont.geist(14.3 * u))
+						.lineSpacing((22 - 14.3) * u)
+						.foregroundStyle(News.muted)
+						// 1:1495: 26 of ink gap under the headline (the column's 15 + 5).
+						.padding(.top, 5 * u)
+					Byline(source: article.source, meta: article.sourceMeta)
+					if !saved {
+						AddToStakButton(action: onAddToStak)
+					}
+					NewsHairline()
+					// ONE template for every story (user, 2026-08-25: the
+					// Apple article is the section's PLACEHOLDER - each
+					// block renders per story from served data; stock
+					// blocks appear whenever the story has a ticker).
+					if let ticker = article.ticker { StockCard(saved: saved, ticker: ticker, facts: NewsArticleFeed.stockFacts(ticker)) }
+					if !article.gist.isEmpty { GistCard(bullets: article.gist) }
+					if let first = article.paragraphs.first {
+						Paragraph(text: first, size: 15, line: 24)
+					}
+					if article.paragraphs.count > 1 {
+						Paragraph(text: article.paragraphs[1])
+					}
+					if let quote = article.pullQuote { PullQuote(text: quote) }
+					if let explainer = article.explainer { NewToThisCard(body_: explainer) }
+					ForEach(Array(article.paragraphs.dropFirst(2).enumerated()), id: \.offset) { _, text in
+						Paragraph(text: text)
+					}
+					SourceRow()
+					if let ticker = article.ticker { KeyStatsCard(facts: NewsArticleFeed.stockFacts(ticker)) }
+					NewsHairline()
+					HStack(spacing: 8 * u) {
+						if let first = article.tags.first { ArticleTag(text: first) }
+						if saved, article.tags.count > 1 {
+							ArticleTag(text: article.tags[1])
+						}
+					}
+					ReadNext(currentId: article.id, onOpen: onOpenArticle)
+				}
+				.frame(maxWidth: .infinity, alignment: .leading)
+				.padding(.horizontal, 20 * u)
+				// Render-measured vs 1:1495: headline cap-top 68 below the hero.
+				.padding(.top, 26 * u)
+				.padding(.bottom, 28 * u)
+			}
+		}
 	}
 }
 
@@ -156,6 +239,12 @@ private struct HeroImage: View {
 	let media: NewsMedia
 	let category: String
 	let saved: Bool
+	/// The hero's page is the pager's CURRENT page (NewsDetailView,
+	/// 2026-08-31). Only the current page owns a player: it pre-buffers the
+	/// moment its page becomes current, and swiping away stops and releases
+	/// it - native chrome, system PiP window and fullscreen included - so an
+	/// off-screen page never plays audio. Rest state (poster + glyph) untouched.
+	let isActive: Bool
 	let onBookmark: () -> Void
 	/// The hero is a media slot: poster + play glyph at rest (frame-exact),
 	/// the served video playing IN PLACE once tapped (user, 2026-08-23).
@@ -163,7 +252,7 @@ private struct HeroImage: View {
 	/// 2026-08-30 tap-to-pause glyph and its `paused` state are gone.
 	@State private var playing = false
 	/// Cinema-fast start (user, 2026-08-30): the player is created (and starts
-	/// buffering) when the article opens; the poster holds until playback runs.
+	/// buffering) while the page is current; the poster holds until playback runs.
 	@State private var heroPlayer: AVPlayer? = nil
 	@State private var firstFrame = false
 	@Environment(\.openURL) private var openURL
@@ -172,14 +261,11 @@ private struct HeroImage: View {
 		let u = figmaUnit
 		ZStack {
 			Color(argb: 0xFFC4C4C4)
-				.onAppear {
-					if case let .video(url, _, _, _) = media, NewsMedia.youTubeEmbedURL(for: url) == nil,
-						heroPlayer == nil, let direct = URL(string: url) {
-						let p = AVPlayer(url: direct)
-						// Deep buffer so playback never stall-cycles (user, 2026-08-30).
-				p.currentItem?.preferredForwardBufferDuration = 30
-						heroPlayer = p
-					}
+				.onAppear { if isActive { prebuffer() } }
+				// The page swiped in or out (a page the pager built mid-drag
+				// appears inactive and picks its player up once it snaps current).
+				.onChange(of: isActive) { _, active in
+					if active { prebuffer() } else { release() }
 				}
 			if playing, case let .video(url, _, _, _) = media {
 				// A failed OR FINISHED stream returns to the poster + glyph
@@ -290,6 +376,30 @@ private struct HeroImage: View {
 		// Authored radius 10 (1:1517 Inspect) - the earlier 24 was wrong.
 		.clipShape(RoundedRectangle(cornerRadius: 10 * u))
 		.padding(.horizontal, 15 * u)
+	}
+
+	/// Cinema-fast start (user, 2026-08-30): the player is created (and
+	/// starts buffering) as soon as this page is the current one, so the play
+	/// tap finds a warm player; the poster holds until playback runs.
+	private func prebuffer() {
+		guard heroPlayer == nil, case let .video(url, _, _, _) = media,
+			NewsMedia.youTubeEmbedURL(for: url) == nil, let direct = URL(string: url) else { return }
+		let p = AVPlayer(url: direct)
+		// Deep buffer so playback never stall-cycles (user, 2026-08-30).
+		p.currentItem?.preferredForwardBufferDuration = 30
+		heroPlayer = p
+	}
+
+	/// The page was swiped away: back to poster + glyph, which drops the
+	/// player view - NativePlayerView.dismantleUIViewController detaches the
+	/// AVPlayer, ending any system PiP window or fullscreen presentation, and
+	/// a YouTube embed's WKWebView simply goes - then the pre-buffered player
+	/// is paused and let go: no audio, no buffering from an off-screen page.
+	private func release() {
+		playing = false
+		firstFrame = false
+		heroPlayer?.pause()
+		heroPlayer = nil
 	}
 }
 

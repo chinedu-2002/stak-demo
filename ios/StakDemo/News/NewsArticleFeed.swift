@@ -366,6 +366,14 @@ enum NewsArticleFeed {
 		articles.first { $0.id == id } ?? articles[0]
 	}
 
+	/// The article page's swipe order (user, 2026-08-31: "swipe to get the
+	/// previous/next news - social media vibes"): every served story in the
+	/// feed's canonical order - the order `articles` defines - through the
+	/// strict stock-news gate like every other News surface (the off-topic
+	/// sports story never renders, the pager included). NewsDetailView pages
+	/// through these and opens on the tapped story's index.
+	static let pageOrder: [String] = articles.filter { isStockNews($0) }.map(\.id)
+
 	/// Brief page index -> its article id (demo mapping). Served briefs
 	/// pass the same strict stock-news gate as the listing rows.
 	static let briefArticles = ["dow-record-chips-slide", "googl-ad-quarter", "oil-opec-supply", "tech-earnings-week"]

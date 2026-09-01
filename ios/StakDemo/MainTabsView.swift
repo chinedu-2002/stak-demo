@@ -241,7 +241,9 @@ struct MainTabsView: View {
 				// shell, already retargeted to My STAK, enters from leading.
 				onViewInMyStak: { pop(.forwardPush, all: true, landing: .myStak) },
 				// READ NEXT rows push the next story's article (user, 2026-08-25).
-				onOpenArticle: { id in pushInstant(.newsDetail(article: id)) }
+				// allowRepeat: after a swipe the page's READ NEXT can list the
+				// story this entry was opened for (pager, 2026-08-31).
+				onOpenArticle: { id in pushInstant(.newsDetail(article: id), allowRepeat: true) }
 			)
 		case .stockDetail(let fromMyStak):
 			StockDetailView(
@@ -327,8 +329,12 @@ struct MainTabsView: View {
 	}
 
 	/// Appends with no animation - the prototype's "Instant".
-	private func pushInstant(_ page: PushedPage) {
-		guard pushed.last?.page.id != page.id else { return }
+	/// `allowRepeat`: the article pager can legally push the very story it
+	/// was opened for - a swiped-to page's READ NEXT lists it; instant pushes
+	/// cover the row before a second tap can land, so the double-tap guard
+	/// is not needed there.
+	private func pushInstant(_ page: PushedPage, allowRepeat: Bool = false) {
+		guard allowRepeat || pushed.last?.page.id != page.id else { return }
 		parkedShift = pageWidth
 		pushed.append(PushedEntry(page: page))
 	}

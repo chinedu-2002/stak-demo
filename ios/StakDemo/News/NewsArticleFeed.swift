@@ -142,7 +142,7 @@ enum NewsArticleFeed {
 			// only through the stocks it is about - the chip names.
 			nil, ["NVDA", "MU"],
 			// NYSE-facade b-roll (Pexels, real-time 30fps, verified).
-			media: .video(url: "https://video.twimg.com/amplify_video/1407070844472508418/vid/1280x720/00MqVlMOkWZgag2l.mp4?tag=14", posterAsset: nil, posterUrl: "https://pbs.twimg.com/media/E4brjWsXoAAF3gP.jpg", sourceLink: "https://x.com/CNBCClosingBell/status/1407070932716474374")
+			media: .video(url: "https://video.twimg.com/amplify_video/1407070844472508418/vid/640x360/IrLoEoh_QEHqT5Zc.mp4?tag=14", posterAsset: nil, posterUrl: "https://pbs.twimg.com/media/E4brjWsXoAAF3gP.jpg", sourceLink: "https://x.com/CNBCClosingBell/status/1407070932716474374")
 		),
 		// STRICT stock news (user, 2026-08-25): the old fed-holds-rates
 		// demo article was macro, not stock news - replaced with the
@@ -196,7 +196,7 @@ enum NewsArticleFeed {
 			// Real-time pumpjack drone b-roll (Pexels, verified direct
 			// stream) - the first pick was a TIME-LAPSE and read as
 			// racing playback (user, 2026-08-26).
-			media: .video(url: "https://video.twimg.com/amplify_video/1699284608536248320/vid/avc1/1280x720/fF0HarT7NB5rsr05.mp4?tag=16", posterAsset: nil, posterUrl: "https://pbs.twimg.com/amplify_video_thumb/1699284608536248320/img/FYIKCy2RrRRIaOEG.jpg", sourceLink: "https://x.com/BloombergTV/status/1699393999142879621")
+			media: .video(url: "https://video.twimg.com/amplify_video/1699284608536248320/vid/avc1/640x360/Eeh_WcbfPbwwZC8h.mp4?tag=16", posterAsset: nil, posterUrl: "https://pbs.twimg.com/amplify_video_thumb/1699284608536248320/img/FYIKCy2RrRRIaOEG.jpg", sourceLink: "https://x.com/BloombergTV/status/1699393999142879621")
 		),
 		demo(
 			"tech-earnings-week", "Tech & Ai",
@@ -266,7 +266,7 @@ enum NewsArticleFeed {
 			"Reuters", "2d", "· Jul 2 · 3 min read",
 			"NewsThumbNVDA", ["NVDA"],
 			// NVIDIA RTX graphics-card b-roll (Pexels, real-time 30fps, verified).
-			media: .video(url: "https://pdl-iphone-cnbc-com.akamaized.net/7000396229/a2927310-c652-11f0-afc8-d79487fce04e/1763671856-42633094871-hd_H264_1M_720x405.mp4", posterAsset: nil, posterUrl: "https://image.cnbcfm.com/api/v1/image/108229488-17636718631763671856-42633094871-1080pnbcnews.jpg?v=1763671862&w=1280&h=720", sourceLink: "https://www.cnbc.com/video/2025/11/20/dan-ives-nvidia-put-up-a-masterpiece-quarter-and-threw-ai-bubble-out-the-window.html")
+			media: .video(url: "https://pdl-iphone-cnbc-com.akamaized.net/7000396229/a2927310-c652-11f0-afc8-d79487fce04e/1763671856-42633094871-hd_L.mp4", posterAsset: nil, posterUrl: "https://image.cnbcfm.com/api/v1/image/108229488-17636718631763671856-42633094871-1080pnbcnews.jpg?v=1763671862&w=1280&h=720", sourceLink: "https://www.cnbc.com/video/2025/11/20/dan-ives-nvidia-put-up-a-masterpiece-quarter-and-threw-ai-bubble-out-the-window.html")
 		),
 		demo(
 			"tsla-drops-deliveries", "Tech & Ai",
@@ -288,7 +288,7 @@ enum NewsArticleFeed {
 			"CNBC", "2d", "· Jul 2 · 3 min read",
 			"NewsThumbTSLA", ["TSLA"],
 			// Tesla Model X b-roll (Pexels, real-time 30fps, verified).
-			media: .video(url: "https://video.twimg.com/amplify_video/1477968621418823684/vid/1280x720/sHusOTE6TWR5mUN4.mp4?tag=14", posterAsset: nil, posterUrl: "https://pbs.twimg.com/media/FILMuTvXMAAk1hK.jpg", sourceLink: "https://x.com/SquawkCNBC/status/1477968728969072641")
+			media: .video(url: "https://video.twimg.com/amplify_video/1477968621418823684/vid/640x360/RK2UN9LzxttCiyIs.mp4?tag=14", posterAsset: nil, posterUrl: "https://pbs.twimg.com/media/FILMuTvXMAAk1hK.jpg", sourceLink: "https://x.com/SquawkCNBC/status/1477968728969072641")
 		),
 		// STRICT stock news (user, 2026-08-25): the old jobs-report demo
 		// row was macro, not stock news - replaced with a stock story.
@@ -313,7 +313,7 @@ enum NewsArticleFeed {
 			"Reuters", "2d", "· Jul 2 · 2 min read",
 			"NewsThumbJobs", ["AMD"],
 			// Motherboard-chips b-roll (Mixkit, verified direct stream).
-			media: .video(url: "https://pdl-iphone-cnbc-com.akamaized.net/7000412105/899c3ab0-494e-11f1-8d98-6dd8be25c276/1778073695-45746068381-hd_H264_1M_720x405.mp4", posterAsset: nil, posterUrl: "https://image.cnbcfm.com/api/v1/image/108302924-1778073838912-1778073695-45746068381-hd.jpg?v=1778073840&w=1280&h=720", sourceLink: "https://www.cnbc.com/video/2026/05/06/amd-ceo-lisa-su-agents-are-driving-tremendous-demand-in-the-ai-cycle.html")
+			media: .video(url: "https://pdl-iphone-cnbc-com.akamaized.net/7000412105/899c3ab0-494e-11f1-8d98-6dd8be25c276/1778073695-45746068381-hd_L.mp4", posterAsset: nil, posterUrl: "https://image.cnbcfm.com/api/v1/image/108302924-1778073838912-1778073695-45746068381-hd.jpg?v=1778073840&w=1280&h=720", sourceLink: "https://www.cnbc.com/video/2026/05/06/amd-ceo-lisa-su-agents-are-driving-tremendous-demand-in-the-ai-cycle.html")
 		),
 		demo(
 			"memory-chips-soar", "Tech & Ai",

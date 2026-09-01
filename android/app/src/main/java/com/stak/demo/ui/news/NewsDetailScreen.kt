@@ -28,9 +28,14 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.VolumeOff
-import androidx.compose.material.icons.automirrored.filled.VolumeUp
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.ClosedCaption
 import androidx.compose.material.icons.filled.Fullscreen
+import androidx.compose.material.icons.filled.MoreHoriz
+import androidx.compose.material.icons.filled.PictureInPictureAlt
+import androidx.compose.material.icons.filled.SignalCellularAlt
+import androidx.compose.material.icons.filled.Speed
+import androidx.compose.material.icons.filled.Subtitles
 import androidx.compose.material.icons.filled.FullscreenExit
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
@@ -51,6 +56,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -247,7 +253,13 @@ private fun HeroImage(media: NewsMedia, category: String, saved: Boolean, onBook
 			}
 		}
 		exo?.addListener(listener)
-		onDispose { exo?.removeListener(listener); exo?.release() }
+		// The active hero player registers for the OS PiP window's remote
+		// controls + video-only render (user, 2026-08-31 video_app reference).
+		if (exo != null) NewsPip.player = exo
+		onDispose {
+			if (NewsPip.player === exo) NewsPip.player = null
+			exo?.removeListener(listener); exo?.release()
+		}
 	}
 	// The controls own pause/seek once playing; this starts playback on the
 	// play-glyph tap and stops it when the hero returns to the poster.
@@ -267,16 +279,29 @@ private fun HeroImage(media: NewsMedia, category: String, saved: Boolean, onBook
 			// instead of stranding a frame (user, 2026-08-25/26).
 			if (exo != null) {
 				// Direct clip: the pre-buffered cached player with the full
-				// Compose controller (user, 2026-08-30: play/pause, seek bar,
-				// times, buffering, mute, fullscreen).
+				// reference controller (user, 2026-08-31 video_app shots:
+				// +/-15s skips, times, seek bar, captions/fullscreen/menu,
+				// audio-rates-quality sheet, system PiP).
 				var fullscreen by remember { mutableStateOf(false) }
-				if (!fullscreen) {
+				val activity = remember(heroCtx) {
+					generateSequence(heroCtx) { (it as? android.content.ContextWrapper)?.baseContext }
+						.filterIsInstance<android.app.Activity>().firstOrNull()
+				}
+				val onPip: () -> Unit = { fullscreen = false; activity?.let { NewsPip.enter(it) } }
+				if (NewsPip.inPip) {
+					// Reference image 3: while the clip floats in the OS
+					// mini-player the hero holds the PiP placeholder
+					// (MainActivity renders the video into the PiP window).
+					PipPlaceholder(u = u, modifier = Modifier.matchParentSize())
+				} else if (!fullscreen) {
 					androidx.compose.ui.viewinterop.AndroidView(
 						modifier = Modifier.matchParentSize(),
 						factory = { c -> android.view.TextureView(c).also { exo.setVideoTextureView(it) } },
-						onRelease = { exo.clearVideoSurface() },
+						// Per-view clear (never clearVideoSurface): PiP's overlay
+						// or the fullscreen view may already own the surface.
+						onRelease = { v -> exo.clearVideoTextureView(v) },
 					)
-					HeroControls(exo = exo, u = u, onFullscreen = { fullscreen = true }, modifier = Modifier.matchParentSize())
+					HeroControls(exo = exo, u = u, onFullscreen = { fullscreen = true }, onPip = onPip, modifier = Modifier.matchParentSize())
 				} else {
 					androidx.compose.ui.window.Dialog(
 						onDismissRequest = { fullscreen = false },
@@ -286,13 +311,13 @@ private fun HeroImage(media: NewsMedia, category: String, saved: Boolean, onBook
 							androidx.compose.ui.viewinterop.AndroidView(
 								modifier = Modifier.matchParentSize(),
 								factory = { c -> android.view.TextureView(c).also { exo.setVideoTextureView(it) } },
-								onRelease = { exo.clearVideoSurface() },
+								onRelease = { v -> exo.clearVideoTextureView(v) },
 							)
-							HeroControls(exo = exo, u = u, onFullscreen = { fullscreen = false }, fullscreen = true, modifier = Modifier.matchParentSize())
+							HeroControls(exo = exo, u = u, onFullscreen = { fullscreen = false }, onPip = onPip, fullscreen = true, modifier = Modifier.matchParentSize())
 						}
 					}
 				}
-				if (!firstFrame) {
+				if (!firstFrame && !NewsPip.inPip) {
 					// Poster holds until onRenderedFirstFrame.
 				val posterRes2 = (media as NewsMedia.Video).posterRes
 				if (posterRes2 != null) {
@@ -426,7 +451,12 @@ private fun HeroImage(media: NewsMedia, category: String, saved: Boolean, onBook
 				)
 			}
 		}
-		if (saved) {
+		// The bookmark/saved chip is also REST-state chrome: while playing,
+		// the hero's top-right corner belongs to the player's PiP button
+		// (2026-08-31: the chip sat OVER it and swallowed the tap).
+		if (playing && video != null) {
+			// player chrome owns the canvas
+		} else if (saved) {
 			Row(
 				verticalAlignment = Alignment.CenterVertically,
 				horizontalArrangement = Arrangement.spacedBy((4 * u).dp),
@@ -1162,16 +1192,26 @@ private object NewsVideoCache {
 
 
 /**
- * Full player controls, pure Compose (user, 2026-08-30 "all the features a
- * video player should have"): tap the video to show/hide them (auto-hide 3s);
- * center play/pause; bottom bar = elapsed time, seek slider, total time, mute,
- * fullscreen; buffering spinner while the stream stalls. Rate stays 1x.
+ * The reference player (user, 2026-08-31, Downloads/video_app shots -
+ * "this is the way i wanted the video to be"): tap the video to
+ * show/hide the chrome (auto-hide 3s); center cluster = back-15 /
+ * play-pause / forward-15 (plain white glyphs, no puck); bottom-left
+ * "02:57 / 05:49"; bottom-right captions + fullscreen + "..." menu; a
+ * seek bar with an always-there thumb above the bottom edge; PiP
+ * top-right; the buffering spinner takes the center slot. The "..."
+ * opens the reference's dark sheet: Audio & Subtitles / Playback Rates /
+ * Quality - rates actually retime the player; the demo MP4s are
+ * single-rendition with no text tracks, so Quality lists Default and
+ * Subtitles lists Off (production HLS serves real renditions/tracks
+ * into the same rows). Progress stays STAK teal - the reference's red
+ * is that app's brand accent, ours is 69B3CA; same anatomy.
  */
 @Composable
 private fun HeroControls(
 	exo: androidx.media3.exoplayer.ExoPlayer,
 	u: Float,
 	onFullscreen: () -> Unit,
+	onPip: () -> Unit,
 	modifier: Modifier = Modifier,
 	fullscreen: Boolean = false,
 ) {
@@ -1179,10 +1219,12 @@ private fun HeroControls(
 	var playing by remember { mutableStateOf(exo.playWhenReady) }
 	var buffering by remember { mutableStateOf(exo.playbackState == androidx.media3.common.Player.STATE_BUFFERING) }
 	var muted by remember { mutableStateOf(exo.volume == 0f) }
+	var rate by remember { mutableStateOf(exo.playbackParameters.speed) }
 	var position by remember { mutableStateOf(0L) }
 	var duration by remember { mutableStateOf(0L) }
 	var scrubbing by remember { mutableStateOf(false) }
 	var scrubTo by remember { mutableStateOf(0f) }
+	var sheet by remember { mutableStateOf<PlayerSheet?>(null) }
 	androidx.compose.runtime.DisposableEffect(exo) {
 		val l = object : androidx.media3.common.Player.Listener {
 			override fun onPlayWhenReadyChanged(p: Boolean, reason: Int) { playing = p }
@@ -1200,53 +1242,82 @@ private fun HeroControls(
 	}
 	// Auto-hide 3s after the last interaction while playing.
 	var interactedAt by remember { mutableStateOf(0L) }
+	fun poke() { interactedAt = android.os.SystemClock.elapsedRealtime() }
 	androidx.compose.runtime.LaunchedEffect(visible, playing, interactedAt) {
 		if (visible && playing) { kotlinx.coroutines.delay(3000); visible = false }
 	}
+	// Reference time style: zero-padded "02:57 / 05:49".
 	fun ts(ms: Long): String {
-		val t = ms / 1000; return "%d:%02d".format(t / 60, t % 60)
+		val t = ms / 1000; return "%02d:%02d".format(t / 60, t % 60)
+	}
+	fun skip(deltaMs: Long) {
+		val target = exo.currentPosition + deltaMs
+		exo.seekTo(if (duration > 0) target.coerceIn(0L, duration) else target.coerceAtLeast(0L))
+		poke()
 	}
 	Box(
 		modifier = modifier.clickable(
 			interactionSource = remember { MutableInteractionSource() },
 			indication = null,
-		) { visible = !visible; interactedAt = android.os.SystemClock.elapsedRealtime() },
+		) { visible = !visible; poke() },
 	) {
-		if (buffering) {
+		if (!visible && buffering) {
 			androidx.compose.material3.CircularProgressIndicator(
 				color = Color.White,
 				strokeWidth = (2.5f * u).dp,
-				modifier = Modifier.align(Alignment.Center).size((34 * u).dp),
+				modifier = Modifier.align(Alignment.Center).size((30 * u).dp),
 			)
 		}
 		if (visible) {
-			// Center play/pause.
-			if (!buffering) {
-				Box(
-					contentAlignment = Alignment.Center,
-					modifier = Modifier
-						.align(Alignment.Center)
-						.clip(CircleShape)
-						.background(Color(0x8C000000))
-						.size((44 * u).dp)
-						.clickable(
-							interactionSource = remember { MutableInteractionSource() },
-							indication = null,
-						) { exo.playWhenReady = !playing; interactedAt = android.os.SystemClock.elapsedRealtime() },
-				) {
-					androidx.compose.material3.Icon(
-						imageVector = if (playing) Icons.Filled.Pause else Icons.Filled.PlayArrow,
-						contentDescription = if (playing) "Pause" else "Play",
-						tint = Color.White,
-						modifier = Modifier.size((26 * u).dp),
-					)
-				}
-			}
-			// Sleek bottom bar (user, 2026-08-30): one compact "0:12 / 1:06"
-			// time pill in Geist, a hairline scrubber flush with the bottom
-			// edge, and two small quiet icons. No stock Material slider.
+			// The reference dims the frame behind the white chrome.
+			Box(modifier = Modifier.matchParentSize().background(Color(0x3D000000)))
+			// Top-right: picture in picture (reference image 1's top cluster;
+			// cast/AirPlay are platform services, PiP is the app's own).
+			androidx.compose.material3.Icon(
+				imageVector = Icons.Filled.PictureInPictureAlt,
+				contentDescription = "Play in picture in picture",
+				tint = Color(0xE6FFFFFF),
+				modifier = Modifier
+					.align(Alignment.TopEnd)
+					.padding(top = (9 * u).dp, end = (10 * u).dp)
+					.size((15 * u).dp)
+					.clickable(
+						interactionSource = remember { MutableInteractionSource() },
+						indication = null,
+					) { onPip() },
+			)
+			// Center cluster: back-15 / play-pause / forward-15.
 			Row(
 				verticalAlignment = Alignment.CenterVertically,
+				horizontalArrangement = Arrangement.spacedBy((30 * u).dp),
+				modifier = Modifier.align(Alignment.Center),
+			) {
+				SkipGlyph(forward = false, u = u) { skip(-15_000L) }
+				Box(contentAlignment = Alignment.Center, modifier = Modifier.size((34 * u).dp)) {
+					if (buffering) {
+						androidx.compose.material3.CircularProgressIndicator(
+							color = Color.White,
+							strokeWidth = (2.5f * u).dp,
+							modifier = Modifier.size((30 * u).dp),
+						)
+					} else {
+						androidx.compose.material3.Icon(
+							imageVector = if (playing) Icons.Filled.Pause else Icons.Filled.PlayArrow,
+							contentDescription = if (playing) "Pause" else "Play",
+							tint = Color.White,
+							modifier = Modifier
+								.size((34 * u).dp)
+								.clickable(
+									interactionSource = remember { MutableInteractionSource() },
+									indication = null,
+								) { exo.playWhenReady = !playing; poke() },
+						)
+					}
+				}
+				SkipGlyph(forward = true, u = u) { skip(15_000L) }
+			}
+			// Bottom chrome: time row + seek bar over the gradient.
+			Column(
 				modifier = Modifier
 					.align(Alignment.BottomCenter)
 					.fillMaxWidth()
@@ -1254,65 +1325,339 @@ private fun HeroControls(
 						androidx.compose.ui.graphics.Brush.verticalGradient(
 							listOf(Color.Transparent, Color(0x99000000)),
 						),
-					)
-					.padding(start = (10 * u).dp, end = (10 * u).dp, bottom = (7 * u).dp, top = (10 * u).dp),
+					),
 			) {
-				Text(
-					text = ts(if (scrubbing) scrubTo.toLong() else position) + " / " + ts(duration),
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (8.5f * u).sp, letterSpacing = (0.3f * u).sp),
-					color = Color(0xE6FFFFFF),
+				Row(
+					verticalAlignment = Alignment.CenterVertically,
 					modifier = Modifier
-						.clip(RoundedCornerShape((7 * u).dp))
-						.background(Color(0x59000000))
-						.padding(horizontal = (6 * u).dp, vertical = (2.5f * u).dp),
-				)
-				Spacer(modifier = Modifier.weight(1f))
-				androidx.compose.material3.Icon(
-					imageVector = if (muted) Icons.AutoMirrored.Filled.VolumeOff else Icons.AutoMirrored.Filled.VolumeUp,
-					contentDescription = if (muted) "Unmute" else "Mute",
-					tint = Color(0xE6FFFFFF),
-					modifier = Modifier
-						.size((14 * u).dp)
-						.clickable(
-							interactionSource = remember { MutableInteractionSource() },
-							indication = null,
-						) { muted = !muted; exo.volume = if (muted) 0f else 1f; interactedAt = android.os.SystemClock.elapsedRealtime() },
-				)
-				androidx.compose.material3.Icon(
-					imageVector = if (fullscreen) Icons.Filled.FullscreenExit else Icons.Filled.Fullscreen,
-					contentDescription = if (fullscreen) "Exit fullscreen" else "Fullscreen",
-					tint = Color(0xE6FFFFFF),
-					modifier = Modifier
-						.padding(start = (10 * u).dp)
-						.size((15 * u).dp)
-						.clickable(
-							interactionSource = remember { MutableInteractionSource() },
-							indication = null,
-						) { onFullscreen() },
+						.fillMaxWidth()
+						.padding(start = (12 * u).dp, end = (12 * u).dp, top = (10 * u).dp),
+				) {
+					Text(
+						text = ts(if (scrubbing) scrubTo.toLong() else position) + " / " + ts(duration),
+						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, letterSpacing = (0.2f * u).sp),
+						color = Color.White,
+					)
+					Spacer(modifier = Modifier.weight(1f))
+					// Captions sits dimmed like the reference (the demo clips
+					// carry no text tracks); it opens Audio & Subtitles.
+					androidx.compose.material3.Icon(
+						imageVector = Icons.Filled.ClosedCaption,
+						contentDescription = "Audio and subtitles",
+						tint = Color(0x66FFFFFF),
+						modifier = Modifier
+							.size((15 * u).dp)
+							.clickable(
+								interactionSource = remember { MutableInteractionSource() },
+								indication = null,
+							) { sheet = PlayerSheet.AudioSubs; poke() },
+					)
+					androidx.compose.material3.Icon(
+						imageVector = if (fullscreen) Icons.Filled.FullscreenExit else Icons.Filled.Fullscreen,
+						contentDescription = if (fullscreen) "Exit fullscreen" else "Fullscreen",
+						tint = Color(0xE6FFFFFF),
+						modifier = Modifier
+							.padding(start = (14 * u).dp)
+							.size((15 * u).dp)
+							.clickable(
+								interactionSource = remember { MutableInteractionSource() },
+								indication = null,
+							) { onFullscreen() },
+					)
+					androidx.compose.material3.Icon(
+						imageVector = Icons.Filled.MoreHoriz,
+						contentDescription = "More options",
+						tint = Color(0xE6FFFFFF),
+						modifier = Modifier
+							.padding(start = (14 * u).dp)
+							.size((16 * u).dp)
+							.clickable(
+								interactionSource = remember { MutableInteractionSource() },
+								indication = null,
+							) { sheet = PlayerSheet.Menu; poke() },
+					)
+				}
+				SleekScrubber(
+					fraction = if (duration > 0) ((if (scrubbing) scrubTo else position.toFloat()) / duration.toFloat()).coerceIn(0f, 1f) else 0f,
+					scrubbing = scrubbing,
+					u = u,
+					onScrub = { f ->
+						scrubbing = true
+						scrubTo = (f * duration.toFloat()).coerceIn(0f, duration.toFloat())
+						poke()
+					},
+					onCommit = {
+						exo.seekTo(scrubTo.toLong()); position = scrubTo.toLong(); scrubbing = false
+					},
+					modifier = Modifier.fillMaxWidth().padding(horizontal = (12 * u).dp),
 				)
 			}
-			// Hairline scrubber flush with the bottom edge: 2px track, teal
-			// progress, a thumb that grows while dragging. Tap or drag to seek.
-			SleekScrubber(
-				fraction = if (duration > 0) ((if (scrubbing) scrubTo else position.toFloat()) / duration.toFloat()).coerceIn(0f, 1f) else 0f,
-				scrubbing = scrubbing,
-				u = u,
-				onScrub = { f ->
-					scrubbing = true
-					scrubTo = (f * duration.toFloat()).coerceIn(0f, duration.toFloat())
-					interactedAt = android.os.SystemClock.elapsedRealtime()
-				},
-				onCommit = {
-					exo.seekTo(scrubTo.toLong()); position = scrubTo.toLong(); scrubbing = false
-				},
-				modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth(),
+		}
+	}
+	sheet?.let { page ->
+		PlayerSheetDialog(
+			page = page,
+			u = u,
+			rate = rate,
+			muted = muted,
+			onPage = { sheet = it },
+			onDismiss = { sheet = null; visible = true; poke() },
+			onRate = { r ->
+				rate = r
+				exo.playbackParameters = androidx.media3.common.PlaybackParameters(r)
+				sheet = null
+			},
+			onMuted = { m -> muted = m; exo.volume = if (m) 0f else 1f },
+		)
+	}
+}
+
+
+/** The reference's circular-arrow skip glyph with the seconds in the middle. */
+@Composable
+private fun SkipGlyph(forward: Boolean, u: Float, onTap: () -> Unit) {
+	Box(
+		contentAlignment = Alignment.Center,
+		modifier = Modifier
+			.size((30 * u).dp)
+			.clickable(
+				interactionSource = remember { MutableInteractionSource() },
+				indication = null,
+			) { onTap() },
+	) {
+		androidx.compose.foundation.Canvas(modifier = Modifier.matchParentSize()) {
+			val stroke = (1.8f * u).dp.toPx()
+			val inset = stroke * 1.9f
+			val d = size.minDimension - inset * 2f
+			val r = d / 2f
+			val cx = size.width / 2f
+			val cy = size.height / 2f
+			// Gap at the top for the arrowhead; the back glyph is the mirror.
+			scale(scaleX = if (forward) 1f else -1f, scaleY = 1f) {
+				drawArc(
+					color = Color.White,
+					startAngle = -60f,
+					sweepAngle = 300f,
+					useCenter = false,
+					topLeft = androidx.compose.ui.geometry.Offset(cx - r, cy - r),
+					size = androidx.compose.ui.geometry.Size(d, d),
+					style = androidx.compose.ui.graphics.drawscope.Stroke(width = stroke, cap = androidx.compose.ui.graphics.StrokeCap.Round),
+				)
+				// Arrowhead at the gap's right edge, pointing clockwise.
+				val tip = Math.toRadians(-60.0)
+				val px = cx + r * kotlin.math.cos(tip).toFloat()
+				val py = cy + r * kotlin.math.sin(tip).toFloat()
+				val tx = -kotlin.math.sin(tip).toFloat()
+				val ty = kotlin.math.cos(tip).toFloat()
+				val s = (3.2f * u).dp.toPx()
+				val head = androidx.compose.ui.graphics.Path().apply {
+					moveTo(px + tx * s, py + ty * s)
+					lineTo(px - ty * s * 0.8f, py + tx * s * 0.8f)
+					lineTo(px + ty * s * 0.8f, py - tx * s * 0.8f)
+					close()
+				}
+				drawPath(head, Color.White)
+			}
+		}
+		Text(
+			text = "15",
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.SemiBold, fontSize = (8.5f * u).sp),
+			color = Color.White,
+		)
+	}
+}
+
+
+/** Reference image 3: the hero while its clip floats in the OS PiP window. */
+@Composable
+private fun PipPlaceholder(u: Float, modifier: Modifier = Modifier) {
+	Box(contentAlignment = Alignment.Center, modifier = modifier.background(Color(0xFF0F1115))) {
+		Column(
+			horizontalAlignment = Alignment.CenterHorizontally,
+			verticalArrangement = Arrangement.spacedBy((8 * u).dp),
+		) {
+			androidx.compose.material3.Icon(
+				imageVector = Icons.Filled.PictureInPictureAlt,
+				contentDescription = null,
+				tint = Color(0x8AFFFFFF),
+				modifier = Modifier.size((26 * u).dp),
+			)
+			Text(
+				text = "This video is playing in picture in picture.",
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10.5f * u).sp),
+				color = Color(0x99FFFFFF),
 			)
 		}
 	}
 }
 
 
-/** Hairline seek bar: 2px rounded track, teal progress, thumb grows on touch. */
+/** The "..." sheet's pages (reference image 2). */
+private enum class PlayerSheet { Menu, AudioSubs, Rates, Quality }
+
+private fun rateLabel(r: Float): String =
+	if (r == 1f) "Normal" else if (r == r.toInt().toFloat()) "${r.toInt()}x" else "${r}x"
+
+/**
+ * The reference's dark player sheet (image 2): Audio & Subtitles /
+ * Playback Rates · Normal / Quality · Default, each drilling into its
+ * page. Rendered in its own full-screen Dialog window so it overlays the
+ * whole screen even when opened from the inline 360x208 hero (and above
+ * the fullscreen player's dialog, being the later window).
+ */
+@Composable
+private fun PlayerSheetDialog(
+	page: PlayerSheet,
+	u: Float,
+	rate: Float,
+	muted: Boolean,
+	onPage: (PlayerSheet) -> Unit,
+	onDismiss: () -> Unit,
+	onRate: (Float) -> Unit,
+	onMuted: (Boolean) -> Unit,
+) {
+	androidx.compose.ui.window.Dialog(
+		onDismissRequest = onDismiss,
+		properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false),
+	) {
+		Box(modifier = Modifier.fillMaxSize()) {
+			Box(
+				modifier = Modifier
+					.matchParentSize()
+					.clickable(
+						interactionSource = remember { MutableInteractionSource() },
+						indication = null,
+					) { onDismiss() },
+			)
+			Column(
+				modifier = Modifier
+					.align(Alignment.BottomCenter)
+					.fillMaxWidth()
+					.clip(RoundedCornerShape(topStart = (14 * u).dp, topEnd = (14 * u).dp))
+					.background(Color(0xF2191B20))
+					.padding(top = (8 * u).dp, bottom = (18 * u).dp),
+			) {
+				when (page) {
+					PlayerSheet.Menu -> {
+						SheetRow(u = u, label = "Audio & Subtitles", icon = Icons.Filled.Subtitles) { onPage(PlayerSheet.AudioSubs) }
+						SheetDivider(u)
+						SheetRow(u = u, label = "Playback Rates", icon = Icons.Filled.Speed, value = rateLabel(rate)) { onPage(PlayerSheet.Rates) }
+						SheetDivider(u)
+						SheetRow(u = u, label = "Quality", icon = Icons.Filled.SignalCellularAlt, value = "Default") { onPage(PlayerSheet.Quality) }
+					}
+					PlayerSheet.Rates -> {
+						SheetTitle("Playback Rates", u)
+						listOf(0.5f, 0.75f, 1f, 1.25f, 1.5f, 2f).forEach { r ->
+							SheetRow(u = u, label = rateLabel(r), checked = r == rate) { onRate(r) }
+						}
+					}
+					PlayerSheet.Quality -> {
+						SheetTitle("Quality", u)
+						// Demo stories stream single-rendition MP4s; production
+						// HLS serves its real rendition ladder into these rows.
+						SheetRow(u = u, label = "Default", checked = true) { onDismiss() }
+					}
+					PlayerSheet.AudioSubs -> {
+						SheetTitle("Audio & Subtitles", u)
+						SheetLabel("Audio", u)
+						SheetRow(u = u, label = "Original", checked = !muted) { onMuted(false) }
+						SheetRow(u = u, label = "Muted", checked = muted) { onMuted(true) }
+						SheetLabel("Subtitles", u)
+						// The demo newscast MP4s carry no text tracks.
+						SheetRow(u = u, label = "Off", checked = true) { onDismiss() }
+					}
+				}
+			}
+		}
+	}
+}
+
+@Composable
+private fun SheetRow(
+	u: Float,
+	label: String,
+	icon: androidx.compose.ui.graphics.vector.ImageVector? = null,
+	value: String? = null,
+	checked: Boolean? = null,
+	onClick: () -> Unit,
+) {
+	Row(
+		verticalAlignment = Alignment.CenterVertically,
+		modifier = Modifier
+			.fillMaxWidth()
+			.height((44 * u).dp)
+			.clickable(
+				interactionSource = remember { MutableInteractionSource() },
+				indication = null,
+			) { onClick() }
+			.padding(horizontal = (18 * u).dp),
+	) {
+		if (icon != null) {
+			androidx.compose.material3.Icon(
+				imageVector = icon,
+				contentDescription = null,
+				tint = Color(0xCCFFFFFF),
+				modifier = Modifier.size((17 * u).dp),
+			)
+			Spacer(modifier = Modifier.width((14 * u).dp))
+		}
+		Text(
+			text = label,
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp),
+			color = Color.White,
+		)
+		if (value != null) {
+			Text(
+				text = "  ·  $value",
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp),
+				color = Color(0x8AFFFFFF),
+			)
+		}
+		Spacer(modifier = Modifier.weight(1f))
+		if (checked == true) {
+			androidx.compose.material3.Icon(
+				imageVector = Icons.Filled.Check,
+				contentDescription = "Selected",
+				tint = Color(0xFF69B3CA),
+				modifier = Modifier.size((15 * u).dp),
+			)
+		}
+	}
+}
+
+@Composable
+private fun SheetTitle(text: String, u: Float) {
+	Text(
+		text = text,
+		style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.SemiBold, fontSize = (11 * u).sp, letterSpacing = (0.3f * u).sp),
+		color = Color(0x8AFFFFFF),
+		modifier = Modifier.padding(start = (18 * u).dp, top = (4 * u).dp, bottom = (4 * u).dp),
+	)
+}
+
+@Composable
+private fun SheetLabel(text: String, u: Float) {
+	Text(
+		text = text,
+		style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp),
+		color = Color(0x66FFFFFF),
+		modifier = Modifier.padding(start = (18 * u).dp, top = (8 * u).dp, bottom = (2 * u).dp),
+	)
+}
+
+@Composable
+private fun SheetDivider(u: Float) {
+	Box(
+		modifier = Modifier
+			.fillMaxWidth()
+			.padding(start = (49 * u).dp)
+			.height(0.5.dp)
+			.background(Color(0x1FFFFFFF)),
+	)
+}
+
+
+/** Hairline seek bar: rounded track, teal progress, always-there thumb that grows on touch. */
 @Composable
 private fun SleekScrubber(
 	fraction: Float,
@@ -1339,11 +1684,11 @@ private fun SleekScrubber(
 				}
 			},
 	) {
-		val y = size.height - (4 * u).dp.toPx()
-		val trackH = (2 * u).dp.toPx()
+		val y = size.height - (5 * u).dp.toPx()
+		val trackH = (2.5f * u).dp.toPx()
 		val r = androidx.compose.ui.geometry.CornerRadius(trackH / 2f)
 		drawRoundRect(
-			color = Color(0x40FFFFFF),
+			color = Color(0x4DFFFFFF),
 			topLeft = androidx.compose.ui.geometry.Offset(0f, y - trackH / 2f),
 			size = androidx.compose.ui.geometry.Size(size.width, trackH),
 			cornerRadius = r,
@@ -1356,7 +1701,7 @@ private fun SleekScrubber(
 		)
 		drawCircle(
 			color = Color.White,
-			radius = (if (scrubbing) 4.5f else 2.8f) * u.dp.toPx(),
+			radius = (if (scrubbing) 5f else 3.4f) * u.dp.toPx(),
 			center = androidx.compose.ui.geometry.Offset(size.width * fraction, y),
 		)
 	}

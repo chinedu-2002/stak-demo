@@ -66,12 +66,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -128,23 +133,63 @@ private val CtaBorder = Brush.verticalGradient(
 )
 
 /**
+ * Swipe direction (user, 2026-08-31, "social media vibes"): finger LEFT
+ * -> NEXT story, finger RIGHT -> PREVIOUS - the standard pager convention.
+ * THE ONE PLACE TO FLIP IT: set this to true. HorizontalPager's
+ * reverseLayout then lays the pages out right-to-left, so page indices,
+ * PAGE_ORDER, initialPage and currentPage all keep their meaning and
+ * nothing else has to change.
+ */
+private const val REVERSE_SWIPE = false
+
+/** The per-story saved flags survive process death like the old single flag did. */
+private val SavedIdsSaver = listSaver<SnapshotStateList<String>, String>(
+	save = { it.toList() },
+	restore = { it.toMutableStateList() },
+)
+
+/**
  * 03 · News — the article page in its three frames: "News detail page
  * unsaved" (1:1495), "News detail · Save success" (101:1005, the bottom
  * sheet over a scrim) and "News detail page saved" (1:1359 — hero toast,
  * View-in-My-STAK row on the stock card, Apple + Tech tags).
+ *
+ * Social-media paging (user, 2026-08-31: "swipe to get the previous/next
+ * news"): the whole article body is ONE page of a HorizontalPager over
+ * the feed's canonical order ([NewsArticleFeed.PAGE_ORDER]) and the
+ * screen opens on the tapped story. The top bar stays fixed above the
+ * pager; Share follows the page under the finger. Every page owns its
+ * own hero player, mini window and sheets ([NewsArticlePage]); the
+ * saved / save-success state is keyed per story, and the success sheet
+ * itself renders at the screen root because its authored scrim
+ * (101:1168) covers the top bar too - inside a page it could only dim
+ * the area below the bar.
  */
 @Composable
 fun NewsDetailScreen(articleId: String = NewsArticleFeed.APPLE, onBack: () -> Unit, onViewInMyStak: () -> Unit = {}, onOpenArticle: (String) -> Unit = {}) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
-	// The served article for the tapped story (user, 2026-08-25); the
-	// Apple article is the authored one and renders frame-exact.
-	val article = NewsArticleFeed.article(articleId)
-	val isAuthored = article.id == NewsArticleFeed.APPLE
-	var saved by rememberSaveable { mutableStateOf(false) }
+	val pages = NewsArticleFeed.PAGE_ORDER
+	val pagerState = androidx.compose.foundation.pager.rememberPagerState(
+		initialPage = pages.indexOf(articleId).coerceAtLeast(0),
+	) { pages.size }
+	// The story under the finger (currentPage flips at the halfway point
+	// of a drag) - the served article for the tapped story on open
+	// (user, 2026-08-25); the Apple article is the authored one and
+	// renders frame-exact.
+	val current = NewsArticleFeed.article(pages[pagerState.currentPage])
+	// Saved / save-success state is PER STORY, keyed by id, so it never
+	// bleeds between pages and survives a page being disposed off-screen.
+	val savedIds = rememberSaveable(saver = SavedIdsSaver) { mutableStateListOf<String>() }
 	var showSuccess by rememberSaveable { mutableStateOf(false) }
-	// The hero clip's player lives at screen level: the in-app PiP window
-	// floats over the WHOLE article (reference image 3), not just the hero.
-	val hero = rememberHeroPlayer(article.media)
+	// The story whose sheet is up: it stays valid through the dissolve-out,
+	// and if the user swipes on while the sheet is up the save still lands
+	// on the story that opened it.
+	var successId by rememberSaveable { mutableStateOf<String?>(null) }
+	val successArticle = successId?.let { NewsArticleFeed.article(it) } ?: current
+	fun save(target: NewsArticleFeed.Article) {
+		if (target.id !in savedIds) savedIds += target.id
+		target.ticker?.let { com.stak.demo.ui.MyStakHoldings.add(it) }
+	}
 
 	Box(modifier = Modifier.fillMaxSize().background(StakColors.Bg)) {
 		Column(modifier = Modifier.fillMaxSize()) {
@@ -161,6 +206,7 @@ fun NewsDetailScreen(articleId: String = NewsArticleFeed.APPLE, onBack: () -> Un
 				Spacer(modifier = Modifier.weight(1f))
 				// Designer's call (2026-08-22): share creates a link that takes
 				// a co-app user to the shared info - the system share sheet.
+				// It shares the CURRENT page's story.
 				val context = androidx.compose.ui.platform.LocalContext.current
 				Image(
 					painter = painterResource(R.drawable.ic_news_share),
@@ -173,78 +219,38 @@ fun NewsDetailScreen(articleId: String = NewsArticleFeed.APPLE, onBack: () -> Un
 						) {
 							val send = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
 								type = "text/plain"
-								putExtra(android.content.Intent.EXTRA_TEXT, article.shareText)
+								putExtra(android.content.Intent.EXTRA_TEXT, current.shareText)
 							}
 							context.startActivity(android.content.Intent.createChooser(send, "Share article"))
 						},
 				)
 			}
-			Column(
-				horizontalAlignment = Alignment.CenterHorizontally,
+			// Instagram/TikTok-style paging: one story per page, snapping.
+			// beyondViewportPageCount = 0 keeps only the visible page (plus
+			// the neighbour the finger is revealing mid-drag) composed and
+			// disposes every other page - which is what releases a swiped-
+			// away story's player. The pager takes only horizontal drags;
+			// each page keeps its own vertical scroll.
+			androidx.compose.foundation.pager.HorizontalPager(
+				state = pagerState,
+				beyondViewportPageCount = 0,
+				reverseLayout = REVERSE_SWIPE,
+				key = { pages[it] },
 				modifier = Modifier
 					.weight(1f)
-					.fillMaxWidth()
-					.verticalScroll(rememberScrollState()),
-			) {
-				HeroImage(media = article.media, category = article.category, saved = saved, player = hero, onBookmark = { saved = true; article.ticker?.let { com.stak.demo.ui.MyStakHoldings.add(it) } })
-				Column(
-					verticalArrangement = Arrangement.spacedBy((15 * u).dp),
-					modifier = Modifier
-						.fillMaxWidth()
-						.padding(horizontal = (20 * u).dp)
-						// Render-measured vs 1:1495: headline cap-top 68 below the hero.
-						.padding(top = (26 * u).dp, bottom = (28 * u).dp),
-				) {
-					Text(
-						text = article.headline,
-						// RENDER-measured: the frame draws the headline ~800 device px
-					// wide (≈20sp), not the metadata's 24 — lh32 box stands.
-					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (20 * u).sp, lineHeight = (32 * u).sp),
-						color = Color.White,
+					.fillMaxWidth(),
+			) { page ->
+				val article = NewsArticleFeed.article(pages[page])
+				key(article.id) {
+					NewsArticlePage(
+						article = article,
+						saved = article.id in savedIds,
+						onSave = { save(article) },
+						onAddToStak = { successId = article.id; showSuccess = true },
+						onOpenArticle = onOpenArticle,
 					)
-					Text(
-						text = article.subtitle,
-						// 14.3: at 14 Compose pulls "in" up to line 1; the frame
-						// breaks after "lineup" (authored 3-line shape, lh22).
-						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (14.3 * u).sp, lineHeight = (22 * u).sp),
-						color = News.Muted,
-						// 1:1495: 26 of ink gap under the headline (the column's 15 + 5).
-						modifier = Modifier.padding(top = (5 * u).dp),
-					)
-					Byline(source = article.source, meta = article.sourceMeta)
-					if (!saved) {
-						AddToStakButton(onClick = { showSuccess = true })
-					}
-					Divider()
-					// ONE template for every story (user, 2026-08-25: the Apple
-					// article is the section's PLACEHOLDER - each block renders
-					// per story from served data; stock blocks appear whenever
-					// the story has a related ticker).
-					article.ticker?.let { StockCard(saved = saved, ticker = it, facts = NewsArticleFeed.stockFacts(it)) }
-					if (article.gist.isNotEmpty()) GistCard(bullets = article.gist)
-					article.paragraphs.getOrNull(0)?.let { Paragraph(it, size = 15.sp, line = 24.sp) }
-					article.paragraphs.getOrNull(1)?.let { Paragraph(it) }
-					article.pullQuote?.let { PullQuote(it) }
-					article.explainer?.let { NewToThisCard(it) }
-					article.paragraphs.drop(2).forEach { Paragraph(it) }
-					SourceRow()
-					article.ticker?.let { KeyStatsCard(facts = NewsArticleFeed.stockFacts(it)) }
-					Divider()
-					Row(horizontalArrangement = Arrangement.spacedBy((8 * u).dp)) {
-						article.tags.getOrNull(0)?.let { ArticleTag(it) }
-						if (saved) {
-							article.tags.getOrNull(1)?.let { ArticleTag(it) }
-						}
-					}
-					ReadNext(currentId = article.id, onOpen = onOpenArticle)
 				}
 			}
-		}
-		// Reference image 3: the clip popped out of the hero floats top-left
-		// over the scrolling article (the OS PiP window, when the user has
-		// left the app, takes over the surface instead - MainActivity's view).
-		if (hero.pip && !NewsPip.inPip) {
-			MiniPlayer(player = hero, u = u)
 		}
 		// Authored (101:1005 Motion): Back -> News detail page saved,
 		// DISSOLVE 300 EaseOut; View in My STAK -> My STAK Overview,
@@ -259,10 +265,107 @@ fun NewsDetailScreen(articleId: String = NewsArticleFeed.APPLE, onBack: () -> Un
 			exit = fadeOut(tween(300, easing = EaseOut)),
 		) {
 			SaveSuccessOverlay(
-				facts = NewsArticleFeed.stockFacts(article.ticker ?: "AAPL"),
-				onViewInMyStak = { saved = true; article.ticker?.let { com.stak.demo.ui.MyStakHoldings.add(it) }; onViewInMyStak() },
-				onDismiss = { showSuccess = false; saved = true; article.ticker?.let { com.stak.demo.ui.MyStakHoldings.add(it) } },
+				facts = NewsArticleFeed.stockFacts(successArticle.ticker ?: "AAPL"),
+				onViewInMyStak = { save(successArticle); onViewInMyStak() },
+				onDismiss = { showSuccess = false; save(successArticle) },
 			)
+		}
+	}
+}
+
+/**
+ * ONE story's page: the scrolling article (hero + body) plus everything
+ * that belongs to that story's clip - its pre-buffered hero player, the
+ * in-app PiP mini window, the fullscreen dialog and the "..." sheet
+ * (both composed under the hero). The player is created when the page
+ * is composed and released by [rememberHeroPlayer]'s DisposableEffect
+ * when the page leaves composition, so swiping to a neighbour (the
+ * pager disposes the page that left) stops the clip AND its mini window
+ * / fullscreen together - no audio from an off-screen page. A page never
+ * autoplays: it composes at rest (poster + glyph, buffering silently)
+ * until its own play tap. The page content is exactly the article
+ * content it always was; only the container changed.
+ */
+@Composable
+private fun NewsArticlePage(
+	article: NewsArticleFeed.Article,
+	saved: Boolean,
+	onSave: () -> Unit,
+	onAddToStak: () -> Unit,
+	onOpenArticle: (String) -> Unit,
+) {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
+	// The hero clip's player lives at page level: the in-app PiP window
+	// floats over the WHOLE article (reference image 3), not just the hero.
+	val hero = rememberHeroPlayer(article.media)
+
+	Box(modifier = Modifier.fillMaxSize()) {
+		Column(
+			horizontalAlignment = Alignment.CenterHorizontally,
+			modifier = Modifier
+				.fillMaxSize()
+				// The page owns vertical drags; the pager only takes horizontal ones.
+				.verticalScroll(rememberScrollState()),
+		) {
+			HeroImage(media = article.media, category = article.category, saved = saved, player = hero, onBookmark = onSave)
+			Column(
+				verticalArrangement = Arrangement.spacedBy((15 * u).dp),
+				modifier = Modifier
+					.fillMaxWidth()
+					.padding(horizontal = (20 * u).dp)
+					// Render-measured vs 1:1495: headline cap-top 68 below the hero.
+					.padding(top = (26 * u).dp, bottom = (28 * u).dp),
+			) {
+				Text(
+					text = article.headline,
+					// RENDER-measured: the frame draws the headline ~800 device px
+					// wide (≈20sp), not the metadata's 24 — lh32 box stands.
+					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (20 * u).sp, lineHeight = (32 * u).sp),
+					color = Color.White,
+				)
+				Text(
+					text = article.subtitle,
+					// 14.3: at 14 Compose pulls "in" up to line 1; the frame
+					// breaks after "lineup" (authored 3-line shape, lh22).
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (14.3 * u).sp, lineHeight = (22 * u).sp),
+					color = News.Muted,
+					// 1:1495: 26 of ink gap under the headline (the column's 15 + 5).
+					modifier = Modifier.padding(top = (5 * u).dp),
+				)
+				Byline(source = article.source, meta = article.sourceMeta)
+				if (!saved) {
+					AddToStakButton(onClick = onAddToStak)
+				}
+				Divider()
+				// ONE template for every story (user, 2026-08-25: the Apple
+				// article is the section's PLACEHOLDER - each block renders
+				// per story from served data; stock blocks appear whenever
+				// the story has a related ticker).
+				article.ticker?.let { StockCard(saved = saved, ticker = it, facts = NewsArticleFeed.stockFacts(it)) }
+				if (article.gist.isNotEmpty()) GistCard(bullets = article.gist)
+				article.paragraphs.getOrNull(0)?.let { Paragraph(it, size = 15.sp, line = 24.sp) }
+				article.paragraphs.getOrNull(1)?.let { Paragraph(it) }
+				article.pullQuote?.let { PullQuote(it) }
+				article.explainer?.let { NewToThisCard(it) }
+				article.paragraphs.drop(2).forEach { Paragraph(it) }
+				SourceRow()
+				article.ticker?.let { KeyStatsCard(facts = NewsArticleFeed.stockFacts(it)) }
+				Divider()
+				Row(horizontalArrangement = Arrangement.spacedBy((8 * u).dp)) {
+					article.tags.getOrNull(0)?.let { ArticleTag(it) }
+					if (saved) {
+						article.tags.getOrNull(1)?.let { ArticleTag(it) }
+					}
+				}
+				ReadNext(currentId = article.id, onOpen = onOpenArticle)
+			}
+		}
+		// Reference image 3: the clip popped out of the hero floats top-left
+		// over the scrolling article (the OS PiP window, when the user has
+		// left the app, takes over the surface instead - MainActivity's view).
+		// It belongs to THIS page: it swipes away, and is released, with it.
+		if (hero.pip && !NewsPip.inPip) {
+			MiniPlayer(player = hero, u = u)
 		}
 	}
 }
@@ -1216,8 +1319,9 @@ private val SheetGray = Color(0xFF9AA3B5)
  * The hero clip's shared player: ONE cached, pre-buffered, audible
  * ExoPlayer (NewsVideoCache) that the inline hero, the fullscreen dialog,
  * the "..." sheet and the floating in-app PiP window all render and
- * drive. Hoisted to the article screen because the mini player floats
- * over the whole article (reference image 3), not just the hero.
+ * drive. Hoisted to the article PAGE (one per swiped story) because the
+ * mini player floats over the whole article (reference image 3), not
+ * just the hero.
  */
 private class HeroPlayer(val exo: ExoPlayer?) {
 	/** Video mode (from the play-glyph tap until the clip ends / errors / is closed) vs the rest poster. */
@@ -1294,7 +1398,8 @@ private class HeroPlayer(val exo: ExoPlayer?) {
  * Creates the article's hero player (cinema-fast: buffering from the
  * moment the article opens, disk-cached, audible, exactly 1x) and mirrors
  * the ExoPlayer's events into the shared state. Released when the
- * article leaves composition (Back), exactly as before.
+ * article PAGE leaves composition - Back, or the story swiped off-screen
+ * (the pager disposes it) - so an off-screen page can never keep playing.
  */
 @Composable
 private fun rememberHeroPlayer(media: NewsMedia): HeroPlayer {
@@ -1338,14 +1443,21 @@ private fun rememberHeroPlayer(media: NewsMedia): HeroPlayer {
 			}
 		}
 		exo.addListener(listener)
-		// The active hero player registers for the OS PiP window (leaving the
-		// app while the clip plays - MainActivity's remote controls + render).
-		NewsPip.player = exo
 		onDispose {
-			if (NewsPip.player === exo) NewsPip.player = null
 			exo.removeListener(listener)
 			exo.release()
 		}
+	}
+	// The ACTIVE hero player registers for the OS PiP window (leaving the
+	// app while the clip plays - MainActivity's remote controls + render,
+	// and its onPause pauses it). Keyed on `active`, not on composition:
+	// with the pager a neighbouring page (at rest, pre-buffering) is
+	// composed mid-drag and must neither hijack the playing story's slot
+	// nor, when the drag settles back and it is disposed, clear it.
+	DisposableEffect(player, player.active) {
+		if (exo == null || !player.active) return@DisposableEffect onDispose { }
+		NewsPip.player = exo
+		onDispose { if (NewsPip.player === exo) NewsPip.player = null }
 	}
 	// The clock behind the time label, seek bar and mini progress line.
 	LaunchedEffect(player, player.active) {
@@ -1723,7 +1835,7 @@ private fun PipPlaceholder(u: Float, modifier: Modifier = Modifier, onTap: () ->
  * the fixed top bar (Back / Share stay reachable), draggable, over the
  * scrolling article. Close (x) stops
  * the clip and returns the hero to its poster; the PiP glyph puts the
- * video back into the hero. Composed at the article screen's root Box.
+ * video back into the hero. Composed at the article PAGE's root Box.
  */
 @Composable
 private fun MiniPlayer(player: HeroPlayer, u: Float) {
@@ -1732,13 +1844,14 @@ private fun MiniPlayer(player: HeroPlayer, u: Float) {
 	val w = (150 * u).dp
 	val h = (84 * u).dp
 	val inset = (12 * u).dp
-	// Below the fixed top bar (status bar + 10 pad + 40 back circle + 12 pad)
-	// so the window never covers Back / Share (the layer is already
-	// status-bar padded).
-	val top = (62 * u).dp
+	// The page starts right under the fixed top bar (status bar + 10 pad +
+	// 40 back circle + 12 pad), so anchoring at the page's top edge keeps
+	// the window below Back / Share exactly where it sat when the layer
+	// was screen-level and status-bar padded with a 62 top.
+	val top = 0.dp
 	// A constraints-only layer: no pointer input of its own, so the article
 	// beneath keeps scrolling; it just tells the window how far it may go.
-	BoxWithConstraints(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
+	BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
 		val density = LocalDensity.current
 		val maxDx = with(density) { (maxWidth - w - inset * 2).toPx() }.coerceAtLeast(0f)
 		val maxDy = with(density) { (maxHeight - h - top - inset).toPx() }.coerceAtLeast(0f)

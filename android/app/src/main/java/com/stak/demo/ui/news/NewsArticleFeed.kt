@@ -370,6 +370,15 @@ object NewsArticleFeed {
 	fun article(id: String): Article = ARTICLES.firstOrNull { it.id == id } ?: ARTICLES.first()
 
 	/**
+	 * The feed's canonical story order - the article page's SWIPE order
+	 * (user, 2026-08-31: "swipe to get the previous/next news - social
+	 * media vibes"). Every story in the feed, in the order the feed
+	 * defines it, through the same strict stock-news gate as every other
+	 * surface: the off-topic story never renders, so it is not a page.
+	 */
+	val PAGE_ORDER: List<String> = ARTICLES.filter { isStockNews(it) }.map { it.id }
+
+	/**
 	 * Brief page index -> its article id (demo mapping). Served briefs
 	 * pass the same strict stock-news gate as the listing rows.
 	 */

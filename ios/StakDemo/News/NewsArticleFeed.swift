@@ -396,10 +396,23 @@ enum NewsArticleFeed {
 	private static let marketsIds = ["amd-yearly-high", "memory-chips-soar", "oil-opec-supply"]
 
 	/// The For You rows - strict stock news only.
-	static func forYou() -> [Article] { forYouIds.map { article($0) }.filter { isStockNews($0) } }
+	/// For You = stories about stocks the user HOLDS in My STAK (user,
+	/// 2026-09-01); Markets = general market news. Curated order first so
+	/// the default holdings render the authored sample rows (1:1228).
+	static func forYou() -> [Article] {
+		let held = MyStakHoldings.shared.tickers
+		let curated = forYouIds.compactMap { id in articles.first { $0.id == id } }
+		let rest = articles.filter { a in !curated.contains { $0.id == a.id } }
+		return (curated + rest)
+			.filter { a in isStockNews(a) && a.category != "Markets" && a.relatedTickers.contains { held.contains($0) } }
+	}
 
 	/// The Markets rows - strict stock news only.
-	static func markets() -> [Article] { marketsIds.map { article($0) }.filter { isStockNews($0) } }
+	static func markets() -> [Article] {
+		let chosen = Set(forYou().map(\.id))
+		let pool = articles.filter { isStockNews($0) && !chosen.contains($0.id) }
+		return pool.filter { $0.category == "Markets" } + pool.filter { $0.category != "Markets" }
+	}
 
 	/// The article page's READ NEXT rows - two other row-presented stories.
 	static func readNext(excluding: String) -> [Article] {

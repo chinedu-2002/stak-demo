@@ -28,6 +28,9 @@ enum News {
 /// like the Android build's `u` scaling.
 struct NewsView: View {
 	let onOpenArticle: (String) -> Void
+	// Section membership is holdings-driven (For You = held stocks), so a
+	// save must re-render the listing, not just the row chips.
+	@ObservedObject private var holdings = MyStakHoldings.shared
 
 	// Designer's call (2026-08-22): the search icon opens a search bar that
 	// word-matches the news content; empty when nothing matches.

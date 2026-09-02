@@ -195,6 +195,18 @@ struct DiscoverView: View {
 								.frame(width: 313.14 * u, height: 352.87 * u)
 								.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
 								.offset(x: 18 * u, y: 24 * u)
+							if seen < 11 {
+								// Holding the front card down reveals the REAL next
+								// card beneath it (user, 2026-09-02); invisible at
+								// rest so the authored queue slabs stay frame-exact.
+								let next = deck[(seen + 1) % 3]
+								let reveal = min(1, max(0, dragOffset / (110 * u)))
+								FrontDeckCard(card: next, onSave: {}, u: u, saved: savedCards.contains(next.ticker))
+									.scaleEffect(0.97 + 0.03 * reveal)
+									.opacity(reveal)
+									.offset(y: 54.65 * u)
+									.allowsHitTesting(false)
+							}
 							FrontDeckCard(card: deck[seen % 3], onSave: { savedCards.insert(deck[seen % 3].ticker); MyStakHoldings.shared.add(deck[seen % 3].ticker); savedToast = true }, u: u, saved: savedCards.contains(deck[seen % 3].ticker))
 								.scaleEffect(frontScale)
 								.opacity(frontOpacity)
@@ -251,8 +263,11 @@ struct DiscoverView: View {
 												flyFade = 1
 												seen += 1
 												dragOffset = 0
-												frontOpacity = 0
-												frontScale = 0.97
+												// Hand off from the revealed underlay without a
+												// blink: the new front starts at the drag's reveal.
+												let reveal = min(1, committed / (110 * u))
+												frontOpacity = Double(reveal)
+												frontScale = 0.97 + 0.03 * reveal
 											}
 											DispatchQueue.main.async {
 												withAnimation(.easeOut(duration: 0.28)) { flyOffset = 500 * u }

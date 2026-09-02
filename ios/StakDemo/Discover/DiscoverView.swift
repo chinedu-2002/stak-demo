@@ -227,7 +227,9 @@ struct DiscoverView: View {
 						}
 						.frame(maxWidth: .infinity)
 						.frame(height: 484.65 * u, alignment: .top)
-						.clipped()
+						// Unclipped and above its siblings: a dragged or flying
+						// card stays WHOLE past the deck bounds (2026-09-02).
+						.zIndex(1)
 						.contentShape(Rectangle())
 						.gesture(
 							DragGesture()
@@ -270,11 +272,15 @@ struct DiscoverView: View {
 												// The new front takes over at the mid-slab geometry
 												// the finger just revealed, then promotes forward.
 												promote = 0
+												// A velocity flick can commit before the crossfade
+												// finished - pick the alpha up from the reveal.
+												frontOpacity = Double(min(1, committed / (110 * u)))
 											}
 											DispatchQueue.main.async {
 												withAnimation(.easeOut(duration: 0.28)) { flyOffset = 500 * u }
 												withAnimation(.easeOut(duration: 0.3)) { flyFade = 0 }
 												withAnimation(.easeOut(duration: 0.2)) { promote = 1 }
+												withAnimation(.easeOut(duration: 0.12)) { frontOpacity = 1 }
 											}
 											DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
 												if gen == flyGen { flyingCard = nil }

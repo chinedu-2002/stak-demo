@@ -45,7 +45,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.zIndex
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.CornerRadius
@@ -265,9 +265,11 @@ fun DiscoverScreen(
 						.padding(horizontal = (20 * u).dp)
 						.fillMaxWidth()
 						.height((484.65 * u).dp)
-						// The shuffle lives inside the deck bounds — the
-						// diving card must never cover the gesture/CTA zone.
-						.clipToBounds()
+						// UNCLIPPED and above its siblings: a dragged or flying
+						// card stays WHOLE past the deck bounds (user, 2026-09-02
+						// "i noticed a cut") - it passes over the hint/CTA zone
+						// like a real card deck, fading as it goes.
+						.zIndex(1f)
 						.pointerInput(Unit) {
 							// The commit decision reads a PLAIN var written in the
 							// drag callback itself - never the animatable, whose
@@ -308,6 +310,10 @@ fun DiscoverScreen(
 												// The new front takes over at the mid-slab geometry
 												// the finger just revealed, then promotes forward.
 												enter.snapTo(0f)
+												// A velocity flick can commit before the crossfade
+												// finished - pick the alpha up from the reveal.
+												frontFade.snapTo((committed / with(density) { (110 * u).dp.toPx() }).coerceIn(0f, 1f))
+												launch { frontFade.animateTo(1f, tween(120, easing = EaseOut)) }
 												launch { flyOffset.animateTo(with(density) { (500 * u).dp.toPx() }, tween(280, easing = EaseOut)) }
 												launch { enter.animateTo(1f, tween(200, easing = EaseOut)) }
 												flyFade.animateTo(0f, tween(300, easing = EaseOut))

@@ -425,12 +425,28 @@ private fun NewsSection(
 					)
 					.padding((12 * u).dp),
 			) {
-				row.thumbRes?.let { thumbRes ->
+				// Every row carries art (user, 2026-09-02 "there are no
+				// pictures"): the bundled thumb when one was served, else
+				// the story’s own media poster stands in.
+				val m = row.media
+				val thumbRes = row.thumbRes
+					?: (m as? NewsMedia.Video)?.posterRes
+					?: (m as? NewsMedia.Image)?.posterRes
+				val thumbUrl = (m as? NewsMedia.Video)?.posterUrl ?: (m as? NewsMedia.Image)?.url
+				val thumbMod = Modifier.size((60 * u).dp).clip(RoundedCornerShape((10 * u).dp))
+				if (thumbRes != null) {
 					Image(
 						painter = painterResource(thumbRes),
 						contentDescription = null,
 						contentScale = ContentScale.Crop,
-						modifier = Modifier.size((60 * u).dp).clip(RoundedCornerShape((10 * u).dp)),
+						modifier = thumbMod,
+					)
+				} else if (thumbUrl != null) {
+					coil.compose.AsyncImage(
+						model = thumbUrl,
+						contentDescription = null,
+						contentScale = ContentScale.Crop,
+						modifier = thumbMod,
 					)
 				}
 				Column(verticalArrangement = Arrangement.spacedBy((5 * u).dp), modifier = Modifier.weight(1f)) {

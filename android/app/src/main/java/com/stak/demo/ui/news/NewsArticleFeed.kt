@@ -197,7 +197,9 @@ object NewsArticleFeed {
 			// the user chose to keep it until the backend serves story
 			// images (2026-08-25). Not a loading bug.
 			"Reuters", "3d", "· Jul 1 · 2 min read",
-			R.drawable.news_thumb_oil, listOf("XOM"),
+			// The oil thumb asset was a flat-grey placeholder (2026-09-02) -
+			// null lets the row serve the story's real newscast poster.
+			null, listOf("XOM"),
 			// Real-time pumpjack drone b-roll (Pexels, verified direct
 			// stream) - the first pick was a TIME-LAPSE and read as
 			// racing playback (user, 2026-08-26).

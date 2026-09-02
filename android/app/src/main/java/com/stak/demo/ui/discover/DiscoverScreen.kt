@@ -191,10 +191,16 @@ fun DiscoverScreen(
 	var savedToast by remember { mutableStateOf(false) }
 	// 1:1627 vs 1:1796: the front card's Save chip disappears once its stock is saved.
 	var savedCards by remember { mutableStateOf(setOf<String>()) }
-	val topOffset = remember(seen) { Animatable(0f) }
-	val promote = remember(seen) { Animatable(0f) }
-	val enter = remember(seen) { Animatable(if (seen == 0) 1f else 0f) }
-	LaunchedEffect(seen) { if (enter.value < 1f) enter.animateTo(1f, tween(200, easing = EaseOut)) }
+	// Swipes must NEVER be eaten (user, 2026-09-02 "when swiping card i
+	// feel there is an error"): the deck advances the moment a swipe
+	// commits, and the swiped card flies off as a non-interactive GHOST
+	// above the live deck - the finger owns the new front card
+	// immediately, so any cadence lands (the Instagram feel).
+	var flyingCard by remember { mutableStateOf<DeckCard?>(null) }
+	val flyOffset = remember { Animatable(0f) }
+	val flyFade = remember { Animatable(1f) }
+	val topOffset = remember { Animatable(0f) }
+	val enter = remember { Animatable(1f) }
 	val scope = rememberCoroutineScope()
 	val density = LocalDensity.current
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
@@ -259,36 +265,70 @@ fun DiscoverScreen(
 						// The shuffle lives inside the deck bounds — the
 						// diving card must never cover the gesture/CTA zone.
 						.clipToBounds()
-						.pointerInput(seen) {
+						.pointerInput(Unit) {
+							// The commit decision reads a PLAIN var written in the
+							// drag callback itself - never the animatable, whose
+							// queued snapTo can lag the finger on starved frames.
+							var dragTotal = 0f
+							var maxVel = 0f
 							detectVerticalDragGestures(
+								onDragStart = { dragTotal = 0f; maxVel = 0f },
 								onDragEnd = {
+									val committed = dragTotal
+									val flung = maxVel > 1.2f
 									scope.launch {
-										if (topOffset.value > with(density) { (110 * u).dp.toPx() }) {
-											// The frame's card shuffle: the swiped card flies
-											// off fading while the queue steps forward and the
-											// cycled card fades in at the back (1:1627).
-											launch { topOffset.animateTo(with(density) { (500 * u).dp.toPx() }, tween(280, easing = EaseOut)) }
-											promote.animateTo(1f, tween(300, easing = EaseOut))
-											seen += 1
+										// Commit on distance OR on a fling - a fast short
+										// flick advances too (the Instagram rule), and a
+										// frame-starved gesture whose measured travel came
+										// up short still lands (2026-09-02).
+										if (committed > with(density) { (110 * u).dp.toPx() } ||
+											(flung && committed > with(density) { (20 * u).dp.toPx() })
+										) {
+											if (seen >= 11) {
+												// The final card: the authored fly-off finishes
+												// before the end-of-deck receipt lands (1:2330).
+												launch { topOffset.animateTo(with(density) { (500 * u).dp.toPx() }, tween(280, easing = EaseOut)) }
+												enter.animateTo(0f, tween(300, easing = EaseOut))
+												seen += 1
+												topOffset.snapTo(0f)
+												enter.snapTo(1f)
+											} else {
+												// The frame's card shuffle (1:1627), commit-first:
+												// the swiped card becomes the ghost and the deck
+												// advances NOW - a second swipe grabs the next
+												// card even while the ghost is still flying.
+												flyingCard = DECK[seen % 3]
+												flyFade.snapTo(1f)
+												flyOffset.snapTo(committed)
+												seen += 1
+												topOffset.snapTo(0f)
+												enter.snapTo(0f)
+												launch { flyOffset.animateTo(with(density) { (500 * u).dp.toPx() }, tween(280, easing = EaseOut)) }
+												launch { enter.animateTo(1f, tween(200, easing = EaseOut)) }
+												flyFade.animateTo(0f, tween(300, easing = EaseOut))
+												flyingCard = null
+											}
 										} else {
 											topOffset.animateTo(0f, tween(180))
 										}
 									}
 								},
 							) { change, dragAmount ->
+								// Each event carries its own dt, so even a gesture the
+								// starved main thread coalesced into ONE move still
+								// yields a velocity (px/ms).
+								val dt = (change.uptimeMillis - change.previousUptimeMillis).coerceAtLeast(1L)
+								maxVel = maxOf(maxVel, dragAmount / dt)
 								change.consume()
-								if (promote.value == 0f && enter.value == 1f && (dragAmount > 0f || topOffset.value > 0f)) {
-									scope.launch {
-										topOffset.snapTo((topOffset.value + dragAmount).coerceAtLeast(0f))
-									}
-								}
+								dragTotal = (dragTotal + dragAmount).coerceAtLeast(0f)
+								val target = dragTotal
+								scope.launch { topOffset.snapTo(target) }
 							}
 						},
 				) {
 					// The authored deck (1:1627): the queued cards behind are
 					// the DESIGNED ILLUSION — the exact authored slabs, always
 					// (the user's spec: they give the illusion of a queue).
-					val p = promote.value
 					Image(
 						painter = painterResource(R.drawable.disc_peek_top),
 						contentDescription = null,
@@ -315,7 +355,7 @@ fun DiscoverScreen(
 							.offset(y = (54.65 * u).dp)
 							.offset { androidx.compose.ui.unit.IntOffset(0, topOffset.value.roundToInt()) }
 							.graphicsLayer {
-								alpha = (1f - p) * enter.value
+								alpha = enter.value
 								val s = 0.97f + 0.03f * enter.value
 								scaleX = s
 								scaleY = s
@@ -326,6 +366,21 @@ fun DiscoverScreen(
 								onClick = { onLearnMore(DECK[seen % 3].symbol) },
 							),
 					)
+					flyingCard?.let { ghost ->
+						// The swiped-away card flying off above the live deck;
+						// no handlers - input falls through to the front card.
+						FrontDeckCard(
+							card = ghost,
+							onSave = {},
+							saved = ghost.ticker in savedCards,
+							u = u,
+							modifier = Modifier
+								.align(Alignment.TopCenter)
+								.offset(y = (54.65 * u).dp)
+								.offset { androidx.compose.ui.unit.IntOffset(0, flyOffset.value.roundToInt()) }
+								.graphicsLayer { alpha = flyFade.value },
+						)
+					}
 				}
 				Spacer(modifier = Modifier.height((10 * u).dp))
 				Column(

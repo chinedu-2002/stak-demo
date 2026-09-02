@@ -329,10 +329,12 @@ struct ProgressRing: View {
 /// the rim — a tight dark seam hugging the edge — so the card reads as
 /// its own layer over the queue in EVERY state.
 private struct FrontDeckCard: View {
+	// Property order IS the memberwise-init argument order; call site 183
+	// and DeckCardBody both go card, onSave, u, saved.
 	let card: DeckCard
 	let onSave: () -> Void
-	var saved: Bool = false
 	let u: CGFloat
+	var saved: Bool = false
 
 	var body: some View {
 		DeckCardBody(card: card, onSave: onSave, u: u, saved: saved)

@@ -302,7 +302,9 @@ fun DiscoverScreen(
 												flyOffset.snapTo(committed)
 												seen += 1
 												topOffset.snapTo(0f)
-												enter.snapTo(0f)
+												// Hand off from the revealed underlay without a
+												// blink: the new front starts at the drag's reveal.
+												enter.snapTo((committed / with(density) { (110 * u).dp.toPx() }).coerceIn(0f, 1f))
 												launch { flyOffset.animateTo(with(density) { (500 * u).dp.toPx() }, tween(280, easing = EaseOut)) }
 												launch { enter.animateTo(1f, tween(200, easing = EaseOut)) }
 												flyFade.animateTo(0f, tween(300, easing = EaseOut))
@@ -345,6 +347,30 @@ fun DiscoverScreen(
 							.offset(x = (18 * u).dp, y = (24 * u).dp)
 							.size((313.14 * u).dp, (352.87 * u).dp),
 					)
+					if (seen < 11) {
+						// Holding the front card down reveals the REAL next card
+						// beneath it (user, 2026-09-02: "aapl instead of the next
+						// card") - invisible at rest so the authored queue slabs
+						// stay frame-exact, materializing as the drag progresses.
+						val next = DECK[(seen + 1) % 3]
+						val commitPx = with(density) { (110 * u).dp.toPx() }
+						FrontDeckCard(
+							card = next,
+							onSave = {},
+							saved = next.ticker in savedCards,
+							u = u,
+							modifier = Modifier
+								.align(Alignment.TopCenter)
+								.offset(y = (54.65 * u).dp)
+								.graphicsLayer {
+									val reveal = (topOffset.value / commitPx).coerceIn(0f, 1f)
+									alpha = reveal
+									val sc = 0.97f + 0.03f * reveal
+									scaleX = sc
+									scaleY = sc
+								},
+						)
+					}
 					FrontDeckCard(
 						card = DECK[seen % 3],
 						onSave = { savedCards = savedCards + DECK[seen % 3].ticker; com.stak.demo.ui.MyStakHoldings.add(DECK[seen % 3].ticker); savedToast = true },

@@ -403,10 +403,27 @@ object NewsArticleFeed {
 	private val MARKETS = listOf("amd-yearly-high", "memory-chips-soar", "oil-opec-supply")
 
 	/** The For You rows - strict stock news only. */
-	fun forYou(): List<Article> = FOR_YOU.map { article(it) }.filter { isStockNews(it) }
+	/**
+	 * For You = stories about stocks the user HOLDS in My STAK (user,
+	 * 2026-09-01: "should show news that the user holds stock on");
+	 * Markets = general market news. The curated order comes first so the
+	 * default holdings render the authored sample rows (1:1228); saving a
+	 * new stock moves its story from Markets into For You instantly.
+	 */
+	fun forYou(): List<Article> {
+		val held = com.stak.demo.ui.MyStakHoldings.tickers
+		val curated = FOR_YOU.mapNotNull { id -> ARTICLES.firstOrNull { it.id == id } }
+		val rest = ARTICLES.filter { a -> curated.none { it.id == a.id } }
+		return (curated + rest)
+			.filter { isStockNews(it) && it.category != "Markets" && it.relatedTickers.any { t -> t in held } }
+	}
 
 	/** The Markets rows - strict stock news only. */
-	fun markets(): List<Article> = MARKETS.map { article(it) }.filter { isStockNews(it) }
+	fun markets(): List<Article> {
+		val chosen = forYou().map { it.id }.toSet()
+		val pool = ARTICLES.filter { isStockNews(it) && it.id !in chosen }
+		return pool.filter { it.category == "Markets" } + pool.filter { it.category != "Markets" }
+	}
 
 	/** The article page's READ NEXT rows - two other row-presented stories. */
 	fun readNext(excluding: String): List<Article> =

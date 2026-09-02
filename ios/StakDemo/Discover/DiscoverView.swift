@@ -124,7 +124,9 @@ struct DiscoverView: View {
 	@State private var savedCards: Set<String> = []
 	@State private var dragOffset: CGFloat = 0
 	@State private var frontOpacity: Double = 1
-	@State private var frontScale: CGFloat = 1
+	// Promote progress: 0 = the authored mid-slab geometry (1:1701,
+	// y 36.39 / 313.14 wide), 1 = settled in the front slot.
+	@State private var promote: CGFloat = 1
 	// Swipes must NEVER be eaten (user, 2026-09-02, mirrors android): the
 	// deck advances the moment a swipe commits and the swiped card flies
 	// off as a non-interactive GHOST above the live deck - the finger
@@ -195,22 +197,24 @@ struct DiscoverView: View {
 								.frame(width: 313.14 * u, height: 352.87 * u)
 								.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
 								.offset(x: 18 * u, y: 24 * u)
+								.opacity(1 - min(1, max(0, dragOffset / (110 * u))))
 							if seen < 11 {
-								// Holding the front card down reveals the REAL next
-								// card beneath it (user, 2026-09-02); invisible at
-								// rest so the authored queue slabs stay frame-exact.
+								// The design's queue is REAL cards (1:1701 = the next
+								// card behind the front one - file metadata,
+								// 2026-09-02): as the drag exposes the mid slab it
+								// crossfades into the LIVE next card at the SAME
+								// authored geometry, so the queue tells the truth.
 								let next = deck[(seen + 1) % 3]
-								let reveal = min(1, max(0, dragOffset / (110 * u)))
 								FrontDeckCard(card: next, onSave: {}, u: u, saved: savedCards.contains(next.ticker))
-									.scaleEffect(0.97 + 0.03 * reveal)
-									.opacity(reveal)
-									.offset(y: 54.65 * u)
+									.scaleEffect(0.8947, anchor: .top)
+									.opacity(min(1, max(0, dragOffset / (110 * u))))
+									.offset(y: 36.39 * u)
 									.allowsHitTesting(false)
 							}
 							FrontDeckCard(card: deck[seen % 3], onSave: { savedCards.insert(deck[seen % 3].ticker); MyStakHoldings.shared.add(deck[seen % 3].ticker); savedToast = true }, u: u, saved: savedCards.contains(deck[seen % 3].ticker))
-								.scaleEffect(frontScale)
+								.scaleEffect(0.8947 + 0.1053 * promote, anchor: .top)
 								.opacity(frontOpacity)
-								.offset(y: 54.65 * u + dragOffset)
+								.offset(y: 54.65 * u - 18.26 * u * (1 - promote) + dragOffset)
 								.onTapGesture { onLearnMore(deck[seen % 3].symbol) }
 							if let ghost = flyingCard {
 								// The swiped-away card flying off above the live
@@ -246,7 +250,7 @@ struct DiscoverView: View {
 												seen += 1
 												dragOffset = 0
 												frontOpacity = 1
-												frontScale = 1
+												promote = 1
 											}
 										} else {
 											// The frame's card shuffle (1:1627), commit-first:
@@ -263,19 +267,14 @@ struct DiscoverView: View {
 												flyFade = 1
 												seen += 1
 												dragOffset = 0
-												// Hand off from the revealed underlay without a
-												// blink: the new front starts at the drag's reveal.
-												let reveal = min(1, committed / (110 * u))
-												frontOpacity = Double(reveal)
-												frontScale = 0.97 + 0.03 * reveal
+												// The new front takes over at the mid-slab geometry
+												// the finger just revealed, then promotes forward.
+												promote = 0
 											}
 											DispatchQueue.main.async {
 												withAnimation(.easeOut(duration: 0.28)) { flyOffset = 500 * u }
 												withAnimation(.easeOut(duration: 0.3)) { flyFade = 0 }
-												withAnimation(.easeOut(duration: 0.2)) {
-													frontOpacity = 1
-													frontScale = 1
-												}
+												withAnimation(.easeOut(duration: 0.2)) { promote = 1 }
 											}
 											DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
 												if gen == flyGen { flyingCard = nil }

@@ -356,7 +356,7 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
 			MainShell(
 				pendingTab = pendingShellTab,
 				onOpenArticle = { id -> navController.navigate(StakRoutes.newsDetail(id)) },
-				onOpenStock = { navController.navigate(StakRoutes.stockDetail("AAPL")) },
+				onOpenStock = { symbol -> navController.navigate(StakRoutes.stockDetail(symbol)) },
 				onOpenCollection = { navController.navigate(StakRoutes.COLLECTION) },
 				onOpenProfile = { navController.navigate(StakRoutes.PROFILE) },
 				onOpenSimPortfolio = { navController.navigate(StakRoutes.SIM_PORTFOLIO) },
@@ -384,9 +384,10 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
 			exitTransition = { ExitTransition.None },
 			popEnterTransition = { EnterTransition.None },
 			popExitTransition = { popExitFor(shellPop.value, instantRoute = true) },
-		) {
+		) { entry ->
 			StockDetailScreen(
 				onBack = { navController.popBackStack() },
+				symbol = entry.arguments?.getString("symbol") ?: "AAPL",
 				// B5 (1:2382 Motion): Practice buy leaves the detail and
 				// lands on the Simulate tab, Instant.
 				onPracticeBuy = { popToShell(PopStyle.INSTANT, MainTab.Simulate) },
@@ -606,7 +607,7 @@ private enum class TabPushStyle { INSTANT, FORWARD_PUSH }
 private fun MainShell(
 	pendingTab: MutableState<MainTab?>,
 	onOpenArticle: (String) -> Unit,
-	onOpenStock: () -> Unit,
+	onOpenStock: (String) -> Unit,
 	onOpenCollection: () -> Unit,
 	onOpenProfile: () -> Unit,
 	onOpenSimPortfolio: () -> Unit,

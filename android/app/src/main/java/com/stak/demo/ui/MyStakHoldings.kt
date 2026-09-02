@@ -21,6 +21,7 @@ object MyStakHoldings {
 	fun holdsAny(related: List<String>): Boolean = related.any { it in tickers }
 
 	fun add(ticker: String) {
-		tickers = tickers + ticker
+		// Deck cards carry "NVDA · NVIDIA Corp" - hold the bare symbol.
+		tickers = tickers + ticker.substringBefore(" · ").trim()
 	}
 }

@@ -126,6 +126,7 @@ internal data class BuySpec(
 
 internal val NVDA_BUY = BuySpec("Buy NVDA?", "N", "NVIDIA Corp", "$122.10 today", "\u25b2 2.4%", "$8,800.00", "$8,775.00", "0.2048", "NVDA")
 internal val AAPL_BUY = BuySpec("Buy AAPL?", "A", "Apple", "$229.35 today", "\u25b2 1.2%", "$8,800.00", "$8,775.00", "0.1090", "AAPL")
+internal val GOOGL_BUY = BuySpec("Buy GOOGL?", "G", "Alphabet", "$178.90 today", "\u25b2 0.8%", "$8,800.00", "$8,775.00", "0.1397", "GOOGL")
 
 /** One deck card's designed content (art + copy at the front-card scale). */
 internal data class DeckCard(
@@ -137,7 +138,10 @@ internal data class DeckCard(
 	val tip: String,
 	val cardTop: Color,
 	val artBg: Color,
-)
+) {
+	/** "NVDA \u00b7 NVIDIA Corp" -> "NVDA" - the routing/holdings symbol. */
+	val symbol: String get() = ticker.substringBefore(" \u00b7 ").trim()
+}
 
 internal val DECK = listOf(
 	DeckCard(
@@ -171,7 +175,9 @@ internal val DECK = listOf(
 @Composable
 fun DiscoverScreen(
 	resetKey: Int = 0,
-	onLearnMore: () -> Unit = {},
+	// The tapped card's SYMBOL rides along - the detail page serves that
+	// stock, not always AAPL (user, 2026-09-01).
+	onLearnMore: (String) -> Unit = {},
 	onPracticeBuy: () -> Unit = {},
 	// B4 (1:2330 Motion): the end-of-deck CTAs hop tabs via the shell.
 	onPracticeBuySaves: () -> Unit = {},
@@ -317,7 +323,7 @@ fun DiscoverScreen(
 							.clickable(
 								interactionSource = remember { MutableInteractionSource() },
 								indication = null,
-								onClick = onLearnMore,
+								onClick = { onLearnMore(DECK[seen % 3].symbol) },
 							),
 					)
 				}
@@ -374,7 +380,7 @@ fun DiscoverScreen(
 							.clickable(
 								interactionSource = remember { MutableInteractionSource() },
 								indication = null,
-								onClick = onLearnMore,
+								onClick = { onLearnMore(DECK[seen % 3].symbol) },
 							),
 					) {
 						Text(

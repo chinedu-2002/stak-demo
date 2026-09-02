@@ -200,7 +200,10 @@ fun DiscoverScreen(
 	val flyOffset = remember { Animatable(0f) }
 	val flyFade = remember { Animatable(1f) }
 	val topOffset = remember { Animatable(0f) }
+	// `enter` is the PROMOTE progress: 0 = the authored mid-slab geometry
+	// (1:1701, y 36.39 / 313.14 wide), 1 = settled in the front slot.
 	val enter = remember { Animatable(1f) }
+	val frontFade = remember { Animatable(1f) }
 	val scope = rememberCoroutineScope()
 	val density = LocalDensity.current
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
@@ -288,10 +291,10 @@ fun DiscoverScreen(
 												// The final card: the authored fly-off finishes
 												// before the end-of-deck receipt lands (1:2330).
 												launch { topOffset.animateTo(with(density) { (500 * u).dp.toPx() }, tween(280, easing = EaseOut)) }
-												enter.animateTo(0f, tween(300, easing = EaseOut))
+												frontFade.animateTo(0f, tween(300, easing = EaseOut))
 												seen += 1
 												topOffset.snapTo(0f)
-												enter.snapTo(1f)
+												frontFade.snapTo(1f)
 											} else {
 												// The frame's card shuffle (1:1627), commit-first:
 												// the swiped card becomes the ghost and the deck
@@ -302,9 +305,9 @@ fun DiscoverScreen(
 												flyOffset.snapTo(committed)
 												seen += 1
 												topOffset.snapTo(0f)
-												// Hand off from the revealed underlay without a
-												// blink: the new front starts at the drag's reveal.
-												enter.snapTo((committed / with(density) { (110 * u).dp.toPx() }).coerceIn(0f, 1f))
+												// The new front takes over at the mid-slab geometry
+												// the finger just revealed, then promotes forward.
+												enter.snapTo(0f)
 												launch { flyOffset.animateTo(with(density) { (500 * u).dp.toPx() }, tween(280, easing = EaseOut)) }
 												launch { enter.animateTo(1f, tween(200, easing = EaseOut)) }
 												flyFade.animateTo(0f, tween(300, easing = EaseOut))
@@ -328,9 +331,14 @@ fun DiscoverScreen(
 							}
 						},
 				) {
-					// The authored deck (1:1627): the queued cards behind are
-					// the DESIGNED ILLUSION — the exact authored slabs, always
-					// (the user's spec: they give the illusion of a queue).
+					// The authored deck (1:1627): the layers behind the front
+					// card ARE the real next cards (1:1701 = the next card,
+					// 1:1660 = the one after - confirmed in the file metadata,
+					// 2026-09-02). At rest the baked exports keep the frame
+					// pixel-exact; as the drag exposes the mid slab it
+					// crossfades into the LIVE next card at the SAME authored
+					// geometry, so the queue always tells the truth.
+					val commitPx = with(density) { (110 * u).dp.toPx() }
 					Image(
 						painter = painterResource(R.drawable.disc_peek_top),
 						contentDescription = null,
@@ -345,15 +353,11 @@ fun DiscoverScreen(
 						modifier = Modifier
 							.align(Alignment.TopStart)
 							.offset(x = (18 * u).dp, y = (24 * u).dp)
-							.size((313.14 * u).dp, (352.87 * u).dp),
+							.size((313.14 * u).dp, (352.87 * u).dp)
+							.graphicsLayer { alpha = 1f - (topOffset.value / commitPx).coerceIn(0f, 1f) },
 					)
 					if (seen < 11) {
-						// Holding the front card down reveals the REAL next card
-						// beneath it (user, 2026-09-02: "aapl instead of the next
-						// card") - invisible at rest so the authored queue slabs
-						// stay frame-exact, materializing as the drag progresses.
 						val next = DECK[(seen + 1) % 3]
-						val commitPx = with(density) { (110 * u).dp.toPx() }
 						FrontDeckCard(
 							card = next,
 							onSave = {},
@@ -361,13 +365,12 @@ fun DiscoverScreen(
 							u = u,
 							modifier = Modifier
 								.align(Alignment.TopCenter)
-								.offset(y = (54.65 * u).dp)
+								.offset(y = (36.39 * u).dp)
 								.graphicsLayer {
-									val reveal = (topOffset.value / commitPx).coerceIn(0f, 1f)
-									alpha = reveal
-									val sc = 0.97f + 0.03f * reveal
-									scaleX = sc
-									scaleY = sc
+									alpha = (topOffset.value / commitPx).coerceIn(0f, 1f)
+									transformOrigin = androidx.compose.ui.graphics.TransformOrigin(0.5f, 0f)
+									scaleX = 0.8947f
+									scaleY = 0.8947f
 								},
 						)
 					}
@@ -381,8 +384,14 @@ fun DiscoverScreen(
 							.offset(y = (54.65 * u).dp)
 							.offset { androidx.compose.ui.unit.IntOffset(0, topOffset.value.roundToInt()) }
 							.graphicsLayer {
-								alpha = enter.value
-								val s = 0.97f + 0.03f * enter.value
+								// The promote: from the authored mid-slab geometry
+								// (y 36.39, 313.14 wide) into the front slot as
+								// `enter` settles - the queue visibly steps forward.
+								alpha = frontFade.value
+								transformOrigin = androidx.compose.ui.graphics.TransformOrigin(0.5f, 0f)
+								val e = enter.value
+								translationY = (36.39f - 54.65f) * u * this.density * (1f - e)
+								val s = 0.8947f + 0.1053f * e
 								scaleX = s
 								scaleY = s
 							}

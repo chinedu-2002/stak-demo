@@ -21,8 +21,12 @@ final class Session: ObservableObject {
 
 	private init() {
 		let d = UserDefaults.standard
-		signedIn = d.bool(forKey: Self.keySignedIn)
-		resumedSignedIn = signedIn
+		// A @Published property can be assigned but not READ through self
+		// until every stored property is initialized - both flags come
+		// from the local instead.
+		let wasSignedIn = d.bool(forKey: Self.keySignedIn)
+		signedIn = wasSignedIn
+		resumedSignedIn = wasSignedIn
 		UserProfile.shared.displayName = d.string(forKey: Self.keyName) ?? ""
 		if let risk = d.string(forKey: Self.keyRisk) { UserProfile.shared.riskStyle = risk }
 		UserProfile.shared.photoData = d.data(forKey: Self.keyPhoto)

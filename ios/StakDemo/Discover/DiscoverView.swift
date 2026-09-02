@@ -125,8 +125,14 @@ struct DiscoverView: View {
 	@State private var dragOffset: CGFloat = 0
 	@State private var frontOpacity: Double = 1
 	@State private var frontScale: CGFloat = 1
-	/// Guards the drag while the fly-off or enter animation runs.
-	@State private var shuffling = false
+	// Swipes must NEVER be eaten (user, 2026-09-02, mirrors android): the
+	// deck advances the moment a swipe commits and the swiped card flies
+	// off as a non-interactive GHOST above the live deck - the finger
+	// owns the new front card immediately, so any cadence lands.
+	@State private var flyingCard: DeckCard? = nil
+	@State private var flyOffset: CGFloat = 0
+	@State private var flyFade: Double = 0
+	@State private var flyGen = 0
 
 	var body: some View {
 		let u = figmaUnit
@@ -194,6 +200,14 @@ struct DiscoverView: View {
 								.opacity(frontOpacity)
 								.offset(y: 54.65 * u + dragOffset)
 								.onTapGesture { onLearnMore(deck[seen % 3].symbol) }
+							if let ghost = flyingCard {
+								// The swiped-away card flying off above the live
+								// deck; input falls through to the front card.
+								FrontDeckCard(card: ghost, onSave: {}, u: u, saved: savedCards.contains(ghost.ticker))
+									.opacity(flyFade)
+									.offset(y: 54.65 * u + flyOffset)
+									.allowsHitTesting(false)
+							}
 						}
 						.frame(maxWidth: .infinity)
 						.frame(height: 484.65 * u, alignment: .top)
@@ -202,30 +216,54 @@ struct DiscoverView: View {
 						.gesture(
 							DragGesture()
 								.onChanged { value in
-									if !shuffling {
-										dragOffset = max(0, value.translation.height)
-									}
+									dragOffset = max(0, value.translation.height)
 								}
-								.onEnded { _ in
-									guard !shuffling else { return }
-									if dragOffset > 110 * u {
-										// The frame's card shuffle: the swiped card
-										// flies off fading while the counter steps
-										// and the cycled card enters at the front
-										// slot alone (1:1627).
-										shuffling = true
-										withAnimation(.easeOut(duration: 0.28)) { dragOffset = 500 * u }
-										withAnimation(.easeOut(duration: 0.3)) { frontOpacity = 0 }
-										DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-											seen += 1
-											dragOffset = 0
-											frontScale = 0.97
-											withAnimation(.easeOut(duration: 0.2)) {
+								.onEnded { value in
+									let committed = max(0, value.translation.height)
+									// Commit on distance OR on a fling (the predicted
+									// end folds velocity in) - a fast short flick
+									// advances too, the Instagram rule (2026-09-02).
+									let flung = value.predictedEndTranslation.height > 110 * u && committed > 20 * u
+									if committed > 110 * u || flung {
+										if seen >= 11 {
+											// The final card: the authored fly-off finishes
+											// before the end-of-deck receipt lands (1:2330).
+											withAnimation(.easeOut(duration: 0.28)) { dragOffset = 500 * u }
+											withAnimation(.easeOut(duration: 0.3)) { frontOpacity = 0 }
+											DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+												seen += 1
+												dragOffset = 0
 												frontOpacity = 1
 												frontScale = 1
 											}
-											DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-												shuffling = false
+										} else {
+											// The frame's card shuffle (1:1627), commit-first:
+											// the swiped card becomes the ghost and the deck
+											// advances NOW - a second swipe grabs the next
+											// card even while the ghost is still flying.
+											flyingCard = deck[seen % 3]
+											flyGen += 1
+											let gen = flyGen
+											var reset = Transaction()
+											reset.disablesAnimations = true
+											withTransaction(reset) {
+												flyOffset = committed
+												flyFade = 1
+												seen += 1
+												dragOffset = 0
+												frontOpacity = 0
+												frontScale = 0.97
+											}
+											DispatchQueue.main.async {
+												withAnimation(.easeOut(duration: 0.28)) { flyOffset = 500 * u }
+												withAnimation(.easeOut(duration: 0.3)) { flyFade = 0 }
+												withAnimation(.easeOut(duration: 0.2)) {
+													frontOpacity = 1
+													frontScale = 1
+												}
+											}
+											DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+												if gen == flyGen { flyingCard = nil }
 											}
 										}
 									} else {

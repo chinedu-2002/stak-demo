@@ -344,6 +344,20 @@ private struct NewsSectionView: View {
 	let rows: [NewsArticleFeed.Article]
 	let onOpen: (String) -> Void
 
+	private func rowPosterAsset(_ row: NewsArticleFeed.Article) -> String? {
+		switch row.media {
+		case .image(let posterAsset, _, _): return posterAsset
+		case .video(_, let posterAsset, _, _): return posterAsset
+		}
+	}
+
+	private func rowPosterUrl(_ row: NewsArticleFeed.Article) -> String? {
+		switch row.media {
+		case .image(_, let url, _): return url
+		case .video(_, _, let posterUrl, _): return posterUrl
+		}
+	}
+
 	var body: some View {
 		let u = figmaUnit
 		VStack(alignment: .leading, spacing: 10 * u) {
@@ -356,12 +370,22 @@ private struct NewsSectionView: View {
 					onOpen(row.id)
 				} label: {
 					HStack(spacing: 12 * u) {
-						if let thumb = row.thumb {
+						// Every row carries art (user, 2026-09-02): the bundled
+						// thumb when served, else the story’s own media poster.
+						if let thumb = row.thumb ?? rowPosterAsset(row) {
 							Image(thumb)
 								.resizable()
 								.scaledToFill()
 								.frame(width: 60 * u, height: 60 * u)
 								.clipShape(RoundedRectangle(cornerRadius: 10 * u))
+						} else if let urlString = rowPosterUrl(row), let url = URL(string: urlString) {
+							AsyncImage(url: url) { img in
+								img.resizable().scaledToFill()
+							} placeholder: {
+								News.cardBg
+							}
+							.frame(width: 60 * u, height: 60 * u)
+							.clipShape(RoundedRectangle(cornerRadius: 10 * u))
 						}
 						VStack(alignment: .leading, spacing: 5 * u) {
 							HStack {

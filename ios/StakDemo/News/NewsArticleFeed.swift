@@ -192,7 +192,9 @@ enum NewsArticleFeed {
 			// the user chose to keep it until the backend serves story
 			// images (2026-08-25). Not a loading bug.
 			"Reuters", "3d", "· Jul 1 · 2 min read",
-			"NewsThumbOil", ["XOM"],
+			// The oil thumb asset was a flat-grey placeholder (2026-09-02) -
+			// nil lets the row serve the story's real newscast poster.
+			nil, ["XOM"],
 			// Real-time pumpjack drone b-roll (Pexels, verified direct
 			// stream) - the first pick was a TIME-LAPSE and read as
 			// racing playback (user, 2026-08-26).

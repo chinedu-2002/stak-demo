@@ -58,6 +58,10 @@ let aaplBuy = BuySpec(
 	title: "Buy AAPL?", badge: "A", name: "Apple", priceLine: "$229.35 today",
 	change: "▲ 1.2%", cashBefore: "$8,800.00", cashAfter: "$8,775.00", shares: "0.1090", symbol: "AAPL"
 )
+let googlBuy = BuySpec(
+	title: "Buy GOOGL?", badge: "G", name: "Alphabet", priceLine: "$178.90 today",
+	change: "▲ 0.8%", cashBefore: "$8,800.00", cashAfter: "$8,775.00", shares: "0.1397", symbol: "GOOGL"
+)
 
 /// One deck card's designed content (art + copy at the front-card scale).
 private struct DeckCard {
@@ -69,6 +73,9 @@ private struct DeckCard {
 	let tip: String
 	let cardTop: Color
 	let artBg: Color
+
+	/// "NVDA · NVIDIA Corp" -> "NVDA" - the routing/holdings symbol.
+	var symbol: String { ticker.components(separatedBy: " · ").first ?? ticker }
 }
 
 private let deck: [DeckCard] = [
@@ -96,7 +103,9 @@ private let deck: [DeckCard] = [
 ]
 
 struct DiscoverView: View {
-	var onLearnMore: () -> Void = {}
+	// The tapped card’s SYMBOL rides along - the detail page serves that
+	// stock, not always AAPL (user, 2026-09-01).
+	var onLearnMore: (String) -> Void = { _ in }
 	/// Raised to the shell — the buy ticket scrims the TAB BAR too (frame
 	/// 1:1970), so MainTabsView owns the overlay, mirroring Android's
 	/// MainShell `discoverBuy` hoist.
@@ -184,7 +193,7 @@ struct DiscoverView: View {
 								.scaleEffect(frontScale)
 								.opacity(frontOpacity)
 								.offset(y: 54.65 * u + dragOffset)
-								.onTapGesture(perform: onLearnMore)
+								.onTapGesture { onLearnMore(deck[seen % 3].symbol) }
 						}
 						.frame(maxWidth: .infinity)
 						.frame(height: 484.65 * u, alignment: .top)
@@ -256,7 +265,7 @@ struct DiscoverView: View {
 									.overlay(RoundedRectangle(cornerRadius: 6 * u).strokeBorder(Disc.ctaBorder, lineWidth: 0.36 * u))
 							}
 							.buttonStyle(.plain)
-							Button(action: onLearnMore) {
+							Button(action: { onLearnMore(deck[seen % 3].symbol) }) {
 								Text("Learn more")
 									.font(StakFont.sora(12 * u))
 									.foregroundStyle(Disc.muted)

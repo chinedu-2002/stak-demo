@@ -3,7 +3,7 @@ import SwiftUI
 /// A page pushed over the tab shell.
 private enum PushedPage: Identifiable, Equatable {
 	case newsDetail(article: String)
-	case stockDetail(fromMyStak: Bool)
+	case stockDetail(fromMyStak: Bool, symbol: String)
 	case collection
 	case profile
 	case simPortfolio
@@ -13,7 +13,7 @@ private enum PushedPage: Identifiable, Equatable {
 	var id: String {
 		switch self {
 		case .newsDetail(let article): return "newsDetail-\(article)"
-		case .stockDetail(let fromMyStak): return "stockDetail-\(fromMyStak)"
+		case .stockDetail(let fromMyStak, let symbol): return "stockDetail-\(fromMyStak)-\(symbol)"
 		case .collection: return "collection"
 		case .profile: return "profile"
 		case .simPortfolio: return "simPortfolio"
@@ -157,7 +157,7 @@ struct MainTabsView: View {
 						DiscoverView(
 							resetKey: discoverResetKey,
 							// Authored (1:1785): Learn more -> Stock Detail folded, Instant.
-							onLearnMore: { pushInstant(.stockDetail(fromMyStak: false)) },
+							onLearnMore: { symbol in pushInstant(.stockDetail(fromMyStak: false, symbol: symbol)) },
 							onPracticeBuy: { discoverBuy = $0 },
 							// Authored (1:2330): the receipt's cross-tab CTAs are
 							// instant SWAPs to My STAK / Simulate.
@@ -245,13 +245,14 @@ struct MainTabsView: View {
 				// story this entry was opened for (pager, 2026-08-31).
 				onOpenArticle: { id in pushInstant(.newsDetail(article: id), allowRepeat: true) }
 			)
-		case .stockDetail(let fromMyStak):
+		case .stockDetail(let fromMyStak, let symbol):
 			StockDetailView(
 				// The My STAK entry's authored Back -> Collection is Instant
 				// (16:1012); the Discover entry's back is unauthored and
 				// keeps its instant pop.
 				onBack: { pop(.instant) },
 				fromMyStak: fromMyStak,
+				symbol: symbol,
 				// Authored (92:969 / 71:949): success "View in My STAK" ->
 				// Overview, PUSH LEFT 300.
 				onViewInMyStak: { pop(.forwardPush, all: true, landing: .myStak) },
@@ -269,7 +270,7 @@ struct MainTabsView: View {
 				// Authored (1:3333): Back -> Overview Instant; every stock
 				// card -> the saved Stock Detail, Instant.
 				onBack: { pop(.instant) },
-				onOpenStock: { pushInstant(.stockDetail(fromMyStak: true)) }
+				onOpenStock: { pushInstant(.stockDetail(fromMyStak: true, symbol: "AAPL")) }
 			)
 		case .profile:
 			// Authored (171:995): Back = BACK action - the house back pop.

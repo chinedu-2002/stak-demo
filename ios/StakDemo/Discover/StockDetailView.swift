@@ -1,7 +1,8 @@
 import SwiftUI
 
 /// Discover · Stock Detail (CHINEDU 1:2382 folded / 1:2579 open, save
-/// success 92:969; My STAK entry 16:1012) — the AAPL page: price hero,
+/// success 92:969; My STAK entry 16:1012) — serves the TAPPED stock’s
+/// DetailFacts (AAPL carries the authored values verbatim): price hero,
 /// chart with range pills, Risk fit, Numbers that matter, expandable
 /// Analyst view / Compare and learn, News signal, TIP and the CTAs.
 /// Every authored metric is multiplied by `figmaUnit` (390px artboard).
@@ -16,6 +17,9 @@ private let wellBg = Color(argb: 0xFF10182B)
 struct StockDetailView: View {
 	let onBack: () -> Void
 	var fromMyStak: Bool = false
+	/// The stock the page serves - deck taps route their card here (user,
+	/// 2026-09-01: the NVIDIA card must open NVIDIA, not AAPL).
+	var symbol: String = "AAPL"
 	/// Authored exits raised to the shell (nil keeps the local fallback):
 	/// success "View in My STAK" (92:969 / 71:949, the forward push), "Keep
 	/// exploring" (deck dissolve 300), the Discover entry's "Practice buy"
@@ -36,6 +40,7 @@ struct StockDetailView: View {
 	init(
 		onBack: @escaping () -> Void,
 		fromMyStak: Bool = false,
+		symbol: String = "AAPL",
 		onViewInMyStak: (() -> Void)? = nil,
 		onKeepExploring: (() -> Void)? = nil,
 		onPracticeBuyToSimulate: (() -> Void)? = nil,
@@ -43,6 +48,7 @@ struct StockDetailView: View {
 	) {
 		self.onBack = onBack
 		self.fromMyStak = fromMyStak
+		self.symbol = symbol
 		self.onViewInMyStak = onViewInMyStak
 		self.onKeepExploring = onKeepExploring
 		self.onPracticeBuyToSimulate = onPracticeBuyToSimulate
@@ -52,6 +58,7 @@ struct StockDetailView: View {
 
 	var body: some View {
 		let u = figmaUnit
+		let f = detailFacts[symbol] ?? detailFacts["AAPL"]!
 		// Authored (1:2579): ONLY the Discover-entry open state composes the
 		// shell tab bar (an authored inconsistency - matched per frame).
 		let showsBar = !fromMyStak && analystOpen && onTab != nil
@@ -60,7 +67,7 @@ struct StockDetailView: View {
 				HStack {
 					AuthBackCircle(action: onBack)
 					Spacer()
-					Text("AAPL")
+					Text(f.symbol)
 						.font(StakFont.sora(16 * u, .semiBold))
 						.foregroundStyle(Color.white)
 					Spacer()
@@ -78,13 +85,13 @@ struct StockDetailView: View {
 				ScrollView(showsIndicators: false) {
 					VStack(spacing: 0) {
 						VStack(alignment: .leading, spacing: 4 * u) {
-							Text("AAPL · Apple Inc")
+							Text(f.title)
 								.font(StakFont.geist(11 * u))
 								.foregroundStyle(muted)
-							Text("$229.35")
+							Text(f.price)
 								.font(StakFont.sora(26 * u, .semiBold))
 								.foregroundStyle(bright)
-							Text("▲ 1.2% today")
+							Text(f.change)
 								.font(StakFont.geist(12 * u, .medium))
 								.foregroundStyle(green)
 						}
@@ -122,16 +129,16 @@ struct StockDetailView: View {
 							if fromMyStak {
 								SinceYouSavedCard()
 							}
-							RiskFitCard()
-							NumbersCard()
-							AnalystCard(open: $analystOpen)
-							NewsSignalCard()
-							CompareCard()
+							RiskFitCard(f: f)
+							NumbersCard(f: f)
+							AnalystCard(f: f, open: $analystOpen)
+							NewsSignalCard(f: f)
+							CompareCard(f: f)
 							HStack(alignment: .top, spacing: 8 * u) {
 								Text("TIP")
 									.font(StakFont.geist(11 * u, .medium))
 									.foregroundStyle(Color(argb: 0xFF5BD7E4))
-								Text("Steady giants move slower. Stable stocks often do.")
+								Text(f.tip)
 									.font(StakFont.geist(11 * u))
 									.foregroundStyle(muted)
 									.frame(width: 260 * u, alignment: .leading)
@@ -186,6 +193,7 @@ struct StockDetailView: View {
 			.ignoresSafeArea(edges: showsBar ? .bottom : [])
 			if showSuccess {
 				DetailSavedSheet(
+					f: f,
 					// Unauthored scrim tap - keeps its instant dismiss-and-mark.
 					onDismiss: { showSuccess = false; saved = true },
 					// Authored (92:969): View in My STAK -> Overview, the
@@ -193,12 +201,12 @@ struct StockDetailView: View {
 					// the stock is marked saved before the page leaves.
 					onViewInMyStak: {
 						saved = true
-						MyStakHoldings.shared.add("AAPL")
+						MyStakHoldings.shared.add(f.symbol)
 						if let onViewInMyStak { onViewInMyStak() } else { showSuccess = false }
 					},
 					onKeepExploring: {
 						saved = true
-						MyStakHoldings.shared.add("AAPL")
+						MyStakHoldings.shared.add(f.symbol)
 						if let onKeepExploring { onKeepExploring() } else { showSuccess = false }
 					}
 				)
@@ -208,7 +216,7 @@ struct StockDetailView: View {
 			}
 			if showBuy {
 				DiscoverBuyFlow(
-					spec: aaplBuy,
+					spec: f.buySpec,
 					onClose: { showBuy = false },
 					filledSecondary: "Done", ticketSecondary: "Back",
 					// Authored (71:949 / 71:994): View in My STAK -> Overview,
@@ -295,6 +303,8 @@ private struct Kicker: View {
 }
 
 private struct RiskFitCard: View {
+	let f: DetailFacts
+
 	var body: some View {
 		let u = figmaUnit
 		VStack(alignment: .leading, spacing: 12 * u) {
@@ -316,14 +326,14 @@ private struct RiskFitCard: View {
 				RoundedRectangle(cornerRadius: 4 * u)
 					.fill(Color(argb: 0xFFA6E4F7))
 					.frame(width: 14 * u, height: 8 * u)
-					.offset(x: 88 * u)
+					.offset(x: f.riskPillX * u)
 			}
 			HStack {
 				Text("Low").font(StakFont.geist(10 * u)).foregroundStyle(muted)
 				Spacer()
 				Text("High").font(StakFont.geist(10 * u)).foregroundStyle(muted)
 			}
-			Text("Low volatility. Fits the steady side of your profile.")
+			Text(f.riskCopy)
 				.font(StakFont.geist(11 * u))
 				.foregroundStyle(muted)
 		}
@@ -334,6 +344,8 @@ private struct RiskFitCard: View {
 }
 
 private struct NumbersCard: View {
+	let f: DetailFacts
+
 	var body: some View {
 		let u = figmaUnit
 		VStack(alignment: .leading, spacing: 12 * u) {
@@ -341,9 +353,9 @@ private struct NumbersCard: View {
 				.font(StakFont.sora(15 * u, .semiBold))
 				.foregroundStyle(bright)
 			HStack(spacing: 8 * u) {
-				StatCell(label: "P/E ratio", value: "31.2", verdict: "In line", verdictColor: muted)
-				StatCell(label: "Revenue growth", value: "6.1%", verdict: "Slower", verdictColor: muted)
-				StatCell(label: "Profit margin", value: "24.3%", verdict: "Excellent", verdictColor: green, border: true)
+				ForEach(f.stats, id: \.label) { st in
+					StatCell(label: st.label, value: st.value, verdict: st.verdict, verdictColor: st.good ? green : muted, border: st.border)
+				}
 			}
 			Text("Tap a stat for sector and peer benchmarks")
 				.font(StakFont.geist(10 * u))
@@ -384,6 +396,7 @@ private struct StatCell: View {
 /// flag is hoisted so the page can compose the 1:2579 tab bar and fold the
 /// section when the buy receipt's Done lands on the folded frame (16:1012).
 private struct AnalystCard: View {
+	let f: DetailFacts
 	@Binding var open: Bool
 
 	var body: some View {
@@ -401,7 +414,7 @@ private struct AnalystCard: View {
 				}
 			}
 			if !open {
-				Text("↑ 6.7% upside")
+				Text(f.upside)
 					.font(StakFont.geist(11 * u, .medium))
 					.foregroundStyle(green)
 			} else {
@@ -415,44 +428,42 @@ private struct AnalystCard: View {
 					RoundedRectangle(cornerRadius: 4 * u)
 						.fill(Color(argb: 0xFFA6E4F7))
 						.frame(width: 13 * u, height: 8 * u)
-						.offset(x: 167 * u)
+						.offset(x: f.targetMarkerX * u)
 				}
 				HStack {
 					VStack(alignment: .leading, spacing: 1 * u) {
 						Text("Low").font(StakFont.geist(10 * u)).foregroundStyle(muted)
-						Text("$180").font(StakFont.geist(12 * u, .medium)).foregroundStyle(bright)
+						Text(f.targetLow).font(StakFont.geist(12 * u, .medium)).foregroundStyle(bright)
 					}
 					Spacer()
 					VStack(spacing: 1 * u) {
 						Text("Avg").font(StakFont.geist(10 * u)).foregroundStyle(muted)
-						Text("$248").font(StakFont.geist(12 * u, .medium)).foregroundStyle(bright)
+						Text(f.targetAvg).font(StakFont.geist(12 * u, .medium)).foregroundStyle(bright)
 					}
 					Spacer()
 					VStack(alignment: .trailing, spacing: 1 * u) {
 						Text("High").font(StakFont.geist(10 * u)).foregroundStyle(muted)
-						Text("$300").font(StakFont.geist(12 * u, .medium)).foregroundStyle(bright)
+						Text(f.targetHigh).font(StakFont.geist(12 * u, .medium)).foregroundStyle(bright)
 					}
 				}
-				Text("↑ 6.7% upside")
+				Text(f.upside)
 					.font(StakFont.geist(11 * u, .medium))
 					.foregroundStyle(green)
-				Kicker(text: "WALL ST. CONSENSUS · 42 ANALYSTS")
+				Kicker(text: f.consensus)
 				ZStack(alignment: .leading) {
 					RoundedRectangle(cornerRadius: 4 * u).fill(wellBg).frame(height: 8 * u)
-					RoundedRectangle(cornerRadius: 4 * u).fill(green).frame(width: 212 * u, height: 8 * u)
+					RoundedRectangle(cornerRadius: 4 * u).fill(green).frame(width: f.buyBarW * u, height: 8 * u)
 				}
 				HStack {
-					Text("● Buy 28").font(StakFont.geist(11 * u, .medium)).foregroundStyle(green)
+					Text(f.buyCount).font(StakFont.geist(11 * u, .medium)).foregroundStyle(green)
 					Spacer()
-					Text("Hold 12").font(StakFont.geist(11 * u, .medium)).foregroundStyle(muted)
+					Text(f.holdCount).font(StakFont.geist(11 * u, .medium)).foregroundStyle(muted)
 					Spacer()
-					Text("Sell 2").font(StakFont.geist(11 * u, .medium)).foregroundStyle(muted)
+					Text(f.sellCount).font(StakFont.geist(11 * u, .medium)).foregroundStyle(muted)
 				}
 				Kicker(text: "RECENT ACTIONS")
 				ForEach(
-					[("Morgan Stanley", "Buy", "$260"), ("Wedbush", "Buy", "$285"),
-					 ("Goldman Sachs", "Buy", "$256"), ("UBS", "Hold", "$236"),
-					 ("Barclays", "Hold", "$230")],
+					f.actions,
 					id: \.0
 				) { name, action, target in
 					HStack {
@@ -479,25 +490,28 @@ private struct AnalystCard: View {
 }
 
 private struct NewsSignalCard: View {
+	let f: DetailFacts
+
 	var body: some View {
 		let u = figmaUnit
 		VStack(alignment: .leading, spacing: 12 * u) {
 			Text("News signal")
 				.font(StakFont.sora(15 * u, .semiBold))
 				.foregroundStyle(bright)
-			Text("▲ +0.8% at yesterday’s close")
+			Text(f.newsClose)
 				.font(StakFont.geist(11 * u, .medium))
 				.foregroundStyle(green)
-			Text("Foldable iPhone reports point to a premium fall lineup.")
+			Text(f.newsSignal)
 				.font(StakFont.geist(11 * u))
 				.foregroundStyle(muted)
-			Text("Q3 earnings land July 30.")
+			Text(f.newsEarnings)
 				.font(StakFont.geist(11 * u))
 				.foregroundStyle(muted)
 			ScrollView(.horizontal, showsIndicators: false) {
 				HStack(spacing: 12 * u) {
-					newsChip(source: "Yahoo · 13h ago")
-					newsChip(source: "CNN · 1h ago")
+					ForEach(f.newsSources, id: \.0) { src, tag in
+						newsChip(source: src, tag: tag)
+					}
 				}
 			}
 		}
@@ -506,20 +520,20 @@ private struct NewsSignalCard: View {
 		.background(card, in: RoundedRectangle(cornerRadius: 16 * u))
 	}
 
-	private func newsChip(source: String) -> some View {
+	private func newsChip(source: String, tag: String) -> some View {
 		let u = figmaUnit
 		return VStack(alignment: .leading, spacing: 8 * u) {
 			HStack {
 				Text(source).font(StakFont.geist(10 * u)).foregroundStyle(muted)
 				Spacer()
-				Text("Neutral")
+				Text(tag)
 					.font(StakFont.geist(10 * u, .medium))
 					.foregroundStyle(muted)
 					.padding(.horizontal, 8 * u)
 					.padding(.vertical, 3 * u)
 					.background(Color(argb: 0x14FFFFFF), in: Capsule())
 			}
-			Text("The rally leaves Apple about 4 percent shy of the market-cap crown")
+			Text(f.newsHeadline)
 				.font(StakFont.geist(12 * u))
 				.foregroundStyle(bright)
 				.frame(width: 173 * u, alignment: .leading)
@@ -532,6 +546,8 @@ private struct NewsSignalCard: View {
 
 /// Compare and learn (collapsed 1:2526 / open 1:2719) — peer table.
 private struct CompareCard: View {
+	let f: DetailFacts
+
 	@State private var open = false
 
 	var body: some View {
@@ -549,7 +565,7 @@ private struct CompareCard: View {
 				}
 			}
 			if !open {
-				Text("vs MSFT · GOOGL")
+				Text(f.peersLabel)
 					.font(StakFont.geist(11 * u, .medium))
 					.foregroundStyle(muted)
 			} else {
@@ -560,11 +576,10 @@ private struct CompareCard: View {
 						.frame(width: 81 * u, height: 170 * u)
 						.offset(x: 78 * u)
 					VStack(spacing: 12 * u) {
-						compareRow("", "AAPL", "MSFT", "GOOGL", header: true)
-						compareRow("P/E ratio", "31.2", "36x", "24x")
-						compareRow("Rev growth", "+6.1%", "+15%", "+12%", valueColor: green)
-						compareRow("Profit margin", "24.3%", "36%", "29%")
-						compareRow("Market cap", "$3.5T", "$3.4T", "$2.3T")
+						compareRow("", f.symbol, f.peerA, f.peerB, header: true)
+						ForEach(f.compareRows, id: \.label) { r in
+							compareRow(r.label, r.a, r.b, r.c, valueColor: r.green ? green : nil)
+						}
 					}
 				}
 				Text("Cultural context only, not financial advice.")
@@ -635,6 +650,7 @@ private struct SinceYouSavedCard: View {
 /// Built inline (not on SheetScaffold) to pin the Android geometry: 14u
 /// item spacing, 11u stock-row spacing, and the Detail CTAs (sora 13).
 private struct DetailSavedSheet: View {
+	let f: DetailFacts
 	let onDismiss: () -> Void
 	let onViewInMyStak: () -> Void
 	let onKeepExploring: () -> Void
@@ -660,21 +676,21 @@ private struct DetailSavedSheet: View {
 				HStack(spacing: 11 * u) {
 					ZStack {
 						Circle().fill(Color(argb: 0xFF242B3D))
-						Text("A")
+						Text(f.sheetBadge)
 							.font(StakFont.sora(15 * u, .semiBold))
 							.foregroundStyle(Color(argb: 0xFF9EADC7))
 					}
 					.frame(width: 38 * u, height: 38 * u)
 					VStack(alignment: .leading, spacing: 2 * u) {
-						Text("Apple")
+						Text(f.sheetName)
 							.font(StakFont.geist(13 * u, .medium))
 							.foregroundStyle(Color.white)
-						Text("$229.35 today")
+						Text(f.sheetPrice)
 							.font(StakFont.geist(10 * u))
 							.foregroundStyle(muted)
 					}
 					.frame(maxWidth: .infinity, alignment: .leading)
-					Text("▲ 1.2%")
+					Text(f.sheetChange)
 						.font(StakFont.geist(12 * u, .medium))
 						.foregroundStyle(green)
 				}
@@ -700,3 +716,185 @@ private struct DetailSavedSheet: View {
 		}
 	}
 }
+
+
+/// One stat tile in "Numbers that matter".
+private struct DetailStat {
+	let label: String
+	let value: String
+	let verdict: String
+	var good = false
+	var border = false
+}
+
+/// One "Compare and learn" table row (a = this stock).
+private struct DetailCompareRow {
+	let label: String
+	let a: String
+	let b: String
+	let c: String
+	var green = false
+}
+
+/// Everything the detail page serves per stock - backend-shaped like the
+/// news feed’s StockFacts, mirroring android/ StockDetailScreen.kt.
+/// AAPL carries the authored 1:2382/92:969 frame values VERBATIM;
+/// NVDA and GOOGL extend their deck cards off the same DECK numbers.
+private struct DetailFacts {
+	let symbol: String
+	let title: String
+	let price: String
+	let change: String
+	let tip: String
+	let riskPillX: CGFloat
+	let riskCopy: String
+	let stats: [DetailStat]
+	let upside: String
+	let targetLow: String
+	let targetAvg: String
+	let targetHigh: String
+	let targetMarkerX: CGFloat
+	let consensus: String
+	let buyCount: String
+	let holdCount: String
+	let sellCount: String
+	let buyBarW: CGFloat
+	let actions: [(String, String, String)]
+	let newsClose: String
+	let newsSignal: String
+	let newsEarnings: String
+	let newsSources: [(String, String)]
+	let newsHeadline: String
+	let peersLabel: String
+	let peerA: String
+	let peerB: String
+	let compareRows: [DetailCompareRow]
+	let sheetBadge: String
+	let sheetName: String
+	let sheetPrice: String
+	let sheetChange: String
+	let buySpec: BuySpec
+}
+
+private let detailFacts: [String: DetailFacts] = [
+	"AAPL": DetailFacts(
+		symbol: "AAPL",
+		title: "AAPL · Apple Inc",
+		price: "$229.35",
+		change: "▲ 1.2% today",
+		tip: "Steady giants move slower. Stable stocks often do.",
+		riskPillX: 88,
+		riskCopy: "Low volatility. Fits the steady side of your profile.",
+		stats: [
+			DetailStat(label: "P/E ratio", value: "31.2", verdict: "In line"),
+			DetailStat(label: "Revenue growth", value: "6.1%", verdict: "Slower"),
+			DetailStat(label: "Profit margin", value: "24.3%", verdict: "Excellent", good: true, border: true),
+		],
+		upside: "↑ 6.7% upside",
+		targetLow: "$180", targetAvg: "$248", targetHigh: "$300", targetMarkerX: 167,
+		consensus: "WALL ST. CONSENSUS · 42 ANALYSTS",
+		buyCount: "● Buy 28", holdCount: "Hold 12", sellCount: "Sell 2", buyBarW: 212,
+		actions: [
+			("Morgan Stanley", "Buy", "$260"),
+			("Wedbush", "Buy", "$285"),
+			("Goldman Sachs", "Buy", "$256"),
+			("UBS", "Hold", "$236"),
+			("Barclays", "Hold", "$230"),
+		],
+		newsClose: "▲ +0.8% at yesterday’s close",
+		newsSignal: "Foldable iPhone reports point to a premium fall lineup.",
+		newsEarnings: "Q3 earnings land July 30.",
+		newsSources: [("Yahoo · 13h ago", "Neutral"), ("CNN · 1h ago", "Neutral")],
+		newsHeadline: "The rally leaves Apple about 4 percent shy of the market-cap crown",
+		peersLabel: "vs MSFT · GOOGL",
+		peerA: "MSFT", peerB: "GOOGL",
+		compareRows: [
+			DetailCompareRow(label: "P/E ratio", a: "31.2", b: "36x", c: "24x"),
+			DetailCompareRow(label: "Rev growth", a: "+6.1%", b: "+15%", c: "+12%", green: true),
+			DetailCompareRow(label: "Profit margin", a: "24.3%", b: "36%", c: "29%"),
+			DetailCompareRow(label: "Market cap", a: "$3.5T", b: "$3.4T", c: "$2.3T"),
+		],
+		sheetBadge: "A", sheetName: "Apple", sheetPrice: "$229.35 today", sheetChange: "▲ 1.2%",
+		buySpec: aaplBuy
+	),
+	"NVDA": DetailFacts(
+		symbol: "NVDA",
+		title: "NVDA · NVIDIA Corp",
+		price: "$122.10",
+		change: "▲ 2.4% today",
+		tip: "Chip stocks swing hard. Small stakes, long views.",
+		riskPillX: 238,
+		riskCopy: "High volatility. Fits the bolder side of your profile.",
+		stats: [
+			DetailStat(label: "P/E ratio", value: "52.8", verdict: "Rich"),
+			DetailStat(label: "Revenue growth", value: "62%", verdict: "Explosive", good: true, border: true),
+			DetailStat(label: "Profit margin", value: "48.9%", verdict: "Strong"),
+		],
+		upside: "↑ 17.9% upside",
+		targetLow: "$100", targetAvg: "$144", targetHigh: "$200", targetMarkerX: 33,
+		consensus: "WALL ST. CONSENSUS · 63 ANALYSTS",
+		buyCount: "● Buy 55", holdCount: "Hold 7", sellCount: "Sell 1", buyBarW: 273,
+		actions: [
+			("Morgan Stanley", "Buy", "$152"),
+			("BofA", "Buy", "$150"),
+			("Goldman Sachs", "Buy", "$145"),
+			("Citi", "Buy", "$150"),
+			("HSBC", "Hold", "$120"),
+		],
+		newsClose: "▲ +2.1% at yesterday’s close",
+		newsSignal: "Blackwell demand keeps outrunning supply into the fall.",
+		newsEarnings: "Q2 earnings land Aug 27.",
+		newsSources: [("Reuters · 2h ago", "Bullish"), ("CNBC · 9h ago", "Neutral")],
+		newsHeadline: "Nvidia lags the chip rally it kicked off as orders pile up",
+		peersLabel: "vs AMD · TSM",
+		peerA: "AMD", peerB: "TSM",
+		compareRows: [
+			DetailCompareRow(label: "P/E ratio", a: "52.8", b: "110x", c: "28x"),
+			DetailCompareRow(label: "Rev growth", a: "+62%", b: "+18%", c: "+33%", green: true),
+			DetailCompareRow(label: "Profit margin", a: "48.9%", b: "6.4%", c: "39%"),
+			DetailCompareRow(label: "Market cap", a: "$3.0T", b: "$0.2T", c: "$1.0T"),
+		],
+		sheetBadge: "N", sheetName: "NVIDIA", sheetPrice: "$122.10 today", sheetChange: "▲ 2.4%",
+		buySpec: nvdaBuy
+	),
+	"GOOGL": DetailFacts(
+		symbol: "GOOGL",
+		title: "GOOGL · Alphabet Inc",
+		price: "$178.90",
+		change: "▲ 0.8% today",
+		tip: "Ad money moves with the economy, so some quarters just drift.",
+		riskPillX: 150,
+		riskCopy: "Moderate volatility. Sits mid-range for your profile.",
+		stats: [
+			DetailStat(label: "P/E ratio", value: "24.1", verdict: "Cheaper", good: true, border: true),
+			DetailStat(label: "Revenue growth", value: "12%", verdict: "Healthy"),
+			DetailStat(label: "Profit margin", value: "29.5%", verdict: "Strong"),
+		],
+		upside: "↑ 12.4% upside",
+		targetLow: "$150", targetAvg: "$201", targetHigh: "$240", targetMarkerX: 52,
+		consensus: "WALL ST. CONSENSUS · 48 ANALYSTS",
+		buyCount: "● Buy 40", holdCount: "Hold 8", sellCount: "Sell 0", buyBarW: 261,
+		actions: [
+			("Morgan Stanley", "Buy", "$210"),
+			("JPMorgan", "Buy", "$208"),
+			("Goldman Sachs", "Buy", "$205"),
+			("Bernstein", "Hold", "$185"),
+			("Wells Fargo", "Hold", "$182"),
+		],
+		newsClose: "▲ +0.6% at yesterday’s close",
+		newsSignal: "A blowout ad quarter pushed the stock to fresh highs.",
+		newsEarnings: "Q2 earnings land Jul 22.",
+		newsSources: [("Bloomberg · 5h ago", "Bullish"), ("Yahoo · 1d ago", "Neutral")],
+		newsHeadline: "Alphabet jumps after a blowout ad quarter as cloud accelerates",
+		peersLabel: "vs MSFT · META",
+		peerA: "MSFT", peerB: "META",
+		compareRows: [
+			DetailCompareRow(label: "P/E ratio", a: "24.1", b: "36x", c: "27x"),
+			DetailCompareRow(label: "Rev growth", a: "+12%", b: "+15%", c: "+19%", green: true),
+			DetailCompareRow(label: "Profit margin", a: "29.5%", b: "36%", c: "34%"),
+			DetailCompareRow(label: "Market cap", a: "$2.3T", b: "$3.4T", c: "$1.5T"),
+		],
+		sheetBadge: "G", sheetName: "Alphabet", sheetPrice: "$178.90 today", sheetChange: "▲ 0.8%",
+		buySpec: googlBuy
+	),
+]

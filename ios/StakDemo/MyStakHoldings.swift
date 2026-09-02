@@ -19,7 +19,8 @@ final class MyStakHoldings: ObservableObject {
 	}
 
 	func add(_ ticker: String) {
-		tickers.insert(ticker)
+		// Deck cards carry "NVDA · NVIDIA Corp" - hold the bare symbol.
+		tickers.insert(ticker.components(separatedBy: " · ").first ?? ticker)
 	}
 
 	private init() {}

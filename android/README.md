@@ -104,7 +104,7 @@ a few interactions on top of it. Each is deliberate, with its source:
   into the authored template — the same thing the Discover deck's
   "Learn more" already does (Codex parity audit, 2026-09-04).
 - Portrait lock (2026-09-04).
-- The My STAK holdings store decides every saved state (Codex audit 2026-09-04): chip counts, allocation, collection contents, Unsave, and the stock page's saved/unsaved state - so the seeded demo (which holds the three deck stocks) opens the deck's Learn more pages already saved; Unsave one from AI & Tech to demo the authored Save flow.
+- The My STAK holdings store drives the collection chips' counts, the collection pages, Unsave and the stock page's saved state (Codex audit 2026-09-04); the Overview's summary copy ('Across 14 stocks', 'Six of your fourteen picks', the allocation donut and bars) stays the authored frame (user, 2026-09-04: the exact design wins). The seeded demo holds the three deck stocks, so the deck's Learn more pages open already saved; Unsave one from AI & Tech to demo the authored Save flow.
 
 ## Fonts & assets
 

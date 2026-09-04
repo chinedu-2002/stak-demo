@@ -97,6 +97,7 @@ struct MainTabsView: View {
 	}
 	/// Hoisted Discover buy ticket — the sheet's scrim covers the tab bar
 	/// (frame 1:1970), so the shell owns it, mirroring Android MainShell.
+	/// Codex audit (2026-09-04): carries the FRONT card's spec.
 	@State private var discoverBuy: BuySpec? = nil
 	/// 1:4232 / 85:895: the Simulate ticket also covers the tab bar. It
 	/// carries the tapped row's spec (PLTR or COST) the way discoverBuy does.
@@ -215,7 +216,11 @@ struct MainTabsView: View {
 					// LEFT 300 — deck + sheet leave together as the tab
 					// switches; Keep exploring -> deck, DISSOLVE 300.
 					onFilledPrimary: { switchTab(.myStak, .forwardPush) { discoverBuy = nil } },
-					onFilledSecondary: { withAnimation(.easeOut(duration: 0.3)) { discoverBuy = nil } }
+					onFilledSecondary: { withAnimation(.easeOut(duration: 0.3)) { discoverBuy = nil } },
+					// Codex audit (2026-09-04): the receipt's Bought count (1:2330)
+					// - the ticket lives here, so the shell reports the fill. Last
+					// argument: onFilled is DiscoverBuyFlow's last stored property.
+					onFilled: { DeckSession.shared.bought += 1 }
 				)
 				.transition(.opacity)
 			}

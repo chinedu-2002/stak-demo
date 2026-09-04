@@ -1,9 +1,10 @@
 import SwiftUI
 
 /// 04 · Discover — "first run" (CHINEDU 1:1627) with its states: the
-/// swipe deck (twelve cards cycling the three designed ones), the Save
-/// toast (1:1796), the Buy practice ticket (1:1970) and Order filled
-/// (85:1205), and the End-of-deck receipt (1:2330).
+/// swipe deck (the three designed cards - the frame authored a 12-count
+/// over them; the build counts the real deck, Codex audit 2026-09-04),
+/// the Save toast (1:1796), the Buy practice ticket (1:1970) and Order
+/// filled (85:1205), and the End-of-deck receipt (1:2330).
 /// Ported from android/ ui/discover/DiscoverScreen.kt.
 enum Disc {
 	static let sheetBg = Color(argb: 0xFF181F30)
@@ -50,6 +51,66 @@ struct BuySpec {
 	let cashAfter: String
 	let shares: String
 	let symbol: String
+
+	/// Codex audit (2026-09-04): "$122.10 today" -> 122.10 - the live ticket
+	/// maths keys off the authored price line, so no second price table.
+	var price: Double {
+		Double(priceLine.split(separator: " ").first.map { $0.replacingOccurrences(of: "$", with: "").replacingOccurrences(of: ",", with: "") } ?? "") ?? 0
+	}
+
+	/// Codex audit (2026-09-04): this ticket at a chosen stake - the shares
+	/// and the cash after follow the amount (cashBefore is the seeded
+	/// $8,800). The authored $25 tickets round-trip byte-identically
+	/// (25/122.10 -> "0.2048", 25/947.20 -> "0.0264"). Mirrors android
+	/// ui/discover/DiscoverScreen.kt.
+	func withAmount(_ amount: Double) -> BuySpec {
+		let cash = NumberFormatter()
+		cash.locale = Locale(identifier: "en_US_POSIX")
+		cash.numberStyle = .decimal
+		cash.usesGroupingSeparator = true
+		cash.minimumFractionDigits = 2
+		cash.maximumFractionDigits = 2
+		cash.roundingMode = .halfUp   // Java's %,.2f rounds half up (android parity)
+		let after = cash.string(from: NSNumber(value: 8800 - amount)).map { "$" + $0 } ?? cashAfter
+		return BuySpec(
+			title: title, badge: badge, name: name, priceLine: priceLine, change: change,
+			cashBefore: cashBefore, cashAfter: after,
+			shares: String(format: "%.4f", amount / price), symbol: symbol
+		)
+	}
+}
+
+/// Codex audit (2026-09-04): the Practice buy ticket serves the FRONT card
+/// (1:1970 authors "Buy NVDA?" only because NVDA leads the deck).
+func buySpec(for symbol: String) -> BuySpec {
+	switch symbol {
+	case "AAPL": return aaplBuy
+	case "GOOGL": return googlBuy
+	default: return nvdaBuy
+	}
+}
+
+/// Codex audit (2026-09-04): this run's practice-buy count for the
+/// end-of-deck receipt (1:2330). The Discover ticket is hoisted into the
+/// shell (MainTabsView), so the count lives outside the deck view.
+/// Mirrors android ui/discover/DiscoverScreen.kt.
+final class DeckSession: ObservableObject {
+	static let shared = DeckSession()
+	/// The whole run lives here, not in the view's @State (review,
+	/// 2026-09-04): the Discover page is rebuilt on every tab hop -
+	/// Confirm -> "View in My STAK" -> back to the deck - and a view-local
+	/// `seen` would restart the deck while `bought` kept counting. One
+	/// lifetime, one reset.
+	@Published var seen = 0
+	@Published var saved: Set<String> = []
+	@Published var bought = 0
+
+	/// "Swipe today's deck again" and the tab re-tap from the end.
+	func restart() {
+		seen = 0
+		saved = []
+		bought = 0
+	}
 }
 
 let nvdaBuy = BuySpec(
@@ -104,6 +165,19 @@ private let deck: [DeckCard] = [
 	)
 ]
 
+/// Codex audit (2026-09-04): the frame (1:1627) authored a 12-card counter
+/// over three designed cards; the build counts the real deck - no 12 / 11 /
+/// modulo wrap anywhere.
+private let deckSize = deck.count
+
+/// Codex audit (2026-09-04): 1:2330 authors "Twelve cards, twelve signals"
+/// for a 12-card day - the receipt spells the real deck size (1...12 covers
+/// a day's deck; larger decks fall back to digits).
+private func numberWord(_ n: Int) -> String {
+	let words = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve"]
+	return words.indices.contains(n) ? words[n] : "\(n)"
+}
+
 struct DiscoverView: View {
 	// Property order IS the memberwise-init argument order (Swift); the
 	// only call site, MainTabsView, passes resetKey first - keep it first.
@@ -122,10 +196,27 @@ struct DiscoverView: View {
 	var onReviewSaves: () -> Void = {}
 	var onPracticeBuySaves: () -> Void = {}
 
-	@State private var seen = 0
+	/// The run's position - proxies DeckSession so a tab hop keeps the deck.
+	private var seen: Int {
+		get { session.seen }
+		nonmutating set { session.seen = newValue }
+	}
 	@State private var savedToast = false
-	// 1:1627 vs 1:1796: the front card's Save chip disappears once its stock is saved.
-	@State private var savedCards: Set<String> = []
+	// Codex audit (2026-09-04): THIS RUN's saves (symbols) - only the
+	// receipt's Saved count reads it; the chip state is My STAK below.
+	/// This run's saves (the chip itself reads MyStakHoldings) - proxies DeckSession.
+	private var savedCards: Set<String> {
+		get { session.saved }
+		nonmutating set { session.saved = newValue }
+	}
+	// Codex audit (2026-09-04): the Save chip's state IS My STAK (1:1627 vs
+	// 1:1796) - the seeded My STAK already holds the three authored cards,
+	// so under the demo seed they open in their saved state; the chip
+	// returns for any card not held. Private wrapped defaults stay out of
+	// the memberwise init - resetKey remains the first argument.
+	@ObservedObject private var holdings = MyStakHoldings.shared
+	// Codex audit (2026-09-04): the shell's DISCOVER ticket reports fills here.
+	@ObservedObject private var session = DeckSession.shared
 	@State private var dragOffset: CGFloat = 0
 	@State private var frontOpacity: Double = 1
 	// Promote progress: 0 = the authored mid-slab geometry (1:1701,
@@ -140,6 +231,14 @@ struct DiscoverView: View {
 	@State private var flyFade: Double = 0
 	@State private var flyGen = 0
 
+	/// Codex audit (2026-09-04): the front card's index - clamped, never
+	/// wrapped; past the last card the receipt (1:2330) replaces the deck.
+	private var front: Int { min(seen, deckSize - 1) }
+
+	/// 1:2330 "Swipe today's deck again" and the tab re-tap restart the run:
+	/// the deck, this run's saves and its fills all return to zero.
+	private func restart() { session.restart() }
+
 	var body: some View {
 		let u = figmaUnit
 		ZStack {
@@ -153,12 +252,14 @@ struct DiscoverView: View {
 							.font(StakFont.sora(26 * u, .semiBold))
 							.lineSpacing((33 - 26) * u)
 							.foregroundStyle(Color.white)
-							.offset(y: seen >= 12 ? -7 * u : 0)
+							.offset(y: seen >= deckSize ? -7 * u : 0)
 						Spacer()
-						let count = min(seen + 1, 12)
+						// Codex audit (2026-09-04): the ring counts the real deck (3),
+						// not the frame's authored 12.
+						let count = min(seen + 1, deckSize)
 						ZStack {
-							ProgressRing(progress: CGFloat(count) / 12)
-							Text("\(count)/12")
+							ProgressRing(progress: CGFloat(count) / CGFloat(deckSize))
+							Text("\(count)/\(deckSize)")
 								.font(StakFont.sora(11 * u))
 								.foregroundStyle(Color.white)
 						}
@@ -174,11 +275,14 @@ struct DiscoverView: View {
 
 				Spacer().frame(height: 27 * u)
 
-				if seen >= 12 {
+				if seen >= deckSize {
 					EndOfDeck(
 						onPracticeBuySaves: onPracticeBuySaves,
 						onReviewSaves: onReviewSaves,
-						onSwipeAgain: { seen = 0 }
+						onSwipeAgain: { restart() },
+						seen: min(seen, deckSize),
+						saved: savedCards.count,
+						bought: session.bought
 					)
 					Spacer(minLength: 0)
 				} else {
@@ -188,42 +292,43 @@ struct DiscoverView: View {
 					// diving card must never cover the gesture/CTA zone.
 					VStack(spacing: 0) {
 						ZStack(alignment: .top) {
-							// The authored deck (1:1627): the queued cards behind
-							// are the DESIGNED ILLUSION — the exact authored
-							// slabs, always (they give the illusion of a queue).
-							Image("DiscPeekTop")
-								.resizable()
-								.frame(width: 273.66 * u, height: 336.66 * u)
-								.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-								.offset(x: 39 * u, y: 0)
-							Image("DiscPeekMid")
-								.resizable()
-								.frame(width: 313.14 * u, height: 352.87 * u)
-								.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-								.offset(x: 18 * u, y: 24 * u)
-								.opacity(1 - min(1, max(0, dragOffset / (110 * u))))
-							if seen < 11 {
-								// The design's queue is REAL cards (1:1701 = the next
-								// card behind the front one - file metadata,
-								// 2026-09-02): as the drag exposes the mid slab it
-								// crossfades into the LIVE next card at the SAME
-								// authored geometry, so the queue tells the truth.
-								let next = deck[(seen + 1) % 3]
-								FrontDeckCard(card: next, onSave: {}, u: u, saved: savedCards.contains(next.ticker))
+							// Codex audit (2026-09-04): the queue behind the front
+							// card is LIVE. The frame's peek slabs (1:1627) were
+							// exports with baked Save pills that never changed as
+							// the deck advanced. Back to front: the card two ahead
+							// at the authored top-slab geometry (273.66/350 =
+							// 0.7819; the export's 12.39 top pad scaled = 10.83),
+							// then the next card at the authored mid-slab geometry
+							// (1:1701: y 36.39, 313.14/350 = 0.8947) - ALWAYS fully
+							// opaque, so what a drag reveals is the real next
+							// card. Neither rear card draws a Save chip: only the
+							// front card is actionable. Each renders only while
+							// its index exists - no wrap-around. Mirrors android
+							// ui/discover/DiscoverScreen.kt.
+							if seen + 2 < deckSize {
+								let farther = deck[seen + 2]
+								FrontDeckCard(card: farther, onSave: {}, u: u, saved: holdings.tickers.contains(farther.symbol), showSave: false)
+									.scaleEffect(0.7819, anchor: .top)
+									.offset(y: 10.83 * u)
+									.allowsHitTesting(false)
+							}
+							if seen + 1 < deckSize {
+								let next = deck[seen + 1]
+								FrontDeckCard(card: next, onSave: {}, u: u, saved: holdings.tickers.contains(next.symbol), showSave: false)
 									.scaleEffect(0.8947, anchor: .top)
-									.opacity(min(1, max(0, dragOffset / (110 * u))))
 									.offset(y: 36.39 * u)
 									.allowsHitTesting(false)
 							}
-							FrontDeckCard(card: deck[seen % 3], onSave: { savedCards.insert(deck[seen % 3].ticker); MyStakHoldings.shared.add(deck[seen % 3].ticker); savedToast = true }, u: u, saved: savedCards.contains(deck[seen % 3].ticker))
+							let frontCard = deck[front]
+							FrontDeckCard(card: frontCard, onSave: { savedCards.insert(frontCard.symbol); MyStakHoldings.shared.add(frontCard.symbol); savedToast = true }, u: u, saved: holdings.tickers.contains(frontCard.symbol))
 								.scaleEffect(0.8947 + 0.1053 * promote, anchor: .top)
 								.opacity(frontOpacity)
 								.offset(y: 54.65 * u - 18.26 * u * (1 - promote) + dragOffset)
-								.onTapGesture { onLearnMore(deck[seen % 3].symbol) }
+								.onTapGesture { onLearnMore(frontCard.symbol) }
 							if let ghost = flyingCard {
 								// The swiped-away card flying off above the live
 								// deck; input falls through to the front card.
-								FrontDeckCard(card: ghost, onSave: {}, u: u, saved: savedCards.contains(ghost.ticker))
+								FrontDeckCard(card: ghost, onSave: {}, u: u, saved: holdings.tickers.contains(ghost.symbol))
 									.opacity(flyFade)
 									.offset(y: 54.65 * u + flyOffset)
 									.allowsHitTesting(false)
@@ -247,7 +352,7 @@ struct DiscoverView: View {
 									// advances too, the Instagram rule (2026-09-02).
 									let flung = value.predictedEndTranslation.height > 110 * u && committed > 20 * u
 									if committed > 110 * u || flung {
-										if seen >= 11 {
+										if seen >= deckSize - 1 {
 											// The final card: the authored fly-off finishes
 											// before the end-of-deck receipt lands (1:2330).
 											withAnimation(.easeOut(duration: 0.28)) { dragOffset = 500 * u }
@@ -263,7 +368,7 @@ struct DiscoverView: View {
 											// the swiped card becomes the ghost and the deck
 											// advances NOW - a second swipe grabs the next
 											// card even while the ghost is still flying.
-											flyingCard = deck[seen % 3]
+											flyingCard = deck[front]
 											flyGen += 1
 											let gen = flyGen
 											var reset = Transaction()
@@ -309,7 +414,8 @@ struct DiscoverView: View {
 						}
 						Spacer().frame(height: 19 * u)
 						HStack(spacing: 36 * u) {
-							Button { onPracticeBuy(nvdaBuy) } label: {
+							// Codex audit (2026-09-04): the ticket serves the FRONT card.
+							Button { onPracticeBuy(buySpec(for: deck[front].symbol)) } label: {
 								Text("Practice buy")
 									.font(StakFont.geist(14 * u, .medium))
 									.foregroundStyle(Color.white)
@@ -327,7 +433,7 @@ struct DiscoverView: View {
 									.overlay(RoundedRectangle(cornerRadius: 6 * u).strokeBorder(Disc.ctaBorder, lineWidth: 0.36 * u))
 							}
 							.buttonStyle(.plain)
-							Button(action: { onLearnMore(deck[seen % 3].symbol) }) {
+							Button(action: { onLearnMore(deck[front].symbol) }) {
 								Text("Learn more")
 									.font(StakFont.sora(12 * u))
 									.foregroundStyle(Disc.muted)
@@ -370,7 +476,7 @@ struct DiscoverView: View {
 
 		}
 		.background(StakColors.bg.ignoresSafeArea())
-		.onChange(of: resetKey) { if seen >= 12 { seen = 0 } }
+		.onChange(of: resetKey) { if seen >= deckSize { restart() } }
 	}
 }
 
@@ -400,15 +506,19 @@ struct ProgressRing: View {
 /// the rim — a tight dark seam hugging the edge — so the card reads as
 /// its own layer over the queue in EVERY state.
 private struct FrontDeckCard: View {
-	// Property order IS the memberwise-init argument order; call site 183
-	// and DeckCardBody both go card, onSave, u, saved.
+	// Property order IS the memberwise-init argument order; every call site
+	// goes card, onSave, u, saved[, showSave].
 	let card: DeckCard
 	let onSave: () -> Void
 	let u: CGFloat
 	var saved: Bool = false
+	/// Codex audit (2026-09-04): the rear queue cards draw no Save chip -
+	/// only the front card is actionable (the frame's peek slabs, 1:1627,
+	/// carried pills only because they were exports).
+	var showSave = true
 
 	var body: some View {
-		DeckCardBody(card: card, onSave: onSave, u: u, saved: saved)
+		DeckCardBody(card: card, onSave: onSave, u: u, saved: saved, showSave: showSave)
 			.frame(width: 350 * u)
 			.background { CardSeam(u: u) }
 	}
@@ -438,6 +548,9 @@ private struct DeckCardBody: View {
 	let onSave: (() -> Void)?
 	let u: CGFloat
 	var saved: Bool = false
+	/// Codex audit (2026-09-04): false on the rear queue cards - no chip, no
+	/// hidden Save hit-target. Declared last; callers pass it last.
+	var showSave = true
 
 	var body: some View {
 		// The authored card template (1:1740, shared by all three designs):
@@ -450,7 +563,7 @@ private struct DeckCardBody: View {
 					.frame(width: 340 * u, height: 229 * u)
 					.background(card.artBg)
 					.clipShape(RoundedRectangle(cornerRadius: 18 * u))
-				if !saved {
+				if showSave && !saved {
 					// Every card draws the chip live at the template's authored
 					// spot (art x264 y6); the saved deck (1:1796) has none. The
 					// NVDA art is the chip-less export of 1:1910.
@@ -458,7 +571,7 @@ private struct DeckCardBody: View {
 						.padding(.top, 6 * u)
 						.padding(.trailing, 4 * u)
 				}
-				if let onSave, !saved {
+				if let onSave, showSave, !saved {
 					Button(action: onSave) {
 						Color.clear.frame(width: 86 * u, height: 38 * u)
 					}
@@ -563,6 +676,12 @@ private struct EndOfDeck: View {
 	let onPracticeBuySaves: () -> Void
 	let onReviewSaves: () -> Void
 	let onSwipeAgain: () -> Void
+	// Codex audit (2026-09-04): this run's real counts - 1:2330 authored
+	// 12 / 7 / 2 as sample figures. Declared after the closures (memberwise
+	// order); DiscoverView passes them last.
+	var seen = 0
+	var saved = 0
+	var bought = 0
 
 	var body: some View {
 		let u = figmaUnit
@@ -573,14 +692,16 @@ private struct EndOfDeck: View {
 				.font(StakFont.sora(22 * u, .semiBold))
 				.foregroundStyle(Disc.brightInk)
 			Spacer().frame(height: 8 * u)
-			Text("Twelve cards, twelve signals. Your taste graph got smarter.")
+			// Codex audit (2026-09-04): 1:2330 authored "Twelve cards, twelve
+			// signals" for a 12-card day; the copy spells the real deck size.
+			Text("\(numberWord(deckSize).capitalized) cards, \(numberWord(deckSize)) signals. Your taste graph got smarter.")
 				.font(StakFont.geist(12 * u))
 				.foregroundStyle(Disc.muted)
 			Spacer().frame(height: 32 * u)
 			HStack(spacing: 10 * u) {
-				statTile("Seen", "12", u)
-				statTile("Saved", "7", u)
-				statTile("Bought", "2", u)
+				statTile("Seen", "\(seen)", u)
+				statTile("Saved", "\(saved)", u)
+				statTile("Bought", "\(bought)", u)
 			}
 			Spacer().frame(height: 52 * u)
 			SheetCta(text: "Practice buy your saves", action: onPracticeBuySaves)
@@ -744,14 +865,42 @@ struct SheetSecondary: View {
 
 /// "Buy …?" practice ticket (frame 1:1970, sheet 1:2159) — content only;
 /// DiscoverBuyFlow hosts the ONE scaffold both ticket and receipt share.
+/// The authored pills' stakes (1:1970); index 4 is Custom.
+private let practicePillAmounts: [Double] = [10, 25, 50, 100]
+
 struct PracticeBuySheet: View {
 	let spec: BuySpec
 	let onConfirm: () -> Void
 	let onDismiss: () -> Void
 	/// 1:1970 authors "Not yet"; the Simulate ticket (1:4232) authors "Back".
 	var secondary: String = "Not yet"
+	/// Codex audit (2026-09-04): the chosen stake. DiscoverBuyFlow owns it
+	/// (the receipt reads the same figures) and hands `spec` back already
+	/// AT this amount. Declared last - memberwise order; the call site
+	/// passes them last.
+	var amount: Double = 25
+	var onAmount: (Double) -> Void = { _ in }
 
-	@State private var selected = 1
+	@State private var selected = 1   // the authored $25 pill (1:1970); DiscoverBuyFlow opens at 25
+	@State private var customText = ""
+
+	/// A pill selects its stake; Custom re-applies whatever valid amount
+	/// its field already holds (else the last pill value stands).
+	private func pick(_ i: Int) {
+		selected = i
+		if i < practicePillAmounts.count { onAmount(practicePillAmounts[i]) } else { applyCustom() }
+	}
+
+	/// Codex audit (2026-09-04): a typed stake counts once it parses to > 0
+	/// and <= the $8,800 cash available; anything else leaves the last pill
+	/// value standing.
+	private func applyCustom() {
+		let raw = customText
+			.replacingOccurrences(of: "$", with: "")
+			.replacingOccurrences(of: ",", with: "")
+			.trimmingCharacters(in: .whitespaces)
+		if let value = Double(raw), value > 0, value <= 8800 { onAmount(value) }
+	}
 
 	var body: some View {
 		let u = figmaUnit
@@ -780,7 +929,7 @@ struct PracticeBuySheet: View {
 					HStack(spacing: 8 * u) {
 						ForEach(Array(["$10", "$25", "$50", "$100", "Custom"].enumerated()), id: \.offset) { i, label in
 							let sel = i == selected
-							Button { selected = i } label: {
+							Button { pick(i) } label: {
 								Text(label)
 									.font(StakFont.geist(12 * u, .medium))
 									.foregroundStyle(sel ? Disc.amountSelInk : Disc.amountInk)
@@ -794,6 +943,32 @@ struct PracticeBuySheet: View {
 							}
 							.buttonStyle(.plain)
 						}
+					}
+					if selected == 4 {
+						// Codex audit (2026-09-04): Custom opens an inline amount
+						// field directly under the pills (1:1970 authors the pill
+						// only - its visuals stay as authored). Field chrome = the
+						// pill palette: amountBg fill, amountSelBorder rim.
+						HStack(spacing: 4 * u) {
+							Text("$")
+								.font(StakFont.geist(12 * u, .medium))
+								.foregroundStyle(Disc.amountInk)
+							TextField("0.00", text: $customText)
+								.keyboardType(.decimalPad)
+								// Digits and one point, nine characters at most (mirrors android).
+								.onChange(of: customText) { _, new in
+									let clean = String(new.filter { $0.isNumber || $0 == "." }.prefix(9))
+									if clean != new { customText = clean }
+								}
+								.textFieldStyle(.plain)
+								.font(StakFont.geist(12 * u, .medium))
+								.foregroundStyle(Disc.amountInk)
+						}
+						.padding(.horizontal, 12 * u)
+						.padding(.vertical, 8 * u)
+						.background(Disc.amountBg, in: RoundedRectangle(cornerRadius: 10 * u))
+						.overlay(RoundedRectangle(cornerRadius: 10 * u).strokeBorder(Disc.amountSelBorder, lineWidth: 0.5 * u))
+						.onChange(of: customText) { applyCustom() }
 					}
 				}
 				.padding(.top, 1.5 * u)
@@ -894,17 +1069,26 @@ struct DiscoverBuyFlow: View {
 	var onFilledPrimary: (() -> Void)? = nil
 	var onFilledSecondary: (() -> Void)? = nil
 	var onTicketSecondary: (() -> Void)? = nil
+	/// Codex audit (2026-09-04): fired exactly once when the order fills -
+	/// the shell's DISCOVER flow counts it for the receipt (1:2330).
+	/// Declared last - memberwise order; MainTabsView passes it last.
+	var onFilled: () -> Void = {}
 
 	@State private var filled = false
+	/// Codex audit (2026-09-04): the chosen stake - both sheets read the
+	/// ticket AT this amount, so "You get", the cash after and "You now
+	/// hold" agree (1:1970 / 85:1205).
+	@State private var amount: Double = 25
 
 	var body: some View {
+		let live = spec.withAmount(amount)
 		SheetScaffold(onDismiss: onClose) {
 			ZStack(alignment: .top) {
 				if !filled {
-					PracticeBuySheet(spec: spec, onConfirm: { filled = true }, onDismiss: onTicketSecondary ?? onClose, secondary: ticketSecondary)
+					PracticeBuySheet(spec: live, onConfirm: { guard !filled else { return }; filled = true; onFilled() }, onDismiss: onTicketSecondary ?? onClose, secondary: ticketSecondary, amount: amount, onAmount: { amount = $0 })
 						.transition(.opacity)
 				} else {
-					OrderFilledSheet(spec: spec, onDismiss: onClose, primary: filledPrimary, secondary: filledSecondary, onPrimary: onFilledPrimary, onSecondary: onFilledSecondary)
+					OrderFilledSheet(spec: live, onDismiss: onClose, primary: filledPrimary, secondary: filledSecondary, onPrimary: onFilledPrimary, onSecondary: onFilledSecondary)
 						.transition(.opacity)
 				}
 			}

@@ -620,7 +620,8 @@ private fun FirstRunOverlay(onSeeTodaysPick: () -> Unit, modifier: Modifier = Mo
 				),
 		) {
 			Text(
-				text = "See Today’s Pick",
+				// Authored copy verbatim (user, 2026-09-04 (CHINEDU 02 · Home dev 118:1633): the exact frame wins, spelling included).
+				text = "See Todays Pick",
 				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp),
 				color = Color.White,
 			)

@@ -95,14 +95,9 @@ fun NewsScreen(onOpenArticle: (String) -> Unit) {
 					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (26 * u).sp, lineHeight = (33 * u).sp),
 					color = Color.White,
 				)
-				// The frame's "Saturday, July 4" is the authored example; the
-				// screen shows today (Codex audit 2026-09-04), in the frame's
-				// English format whatever the device locale.
-				val today = androidx.compose.runtime.remember {
-					java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("EEEE, MMMM d", java.util.Locale.US))
-				}
+				// Authored date line (user, 2026-09-04 (CHINEDU 03 · News 1:1228): the authored look wins).
 				Text(
-					text = today,
+					text = "Saturday, July 4",
 					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (13 * u).sp, lineHeight = (17 * u).sp),
 					color = News.Muted,
 				)
@@ -201,10 +196,8 @@ private fun articleMatches(a: NewsArticleFeed.Article, q: String): Boolean {
 }
 
 /**
- * Compact Market Mood row — #171d2c r12 with the small gauge. Both the
- * status line and the needle are the SAME shared mood state Home shows
- * (Codex audit 2026-09-04): the row used to hard-code "Low volatility"
- * over a baked needle resting in the red band.
+ * Compact Market Mood row — #171d2c r12 with the small low-volatility
+ * gauge, exactly as authored (user, 2026-09-04 (CHINEDU 03 · News 1:1228): the authored look wins); Home's card keeps its own live line.
  */
 @Composable
 private fun MoodMiniRow() {
@@ -224,14 +217,17 @@ private fun MoodMiniRow() {
 				color = Color.White,
 			)
 			Text(
-				text = com.stak.demo.ui.home.MarketMoodFeed.statusLead,
+				text = "Low volatility",
 				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp, lineHeight = (14 * u).sp),
 				color = News.Teal,
 			)
 		}
 		Spacer(modifier = Modifier.weight(1f))
-		// The Home gauge drawn at the authored compact size (40.97 x 20.76).
-		com.stak.demo.ui.home.MarketMoodGauge(u = u * (40.97f / 56.9018f))
+		Image(
+			painter = painterResource(R.drawable.news_gauge_small),
+			contentDescription = null,
+			modifier = Modifier.size((40.97 * u).dp, (20.76 * u).dp),
+		)
 	}
 }
 

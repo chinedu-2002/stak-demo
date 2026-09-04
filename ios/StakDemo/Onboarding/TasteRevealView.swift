@@ -20,14 +20,13 @@ private let bars: [TasteBar] = [
 /// Onboarding · 07 Taste reveal — Figma node 1554:9051 (CHINEDU file, "STEP 6 OF 6").
 ///
 /// The quiz result: teal eyebrow, "Here's what you're into." headline,
-/// the #181f30 taste card with four strength bars (fills animate in on
-/// entry, landing on the exact Figma widths), the Risk style chip
-/// ("Growth-Oriented" ›) and the "Lets go!" / Back CTAs.
+/// the #181f30 taste card with four strength bars at their exact Figma
+/// widths (the frame arrives already filled - no entry animation; Codex
+/// parity audit 2026-09-04), the Risk style chip ("Growth-Oriented" ›)
+/// and the "Lets go!" / Back CTAs.
 struct TasteRevealView: View {
 	let onBack: () -> Void
 	let onLetsGo: () -> Void
-
-	@State private var revealed = false
 
 	var body: some View {
 		let u = figmaUnit
@@ -59,7 +58,7 @@ struct TasteRevealView: View {
 
 					// Taste card — four strength bars.
 					VStack(spacing: 14 * u) {
-						ForEach(Array(bars.enumerated()), id: \.element.id) { index, bar in
+						ForEach(bars) { bar in
 							VStack(spacing: 6 * u) {
 								HStack {
 									Text(bar.label)
@@ -77,11 +76,7 @@ struct TasteRevealView: View {
 										RoundedRectangle(cornerRadius: 2.5 * u).fill(Auth.dividerLine)
 										RoundedRectangle(cornerRadius: 2.5 * u)
 											.fill(Auth.linkTeal)
-											.frame(width: proxy.size.width * (revealed ? bar.fraction : 0))
-											.animation(
-												.easeOut(duration: 0.55).delay(0.12 * Double(index)),
-												value: revealed
-											)
+											.frame(width: proxy.size.width * bar.fraction)
 									}
 								}
 								.frame(height: 5 * u)
@@ -129,6 +124,5 @@ struct TasteRevealView: View {
 			.padding(.bottom, 26 * u)
 		}
 		.background(StakColors.bg.ignoresSafeArea())
-		.onAppear { revealed = true }
 	}
 }

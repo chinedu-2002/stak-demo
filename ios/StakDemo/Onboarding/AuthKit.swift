@@ -76,28 +76,34 @@ struct AuthBackCircle: View {
 }
 
 /// The "STEP · …" kicker row — Geist Medium 10, 1.2 tracking, #5c6b85.
+/// Scaled by the artboard unit like every sibling (was fixed - Codex
+/// parity audit 2026-09-04; mirrors android OnboardingKicker).
 struct OnboardingKicker: View {
 	let text: String
 
 	var body: some View {
+		let u = figmaUnit
 		Text(text)
-			.font(StakFont.geist(10, .medium))
-			.tracking(1.2)
+			.font(StakFont.geist(10 * u, .medium))
+			.tracking(1.2 * u)
 			.foregroundStyle(Auth.faintText)
 			.frame(maxWidth: .infinity, alignment: .leading)
-			.padding(.horizontal, 20)
-			.padding(.top, 6)
+			.padding(.horizontal, 20 * u)
+			.padding(.top, 6 * u)
 	}
 }
 
-/// Right-aligned "STEP n OF 6" label used in the nav rows.
+/// Right-aligned "STEP n OF 6" label used in the nav rows. Scaled by the
+/// artboard unit like the inline twins in BrandPicksView / MatrixQuizView
+/// and android's "STEP 6 OF 6" (Codex parity audit 2026-09-04).
 struct StepLabel: View {
 	let text: String
 
 	var body: some View {
+		let u = figmaUnit
 		Text(text)
-			.font(StakFont.geist(10, .medium))
-			.tracking(0.9)
+			.font(StakFont.geist(10 * u, .medium))
+			.tracking(0.9 * u)
 			.foregroundStyle(Auth.faintText)
 	}
 }

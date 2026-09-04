@@ -35,6 +35,9 @@ private let settingsRows = ["Notifications", "Appearance", "Linked accounts", "H
 struct ProfileView: View {
 	let onBack: () -> Void
 	var onLogOut: () -> Void = {}
+	/// Observed (like HomeView's TopNav) so a photo picked / name typed in
+	/// 09 Profile setup re-renders the avatar block.
+	@ObservedObject var profile = UserProfile.shared
 
 	var body: some View {
 		let u = figmaUnit
@@ -59,12 +62,24 @@ struct ProfileView: View {
 					VStack(spacing: 8 * u) {
 						ZStack {
 							Circle().fill(Color(argb: 0xFF242B3D))
-							Text("H")
-								.font(StakFont.sora(22 * u, .semiBold))
-								.foregroundStyle(Color(argb: 0xFF9EADC7))
+							// The picked photo when one exists; else the live initial of
+							// the display name - "H" for the demo persona Hamza, so the
+							// authored 171:995 frame is unchanged (Codex parity audit
+							// 2026-09-04; mirrors android ProfileScreen.kt).
+							if let data = profile.photoData, let photo = UIImage(data: data) {
+								Image(uiImage: photo)
+									.resizable()
+									.scaledToFill()
+									.frame(width: 64 * u, height: 64 * u)
+									.clipShape(Circle())
+							} else {
+								Text(profile.greetingName.prefix(1).uppercased())
+									.font(StakFont.sora(22 * u, .semiBold))
+									.foregroundStyle(Color(argb: 0xFF9EADC7))
+							}
 						}
 						.frame(width: 64 * u, height: 64 * u)
-						Text(UserProfile.shared.greetingName)
+						Text(profile.greetingName)
 							.font(StakFont.sora(20 * u, .semiBold))
 							.foregroundStyle(StakColors.textPrimary)
 						Text("Paper investor · joined July 2026")

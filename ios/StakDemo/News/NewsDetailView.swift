@@ -119,8 +119,10 @@ struct NewsDetailView: View {
 							isActive: isTop && index == i,
 							saved: savedIds.contains(id),
 							onSave: { save(id) },
-							// Designer's call (2026-08-22): the sheet scale-ins.
-							onAddToStak: { withAnimation(.easeOut(duration: 0.3)) { successId = id } },
+							// Designer's call (2026-08-22): the sheet scale-ins; its
+							// authored entry is Smart Animate 350 (1:1359, Codex parity
+							// audit 2026-09-04) - the dismiss below stays the 300 dissolve.
+							onAddToStak: { withAnimation(.easeOut(duration: 0.35)) { successId = id } },
 							onOpenArticle: onOpenArticle
 						)
 						.tag(i)
@@ -130,8 +132,8 @@ struct NewsDetailView: View {
 			}
 			// Authored (101:1005 Motion): Back -> News detail page saved,
 			// DISSOLVE 300 EaseOut; View in My STAK -> My STAK Overview,
-			// Push Right 300 (hoisted to the shell). Entry stays instant (its
-			// authored animate type is still unreadable from the file).
+			// Push Right 300 (hoisted to the shell). Entry is authored Smart
+			// Animate 350 (Codex parity audit 2026-09-04) - see onAddToStak.
 			if let sheetId = successId {
 				SaveSuccessOverlay(
 					facts: NewsArticleFeed.stockFacts(NewsArticleFeed.article(sheetId).ticker ?? "AAPL"),
@@ -542,7 +544,8 @@ private struct StockCard: View {
 				HStack {
 					Text("View \(ticker) in My STAK")
 						.font(StakFont.geist(13 * u, .medium))
-						.foregroundStyle(News.teal)
+						// 1:1359: the link reads #AEAEAE, not teal (Codex parity audit 2026-09-04).
+						.foregroundStyle(Color(argb: 0xFFAEAEAE))
 					Spacer()
 					Image("IcDailyChevron")
 						.resizable()

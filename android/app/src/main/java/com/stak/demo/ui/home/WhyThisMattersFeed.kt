@@ -18,7 +18,7 @@ object WhyThisMattersFeed {
 	/** Production switch - keep false while reviews compare build vs frame. */
 	const val LIVE = false
 
-	const val DEMO_BODY = "Your STAK collections houses 80% of stocks from effected industries."
+	const val DEMO_BODY = "Your STAK collections house 80% of stocks from affected industries."
 
 	/** The current summary - the served personalized copy once the backend exists. */
 	fun body(): String = DEMO_BODY

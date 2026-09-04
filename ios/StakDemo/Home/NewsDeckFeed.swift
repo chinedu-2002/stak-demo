@@ -39,6 +39,19 @@ enum NewsDeckFeed {
 		),
 	]
 
-	/// The current stories - the served breaking news once the backend exists.
-	static func stories() -> [Story] { demoStories }
+	/// The authored deck has exactly this many slots (HomeView's deckCards).
+	static let deckSize = 3
+
+	/// The current stories - the served breaking news once the backend
+	/// exists. Always exactly `deckSize` long.
+	static func stories() -> [Story] { padToDeck(demoStories) }
+
+	/// GUARD (audit 2026-09-04): the Home deck indexes three fixed, authored
+	/// slots, so a served feed shorter than the deck is padded with the
+	/// authored stories and a longer one trimmed - a short or empty backend
+	/// response can never index past the end. Route every live feed through
+	/// this before it reaches the deck. Mirrors android NewsDeckFeed.padToDeck.
+	static func padToDeck(_ served: [Story]) -> [Story] {
+		Array((served + demoStories).prefix(deckSize))
+	}
 }

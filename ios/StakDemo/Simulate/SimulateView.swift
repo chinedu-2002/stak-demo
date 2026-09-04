@@ -112,7 +112,8 @@ struct SimulateView: View {
 							let p = position.row
 							PortfolioRow(badge: p.badge, ticker: p.ticker, sub: p.sub, amount: p.amount, pct: p.pct, up: p.up, action: { onOpenPick(p.ticker) })
 						}
-						CenterLink(text: "See all \(portfolio.pickCount) picks", action: onOpenPortfolio)
+						// Authored copy (user, 2026-09-04 (CHINEDU 07 · Simulate 423:1007): the authored look wins); the ledger still drives the rows above.
+						CenterLink(text: "See all 12 picks", action: onOpenPortfolio)
 						HStack {
 							Text("Portfolio breakdown")
 								.font(StakFont.sora(16 * u, .semiBold))
@@ -203,13 +204,13 @@ private struct ScoreHero: View {
 					Text(figure.cents)
 						.font(StakFont.sora(18 * u, .semiBold))
 						.foregroundStyle(Sim.muted)
-						// Codex audit (2026-09-04): no gap before ".00" - 1:3923
-						// authors an 8 offset after the figure, a design mistake;
-						// "$10,240.00" reads as one number. The cents' box bottom
-						// still sits 8 above the figure's (55 vs y24+h23).
+						// Authored (1:3923): ".00" starts 8 after the figure and its
+						// box bottom sits 8 above the figure's (55 vs y24+h23). The
+						// gap is the design (user, 2026-09-04 (CHINEDU 07 · Simulate 423:1007): the authored look wins).
+						.padding(.leading, 8 * u)
 						.padding(.bottom, 8 * u)
 				}
-				Text("+\(PaperPortfolio.money(portfolio.allTimeGain)) all time on $10,000 paper · \(portfolio.pickCount) picks")
+				Text("+\(PaperPortfolio.money(portfolio.allTimeGain)) all time on $10,000 paper · 12 picks")
 					.font(StakFont.geist(12 * u, .light))
 					.foregroundStyle(Sim.muted)
 				HStack(spacing: 6 * u) {
@@ -672,7 +673,8 @@ private struct BoardCard: View {
 			boardRow(rank: "1", name: "Maya A.", pct: "+9.4%", you: false)
 			boardRow(rank: "2", name: "Jide O.", pct: "+8.8%", you: false)
 			// Audit item 6: the You row quotes the hero's week (1:3898 authored +4.2% here, +1.9% above).
-			boardRow(rank: "\(PaperPortfolio.weekRank)", name: "You", pct: PaperPortfolio.weekPct, you: true)
+			// Authored board figures (1:4111 +4.2%; user, 2026-09-04 (CHINEDU 07 · Simulate 423:1007): the authored look wins).
+			boardRow(rank: "47", name: "You", pct: "+4.2%", you: true)
 			CenterLink(text: "Full leaderboard", action: onOpenLeaderboard)
 		}
 		.padding(16 * u)

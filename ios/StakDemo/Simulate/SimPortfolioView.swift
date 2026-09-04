@@ -45,7 +45,8 @@ struct SimPortfolioView: View {
 						// 1:4496 hides the Portfolio-value/$10,240/cash layers —
 						// the visible summary is this one centered 158x32 pill,
 						// filled with the card colour (no hairline).
-						Text("\(portfolio.pickCount) picks · +\(PaperPortfolio.money(portfolio.allTimeGain)) all time")
+						// Authored copy (user, 2026-09-04 (CHINEDU 07 · Simulate 423:1007): the authored look wins).
+						Text("12 picks · +$240.00 all time")
 							.font(StakFont.geist(10 * u))
 							.foregroundStyle(Sim.muted)
 							.frame(width: 158 * u, height: 32 * u)

@@ -22,8 +22,8 @@ private let top: [Rank] = [
 	Rank(rank: "5", initial: "K", name: "Kofi B.", picks: "11 picks", pct: "+7.0%")
 ]
 private let near: [Rank] = [
-	Rank(rank: "46", initial: "L", name: "Lena S.", picks: "8 picks", pct: "+2.0%"),
-	Rank(rank: "48", initial: "D", name: "Dami F.", picks: "15 picks", pct: "+1.8%")
+	Rank(rank: "46", initial: "L", name: "Lena S.", picks: "8 picks", pct: "+4.3%"),
+	Rank(rank: "48", initial: "D", name: "Dami F.", picks: "15 picks", pct: "+4.1%")
 ]
 
 struct LeaderboardView: View {
@@ -90,14 +90,14 @@ struct LeaderboardView: View {
 							Text("You")
 								.font(StakFont.geist(12 * u, .semiBold))
 								.foregroundStyle(Color.white)
-							Text("\(portfolio.pickCount) picks this week")
+							Text("12 picks this week")
 								.font(StakFont.geist(10 * u))
 								.foregroundStyle(Sim.muted)
 						}
 						.frame(maxWidth: .infinity, alignment: .leading)
 						VStack(alignment: .trailing, spacing: 2 * u) {
-							// Audit item 6: the hero's +1.9% week (1:4124 authored +4.2%).
-							Text(PaperPortfolio.weekPct)
+							// Authored You row (user, 2026-09-04 (CHINEDU 07 · Simulate 423:1007): the authored look wins).
+							Text("+4.2%")
 								.font(StakFont.sora(13 * u, .semiBold))
 								.foregroundStyle(Sim.teal)
 							Text("▲ 12 spots")

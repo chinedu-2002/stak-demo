@@ -463,6 +463,25 @@ object NewsArticleFeed {
 		"MSFT" to StockFacts("Microsoft Corp.", "Microsoft", "$512.40", "+1.45% today", true, "$3.81T", "37.5", "$505.80–$514.20", "22.8M", "$385.60–$518.30", "0.66%"),
 		"XOM" to StockFacts("Exxon Mobil Corp.", "Exxon Mobil", "$109.84", "-1.84% today", false, "$472.6B", "13.9", "$108.90–$112.30", "18.4M", "$101.40–$126.30", "3.41%"),
 		"MU" to StockFacts("Micron Technology", "Micron", "$128.66", "+6.21% today", true, "$142.8B", "21.3", "$120.70–$129.40", "33.9M", "$61.50–$131.20", "0.36%"),
+		// Codex parity audit (2026-09-04): the My STAK collection tickers
+		// (Collections.kt) and the Simulate picks - shared demo data, so
+		// stockFacts() serves each one instead of falling back to AAPL.
+		// Mirrors ios/StakDemo/News/NewsArticleFeed.swift.
+		"JPM" to StockFacts("JPMorgan Chase & Co.", "JPMorgan", "$245.60", "+0.62% today", true, "$690.4B", "13.1", "$243.10–$246.80", "8.9M", "$179.20–$251.40", "2.05%"),
+		"V" to StockFacts("Visa Inc.", "Visa", "$352.10", "+0.31% today", true, "$705.8B", "32.4", "$349.60–$353.40", "6.1M", "$252.70–$366.20", "0.67%"),
+		"GS" to StockFacts("Goldman Sachs Group", "Goldman Sachs", "$612.40", "-0.48% today", false, "$189.3B", "15.2", "$609.80–$618.90", "1.7M", "$439.40–$630.10", "1.96%"),
+		"ENPH" to StockFacts("Enphase Energy", "Enphase", "$78.40", "+1.92% today", true, "$10.3B", "38.6", "$76.10–$79.20", "4.4M", "$54.30–$132.60", "—"),
+		"NEE" to StockFacts("NextEra Energy", "NextEra", "$84.20", "+0.41% today", true, "$173.2B", "22.7", "$83.40–$84.90", "9.2M", "$61.80–$86.10", "2.69%"),
+		"FSLR" to StockFacts("First Solar, Inc.", "First Solar", "$228.90", "-1.12% today", false, "$24.5B", "17.8", "$226.30–$233.10", "2.3M", "$116.60–$262.40", "—"),
+		"PLD" to StockFacts("Prologis, Inc.", "Prologis", "$118.30", "+0.24% today", true, "$109.6B", "27.9", "$117.20–$118.90", "3.0M", "$85.40–$127.30", "3.41%"),
+		"O" to StockFacts("Realty Income Corp.", "Realty Income", "$59.10", "-0.27% today", false, "$53.2B", "54.3", "$58.70–$59.60", "4.8M", "$50.70–$64.90", "5.46%"),
+		"LLY" to StockFacts("Eli Lilly and Co.", "Eli Lilly", "$792.50", "+1.38% today", true, "$751.6B", "63.4", "$781.90–$795.20", "2.9M", "$677.10–$972.50", "0.76%"),
+		"UNH" to StockFacts("UnitedHealth Group", "UnitedHealth", "$318.70", "-0.81% today", false, "$289.1B", "13.7", "$316.20–$323.40", "7.4M", "$248.90–$630.70", "2.78%"),
+		"JNJ" to StockFacts("Johnson & Johnson", "J&J", "$162.40", "+0.49% today", true, "$391.0B", "16.9", "$161.10–$163.20", "6.6M", "$140.70–$169.90", "3.20%"),
+		"PFE" to StockFacts("Pfizer Inc.", "Pfizer", "$25.30", "-0.20% today", false, "$143.7B", "13.2", "$25.10–$25.60", "38.5M", "$20.90–$30.20", "6.80%"),
+		"COST" to StockFacts("Costco Wholesale Corp.", "Costco", "$947.20", "+0.73% today", true, "$420.4B", "52.1", "$939.80–$951.60", "1.6M", "$793.40–$1,078.20", "0.55%"),
+		"NKE" to StockFacts("Nike, Inc.", "Nike", "$72.80", "-1.28% today", false, "$107.5B", "33.6", "$72.10–$74.30", "9.8M", "$52.30–$90.60", "2.20%"),
+		"PLTR" to StockFacts("Palantir Technologies", "Palantir", "$28.40", "+1.10% today", true, "$64.2B", "—", "$27.90–$28.70", "51.3M", "$15.70–$45.20", "—"),
 	)
 
 	/** The served stock module for a ticker - the backend resolves this in production. */

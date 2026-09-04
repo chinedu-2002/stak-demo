@@ -46,20 +46,70 @@ import com.stak.demo.ui.theme.ADVANCE_ROUNDING
 import androidx.compose.foundation.layout.requiredSize
 
 /**
- * 07 · Simulate — "Pick detail · paper" (CHINEDU 1:4631). The NVDA
- * position page: picked line, the +$24.00 gain hero, chart with range
- * pills, the This-week / vs-the-market duo, Price then/now, the WHY?
- * insight and the dark Sell CTA (raises the sell flow from here too).
+ * One paper pick's numbers - every pick is a $100 stake. NVDA is frame
+ * 1:4631 (and its sell sheets 1:4698 / 73:855) verbatim; the others derive
+ * from the shared demo table - Codex parity audit (2026-09-04). Mirrors
+ * ios/StakDemo/Simulate/PickDetailView.swift.
+ */
+internal data class PickSpec(
+	val symbol: String,
+	val badge: String,
+	/** The sell row's name (1:4698) - NVDA keeps the authored "NVIDIA Corp". */
+	val company: String,
+	val priceNow: String,
+	val pickedLine: String,
+	val priceThen: String,
+	/** Signed dollars, e.g. "+$24.00" - the hero splits it at the point. */
+	val gain: String,
+	/** Unsigned, e.g. "24.0%" - `up` picks the up/down wording and the red. */
+	val gainPct: String,
+	val up: Boolean,
+	val shares: String,
+	/** $100 + gain - the sell sheet's position value / proceeds. */
+	val stakeValue: String,
+	val vsMarket: String,
+	val ahead: Boolean,
+	/** The day move on the sell row - the same figure the My STAK tile shows. */
+	val dayChange: String,
+)
+
+internal val PICK_SPECS = listOf(
+	PickSpec("NVDA", "N", "NVIDIA Corp", "$122.10", "Picked May 8 at $98.50", "$98.50", "+$24.00", "24.0%", true, "1.0152", "$124.00", "+20.8% ahead", true, "▲ 2.4%"),
+	// TSLA's day move: the News feed's "Tesla drops 7%" story (-6.95% today).
+	PickSpec("TSLA", "T", "Tesla", "$291.30", "Picked Jun 3 at $246.86", "$246.86", "+$18.00", "18.0%", true, "0.4051", "$118.00", "+14.8% ahead", true, "▼ 7.0%"),
+	PickSpec("AMD", "A", "AMD", "$164.30", "Picked May 29 at $148.02", "$148.02", "+$11.00", "11.0%", true, "0.6756", "$111.00", "+7.8% ahead", true, "▲ 2.1%"),
+	PickSpec("AAPL", "A", "Apple", "$229.35", "Picked Apr 22 at $216.37", "$216.37", "+$6.00", "6.0%", true, "0.4622", "$106.00", "+2.8% ahead", true, "▲ 1.2%"),
+	PickSpec("JPM", "J", "JPMorgan", "$245.60", "Picked Jun 20 at $240.78", "$240.78", "+$2.00", "2.0%", true, "0.4153", "$102.00", "-1.2% behind", false, "▲ 0.6%"),
+	PickSpec("MSFT", "M", "Microsoft", "$438.20", "Picked Jun 26 at $451.75", "$451.75", "-$3.00", "3.0%", false, "0.2214", "$97.00", "-6.2% behind", false, "▼ 0.4%"),
+)
+
+/** The tapped pick's numbers; an unknown symbol falls back to the frame's NVDA. */
+internal fun pickSpec(symbol: String): PickSpec = PICK_SPECS.firstOrNull { it.symbol == symbol } ?: PICK_SPECS.first()
+
+/**
+ * 07 · Simulate — "Pick detail · paper" (CHINEDU 1:4631). The position
+ * page, templated on the tapped pick (NVDA is the frame): picked line,
+ * the +$24.00 gain hero, chart with range pills, the This-week /
+ * vs-the-market duo, Price then/now, the WHY? insight and the dark Sell
+ * CTA (raises the sell flow from here too).
  */
 @Composable
 fun PickDetailScreen(
 	onBack: () -> Unit,
+	// Codex parity audit (2026-09-04): the tapped row's ticker rides the
+	// route (simulate/pick/{symbol}); its numbers fill the same template.
+	symbol: String = "NVDA",
 	// B19 (73:855 Motion): the sell-success CTAs leave the page with
 	// their own styles - wired by the nav host.
 	onBackToSimulate: (() -> Unit)? = null,
 	onViewPortfolio: (() -> Unit)? = null,
 ) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
+	val p = pickSpec(symbol)
+	// "+$24.00" -> "+$24" in the 48 box and ".00" in its own 16/20 box (1:4654).
+	val gainWhole = p.gain.substringBefore('.')
+	// "" when a gain carries no cents, ".00" otherwise - never an index crash.
+	val gainCents = p.gain.removePrefix(p.gain.substringBefore('.'))
 	var showSell by rememberSaveable { mutableStateOf(false) }
 
 	Box(modifier = Modifier.fillMaxSize().background(StakColors.Bg)) {
@@ -75,7 +125,7 @@ fun PickDetailScreen(
 				AuthBackCircle(onClick = onBack)
 				Spacer(modifier = Modifier.weight(1f))
 				Text(
-					text = "NVDA",
+					text = p.symbol,
 					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp),
 					color = Color.White,
 				)
@@ -109,29 +159,30 @@ fun PickDetailScreen(
 				) {
 					Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy((9 * u).dp)) {
 						Box(contentAlignment = Alignment.Center, modifier = Modifier.size((38 * u).dp).background(Sim.ChipBg, CircleShape)) {
-							Text("N", style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp, lineHeight = (19 * u).sp), color = Sim.BadgeInk)
+							Text(p.badge, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp, lineHeight = (19 * u).sp), color = Sim.BadgeInk)
 						}
 						Text(
-							"Picked May 8 at $98.50",
+							p.pickedLine,
 							style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
 							color = Sim.Muted,
 						)
 					}
 					Row(verticalAlignment = Alignment.Bottom, modifier = Modifier.padding(top = (11 * u).dp).height((48 * u).dp)) {
 						Text(
-							"+$24",
+							gainWhole,
 							style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (38 * u).sp, lineHeight = (48 * u).sp, letterSpacing = (-0.38 * u).sp),
-							color = Color.White,
+							// A losing pick's figure takes the authored red (the rows' Sim.Red).
+							color = if (p.up) Color.White else Sim.Red,
 						)
 						Text(
-							".00",
+							gainCents,
 							style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp, lineHeight = (20 * u).sp),
 							color = Sim.Muted,
 							modifier = Modifier.padding(start = (7 * u).dp, bottom = (6 * u).dp),
 						)
 					}
 					Text(
-						"That is up 24.0% on a $100 paper stake",
+						"That is ${if (p.up) "up" else "down"} ${p.gainPct} on a $100 paper stake",
 						style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
 						color = Sim.Muted,
 						modifier = Modifier.padding(top = (11 * u).dp),
@@ -168,12 +219,14 @@ fun PickDetailScreen(
 				// Stats (1:4673): two 61-tall rows, 10 apart, 170-wide cells.
 				Column(verticalArrangement = Arrangement.spacedBy((10 * u).dp)) {
 					Row(horizontalArrangement = Arrangement.spacedBy((10 * u).dp)) {
+						// "This week" stays the authored literal for every pick - the
+						// shared demo table carries no weekly move (no invented copy).
 						StatBox("This week", "+$3.80", Sim.Green, Modifier.weight(1f))
-						StatBox("vs the market", "+20.8% ahead", Sim.Green, Modifier.weight(1f))
+						StatBox("vs the market", p.vsMarket, if (p.ahead) Sim.Green else Sim.Red, Modifier.weight(1f))
 					}
 					Row(horizontalArrangement = Arrangement.spacedBy((10 * u).dp)) {
-						StatBox("Price then", "$98.50", Sim.Bright, Modifier.weight(1f))
-						StatBox("Price now", "$122.10", Sim.Bright, Modifier.weight(1f))
+						StatBox("Price then", p.priceThen, Sim.Bright, Modifier.weight(1f))
+						StatBox("Price now", p.priceNow, Sim.Bright, Modifier.weight(1f))
 					}
 				}
 				// WHY / insight card — teal-tinted like the deck tips.
@@ -195,7 +248,8 @@ fun PickDetailScreen(
 						)
 					}
 					Text(
-						"Your stake tracks the move live. If NVDA gives back gains, the dollars follow it down.",
+						// The authored sentence with only the symbol swapped (losing picks too).
+						"Your stake tracks the move live. If ${p.symbol} gives back gains, the dollars follow it down.",
 						style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp, lineHeight = (17 * u).sp),
 						color = Sim.Body,
 					)
@@ -238,6 +292,7 @@ fun PickDetailScreen(
 			// Instant; the success CTAs route through the nav host (B19) so
 			// the sheet rides the page's own transition out.
 			SellFlowHost(
+				pick = p,
 				onClose = { showSell = false },
 				onBackToSimulate = { if (onBackToSimulate != null) onBackToSimulate() else { showSell = false; onBack() } },
 				onViewPortfolio = { if (onViewPortfolio != null) onViewPortfolio() else { showSell = false; onBack() } },

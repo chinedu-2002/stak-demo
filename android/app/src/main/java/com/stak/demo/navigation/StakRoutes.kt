@@ -22,11 +22,17 @@ object StakRoutes {
 	const val MAIN = "main" // bottom-tab shell (Home/News/Discover/My STAK/Simulate)
 	const val NEWS_DETAIL = "news/detail/{articleId}"
 	fun newsDetail(articleId: String) = "news/detail/$articleId"
-	const val COLLECTION = "mystak/collection"
-	const val MYSTAK_STOCK = "mystak/stock"
+	/** My STAK collection page - `id` is the tapped chip's catalogue id (Codex parity audit, 2026-09-04). */
+	const val COLLECTION = "mystak/collection/{id}"
+	fun collection(id: String) = "mystak/collection/$id"
+	/** The saved-flavour Stock Detail - `symbol` is the tapped collection tile's ticker. */
+	const val MYSTAK_STOCK = "mystak/stock/{symbol}"
+	fun myStakStock(symbol: String) = "mystak/stock/$symbol"
 	const val PROFILE = "profile"
 	const val SIM_PORTFOLIO = "simulate/portfolio"
-	const val SIM_PICK = "simulate/pick"
+	/** Pick detail - `symbol` is the tapped pick's ticker; NVDA is the authored frame (1:4631). Codex parity audit (2026-09-04). */
+	const val SIM_PICK = "simulate/pick/{symbol}"
+	fun simPick(symbol: String) = "simulate/pick/$symbol"
 	const val LEADERBOARD = "simulate/leaderboard"
 
 	const val STOCK_DETAIL = "stock/{symbol}"

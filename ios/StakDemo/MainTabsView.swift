@@ -120,7 +120,11 @@ struct MainTabsView: View {
 				.transition(tabStyle.transition)
 
 			ForEach(pushed) { entry in
-				pageView(entry.page)
+				// isTop: a READ NEXT push covers the previous article without
+				// unmounting it (the parked page carries the pop transitions),
+				// so the covered page is told explicitly - it releases its hero
+				// player instead of playing on under the new article.
+				pageView(entry.page, isTop: entry.id == pushed.last?.id)
 					.offset(x: entry.id == pushed.last?.id ? 0 : parkedShift)
 					.id(entry.id)
 					.transition(navStyle.transition)
@@ -228,7 +232,7 @@ struct MainTabsView: View {
 	}
 
 	@ViewBuilder
-	private func pageView(_ page: PushedPage) -> some View {
+	private func pageView(_ page: PushedPage, isTop: Bool) -> some View {
 		switch page {
 		case .newsDetail(let article):
 			// The article's back motion is not authored - it mirrors the
@@ -243,7 +247,9 @@ struct MainTabsView: View {
 				// READ NEXT rows push the next story's article (user, 2026-08-25).
 				// allowRepeat: after a swipe the page's READ NEXT can list the
 				// story this entry was opened for (pager, 2026-08-31).
-				onOpenArticle: { id in pushInstant(.newsDetail(article: id), allowRepeat: true) }
+				onOpenArticle: { id in pushInstant(.newsDetail(article: id), allowRepeat: true) },
+				// Only the top of the pushed stack owns a live hero player.
+				isTop: isTop
 			)
 		case .stockDetail(let fromMyStak, let symbol):
 			StockDetailView(

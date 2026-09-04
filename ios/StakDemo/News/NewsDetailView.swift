@@ -39,6 +39,11 @@ struct NewsDetailView: View {
 	var onViewInMyStak: () -> Void = {}
 	/// READ NEXT rows push the next story's article (user, 2026-08-25).
 	var onOpenArticle: (String) -> Void = { _ in }
+	/// This screen is the TOP of the shell's pushed stack. A READ NEXT push
+	/// covers the previous article without unmounting it, so the shell
+	/// passes false to the covered one: its hero releases its player (no
+	/// audio under the new article) and re-warms when Back uncovers it.
+	var isTop: Bool = true
 
 	/// SWIPE DIRECTION - the one place to flip it. `true` is the standard
 	/// pager convention: a finger swipe to the LEFT snaps to the NEXT story,
@@ -58,11 +63,12 @@ struct NewsDetailView: View {
 	/// The story whose save-success sheet is up (nil = none).
 	@State private var successId: String? = nil
 
-	init(articleId: String = NewsArticleFeed.apple, onBack: @escaping () -> Void, onViewInMyStak: @escaping () -> Void = {}, onOpenArticle: @escaping (String) -> Void = { _ in }) {
+	init(articleId: String = NewsArticleFeed.apple, onBack: @escaping () -> Void, onViewInMyStak: @escaping () -> Void = {}, onOpenArticle: @escaping (String) -> Void = { _ in }, isTop: Bool = true) {
 		self.articleId = articleId
 		self.onBack = onBack
 		self.onViewInMyStak = onViewInMyStak
 		self.onOpenArticle = onOpenArticle
+		self.isTop = isTop
 		// The feed's canonical order; a story outside it (never, in the demo)
 		// still opens - as the only page.
 		let order = NewsArticleFeed.pageOrder
@@ -108,7 +114,9 @@ struct NewsDetailView: View {
 						let id = pages[i]
 						NewsArticlePage(
 							article: NewsArticleFeed.article(id),
-							isActive: index == i,
+							// Live hero only on the current page of the TOP screen:
+							// a covered article (READ NEXT) releases its player.
+							isActive: isTop && index == i,
 							saved: savedIds.contains(id),
 							onSave: { save(id) },
 							// Designer's call (2026-08-22): the sheet scale-ins.

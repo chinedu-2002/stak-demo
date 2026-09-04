@@ -194,11 +194,23 @@ private fun TopNav(onProfile: () -> Unit, modifier: Modifier = Modifier) {
 						onClick = onProfile,
 					),
 			) {
-				Image(
-					painter = painterResource(R.drawable.ic_nav_person),
-					contentDescription = "Profile",
-					modifier = Modifier.size((12.99 * u).dp, (13.64 * u).dp),
-				)
+				// The picked photo when one exists (Codex audit 2026-09-04),
+				// as on the Profile hub; else the authored glyph (118:1633).
+				val photo = com.stak.demo.ui.UserProfile.photoUri
+				if (photo != null) {
+					coil.compose.AsyncImage(
+						model = photo,
+						contentDescription = "Profile",
+						contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+						modifier = Modifier.size((35 * u).dp).clip(CircleShape),
+					)
+				} else {
+					Image(
+						painter = painterResource(R.drawable.ic_nav_person),
+						contentDescription = "Profile",
+						modifier = Modifier.size((12.99 * u).dp, (13.64 * u).dp),
+					)
+				}
 			}
 		}
 		Spacer(modifier = Modifier.height((10 * u).dp))
@@ -608,7 +620,7 @@ private fun FirstRunOverlay(onSeeTodaysPick: () -> Unit, modifier: Modifier = Mo
 				),
 		) {
 			Text(
-				text = "See Todays Pick",
+				text = "See Today’s Pick",
 				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp),
 				color = Color.White,
 			)

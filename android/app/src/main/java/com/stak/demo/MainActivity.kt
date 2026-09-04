@@ -45,7 +45,14 @@ class MainActivity : ComponentActivity() {
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-		enableEdgeToEdge()
+		// The app is navy on every screen: force LIGHT status/navigation-bar
+		// icons. The parameterless call picks icon colours from the device
+		// theme, so a light-themed phone got black icons on the navy header
+		// (Codex audit 2026-09-04). iOS pins the same via UIUserInterfaceStyle.
+		enableEdgeToEdge(
+			statusBarStyle = androidx.activity.SystemBarStyle.dark(android.graphics.Color.TRANSPARENT),
+			navigationBarStyle = androidx.activity.SystemBarStyle.dark(android.graphics.Color.TRANSPARENT),
+		)
 		ContextCompat.registerReceiver(
 			this, pipControls, IntentFilter(NewsPip.ACTION), ContextCompat.RECEIVER_NOT_EXPORTED,
 		)

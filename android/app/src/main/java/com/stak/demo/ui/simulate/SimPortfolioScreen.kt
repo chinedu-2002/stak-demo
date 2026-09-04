@@ -71,9 +71,15 @@ private val PICKS = listOf(
 /**
  * 07 · Simulate — "Final · Portfolio · paper" (CHINEDU 1:4496) with the
  * Sell NVDA? confirm (1:4698) and Position closed (73:855) sheets.
+ * Mirrors ios/StakDemo/Simulate/SimPortfolioView.swift.
  */
 @Composable
-fun SimPortfolioScreen(onBack: () -> Unit, onOpenPick: () -> Unit) {
+fun SimPortfolioScreen(
+	onBack: () -> Unit,
+	// Codex parity audit (2026-09-04): every row (and its Sell pill) opens
+	// ITS pick - the row's ticker rides to PickDetailScreen.
+	onOpenPick: (String) -> Unit,
+) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	var showSell by rememberSaveable { mutableStateOf(false) }
 	var showClosed by rememberSaveable { mutableStateOf(false) }
@@ -134,11 +140,11 @@ fun SimPortfolioScreen(onBack: () -> Unit, onOpenPick: () -> Unit) {
 					PortfolioRow(
 						badge = p.badge, ticker = p.ticker, sub = p.sub,
 						amount = p.amount, pct = p.pct, up = p.up,
-						onClick = onOpenPick,
+						onClick = { onOpenPick(p.ticker) },
 						// B16 (1:4496 Motion): the Sell pill opens the Pick detail
 						// - the authored sell flow lives there; the in-page
 						// sheets below stay built but unwired.
-						trailing = { SellPill(onClick = onOpenPick) },
+						trailing = { SellPill(onClick = { onOpenPick(p.ticker) }) },
 					)
 				}
 				Box(
@@ -161,14 +167,17 @@ fun SimPortfolioScreen(onBack: () -> Unit, onOpenPick: () -> Unit) {
 				)
 			}
 		}
+		// The unwired in-page host keeps the frame's NVDA (1:4698 / 73:855).
 		if (showSell) {
 			SellConfirmSheet(
+				pick = pickSpec("NVDA"),
 				onConfirm = { showSell = false; showClosed = true },
 				onDismiss = { showSell = false },
 			)
 		}
 		if (showClosed) {
 			PositionClosedSheet(
+				pick = pickSpec("NVDA"),
 				onBackToSimulate = { showClosed = false; onBack() },
 				onViewPortfolio = { showClosed = false },
 			)
@@ -280,8 +289,9 @@ private fun SimSheet(onDismiss: () -> Unit, content: @Composable () -> Unit) {
 	}
 }
 
+/** The sell sheets' stock row (1:4698) - the tapped pick's name, price and day move. */
 @Composable
-private fun NvdaSellRow() {
+private fun PickSellRow(pick: PickSpec) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Row(
 		verticalAlignment = Alignment.CenterVertically,
@@ -293,31 +303,35 @@ private fun NvdaSellRow() {
 			.padding(horizontal = (14 * u).dp, vertical = (12 * u).dp),
 	) {
 		Box(contentAlignment = Alignment.Center, modifier = Modifier.size((38 * u).dp).background(Sim.ChipBg, CircleShape)) {
-			Text("N", style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp), color = Sim.BadgeInk)
+			Text(pick.badge, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp), color = Sim.BadgeInk)
 		}
 		Column(verticalArrangement = Arrangement.spacedBy((2 * u).dp), modifier = Modifier.weight(1f)) {
-			Text("NVIDIA Corp", style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp), color = Color.White)
-			Text("$122.10 today", style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp), color = Sim.Muted)
+			Text(pick.company, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp), color = Color.White)
+			Text("${pick.priceNow} today", style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp), color = Sim.Muted)
 		}
-		Text("▲ 2.4%", style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp), color = Sim.Green)
+		Text(
+			pick.dayChange,
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp),
+			color = if (pick.dayChange.startsWith("▼")) Sim.Red else Sim.Green,
+		)
 	}
 }
 
-/** "Sell NVDA?" confirm sheet content (1:4698). */
+/** "Sell NVDA?" confirm sheet content (1:4698), templated on the tapped pick. */
 @Composable
-private fun SellConfirmContent(onConfirm: () -> Unit, onDismiss: () -> Unit) {
+private fun SellConfirmContent(pick: PickSpec, onConfirm: () -> Unit, onDismiss: () -> Unit) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	var mode by rememberSaveable { mutableIntStateOf(0) }
 	Column(verticalArrangement = Arrangement.spacedBy((14 * u).dp), modifier = Modifier.fillMaxWidth()) {
 		Text(
-			"Sell NVDA?",
+			"Sell ${pick.symbol}?",
 			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (18 * u).sp),
 			color = Color.White,
 		)
-		NvdaSellRow()
+		PickSellRow(pick)
 		Row(horizontalArrangement = Arrangement.spacedBy((6 * u).dp)) {
 			Text(
-				"You hold 1.0152 shares from your $100 stake.",
+				"You hold ${pick.shares} shares from your $100 stake.",
 				style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp, lineHeight = (18 * u).sp),
 				color = Sim.Body,
 			)
@@ -325,7 +339,7 @@ private fun SellConfirmContent(onConfirm: () -> Unit, onDismiss: () -> Unit) {
 		Row(horizontalArrangement = Arrangement.spacedBy((6 * u).dp)) {
 			Text("Position value", style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp), color = Sim.Muted)
 			Text(
-				"$124.00",
+				pick.stakeValue,
 				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp),
 				color = Sim.Bright,
 			)
@@ -364,7 +378,7 @@ private fun SellConfirmContent(onConfirm: () -> Unit, onDismiss: () -> Unit) {
 		) {
 			Text("Returning", style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp), color = Sim.Muted)
 			Text(
-				"$124.00",
+				pick.stakeValue,
 				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp),
 				color = Sim.Bright,
 			)
@@ -409,9 +423,9 @@ private fun SellConfirmContent(onConfirm: () -> Unit, onDismiss: () -> Unit) {
 	}
 }
 
-/** "Position closed" success sheet content (73:855). */
+/** "Position closed" success sheet content (73:855), templated on the tapped pick. */
 @Composable
-private fun PositionClosedContent(onBackToSimulate: () -> Unit, onViewPortfolio: () -> Unit) {
+private fun PositionClosedContent(pick: PickSpec, onBackToSimulate: () -> Unit, onViewPortfolio: () -> Unit) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Column(
 		horizontalAlignment = Alignment.CenterHorizontally,
@@ -424,9 +438,9 @@ private fun PositionClosedContent(onBackToSimulate: () -> Unit, onViewPortfolio:
 			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (18 * u).sp),
 			color = Color.White,
 		)
-		NvdaSellRow()
+		PickSellRow(pick)
 		Text(
-			"Sold 1.0152 shares from your $100 stake.",
+			"Sold ${pick.shares} shares from your $100 stake.",
 			style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp, lineHeight = (18 * u).sp),
 			color = Sim.Body,
 			modifier = Modifier.fillMaxWidth(),
@@ -434,7 +448,7 @@ private fun PositionClosedContent(onBackToSimulate: () -> Unit, onViewPortfolio:
 		Row(horizontalArrangement = Arrangement.spacedBy((6 * u).dp), modifier = Modifier.fillMaxWidth()) {
 			Text("Proceeds", style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp), color = Sim.Muted)
 			Text(
-				"$124.00",
+				pick.stakeValue,
 				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp),
 				color = Sim.Bright,
 			)
@@ -443,11 +457,11 @@ private fun PositionClosedContent(onBackToSimulate: () -> Unit, onViewPortfolio:
 		Row(horizontalArrangement = Arrangement.spacedBy((6 * u).dp, Alignment.CenterHorizontally), modifier = Modifier.fillMaxWidth()) {
 			Text("Returned", style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp), color = Sim.Muted)
 			Text(
-				"$124.00",
+				pick.stakeValue,
 				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp),
 				color = Sim.Bright,
 			)
-			Text("to your cash (+$24.00)", style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp), color = Sim.Muted)
+			Text("to your cash (${pick.gain})", style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp), color = Sim.Muted)
 		}
 		Column(verticalArrangement = Arrangement.spacedBy((16 * u).dp), modifier = Modifier.fillMaxWidth()) {
 			Box(
@@ -505,14 +519,14 @@ private fun PositionClosedContent(onBackToSimulate: () -> Unit, onViewPortfolio:
 
 /** "Sell NVDA?" confirm sheet (1:4698) — kept for the in-page host. */
 @Composable
-private fun SellConfirmSheet(onConfirm: () -> Unit, onDismiss: () -> Unit) {
-	SimSheet(onDismiss = onDismiss) { SellConfirmContent(onConfirm = onConfirm, onDismiss = onDismiss) }
+private fun SellConfirmSheet(pick: PickSpec, onConfirm: () -> Unit, onDismiss: () -> Unit) {
+	SimSheet(onDismiss = onDismiss) { SellConfirmContent(pick = pick, onConfirm = onConfirm, onDismiss = onDismiss) }
 }
 
 /** "Position closed" success sheet (73:855) — kept for the in-page host. */
 @Composable
-private fun PositionClosedSheet(onBackToSimulate: () -> Unit, onViewPortfolio: () -> Unit) {
-	SimSheet(onDismiss = onViewPortfolio) { PositionClosedContent(onBackToSimulate = onBackToSimulate, onViewPortfolio = onViewPortfolio) }
+private fun PositionClosedSheet(pick: PickSpec, onBackToSimulate: () -> Unit, onViewPortfolio: () -> Unit) {
+	SimSheet(onDismiss = onViewPortfolio) { PositionClosedContent(pick = pick, onBackToSimulate = onBackToSimulate, onViewPortfolio = onViewPortfolio) }
 }
 
 /**
@@ -523,6 +537,8 @@ private fun PositionClosedSheet(onBackToSimulate: () -> Unit, onViewPortfolio: (
  */
 @Composable
 internal fun SellFlowHost(
+	// Codex parity audit (2026-09-04): the sheets sell the TAPPED pick.
+	pick: PickSpec,
 	onClose: () -> Unit,
 	// B19: hosts route the success CTAs to their authored edges; left
 	// alone they fall back to a plain close.
@@ -545,9 +561,9 @@ internal fun SellFlowHost(
 			label = "sellMorph",
 		) { isClosed ->
 			if (!isClosed) {
-				SellConfirmContent(onConfirm = { closed = true }, onDismiss = onClose)
+				SellConfirmContent(pick = pick, onConfirm = { closed = true }, onDismiss = onClose)
 			} else {
-				PositionClosedContent(onBackToSimulate = onBackToSimulate, onViewPortfolio = onViewPortfolio)
+				PositionClosedContent(pick = pick, onBackToSimulate = onBackToSimulate, onViewPortfolio = onViewPortfolio)
 			}
 		}
 	}

@@ -26,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -73,6 +74,24 @@ internal val PLTR_BUY = BuySpec(
 	"$8,800.00", "$8,775.00", "0.8803", "PLTR",
 )
 
+// Codex parity audit (2026-09-04): the COST row's Buy serves COST into the
+// same 1:4232 ticket template - a $25 paper order like PLTR's. Mirrors
+// ios/StakDemo/Simulate/SimulateView.swift.
+internal val COST_BUY = BuySpec(
+	"Buy COST?", "C", "Costco Wholesale", "$947.20 today", "▲ 0.7%",
+	"$8,800.00", "$8,775.00", "0.0264", "COST",
+)
+
+/** The Saved-staks tickets, by symbol; an unknown symbol falls back to the frame's PLTR. */
+internal fun simBuySpec(symbol: String): BuySpec = listOf(PLTR_BUY, COST_BUY).firstOrNull { it.symbol == symbol } ?: PLTR_BUY
+
+// A BuySpec is not Saveable - a raised ticket survives by its symbol and
+// is re-served from simBuySpec on restore.
+internal val SimBuySpecSaver: Saver<BuySpec?, String> = Saver(
+	save = { it?.symbol },
+	restore = { simBuySpec(it) },
+)
+
 /**
  * 07 · Simulate — "Simulate home · paper" (CHINEDU 1:3898) with the
  * Buy-PLTR ticket (1:4232) and Order filled (85:895). The paper-money
@@ -80,18 +99,24 @@ internal val PLTR_BUY = BuySpec(
  * insight, best/worst duo, how-paper-trading-works, portfolio rows,
  * the allocation breakdown and this week's board.
  */
+// `internal` because the hoisted ticket callback carries the internal BuySpec.
 @Composable
-fun SimulateScreen(
+internal fun SimulateScreen(
 	onOpenPortfolio: () -> Unit,
-	onOpenPick: () -> Unit,
+	// Codex parity audit (2026-09-04): pick rows and the best/worst duo
+	// open THEIR pick - the tapped ticker rides to PickDetailScreen.
+	onOpenPick: (String) -> Unit,
 	onOpenLeaderboard: () -> Unit,
-	// When the shell hosts the ticket (1:4232: the sheet covers the tab bar), it raises it here.
-	onPracticeBuy: (() -> Unit)? = null,
+	// When the shell hosts the ticket (1:4232: the sheet covers the tab bar),
+	// it raises it here with the tapped row's spec (PLTR_BUY / COST_BUY).
+	onPracticeBuy: ((BuySpec) -> Unit)? = null,
 	// B14 (1:3964 Motion): "All saved staks ›" hops to the My STAK tab.
 	onOpenMyStak: () -> Unit = {},
 ) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
-	var showBuy by rememberSaveable { mutableStateOf(false) }
+	// The in-page ticket: null = closed, else the tapped row's spec.
+	var buySpec by rememberSaveable(stateSaver = SimBuySpecSaver) { mutableStateOf<BuySpec?>(null) }
+	val practiceBuy: (BuySpec) -> Unit = onPracticeBuy ?: { buySpec = it }
 
 	Box(modifier = Modifier.fillMaxSize().background(StakColors.Bg)) {
 		Column(modifier = Modifier.fillMaxSize()) {
@@ -135,19 +160,19 @@ fun SimulateScreen(
 			) {
 				ScoreHero(onOpenLeaderboard = onOpenLeaderboard)
 				SectionHeader("Saved staks")
-				SavedStakRow("P", "PLTR", "Saved Jun 30 · not in portfolio yet", onBuy = { if (onPracticeBuy != null) onPracticeBuy() else showBuy = true })
-				SavedStakRow("C", "COST", "Saved Jul 2 · not in portfolio yet", onBuy = { if (onPracticeBuy != null) onPracticeBuy() else showBuy = true })
+				SavedStakRow("P", "PLTR", "Saved Jun 30 · not in portfolio yet", spec = PLTR_BUY, onBuy = practiceBuy)
+				SavedStakRow("C", "COST", "Saved Jul 2 · not in portfolio yet", spec = COST_BUY, onBuy = practiceBuy)
 				CenterLink("All saved staks", onClick = onOpenMyStak)
 				InsightCard()
 				Row(horizontalArrangement = Arrangement.spacedBy((10 * u).dp)) {
-					PickDuo("BEST PICK", "+24.0%", Sim.Green, "N", "NVDA", "+$24 on $100", Modifier.weight(1f), onOpenPick)
-					PickDuo("WORST PICK", "-3.0%", Sim.Red, "M", "MSFT", "-$3 on $100", Modifier.weight(1f), onOpenPick)
+					PickDuo("BEST PICK", "+24.0%", Sim.Green, "N", "NVDA", "+$24 on $100", Modifier.weight(1f)) { onOpenPick("NVDA") }
+					PickDuo("WORST PICK", "-3.0%", Sim.Red, "M", "MSFT", "-$3 on $100", Modifier.weight(1f)) { onOpenPick("MSFT") }
 				}
 				HowItWorksCard()
 				SectionHeader("Your portfolio")
-				PortfolioRow("N", "NVDA", "Picked May 8 · up 24% since", "+$24.00", "+24.0%", true, onOpenPick)
-				PortfolioRow("T", "TSLA", "Picked Jun 3 · up 18% since", "+$18.00", "+18.0%", true, onOpenPick)
-				PortfolioRow("M", "MSFT", "Picked Jun 26 · down 3% since", "-$3.00", "-3.0%", false, onOpenPick)
+				PortfolioRow("N", "NVDA", "Picked May 8 · up 24% since", "+$24.00", "+24.0%", true, onClick = { onOpenPick("NVDA") })
+				PortfolioRow("T", "TSLA", "Picked Jun 3 · up 18% since", "+$18.00", "+18.0%", true, onClick = { onOpenPick("TSLA") })
+				PortfolioRow("M", "MSFT", "Picked Jun 26 · down 3% since", "-$3.00", "-3.0%", false, onClick = { onOpenPick("MSFT") })
 				CenterLink("See all 12 picks", onClick = onOpenPortfolio)
 				Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
 					Text(
@@ -181,9 +206,9 @@ fun SimulateScreen(
 				BoardCard(onOpenLeaderboard = onOpenLeaderboard)
 			}
 		}
-		if (showBuy) {
+		buySpec?.let { spec ->
 			// 85:895 authors "View portfolio" / "Done" on the Simulate add-success sheet.
-			DiscoverBuyFlow(onClose = { showBuy = false }, spec = PLTR_BUY, filledPrimary = "View portfolio", filledSecondary = "Done", ticketSecondary = "Back")
+			DiscoverBuyFlow(onClose = { buySpec = null }, spec = spec, filledPrimary = "View portfolio", filledSecondary = "Done", ticketSecondary = "Back")
 		}
 	}
 }
@@ -307,9 +332,9 @@ private fun ScoreHero(onOpenLeaderboard: () -> Unit) {
 	}
 }
 
-/** Saved stak row — badge, ticker + saved line, teal Buy pill (60x30). */
+/** Saved stak row — badge, ticker + saved line, teal Buy pill (60x30); Buy raises the row's own ticket. */
 @Composable
-private fun SavedStakRow(badge: String, ticker: String, sub: String, onBuy: () -> Unit) {
+private fun SavedStakRow(badge: String, ticker: String, sub: String, spec: BuySpec, onBuy: (BuySpec) -> Unit) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Row(
 		verticalAlignment = Alignment.CenterVertically,
@@ -327,7 +352,7 @@ private fun SavedStakRow(badge: String, ticker: String, sub: String, onBuy: () -
 			Text(ticker, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp), color = Color.White)
 			Text(sub, style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp), color = Sim.Muted)
 		}
-		BuyPill(onClick = onBuy)
+		BuyPill(onClick = { onBuy(spec) })
 	}
 }
 

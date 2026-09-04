@@ -86,6 +86,8 @@ private object Disc {
 	val Body = Color(0xFFC8D2E0)
 	val Teal = Color(0xFF69B3CA)
 	val Green = Color(0xFF2FD08A)
+	/** Down moves on a ticket (Codex parity audit 2026-09-04) - the Simulate red. */
+	val Red = Color(0xFFFF5A6A)
 	val ChipBg = Color(0xFF242B3D)
 	val Divider = Color(0xFF2A3346)
 	val BadgeInk = Color(0xFF9EADC7)
@@ -784,7 +786,7 @@ private fun NvdaStockRow(spec: BuySpec = NVDA_BUY) {
 		Text(
 			text = spec.change,
 			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
-			color = Disc.Green,
+			color = if (spec.change.startsWith("▼")) Disc.Red else Disc.Green,
 		)
 	}
 }

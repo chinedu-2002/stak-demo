@@ -33,6 +33,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.stak.demo.ui.components.MainTab
 import com.stak.demo.ui.components.MainTabBar
+import com.stak.demo.ui.discover.BuySpec
 import com.stak.demo.ui.discover.DiscoverBuyFlow
 import com.stak.demo.ui.discover.DiscoverScreen
 import com.stak.demo.ui.discover.StockDetailScreen
@@ -43,6 +44,7 @@ import com.stak.demo.ui.news.NewsDetailScreen
 import com.stak.demo.ui.profile.ProfileScreen
 import com.stak.demo.ui.simulate.LeaderboardScreen
 import com.stak.demo.ui.simulate.PickDetailScreen
+import com.stak.demo.ui.simulate.SimBuySpecSaver
 import com.stak.demo.ui.simulate.SimPortfolioScreen
 import com.stak.demo.ui.simulate.SimulateScreen
 import com.stak.demo.ui.news.NewsScreen
@@ -356,10 +358,10 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
 				pendingTab = pendingShellTab,
 				onOpenArticle = { id -> navController.navigate(StakRoutes.newsDetail(id)) },
 				onOpenStock = { symbol -> navController.navigate(StakRoutes.stockDetail(symbol)) },
-				onOpenCollection = { navController.navigate(StakRoutes.COLLECTION) },
+				onOpenCollection = { id -> navController.navigate(StakRoutes.collection(id)) },
 				onOpenProfile = { navController.navigate(StakRoutes.PROFILE) },
 				onOpenSimPortfolio = { navController.navigate(StakRoutes.SIM_PORTFOLIO) },
-				onOpenSimPick = { navController.navigate(StakRoutes.SIM_PICK) },
+				onOpenSimPick = { symbol -> navController.navigate(StakRoutes.simPick(symbol)) },
 				onOpenLeaderboard = { navController.navigate(StakRoutes.LEADERBOARD) },
 				// B20 (85:895 Motion): the ticket's View portfolio pushes the
 				// portfolio with the house forward push over the leaving shell.
@@ -405,10 +407,13 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
 			exitTransition = { ExitTransition.None },
 			popEnterTransition = { popEnterFor(shellPop.value, instantRoute = true) },
 			popExitTransition = { popExitFor(shellPop.value, instantRoute = true) },
-		) {
+		) { entry ->
 			CollectionScreen(
+				// Codex parity audit (2026-09-04): the chip's id rides the
+				// route so the page serves THAT collection (aitech = frame).
+				collectionId = entry.arguments?.getString("id") ?: "aitech",
 				onBack = { navController.popBackStack() },
-				onOpenStock = { navController.navigate(StakRoutes.MYSTAK_STOCK) },
+				onOpenStock = { symbol -> navController.navigate(StakRoutes.myStakStock(symbol)) },
 			)
 		}
 		composable(
@@ -419,9 +424,12 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
 			exitTransition = { ExitTransition.None },
 			popEnterTransition = { EnterTransition.None },
 			popExitTransition = { popExitFor(shellPop.value, instantRoute = true) },
-		) {
+		) { entry ->
 			StockDetailScreen(
 				onBack = { navController.popBackStack() },
+				// Codex parity audit (2026-09-04): the tapped tile's ticker,
+				// same as the Discover deck's Learn more (STOCK_DETAIL above).
+				symbol = entry.arguments?.getString("symbol") ?: "AAPL",
 				fromMyStak = true,
 				// B13 (71:949/71:994 Motion): View in My STAK forward-pushes
 				// the Overview - the detail (and Collection) pop to the shell.
@@ -447,7 +455,7 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
 		) {
 			SimPortfolioScreen(
 				onBack = { navController.popBackStack() },
-				onOpenPick = { navController.navigate(StakRoutes.SIM_PICK) },
+				onOpenPick = { symbol -> navController.navigate(StakRoutes.simPick(symbol)) },
 			)
 		}
 		composable(
@@ -461,8 +469,11 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
 			},
 			popEnterTransition = { EnterTransition.None },
 			popExitTransition = { popExitFor(shellPop.value, instantRoute = true) },
-		) {
+		) { entry ->
 			PickDetailScreen(
+				// Codex parity audit (2026-09-04): the tapped pick's ticker,
+				// same as the Discover deck's Learn more (STOCK_DETAIL above).
+				symbol = entry.arguments?.getString("symbol") ?: "NVDA",
 				// B17 (1:4631 Motion): both Back buttons land on the
 				// Portfolio, Instant - even from Simulate home. If the
 				// Portfolio is not below, replace the pick with it so its
@@ -607,10 +618,11 @@ private fun MainShell(
 	pendingTab: MutableState<MainTab?>,
 	onOpenArticle: (String) -> Unit,
 	onOpenStock: (String) -> Unit,
-	onOpenCollection: () -> Unit,
+	onOpenCollection: (String) -> Unit,
 	onOpenProfile: () -> Unit,
 	onOpenSimPortfolio: () -> Unit,
-	onOpenSimPick: () -> Unit,
+	// Codex parity audit (2026-09-04): the tapped pick's ticker.
+	onOpenSimPick: (String) -> Unit,
 	onOpenLeaderboard: () -> Unit,
 	onViewSimPortfolio: () -> Unit,
 ) {
@@ -634,6 +646,10 @@ private fun MainShell(
 	var homeFirstRun by rememberSaveable { mutableStateOf(!com.stak.demo.ui.Session.resumedSignedIn) }
 	var discoverBuy by rememberSaveable { mutableStateOf(false) }
 	var simulateBuy by rememberSaveable { mutableStateOf(false) }
+	// Codex parity audit (2026-09-04): the Simulate ticket serves the TAPPED
+	// saved stak (PLTR_BUY / COST_BUY into the 1:4232 template). Held past
+	// the close so a sheet riding out with the page (B20) keeps its stock.
+	var simulateBuySpec by rememberSaveable(stateSaver = SimBuySpecSaver) { mutableStateOf<BuySpec?>(null) }
 	// Key each raise of a buy overlay: a `filled` state saved while a ticket rides
 	// out with the leaving page must never be restored into a fresh ticket.
 	var discoverBuyGen by rememberSaveable { mutableStateOf(0) }
@@ -697,7 +713,7 @@ private fun MainShell(
 							onReviewSaves = { switchTab(MainTab.MySTAK) },
 						)
 						MainTab.Simulate -> SimulateScreen(
-							onPracticeBuy = { simulateBuyGen++; simulateBuyDissolve = false; simulateBuy = true },
+							onPracticeBuy = { spec -> simulateBuySpec = spec; simulateBuyGen++; simulateBuyDissolve = false; simulateBuy = true },
 							onOpenPortfolio = onOpenSimPortfolio,
 							onOpenPick = onOpenSimPick,
 							onOpenLeaderboard = onOpenLeaderboard,
@@ -753,7 +769,7 @@ private fun MainShell(
 					androidx.compose.runtime.key(simulateBuyGen) {
 					DiscoverBuyFlow(
 						onClose = { simulateBuy = false },
-						spec = com.stak.demo.ui.simulate.PLTR_BUY,
+						spec = simulateBuySpec ?: com.stak.demo.ui.simulate.PLTR_BUY,
 						filledPrimary = "View portfolio",
 						filledSecondary = "Done",
 						ticketSecondary = "Back",

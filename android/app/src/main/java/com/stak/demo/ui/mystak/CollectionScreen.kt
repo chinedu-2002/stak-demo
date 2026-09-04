@@ -50,28 +50,19 @@ private val Green = Color(0xFF2FD08A)
 private val RedDown = Color(0xFFE5484D)
 private val BadgeInk = Color(0xFF9EADC7)
 
-private data class CollStock(
-	val badge: String, val change: String, val up: Boolean,
-	val ticker: String, val company: String, val price: String,
-)
-
-private val STOCKS = listOf(
-	CollStock("N", "▲ 2.4%", true, "NVDA", "NVIDIA", "$122.10"),
-	CollStock("A", "▲ 1.2%", true, "AAPL", "Apple", "$229.35"),
-	CollStock("M", "▼ 0.4%", false, "MSFT", "Microsoft", "$438.20"),
-	CollStock("G", "▲ 0.8%", true, "GOOGL", "Alphabet", "$178.90"),
-	CollStock("A", "▲ 2.1%", true, "AMD", "Adv Micro", "$164.30"),
-)
-
 /**
  * 06 · My STAK — "Collection · Cards A · corrected" (CHINEDU 1:3333).
- * The AI & Tech collection: hero (glass art, title, meta, blurb) and
- * the stock-tile grid with the dashed Add-stock card. Every stock card
- * opens the saved Stock Detail - 1:3375's edge is the template (B11).
+ * The authored AI & Tech layout - hero (glass art, title, meta, blurb)
+ * and the stock-tile grid with the dashed Add-stock card - served with
+ * the TAPPED collection's data from Collections.kt (Codex parity audit,
+ * 2026-09-04; unknown ids fall back to AI & Tech). Every stock card
+ * opens ITS saved Stock Detail - 1:3375's edge is the template (B11).
+ * Mirrors ios/StakDemo/MyStak/CollectionView.swift.
  */
 @Composable
-fun CollectionScreen(onBack: () -> Unit, onOpenStock: () -> Unit) {
+fun CollectionScreen(collectionId: String, onBack: () -> Unit, onOpenStock: (String) -> Unit) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
+	val c = collection(collectionId)
 	Column(modifier = Modifier.fillMaxSize().background(StakColors.Bg)) {
 		Row(
 			verticalAlignment = Alignment.CenterVertically,
@@ -84,7 +75,7 @@ fun CollectionScreen(onBack: () -> Unit, onOpenStock: () -> Unit) {
 			AuthBackCircle(onClick = onBack)
 			Spacer(modifier = Modifier.weight(1f))
 			Text(
-				text = "AI & Tech",
+				text = c.name,
 				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp),
 				color = Color.White,
 			)
@@ -106,20 +97,32 @@ fun CollectionScreen(onBack: () -> Unit, onOpenStock: () -> Unit) {
 				.padding(top = (16 * u).dp, bottom = (26 * u).dp),
 		) {
 			Column(verticalArrangement = Arrangement.spacedBy((10 * u).dp)) {
-				Image(
-					painter = painterResource(R.drawable.ms_coll_aitech),
-					contentDescription = null,
-					contentScale = ContentScale.Crop,
-					modifier = Modifier.size((60 * u).dp),
-				)
+				if (c.imageRes != null) {
+					Image(
+						painter = painterResource(c.imageRes),
+						contentDescription = null,
+						contentScale = ContentScale.Crop,
+						modifier = Modifier.size((60 * u).dp),
+					)
+				} else if (c.iconRes != null) {
+					// Codex parity audit (2026-09-04): a collection without
+					// glass art centres its chip icon (1:3155) at the chip's own
+					// 36 inside the authored 60 hero frame, so title/meta/blurb
+					// keep their positions. Mirrors ios CollectionView.
+					Box(contentAlignment = Alignment.Center, modifier = Modifier.size((60 * u).dp)) {
+						Image(painterResource(c.iconRes), null, modifier = Modifier.size((36 * u).dp))
+					}
+				}
 				Text(
-					text = "AI & Tech",
+					text = c.name,
 					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (26 * u).sp),
 					color = Color.White,
 				)
 				Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy((7 * u).dp)) {
-					Text("5 stocks", style = TextStyle(fontFamily = Geist, fontSize = (13 * u).sp), color = Muted)
+					Text(c.countLabel, style = TextStyle(fontFamily = Geist, fontSize = (13 * u).sp), color = Muted)
 					Text("·", style = TextStyle(fontFamily = Geist, fontSize = (13 * u).sp), color = Faint)
+					// The weekly move is not in the shared demo data - the
+					// authored 1:3333 literal stays for every collection.
 					Text(
 						"+2.4% this week",
 						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp),
@@ -127,18 +130,19 @@ fun CollectionScreen(onBack: () -> Unit, onOpenStock: () -> Unit) {
 					)
 				}
 				Text(
-					text = "Your highest-conviction growth and AI names.",
+					text = c.blurb,
 					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (13 * u).sp),
 					color = Color(0xFFC8D2E0),
 				)
 			}
 			Column(verticalArrangement = Arrangement.spacedBy((10 * u).dp), modifier = Modifier.fillMaxWidth()) {
-				STOCKS.chunked(2).forEachIndexed { rowIndex, row ->
+				c.stocks.chunked(2).forEachIndexed { rowIndex, row ->
 					Row(horizontalArrangement = Arrangement.spacedBy((10 * u).dp), modifier = Modifier.fillMaxWidth().height(androidx.compose.foundation.layout.IntrinsicSize.Min)) {
 						row.forEach { stock ->
 							StockTile(
 								stock = stock,
-								onClick = onOpenStock,
+								// B11: the tile opens ITS ticker, not always AAPL.
+								onClick = { onOpenStock(stock.ticker) },
 								modifier = Modifier.weight(1f).fillMaxSize(),
 							)
 						}

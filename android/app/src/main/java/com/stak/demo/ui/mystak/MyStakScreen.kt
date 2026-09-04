@@ -69,7 +69,7 @@ private val CtaGradient = Brush.verticalGradient(
  * "More like your STAK" Discover banner. Tab bar via MainShell.
  */
 @Composable
-fun MyStakScreen(onOpenCollection: () -> Unit, onStartSwiping: () -> Unit) {
+fun MyStakScreen(onOpenCollection: (String) -> Unit, onStartSwiping: () -> Unit) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Column(modifier = Modifier.fillMaxSize().background(StakColors.Bg)) {
 		Column(
@@ -106,17 +106,15 @@ fun MyStakScreen(onOpenCollection: () -> Unit, onStartSwiping: () -> Unit) {
 			Column(verticalArrangement = Arrangement.spacedBy((10 * u).dp), modifier = Modifier.fillMaxWidth()) {
 				// B10 (1:3180 Motion): the sample card's edge is the TEMPLATE -
 				// every collection opens the authored Collection page, Instant.
-				Row(horizontalArrangement = Arrangement.spacedBy((10 * u).dp), modifier = Modifier.fillMaxWidth()) {
-					CollectionChip("AI & Tech", "5 stocks", imageRes = R.drawable.ms_coll_aitech, onClick = onOpenCollection, modifier = Modifier.weight(1f))
-					CollectionChip("Finance", "3 stocks", imageRes = R.drawable.ms_coll_finance, onClick = onOpenCollection, modifier = Modifier.weight(1f))
-				}
-				Row(horizontalArrangement = Arrangement.spacedBy((10 * u).dp), modifier = Modifier.fillMaxWidth()) {
-					CollectionChip("Green Energy", "3 stocks", iconRes = R.drawable.ic_cat_green, onClick = onOpenCollection, modifier = Modifier.weight(1f))
-					CollectionChip("Real Estate", "2 stocks", iconRes = R.drawable.ic_cat_realestate, onClick = onOpenCollection, modifier = Modifier.weight(1f))
-				}
-				Row(horizontalArrangement = Arrangement.spacedBy((10 * u).dp), modifier = Modifier.fillMaxWidth()) {
-					CollectionChip("Healthcare", "4 stocks", iconRes = R.drawable.ic_cat_health, onClick = onOpenCollection, modifier = Modifier.weight(1f))
-					CollectionChip("Consumer", "2 stocks", iconRes = R.drawable.ic_cat_consumer, onClick = onOpenCollection, modifier = Modifier.weight(1f))
+				// Codex parity audit (2026-09-04): each chip carries ITS
+				// catalogue id (Collections.kt) so the page serves that
+				// collection, the way the deck's Learn more serves its stock.
+				COLLECTIONS.chunked(2).forEach { pair ->
+					Row(horizontalArrangement = Arrangement.spacedBy((10 * u).dp), modifier = Modifier.fillMaxWidth()) {
+						pair.forEach { c ->
+							CollectionChip(c.name, c.countLabel, imageRes = c.imageRes, iconRes = c.iconRes, onClick = { onOpenCollection(c.id) }, modifier = Modifier.weight(1f))
+						}
+					}
 				}
 			}
 			Row(
@@ -134,7 +132,8 @@ fun MyStakScreen(onOpenCollection: () -> Unit, onStartSwiping: () -> Unit) {
 			) {
 				Text(
 					text = "Add more",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (16 * u).sp, lineHeight = (21 * u).sp),
+					// Codex parity audit (2026-09-04): 1:3155 sets the CTA at 14.
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp, lineHeight = (21 * u).sp),
 					color = Color.White,
 				)
 				Image(painterResource(R.drawable.ic_plus_small), null, modifier = Modifier.size((14 * u).dp))
@@ -163,7 +162,8 @@ fun MyStakScreen(onOpenCollection: () -> Unit, onStartSwiping: () -> Unit) {
 				)
 				Text(
 					text = "Six of your fourteen picks are tech or AI names. Your STAK skews high-growth, with a small hedge in real estate.",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp, lineHeight = (19 * u).sp),
+					// Codex parity audit (2026-09-04): 1:3155 sets the body at 13.
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (13 * u).sp, lineHeight = (19 * u).sp),
 					color = Body,
 				)
 			}

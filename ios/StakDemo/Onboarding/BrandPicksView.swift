@@ -22,6 +22,9 @@ private let brands: [Brand] = [
 	Brand(name: "Uber", asset: "BrandUber")
 ]
 
+/// The five tiles selected on the authored frame (1554:8541), by brand name.
+private let figmaPicks: Set<String> = ["Apple", "Tesla", "Nike", "Spotify", "Coinbase"]
+
 /// Onboarding · 02 Brand picks — Figma node 1554:8541 (CHINEDU file, "STEP 2 OF 6").
 ///
 /// A 3-wide grid of #181f30 tiles, each a white 34pt circle with the real
@@ -32,7 +35,10 @@ private let brands: [Brand] = [
 struct BrandPicksView: View {
 	let onBack: () -> Void
 	let onContinue: () -> Void
-	@State private var picked: Set<String> = []
+	// The frame (1554:8541) arrives with five brands already picked and the
+	// CTA reading "Continue · 5 picked"; the build starts in that state
+	// (Codex parity audit 2026-09-04). Every tile stays toggleable.
+	@State private var picked: Set<String> = figmaPicks
 
 	var body: some View {
 		let u = figmaUnit

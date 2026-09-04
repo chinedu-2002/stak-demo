@@ -25,8 +25,15 @@ struct MatrixQuizView: View {
 	let options: [MatrixOption]
 	let onBack: () -> Void
 	let onContinue: () -> Void
+	/// The frames arrive with one card already selected (04 Goal 1554:8828,
+	/// 05 Risk 1554:8913); the caller names it (Codex parity audit
+	/// 2026-09-04). -1 = start unselected. Declared last: memberwise-init
+	/// argument order is declaration order, and callers pass it last.
+	var initialSelection: Int = -1
 
-	@State private var selected = -1
+	/// The user's own tap, once made; until then the authored selection shows.
+	@State private var chosen: Int? = nil
+	private var selected: Int { chosen ?? initialSelection }
 
 	var body: some View {
 		let u = figmaUnit
@@ -62,7 +69,7 @@ struct MatrixQuizView: View {
 								ForEach(0..<2) { col in
 									let index = row * 2 + col
 									MatrixCard(option: options[index], selected: selected == index) {
-										selected = index
+										chosen = index
 									}
 								}
 							}

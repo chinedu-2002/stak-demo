@@ -19,7 +19,9 @@ struct RiskView: View {
 				MatrixOption(title: "Sell some, reduce risk", subtitle: "I’d rather protect part of my money", icon: "RiskShield", iconSize: 20, circleSize: 36, iconDy: 9.95)
 			],
 			onBack: onBack,
-			onContinue: onContinue
+			onContinue: onContinue,
+			// 1554:8913 arrives with "Sell some, reduce risk" selected.
+			initialSelection: 3
 		)
 	}
 }

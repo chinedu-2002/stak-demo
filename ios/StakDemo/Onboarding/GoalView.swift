@@ -18,7 +18,9 @@ struct GoalView: View {
 				MatrixOption(title: "Just exploring", subtitle: "Curious, no plan yet", icon: "GoalExplore", iconDy: 9)
 			],
 			onBack: onBack,
-			onContinue: onContinue
+			onContinue: onContinue,
+			// 1554:8828 arrives with "Find my first stocks" selected.
+			initialSelection: 2
 		)
 	}
 }

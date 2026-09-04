@@ -48,13 +48,6 @@ struct NewsView: View {
 		matches(b.title) || matches(b.body) || matches(b.source)
 	}
 
-	private static func todayLabel() -> String {
-		let f = DateFormatter()
-		f.locale = Locale(identifier: "en_US_POSIX")
-		f.dateFormat = "EEEE, MMMM d"
-		return f.string(from: Date())
-	}
-
 	var body: some View {
 		let u = figmaUnit
 		VStack(spacing: 0) {
@@ -63,10 +56,8 @@ struct NewsView: View {
 					Text("News")
 						.font(StakFont.sora(26 * u, .semiBold))
 						.foregroundStyle(StakColors.textPrimary)
-					// The frame's "Saturday, July 4" is the authored example; the
-					// screen shows today (Codex audit 2026-09-04), in the frame's
-					// English format whatever the device locale.
-					Text(Self.todayLabel())
+					// Authored date line (user, 2026-09-04 (CHINEDU 03 · News 1:1228): the authored look wins).
+					Text("Saturday, July 4")
 						.font(StakFont.geist(13 * u))
 						.foregroundStyle(News.muted)
 				}
@@ -150,10 +141,9 @@ private func articleMatches(_ a: NewsArticleFeed.Article, _ q: String) -> Bool {
 	return hit(a.headline) || hit(a.subtitle) || hit(a.source) || a.tags.contains(where: hit) || (a.ticker.map(hit) ?? false)
 }
 
-/// Compact Market Mood row — #171d2c r12 with the small gauge. Both the
-/// status line and the needle are the SAME shared mood state Home shows
-/// (Codex audit 2026-09-04): the row used to hard-code "Low volatility"
-/// over the baked NewsGaugeSmall needle resting in the red band.
+/// Compact Market Mood row — #171d2c r12 with the small low-volatility
+/// gauge (the baked NewsGaugeSmall asset), exactly as authored (user, 2026-09-04 (CHINEDU 03 · News 1:1228): the authored look wins);
+/// Home's card keeps its own live line.
 private struct MoodMiniRow: View {
 	var body: some View {
 		let u = figmaUnit
@@ -162,13 +152,14 @@ private struct MoodMiniRow: View {
 				Text("Market Mood")
 					.font(StakFont.sora(13 * u, .semiBold))
 					.foregroundStyle(StakColors.textPrimary)
-				Text(MarketMoodFeed.statusLead)
+				Text("Low volatility")
 					.font(StakFont.geist(11 * u))
 					.foregroundStyle(News.teal)
 			}
 			Spacer()
-			// The Home gauge drawn at the authored compact size (40.97 x 20.76).
-			MarketMoodGauge(scale: 40.97 / 56.9018)
+			Image("NewsGaugeSmall")
+				.resizable()
+				.frame(width: 40.97 * u, height: 20.76 * u)
 		}
 		.padding(.horizontal, 14 * u)
 		.padding(.vertical, 12 * u)

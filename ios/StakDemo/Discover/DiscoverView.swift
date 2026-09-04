@@ -58,23 +58,18 @@ struct BuySpec {
 		Double(priceLine.split(separator: " ").first.map { $0.replacingOccurrences(of: "$", with: "").replacingOccurrences(of: ",", with: "") } ?? "") ?? 0
 	}
 
-	/// Codex audit (2026-09-04): this ticket at a chosen stake - the shares
-	/// and the cash after follow the amount (cashBefore is the seeded
-	/// $8,800). The authored $25 tickets round-trip byte-identically
-	/// (25/122.10 -> "0.2048", 25/947.20 -> "0.0264"). Mirrors android
+	/// Codex audit (2026-09-04): this ticket at a chosen stake against the
+	/// cash on hand - the shares and the cash after follow the amount, the
+	/// cash before is `cash` (PaperPortfolio.shared.cash when the ticket
+	/// opens; the authored seed is 8800). The authored $25 tickets
+	/// round-trip byte-identically (25/122.10 -> "0.2048", 25/947.20 ->
+	/// "0.0264"; $8,800.00 / $8,775.00). Review (2026-09-04): no cash
+	/// default - the one caller passes it. Mirrors android
 	/// ui/discover/DiscoverScreen.kt.
-	func withAmount(_ amount: Double) -> BuySpec {
-		let cash = NumberFormatter()
-		cash.locale = Locale(identifier: "en_US_POSIX")
-		cash.numberStyle = .decimal
-		cash.usesGroupingSeparator = true
-		cash.minimumFractionDigits = 2
-		cash.maximumFractionDigits = 2
-		cash.roundingMode = .halfUp   // Java's %,.2f rounds half up (android parity)
-		let after = cash.string(from: NSNumber(value: 8800 - amount)).map { "$" + $0 } ?? cashAfter
-		return BuySpec(
+	func withAmount(_ amount: Double, cash: Double) -> BuySpec {
+		BuySpec(
 			title: title, badge: badge, name: name, priceLine: priceLine, change: change,
-			cashBefore: cashBefore, cashAfter: after,
+			cashBefore: PaperPortfolio.money(cash), cashAfter: PaperPortfolio.money(cash - amount),
 			shares: String(format: "%.4f", amount / price), symbol: symbol
 		)
 	}
@@ -892,14 +887,14 @@ struct PracticeBuySheet: View {
 	}
 
 	/// Codex audit (2026-09-04): a typed stake counts once it parses to > 0
-	/// and <= the $8,800 cash available; anything else leaves the last pill
-	/// value standing.
+	/// and <= the cash available (PaperPortfolio; $8,800 seeded); anything
+	/// else leaves the last pill value standing.
 	private func applyCustom() {
 		let raw = customText
 			.replacingOccurrences(of: "$", with: "")
 			.replacingOccurrences(of: ",", with: "")
 			.trimmingCharacters(in: .whitespaces)
-		if let value = Double(raw), value > 0, value <= 8800 { onAmount(value) }
+		if let value = Double(raw), value > 0, value <= PaperPortfolio.shared.cash { onAmount(value) }
 	}
 
 	var body: some View {
@@ -1079,17 +1074,33 @@ struct DiscoverBuyFlow: View {
 	/// ticket AT this amount, so "You get", the cash after and "You now
 	/// hold" agree (1:1970 / 85:1205).
 	@State private var amount: Double = 25
+	/// Codex audit (2026-09-04): the cash on hand when the ticket opened -
+	/// read once, so the receipt's cash after (85:1205) holds still after
+	/// the buy lands in PaperPortfolio.
+	@State private var cashAtOpen: Double = PaperPortfolio.shared.cash
 
 	var body: some View {
-		let live = spec.withAmount(amount)
+		let live = spec.withAmount(amount, cash: cashAtOpen)
 		SheetScaffold(onDismiss: onClose) {
 			ZStack(alignment: .top) {
 				if !filled {
-					PracticeBuySheet(spec: live, onConfirm: { guard !filled else { return }; filled = true; onFilled() }, onDismiss: onTicketSecondary ?? onClose, secondary: ticketSecondary, amount: amount, onAmount: { amount = $0 })
+					// Codex audit (2026-09-04): every host (Discover, Simulate, Stock
+					// Detail) fills through here, so the paper buy lands once, before
+					// the host's onFilled.
+					PracticeBuySheet(spec: live, onConfirm: { guard !filled else { return }; PaperPortfolio.shared.buy(spec, amount: amount); filled = true; onFilled() }, onDismiss: onTicketSecondary ?? onClose, secondary: ticketSecondary, amount: amount, onAmount: { amount = $0 })
 						.transition(.opacity)
 				} else {
-					OrderFilledSheet(spec: live, onDismiss: onClose, primary: filledPrimary, secondary: filledSecondary, onPrimary: onFilledPrimary, onSecondary: onFilledSecondary)
-						.transition(.opacity)
+					// Review (2026-09-04): "You now hold" is the FULL holding after the
+					// buy - a top-up shows the position's shares, not the ticket's.
+					let held = PaperPortfolio.shared.pickSpec(spec.symbol)?.shares ?? live.shares
+					OrderFilledSheet(
+						spec: BuySpec(
+							title: live.title, badge: live.badge, name: live.name, priceLine: live.priceLine, change: live.change,
+							cashBefore: live.cashBefore, cashAfter: live.cashAfter, shares: held, symbol: live.symbol
+						),
+						onDismiss: onClose, primary: filledPrimary, secondary: filledSecondary, onPrimary: onFilledPrimary, onSecondary: onFilledSecondary
+					)
+					.transition(.opacity)
 				}
 			}
 			.animation(.easeOut(duration: 0.35), value: filled)

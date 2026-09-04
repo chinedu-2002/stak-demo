@@ -22,12 +22,16 @@ private let top: [Rank] = [
 	Rank(rank: "5", initial: "K", name: "Kofi B.", picks: "11 picks", pct: "+7.0%")
 ]
 private let near: [Rank] = [
-	Rank(rank: "46", initial: "L", name: "Lena S.", picks: "8 picks", pct: "+4.3%"),
-	Rank(rank: "48", initial: "D", name: "Dami F.", picks: "15 picks", pct: "+4.1%")
+	Rank(rank: "46", initial: "L", name: "Lena S.", picks: "8 picks", pct: "+2.0%"),
+	Rank(rank: "48", initial: "D", name: "Dami F.", picks: "15 picks", pct: "+1.8%")
 ]
 
 struct LeaderboardView: View {
 	let onBack: () -> Void
+
+	/// Codex audit (2026-09-04): the You row quotes PaperPortfolio's week
+	/// figures and pick count - the same numbers as the Simulate hero.
+	@ObservedObject private var portfolio = PaperPortfolio.shared
 
 	var body: some View {
 		let u = figmaUnit
@@ -71,7 +75,7 @@ struct LeaderboardView: View {
 					// You — highlighted with the ▲ spots delta. Teal-tint bg
 					// only, no border (1:4124).
 					HStack(spacing: 11 * u) {
-						Text("47")
+						Text("\(PaperPortfolio.weekRank)")
 							.font(StakFont.sora(16 * u, .semiBold))
 							.foregroundStyle(Sim.teal)
 							.frame(width: 28 * u, alignment: .leading)
@@ -86,13 +90,14 @@ struct LeaderboardView: View {
 							Text("You")
 								.font(StakFont.geist(12 * u, .semiBold))
 								.foregroundStyle(Color.white)
-							Text("12 picks this week")
+							Text("\(portfolio.pickCount) picks this week")
 								.font(StakFont.geist(10 * u))
 								.foregroundStyle(Sim.muted)
 						}
 						.frame(maxWidth: .infinity, alignment: .leading)
 						VStack(alignment: .trailing, spacing: 2 * u) {
-							Text("+4.2%")
+							// Audit item 6: the hero's +1.9% week (1:4124 authored +4.2%).
+							Text(PaperPortfolio.weekPct)
 								.font(StakFont.sora(13 * u, .semiBold))
 								.foregroundStyle(Sim.teal)
 							Text("▲ 12 spots")

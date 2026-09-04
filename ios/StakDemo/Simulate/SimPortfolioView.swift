@@ -5,24 +5,9 @@ import SwiftUI
 /// sheets. Ported from android/ ui/simulate/SimPortfolioScreen.kt.
 /// Every metric is scaled by the 390pt artboard unit (`figmaUnit`),
 /// exactly like the Android build's `u` scaling.
-private struct SimPick {
-	let badge: String
-	let ticker: String
-	let sub: String
-	let amount: String
-	let pct: String
-	let up: Bool
-}
-
-private let picks: [SimPick] = [
-	SimPick(badge: "N", ticker: "NVDA", sub: "Picked May 8 · up 24% since", amount: "+$24.00", pct: "+24.0%", up: true),
-	SimPick(badge: "T", ticker: "TSLA", sub: "Picked Jun 3 · up 18% since", amount: "+$18.00", pct: "+18.0%", up: true),
-	SimPick(badge: "A", ticker: "AMD", sub: "Picked May 29 · up 11% since", amount: "+$11.00", pct: "+11.0%", up: true),
-	SimPick(badge: "A", ticker: "AAPL", sub: "Picked Apr 22 · up 6% since", amount: "+$6.00", pct: "+6.0%", up: true),
-	SimPick(badge: "J", ticker: "JPM", sub: "Picked Jun 20 · up 2% since", amount: "+$2.00", pct: "+2.0%", up: true),
-	SimPick(badge: "M", ticker: "MSFT", sub: "Picked Jun 26 · down 3% since", amount: "-$3.00", pct: "-3.0%", up: false)
-]
-
+/// Codex audit (2026-09-04): the rows (SimPick) and the SOLD · REALIZED
+/// list come from PaperPortfolio - a buy prepends a row, a sell moves it
+/// down here.
 struct SimPortfolioView: View {
 	let onBack: () -> Void
 	/// Codex parity audit (2026-09-04): every row / Sell pill opens ITS
@@ -31,6 +16,7 @@ struct SimPortfolioView: View {
 
 	@State private var showSell = false
 	@State private var showClosed = false
+	@ObservedObject private var portfolio = PaperPortfolio.shared
 
 	var body: some View {
 		let u = figmaUnit
@@ -59,7 +45,7 @@ struct SimPortfolioView: View {
 						// 1:4496 hides the Portfolio-value/$10,240/cash layers —
 						// the visible summary is this one centered 158x32 pill,
 						// filled with the card colour (no hairline).
-						Text("12 picks · +$240.00 all time")
+						Text("\(portfolio.pickCount) picks · +\(PaperPortfolio.money(portfolio.allTimeGain)) all time")
 							.font(StakFont.geist(10 * u))
 							.foregroundStyle(Sim.muted)
 							.frame(width: 158 * u, height: 32 * u)
@@ -70,7 +56,8 @@ struct SimPortfolioView: View {
 							FilterChip(label: "Newest", selected: false)
 							FilterChip(label: "Worst", selected: false)
 						}
-						ForEach(picks, id: \.ticker) { p in
+						ForEach(portfolio.positions) { position in
+							let p = position.row
 							PortfolioRow(
 								badge: p.badge, ticker: p.ticker, sub: p.sub,
 								amount: p.amount, pct: p.pct, up: p.up,
@@ -88,8 +75,9 @@ struct SimPortfolioView: View {
 							.frame(height: 17 * u)
 							.frame(maxWidth: .infinity, alignment: .leading)
 							.padding(.leading, 2 * u)
-						RealizedRow(badge: "S", ticker: "SHOP", sub: "Sold May 30 · profit banked", amount: "+$12.00", up: true)
-						RealizedRow(badge: "C", ticker: "COIN", sub: "Sold Jun 15 · loss realized", amount: "-$8.00", up: false)
+						ForEach(portfolio.realized) { r in
+							RealizedRow(badge: r.badge, ticker: r.ticker, sub: r.sub, amount: r.amount, up: r.up)
+						}
 						Text("Sell a pick and the cash returns to your balance, gain or loss.")
 							.font(StakFont.geist(11 * u))
 							.lineSpacing((14 - 11) * u)
@@ -281,7 +269,8 @@ struct SellConfirmSheet: View {
 					.font(StakFont.sora(18 * u, .semiBold))
 					.foregroundStyle(Color.white)
 				PickSellRow(pick: pick)
-				Text("You hold \(pick.shares) shares from your $100 stake.")
+				// Review (2026-09-04): the pick's own cost basis ("$100" authored).
+				Text("You hold \(pick.shares) shares from your \(pick.stakeBasis) stake.")
 					.font(StakFont.geist(12 * u))
 					.lineSpacing((18 - 12) * u)
 					.foregroundStyle(Sim.body)
@@ -391,7 +380,7 @@ struct PositionClosedSheet: View {
 					.font(StakFont.sora(18 * u, .semiBold))
 					.foregroundStyle(Color.white)
 				PickSellRow(pick: pick)
-				Text("Sold \(pick.shares) shares from your $100 stake.")
+				Text("Sold \(pick.shares) shares from your \(pick.stakeBasis) stake.")
 					.font(StakFont.geist(12 * u))
 					.lineSpacing((18 - 12) * u)
 					.foregroundStyle(Sim.body)
@@ -468,7 +457,10 @@ struct SellFlowHost: View {
 		}) {
 			ZStack(alignment: .top) {
 				if !closed {
-					SellConfirmSheet(pick: pick, onConfirm: { closed = true }, onDismiss: onClose)
+					// Codex audit (2026-09-04): the confirm closes the position in
+					// PaperPortfolio exactly once - here, where the receipt appears.
+					// Review (2026-09-04): the receipt only follows a real sell.
+					SellConfirmSheet(pick: pick, onConfirm: { guard !closed else { return }; if PaperPortfolio.shared.sell(pick.symbol) { closed = true } }, onDismiss: onClose)
 						.transition(.opacity)
 				} else {
 					PositionClosedSheet(

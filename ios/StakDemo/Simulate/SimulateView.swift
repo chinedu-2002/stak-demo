@@ -50,6 +50,9 @@ struct SimulateView: View {
 
 	/// The locally hosted ticket's spec (nil = no ticket).
 	@State private var buy: BuySpec? = nil
+	/// Codex audit (2026-09-04): the paper ledger - rows, pick count and
+	/// the saved rows' "In portfolio" line follow it.
+	@ObservedObject private var portfolio = PaperPortfolio.shared
 
 	var body: some View {
 		let u = figmaUnit
@@ -65,13 +68,19 @@ struct SimulateView: View {
 							.foregroundStyle(Sim.muted)
 					}
 					Spacer()
-					ZStack {
-						Circle().fill(Sim.cardBg)
-						Image("IcSimClock")
-							.resizable()
-							.frame(width: 18 * u, height: 18 * u)
+					// Codex audit (2026-09-04): the clock (1:3918 "btn") opens the
+					// pick history - SOLD · REALIZED lives on the portfolio page.
+					Button(action: onOpenPortfolio) {
+						ZStack {
+							Circle().fill(Sim.cardBg)
+							Image("IcSimClock")
+								.resizable()
+								.frame(width: 18 * u, height: 18 * u)
+						}
+						.frame(width: 40 * u, height: 40 * u)
 					}
-					.frame(width: 40 * u, height: 40 * u)
+					.buttonStyle(.plain)
+					.accessibilityLabel("History")
 				}
 				.padding(.horizontal, 20 * u)
 				.padding(.top, 8 * u)
@@ -81,20 +90,29 @@ struct SimulateView: View {
 					VStack(spacing: 18 * u) {
 						ScoreHero(onOpenLeaderboard: onOpenLeaderboard)
 						sectionHeader("Saved staks")
-						SavedStakRow(badge: "P", ticker: "PLTR", sub: "Saved Jun 30 · not in portfolio yet", spec: pltrBuy, onBuy: { practiceBuy($0) })
-						SavedStakRow(badge: "C", ticker: "COST", sub: "Saved Jul 2 · not in portfolio yet", spec: costBuy, onBuy: { practiceBuy($0) })
+						SavedStakRow(badge: "P", ticker: "PLTR", sub: savedSub("PLTR", authored: "Saved Jun 30 · not in portfolio yet"), spec: pltrBuy, onBuy: { practiceBuy($0) })
+						SavedStakRow(badge: "C", ticker: "COST", sub: savedSub("COST", authored: "Saved Jul 2 · not in portfolio yet"), spec: costBuy, onBuy: { practiceBuy($0) })
 						CenterLink(text: "All saved staks", action: onOpenMyStak)
 						InsightCard()
-						HStack(spacing: 10 * u) {
-							PickDuo(kicker: "BEST PICK", pct: "+24.0%", pctColor: Sim.green, badge: "N", ticker: "NVDA", sub: "+$24 on $100", action: { onOpenPick("NVDA") })
-							PickDuo(kicker: "WORST PICK", pct: "-3.0%", pctColor: Sim.red, badge: "M", ticker: "MSFT", sub: "-$3 on $100", action: { onOpenPick("MSFT") })
+						// Review (2026-09-04): the tiles follow the ledger - largest and
+						// smallest dollar gain (seeded: NVDA +24.0% / "+$24 on $100",
+						// MSFT -3.0% / "-$3 on $100", as authored). Hidden under two picks.
+						if portfolio.pickCount >= 2, let best = portfolio.best, let worst = portfolio.worst {
+							HStack(spacing: 10 * u) {
+								PickDuo(kicker: "BEST PICK", pct: best.row.pct, pctColor: best.row.up ? Sim.green : Sim.red, badge: best.row.badge, ticker: best.row.ticker, sub: "\(PaperPortfolio.gainLabel(PaperPortfolio.amount(best.row.amount))) on \(best.spec.stakeBasis)", action: { onOpenPick(best.row.ticker) })
+								PickDuo(kicker: "WORST PICK", pct: worst.row.pct, pctColor: worst.row.up ? Sim.green : Sim.red, badge: worst.row.badge, ticker: worst.row.ticker, sub: "\(PaperPortfolio.gainLabel(PaperPortfolio.amount(worst.row.amount))) on \(worst.spec.stakeBasis)", action: { onOpenPick(worst.row.ticker) })
+							}
 						}
 						HowItWorksCard()
 						sectionHeader("Your portfolio")
-						PortfolioRow(badge: "N", ticker: "NVDA", sub: "Picked May 8 · up 24% since", amount: "+$24.00", pct: "+24.0%", up: true, action: { onOpenPick("NVDA") })
-						PortfolioRow(badge: "T", ticker: "TSLA", sub: "Picked Jun 3 · up 18% since", amount: "+$18.00", pct: "+18.0%", up: true, action: { onOpenPick("TSLA") })
-						PortfolioRow(badge: "M", ticker: "MSFT", sub: "Picked Jun 26 · down 3% since", amount: "-$3.00", pct: "-3.0%", up: false, action: { onOpenPick("MSFT") })
-						CenterLink(text: "See all 12 picks", action: onOpenPortfolio)
+						// Codex audit (2026-09-04): the ledger's first three rows - a
+						// fresh buy lands at the top (1:3898 authored NVDA/TSLA/MSFT
+						// from a 12-pick sample; the seeded six lead NVDA/TSLA/AMD).
+						ForEach(Array(portfolio.positions.prefix(3))) { position in
+							let p = position.row
+							PortfolioRow(badge: p.badge, ticker: p.ticker, sub: p.sub, amount: p.amount, pct: p.pct, up: p.up, action: { onOpenPick(p.ticker) })
+						}
+						CenterLink(text: "See all \(portfolio.pickCount) picks", action: onOpenPortfolio)
 						HStack {
 							Text("Portfolio breakdown")
 								.font(StakFont.sora(16 * u, .semiBold))
@@ -134,6 +152,14 @@ struct SimulateView: View {
 		if let onPracticeBuy { onPracticeBuy(spec) } else { buy = spec }
 	}
 
+	/// Codex audit (2026-09-04): a saved stak that has been bought reads
+	/// "In portfolio · 0.8803 shares" in place of the authored
+	/// "not in portfolio yet" line (1:3964 template).
+	private func savedSub(_ symbol: String, authored: String) -> String {
+		guard let held = portfolio.pickSpec(symbol) else { return authored }
+		return "In portfolio · \(held.shares) shares"
+	}
+
 	private func sectionHeader(_ title: String) -> some View {
 		Text(title)
 			.font(StakFont.sora(16 * figmaUnit, .semiBold))
@@ -143,8 +169,21 @@ struct SimulateView: View {
 }
 
 /// Portfolio value hero — $10,240.00, cash, weekly change, chart + pills.
+/// Codex audit (2026-09-04): reads PaperPortfolio - value, cash and pick
+/// count follow the ledger; the week figures are the shared constants.
 private struct ScoreHero: View {
 	let onOpenLeaderboard: () -> Void
+
+	@ObservedObject private var portfolio = PaperPortfolio.shared
+	/// Codex audit (2026-09-04): the live range - 3M as authored (1:3935).
+	@State private var range = "3M"
+
+	/// "$10,240.00" split at the point: the 44 figure and the 18 cents.
+	private var figure: (whole: String, cents: String) {
+		let value = PaperPortfolio.money(portfolio.portfolioValue)
+		guard let dot = value.lastIndex(of: ".") else { return (value, "") }
+		return (String(value[..<dot]), String(value[dot...]))
+	}
 
 	var body: some View {
 		let u = figmaUnit
@@ -155,37 +194,38 @@ private struct ScoreHero: View {
 					.tracking(0.9 * u)
 					.foregroundStyle(Sim.faint)
 				HStack(alignment: .bottom, spacing: 0) {
-					Text("$10,240")
+					Text(figure.whole)
 						.font(StakFont.sora(44 * u, .semiBold))
 						.tracking(-0.44 * u)
 						// Authored box (1:3924) is 55 tall — pin it so the stack sums.
 						.frame(height: 55 * u)
 						.foregroundStyle(Color.white)
-					Text(".00")
+					Text(figure.cents)
 						.font(StakFont.sora(18 * u, .semiBold))
 						.foregroundStyle(Sim.muted)
-						// Authored (1:3923): ".00" starts 8 after the figure and its
-						// box bottom sits 8 above the figure's (55 vs y24+h23).
-						.padding(.leading, 8 * u)
+						// Codex audit (2026-09-04): no gap before ".00" - 1:3923
+						// authors an 8 offset after the figure, a design mistake;
+						// "$10,240.00" reads as one number. The cents' box bottom
+						// still sits 8 above the figure's (55 vs y24+h23).
 						.padding(.bottom, 8 * u)
 				}
-				Text("+$240.00 all time on $10,000 paper · 12 picks")
+				Text("+\(PaperPortfolio.money(portfolio.allTimeGain)) all time on $10,000 paper · \(portfolio.pickCount) picks")
 					.font(StakFont.geist(12 * u, .light))
 					.foregroundStyle(Sim.muted)
 				HStack(spacing: 6 * u) {
 					Text("Cash available")
 						.font(StakFont.geist(12 * u))
 						.foregroundStyle(Sim.muted)
-					Text("$8,800.00")
+					Text(PaperPortfolio.money(portfolio.cash))
 						.font(StakFont.geist(12 * u, .medium))
 						.foregroundStyle(Sim.bright)
 				}
-				Text("▲ +$186 (+1.9%) this week")
+				Text("▲ \(PaperPortfolio.weekGain) (\(PaperPortfolio.weekPct)) this week")
 					.font(StakFont.geist(12 * u, .medium))
 					.foregroundStyle(Sim.green)
 				// The "#47 this week" chip sits on its own row of the column.
 				Button(action: onOpenLeaderboard) {
-					Text("#47 this week")
+					Text("#\(PaperPortfolio.weekRank) this week")
 						.font(StakFont.geist(12 * u, .medium))
 						.foregroundStyle(Sim.teal)
 						.padding(.horizontal, 11 * u)
@@ -198,28 +238,29 @@ private struct ScoreHero: View {
 
 			// Authored: ranks→chart gap is exactly the column's 11 (1:3935);
 			// the chart bleeds outside the 20u text padding.
-			Image("SimChartLine")
-				.resizable()
-				.scaledToFit()
-				.frame(width: 343 * u, height: 73.56 * u)
+			SimRangeChart(range: range)
 				.frame(maxWidth: .infinity)
 			HStack(spacing: 37 * u) {
 				ForEach(["1D", "1W", "1M", "3M", "YTD", "1Y"], id: \.self) { label in
-					if label == "3M" {
-						Text(label)
-							.font(StakFont.geist(12 * u, .medium))
-							.foregroundStyle(Sim.teal)
-							.frame(width: 39 * u, height: 22.5 * u)
-							.background(Color(argb: 0x292C9DBC), in: RoundedRectangle(cornerRadius: 11.25 * u))
-							.overlay(
-								RoundedRectangle(cornerRadius: 11.25 * u)
-									.strokeBorder(Color(argb: 0x662C9DBC), lineWidth: 0.75 * u)
-							)
-					} else {
-						Text(label)
-							.font(StakFont.geist(12 * u))
-							.foregroundStyle(Sim.muted)
+					Button { range = label } label: {
+						if label == range {
+							// The authored 39x22.5 teal chrome follows the selection.
+							Text(label)
+								.font(StakFont.geist(12 * u, .medium))
+								.foregroundStyle(Sim.teal)
+								.frame(width: 39 * u, height: 22.5 * u)
+								.background(Color(argb: 0x292C9DBC), in: RoundedRectangle(cornerRadius: 11.25 * u))
+								.overlay(
+									RoundedRectangle(cornerRadius: 11.25 * u)
+										.strokeBorder(Color(argb: 0x662C9DBC), lineWidth: 0.75 * u)
+								)
+						} else {
+							Text(label)
+								.font(StakFont.geist(12 * u))
+								.foregroundStyle(Sim.muted)
+						}
 					}
+					.buttonStyle(.plain)
 				}
 			}
 			.frame(maxWidth: .infinity)
@@ -228,6 +269,67 @@ private struct ScoreHero: View {
 		}
 		.padding(.vertical, 20 * u)
 		.background(Sim.cardBg, in: RoundedRectangle(cornerRadius: 18 * u))
+	}
+}
+
+/// The hero chart at a range (343x73.56, 1:3935). Codex audit
+/// (2026-09-04): "3M" keeps the authored SimChartLine; every other range
+/// draws its series in the same box - stroke Sim.teal 2 wide, round
+/// caps/joins, a teal-to-clear fill beneath. The series are demo
+/// stand-ins until the backend serves price history. Mirrors android
+/// ui/simulate/SimulateScreen.kt.
+struct SimRangeChart: View {
+	let range: String
+
+	/// Height fraction from the bottom (0 = bottom) per point, spread
+	/// evenly across the width.
+	static let series: [String: [CGFloat]] = [
+		"1D": [0.45, 0.50, 0.42, 0.55, 0.60, 0.52, 0.58, 0.66, 0.62, 0.70],
+		"1W": [0.30, 0.38, 0.35, 0.50, 0.46, 0.60, 0.72],
+		"1M": [0.25, 0.30, 0.28, 0.42, 0.38, 0.52, 0.48, 0.60, 0.55, 0.68, 0.75],
+		"YTD": [0.20, 0.35, 0.30, 0.45, 0.40, 0.55, 0.50, 0.62, 0.70, 0.66, 0.80],
+		"1Y": [0.15, 0.22, 0.30, 0.26, 0.40, 0.36, 0.50, 0.55, 0.48, 0.62, 0.70, 0.82]
+	]
+
+	var body: some View {
+		let u = figmaUnit
+		Group {
+			if let points = SimRangeChart.series[range], range != "3M" {
+				GeometryReader { geo in
+					let line = SimRangeChart.linePath(points, in: geo.size)
+					ZStack {
+						SimRangeChart.fillPath(line, in: geo.size)
+							.fill(LinearGradient(colors: [Sim.teal.opacity(0.22), Color.clear], startPoint: .top, endPoint: .bottom))
+						line.stroke(Sim.teal, style: StrokeStyle(lineWidth: 2 * u, lineCap: .round, lineJoin: .round))
+					}
+				}
+			} else {
+				Image("SimChartLine")
+					.resizable()
+					.scaledToFit()
+			}
+		}
+		.frame(width: 343 * u, height: 73.56 * u)
+	}
+
+	/// The series as a polyline across the box.
+	private static func linePath(_ points: [CGFloat], in size: CGSize) -> Path {
+		var path = Path()
+		let steps = CGFloat(max(points.count - 1, 1))
+		for (i, fraction) in points.enumerated() {
+			let point = CGPoint(x: size.width * CGFloat(i) / steps, y: size.height * (1 - fraction))
+			if i == 0 { path.move(to: point) } else { path.addLine(to: point) }
+		}
+		return path
+	}
+
+	/// The polyline closed down to the box's bottom edge for the gradient.
+	private static func fillPath(_ line: Path, in size: CGSize) -> Path {
+		var path = line
+		path.addLine(to: CGPoint(x: size.width, y: size.height))
+		path.addLine(to: CGPoint(x: 0, y: size.height))
+		path.closeSubpath()
+		return path
 	}
 }
 
@@ -569,7 +671,8 @@ private struct BoardCard: View {
 			}
 			boardRow(rank: "1", name: "Maya A.", pct: "+9.4%", you: false)
 			boardRow(rank: "2", name: "Jide O.", pct: "+8.8%", you: false)
-			boardRow(rank: "47", name: "You", pct: "+4.2%", you: true)
+			// Audit item 6: the You row quotes the hero's week (1:3898 authored +4.2% here, +1.9% above).
+			boardRow(rank: "\(PaperPortfolio.weekRank)", name: "You", pct: PaperPortfolio.weekPct, you: true)
 			CenterLink(text: "Full leaderboard", action: onOpenLeaderboard)
 		}
 		.padding(16 * u)

@@ -33,6 +33,14 @@ struct PickSpec {
 	/// Stake value now = $100 + gain: position value, returning, proceeds
 	/// and returned on the sell sheets.
 	let stakeValue: String
+	/// Review (2026-09-04): the cost basis - "$100" for the authored picks,
+	/// the ticket's stake for a bought one ("$25" / "$25.50"); the "on a
+	/// $100 paper stake" / "from your $100 stake" lines read it. Declared
+	/// after the authored fields with a default - memberwise order.
+	var stakeBasis: String = "$100"
+	/// Review (2026-09-04): the "This week" stat (1:4673) - the authored
+	/// +$3.80 for the seeded picks, +$0.00 for a fresh buy. Declared last.
+	var weekGain: String = "+$3.80"
 }
 
 enum PickSpecs {
@@ -71,9 +79,15 @@ struct PickDetailView: View {
 	var onSellBackToSimulate: (() -> Void)? = nil
 	var onSellViewPortfolio: (() -> Void)? = nil
 
-	@State private var showSell = false
+	/// The pick the sell flow is closing (nil = no sheet). Snapshotted at
+	/// the Sell tap so the receipt (73:855) keeps showing the sold pick
+	/// after PaperPortfolio drops it.
+	@State private var selling: PickSpec? = nil
+	@ObservedObject private var portfolio = PaperPortfolio.shared
 
-	private var pick: PickSpec { PickSpecs.pick(symbol) }
+	/// Codex audit (2026-09-04): the ledger's live spec (a bought pick, or
+	/// an authored one topped up) - authored fallback for anything not held.
+	private var pick: PickSpec { selling ?? portfolio.pickSpec(symbol) ?? PickSpecs.pick(symbol) }
 
 	var body: some View {
 		let u = figmaUnit
@@ -130,7 +144,8 @@ struct PickDetailView: View {
 							}
 							.frame(height: 48 * u, alignment: .bottom)
 							.padding(.top, 11 * u)
-							Text("That is \(pick.up ? "up" : "down") \(pick.gainPct) on a $100 paper stake")
+							// Review (2026-09-04): the pick's own cost basis ("$100" authored).
+							Text("That is \(pick.up ? "up" : "down") \(pick.gainPct) on a \(pick.stakeBasis) paper stake")
 								.font(StakFont.geist(12 * u))
 								.foregroundStyle(Sim.muted)
 								.frame(height: 16 * u) // Authored line box is 16 — pin it so the card sums to 271
@@ -177,10 +192,9 @@ struct PickDetailView: View {
 						// Stats (1:4673): two 61-tall rows, 10 apart, 170-wide cells.
 						VStack(alignment: .leading, spacing: 10 * u) {
 							HStack(spacing: 10 * u) {
-								// The shared demo table defines no per-pick week move, so
-								// "This week" stays as authored for every pick (same call
-								// as the collection page's "+2.4% this week").
-								StatBox(label: "This week", value: "+$3.80", valueColor: Sim.green)
+								// Review (2026-09-04): the pick's week move - the authored
+								// +$3.80 for the seeded picks, +$0.00 for a fresh buy.
+								StatBox(label: "This week", value: pick.weekGain, valueColor: Sim.green)
 								StatBox(label: "vs the market", value: pick.vsMarket, valueColor: pick.ahead ? Sim.green : Sim.red)
 							}
 							HStack(spacing: 10 * u) {
@@ -210,15 +224,19 @@ struct PickDetailView: View {
 						.padding(.vertical, 12 * u)
 						.frame(maxWidth: .infinity, alignment: .leading)
 						.background(Sim.tealTint, in: RoundedRectangle(cornerRadius: 16 * u))
-						Button { showSell = true } label: {
-							Text("Sell")
-								.font(StakFont.geist(14 * u, .medium))
-								.foregroundStyle(Color.white)
-								.frame(maxWidth: .infinity)
-								.frame(height: 51 * u)
-								.background(Sim.darkCta, in: RoundedRectangle(cornerRadius: 6 * u))
+						// Review (2026-09-04): no Sell for a pick the ledger no longer
+						// holds (sold, or an authored fallback) - no phantom sell.
+						if portfolio.holds(symbol) {
+							Button { selling = pick } label: {
+								Text("Sell")
+									.font(StakFont.geist(14 * u, .medium))
+									.foregroundStyle(Color.white)
+									.frame(maxWidth: .infinity)
+									.frame(height: 51 * u)
+									.background(Sim.darkCta, in: RoundedRectangle(cornerRadius: 6 * u))
+							}
+							.buttonStyle(.plain)
 						}
-						.buttonStyle(.plain)
 						Button(action: onBack) {
 							Text("Back")
 								.font(StakFont.sora(14 * u))
@@ -237,14 +255,14 @@ struct PickDetailView: View {
 					.padding(.bottom, 20 * u)
 				}
 			}
-			if showSell {
+			if let sellingPick = selling {
 				// The sell flow sells THIS pick (same authored template).
 				SellFlowHost(
-					pick: pick,
+					pick: sellingPick,
 					// Authored (1:4698): the confirm's Back -> Pick detail, Instant.
-					onClose: { showSell = false },
-					onBackToSimulate: { if let onSellBackToSimulate { onSellBackToSimulate() } else { showSell = false; onBack() } },
-					onViewPortfolio: { if let onSellViewPortfolio { onSellViewPortfolio() } else { showSell = false; onBack() } }
+					onClose: { selling = nil },
+					onBackToSimulate: { if let onSellBackToSimulate { onSellBackToSimulate() } else { selling = nil; onBack() } },
+					onViewPortfolio: { if let onSellViewPortfolio { onSellViewPortfolio() } else { selling = nil; onBack() } }
 				)
 			}
 		}

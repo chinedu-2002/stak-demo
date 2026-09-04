@@ -496,7 +496,8 @@ private struct FirstRunOverlay: View {
 				StakColors.bg
 			}
 			Button(action: onSeeTodaysPick) {
-				Text("See Today’s Pick")
+				// Authored copy verbatim (user, 2026-09-04 (CHINEDU 02 · Home dev 118:1633): the exact frame wins, spelling included).
+				Text("See Todays Pick")
 					.font(StakFont.geist(12 * u, .medium))
 					.foregroundStyle(Color.white)
 					.frame(width: 136 * u, height: 51 * u)

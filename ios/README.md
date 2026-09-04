@@ -91,3 +91,20 @@ Google/Apple marks) plus the icon SVGs (back chevron, goal/risk glyphs,
 STAK logo mark) with vector data preserved. Tab-bar icons, chevrons,
 spinner and the 42x24 toggle are drawn in code from the Figma geometry,
 same as the Android Canvas ports.
+
+## Beyond the prototype (intentional)
+
+Behavior that is not wired in the CHINEDU prototype but is deliberate
+in both apps (the authored frames themselves are untouched):
+
+- Swipe between stories on the article screen — the fixed top bar stays
+  put while the article pages ride a horizontal pager (user, 2026-08-31).
+- Every news card, brief page and list row opens its article; the feed is
+  holdings-driven (user, 2026-09-01).
+- READ NEXT chains articles — each row pushes the next story's article.
+- Native hero video players (AVKit) on the article hero.
+- The Discover save toast auto-dismisses after 2.2s.
+- Collection, stock and pick detail pages serve the tapped item's data
+  into the authored template, the way the Discover deck's "Learn more"
+  already serves the tapped stock (Codex parity audit 2026-09-04).
+- Portrait lock: the design is a fixed 390x844 portrait artboard (2026-09-04).

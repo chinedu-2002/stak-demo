@@ -415,6 +415,9 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
 				collectionId = entry.arguments?.getString("id") ?: "aitech",
 				onBack = { navController.popBackStack() },
 				onOpenStock = { symbol -> navController.navigate(StakRoutes.myStakStock(symbol)) },
+				// Codex audit (2026-09-04): adding stocks = the Discover deck,
+				// the app's only add path - the dashed tile hops there, Instant.
+				onAddStock = { popToShell(PopStyle.INSTANT, MainTab.Discover) },
 			)
 		}
 		composable(

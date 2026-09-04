@@ -25,6 +25,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
@@ -33,6 +34,7 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -60,9 +62,19 @@ private val BadgeInk = Color(0xFF9EADC7)
  * Mirrors ios/StakDemo/MyStak/CollectionView.swift.
  */
 @Composable
-fun CollectionScreen(collectionId: String, onBack: () -> Unit, onOpenStock: (String) -> Unit) {
+fun CollectionScreen(
+	collectionId: String,
+	onBack: () -> Unit,
+	onOpenStock: (String) -> Unit,
+	// Codex audit (2026-09-04): the dashed Add-stock tile - adding stocks
+	// is the Discover deck, the app's only add path; the host hops there.
+	onAddStock: () -> Unit = {},
+) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	val c = collection(collectionId)
+	// Codex audit (2026-09-04): the page shows what the holdings store
+	// holds of this collection - Unsave on a tile's Stock Detail drops it.
+	val held = c.held()
 	Column(modifier = Modifier.fillMaxSize().background(StakColors.Bg)) {
 		Row(
 			verticalAlignment = Alignment.CenterVertically,
@@ -80,11 +92,12 @@ fun CollectionScreen(collectionId: String, onBack: () -> Unit, onOpenStock: (Str
 				color = Color.White,
 			)
 			Spacer(modifier = Modifier.weight(1f))
+			// No designed menu yet (Codex audit 2026-09-04) - decorative until the designer draws one.
 			Box(
 				contentAlignment = Alignment.Center,
 				modifier = Modifier.size((40 * u).dp).background(CardBg, CircleShape),
 			) {
-				Image(painterResource(R.drawable.ic_more_dots), null, modifier = Modifier.size((24 * u).dp))
+				Image(painterResource(R.drawable.ic_more_dots), contentDescription = null, modifier = Modifier.size((24 * u).dp))
 			}
 		}
 		Column(
@@ -119,7 +132,7 @@ fun CollectionScreen(collectionId: String, onBack: () -> Unit, onOpenStock: (Str
 					color = Color.White,
 				)
 				Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy((7 * u).dp)) {
-					Text(c.countLabel, style = TextStyle(fontFamily = Geist, fontSize = (13 * u).sp), color = Muted)
+					Text(heldCountLabel(held.size), style = TextStyle(fontFamily = Geist, fontSize = (13 * u).sp), color = Muted)
 					Text("·", style = TextStyle(fontFamily = Geist, fontSize = (13 * u).sp), color = Faint)
 					// The weekly move is not in the shared demo data - the
 					// authored 1:3333 literal stays for every collection.
@@ -136,18 +149,33 @@ fun CollectionScreen(collectionId: String, onBack: () -> Unit, onOpenStock: (Str
 				)
 			}
 			Column(verticalArrangement = Arrangement.spacedBy((10 * u).dp), modifier = Modifier.fillMaxWidth()) {
-				c.stocks.chunked(2).forEachIndexed { rowIndex, row ->
+				// Codex audit (2026-09-04): the dashed Add-stock tile is ALWAYS
+				// the last cell - on a new row when the held count is even or
+				// zero - so an emptied collection still offers "Add stock".
+				// null is that cell; the two-per-row layout is unchanged.
+				val cells: List<CollStock?> = held + null
+				cells.chunked(2).forEach { row ->
 					Row(horizontalArrangement = Arrangement.spacedBy((10 * u).dp), modifier = Modifier.fillMaxWidth().height(androidx.compose.foundation.layout.IntrinsicSize.Min)) {
 						row.forEach { stock ->
-							StockTile(
-								stock = stock,
-								// B11: the tile opens ITS ticker, not always AAPL.
-								onClick = { onOpenStock(stock.ticker) },
-								modifier = Modifier.weight(1f).fillMaxSize(),
-							)
+							if (stock != null) {
+								StockTile(
+									stock = stock,
+									// B11: the tile opens ITS ticker, not always AAPL.
+									onClick = { onOpenStock(stock.ticker) },
+									modifier = Modifier.weight(1f).fillMaxSize(),
+								)
+							} else {
+								AddStockTile(onClick = onAddStock, modifier = Modifier.weight(1f).fillMaxSize())
+							}
 						}
 						if (row.size == 1) {
-							AddStockTile(modifier = Modifier.weight(1f).fillMaxSize())
+							// A lone Add tile keeps a stock tile's slot AND height:
+							// an invisible, inert catalogue tile fills the second
+							// cell so IntrinsicSize.Min still measures the authored
+							// tile height instead of the Add tile's own content.
+							Box(modifier = Modifier.weight(1f).fillMaxSize().alpha(0f).clearAndSetSemantics {}) {
+								StockTile(stock = c.stocks.first(), onClick = null, modifier = Modifier.fillMaxSize())
+							}
 						}
 					}
 				}
@@ -156,18 +184,18 @@ fun CollectionScreen(collectionId: String, onBack: () -> Unit, onOpenStock: (Str
 	}
 }
 
+/** A stock card; a null onClick is the inert height reference beside a lone Add tile. */
 @Composable
-private fun StockTile(stock: CollStock, onClick: () -> Unit, modifier: Modifier = Modifier) {
+private fun StockTile(stock: CollStock, onClick: (() -> Unit)?, modifier: Modifier = Modifier) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
+	val interaction = remember { MutableInteractionSource() }
 	Column(
 		verticalArrangement = Arrangement.spacedBy((10 * u).dp),
 		modifier = modifier
 			.clip(RoundedCornerShape((16 * u).dp))
 			.background(CardBg)
-			.clickable(
-				interactionSource = remember { MutableInteractionSource() },
-				indication = null,
-				onClick = onClick,
+			.then(
+				if (onClick != null) Modifier.clickable(interactionSource = interaction, indication = null, onClick = onClick) else Modifier,
 			)
 			.padding((14 * u).dp),
 	) {
@@ -202,9 +230,9 @@ private fun StockTile(stock: CollStock, onClick: () -> Unit, modifier: Modifier 
 	}
 }
 
-/** Dashed 1.5dp #2a3346 r16 add card. */
+/** Dashed 1.5dp #2a3346 r16 add card - tapping it is onAddStock (the deck). */
 @Composable
-private fun AddStockTile(modifier: Modifier = Modifier) {
+private fun AddStockTile(onClick: () -> Unit, modifier: Modifier = Modifier) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Column(
 		horizontalAlignment = Alignment.CenterHorizontally,
@@ -222,6 +250,11 @@ private fun AddStockTile(modifier: Modifier = Modifier) {
 					),
 				)
 			}
+			.clickable(
+				interactionSource = remember { MutableInteractionSource() },
+				indication = null,
+				onClick = onClick,
+			)
 			.padding((14 * u).dp),
 	) {
 		Image(painterResource(R.drawable.ic_plus_circle), null, modifier = Modifier.size((24 * u).dp))

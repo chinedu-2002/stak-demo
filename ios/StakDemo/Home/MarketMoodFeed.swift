@@ -28,6 +28,31 @@ enum MarketMoodFeed {
 	static let demoStatusLead = "High volatility"
 	static let demoStatusRest = ", you should consider being cautious."
 
+	/// The last served score (nil until `live` delivers one).
+	static private(set) var score: Double? = nil
+
+	/// The status line BOTH mood cards read - Home's and the News mood row
+	/// (Codex audit 2026-09-04: News hard-coded "Low volatility" against the
+	/// same needle resting in the red band). The served score's band once
+	/// live; the authored demo copy until then. Bands follow the gauge
+	/// arcs: red (score < 33) = high, neutral = moderate, green (> 66) = low.
+	/// Copy for the two non-demo bands is a stand-in until the backend
+	/// serves the status line with the score (designer, 2026-08-22).
+	static var statusLead: String { score.map(leadFor) ?? demoStatusLead }
+	static var statusRest: String { score.map(restFor) ?? demoStatusRest }
+
+	static func leadFor(score: Double) -> String {
+		if score < 33 { return "High volatility" }
+		if score <= 66 { return "Moderate volatility" }
+		return "Low volatility"
+	}
+
+	static func restFor(score: Double) -> String {
+		if score < 33 { return demoStatusRest }
+		if score <= 66 { return ", a mixed picture - stay selective." }
+		return ", markets are calm right now."
+	}
+
 	/// 0 = extreme fear (red, right) … 100 = greed (green, left).
 	static func angleFor(score: Double) -> Double { min(max(score, 0), 100) / 100 * 180 }
 
@@ -51,7 +76,10 @@ enum MarketMoodFeed {
 				let fg = obj["fear_and_greed"] as? [String: Any],
 				let score = fg["score"] as? Double
 			else { return }
-			DispatchQueue.main.async { apply(angleFor(score: score)) }
+			DispatchQueue.main.async {
+				Self.score = score
+				apply(angleFor(score: score))
+			}
 		}.resume()
 	}
 }

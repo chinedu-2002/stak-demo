@@ -41,6 +41,19 @@ struct NewsView: View {
 	private func matches(_ text: String) -> Bool {
 		q.isEmpty || text.range(of: q, options: .caseInsensitive) != nil
 	}
+	// Search reads the whole story, not just its headline (Codex audit
+	// 2026-09-04): subtitle, source, tags and ticker too.
+	private func matchesArticle(_ a: NewsArticleFeed.Article) -> Bool { articleMatches(a, q) }
+	private func matchesBrief(_ b: NewsBriefFeed.Brief) -> Bool {
+		matches(b.title) || matches(b.body) || matches(b.source)
+	}
+
+	private static func todayLabel() -> String {
+		let f = DateFormatter()
+		f.locale = Locale(identifier: "en_US_POSIX")
+		f.dateFormat = "EEEE, MMMM d"
+		return f.string(from: Date())
+	}
 
 	var body: some View {
 		let u = figmaUnit
@@ -50,7 +63,10 @@ struct NewsView: View {
 					Text("News")
 						.font(StakFont.sora(26 * u, .semiBold))
 						.foregroundStyle(StakColors.textPrimary)
-					Text("Saturday, July 4")
+					// The frame's "Saturday, July 4" is the authored example; the
+					// screen shows today (Codex audit 2026-09-04), in the frame's
+					// English format whatever the device locale.
+					Text(Self.todayLabel())
 						.font(StakFont.geist(13 * u))
 						.foregroundStyle(News.muted)
 				}
@@ -91,10 +107,13 @@ struct NewsView: View {
 					if q.isEmpty { MoodMiniRow() }
 					// Designer's call (2026-08-22): today's brief on tap leads to
 					// the News info page (Story tile stays wired per 1:1228).
-					if NewsBriefFeed.briefs().contains(where: { matches($0.title) }) {
+					// Only the briefs that match ride the carousel (Codex audit
+					// 2026-09-04: one hit used to show all four pages).
+					let briefHits = NewsBriefFeed.briefs().filter { matchesBrief($0) }
+					if !briefHits.isEmpty {
 						// Each brief opens ITS OWN article (user, 2026-08-25). The
 						// index guard covers a served brief without a mapped article.
-						BriefCarousel(onRead: { page in
+						BriefCarousel(briefs: briefHits, onRead: { page in
 							if NewsArticleFeed.briefArticles.indices.contains(page) {
 								onOpenArticle(NewsArticleFeed.briefArticles[page])
 							}
@@ -104,11 +123,11 @@ struct NewsView: View {
 					// The rows render from the served section feeds - STRICT
 					// stock news only (user, 2026-08-25); EVERY story opens
 					// its article.
-					let forYou = NewsArticleFeed.forYou().filter { matches($0.headline) }
+					let forYou = NewsArticleFeed.forYou().filter { matchesArticle($0) }
 					if !forYou.isEmpty {
 						NewsSectionView(title: "For You", rows: forYou, onOpen: onOpenArticle)
 					}
-					let markets = NewsArticleFeed.markets().filter { matches($0.headline) }
+					let markets = NewsArticleFeed.markets().filter { matchesArticle($0) }
 					if !markets.isEmpty {
 						NewsSectionView(title: "Markets", rows: markets, onOpen: onOpenArticle)
 					}
@@ -124,8 +143,17 @@ struct NewsView: View {
 	}
 }
 
-/// Compact Market Mood row — #171d2c r12 with the small low-volatility gauge
-/// (the baked NewsGaugeSmall asset).
+/// Search over the whole story: headline, subtitle, source, tags, ticker.
+private func articleMatches(_ a: NewsArticleFeed.Article, _ q: String) -> Bool {
+	if q.isEmpty { return true }
+	func hit(_ t: String) -> Bool { t.range(of: q, options: .caseInsensitive) != nil }
+	return hit(a.headline) || hit(a.subtitle) || hit(a.source) || a.tags.contains(where: hit) || (a.ticker.map(hit) ?? false)
+}
+
+/// Compact Market Mood row — #171d2c r12 with the small gauge. Both the
+/// status line and the needle are the SAME shared mood state Home shows
+/// (Codex audit 2026-09-04): the row used to hard-code "Low volatility"
+/// over the baked NewsGaugeSmall needle resting in the red band.
 private struct MoodMiniRow: View {
 	var body: some View {
 		let u = figmaUnit
@@ -134,14 +162,13 @@ private struct MoodMiniRow: View {
 				Text("Market Mood")
 					.font(StakFont.sora(13 * u, .semiBold))
 					.foregroundStyle(StakColors.textPrimary)
-				Text("Low volatility")
+				Text(MarketMoodFeed.statusLead)
 					.font(StakFont.geist(11 * u))
 					.foregroundStyle(News.teal)
 			}
 			Spacer()
-			Image("NewsGaugeSmall")
-				.resizable()
-				.frame(width: 40.97 * u, height: 20.76 * u)
+			// The Home gauge drawn at the authored compact size (40.97 x 20.76).
+			MarketMoodGauge(scale: 40.97 / 56.9018)
 		}
 		.padding(.horizontal, 14 * u)
 		.padding(.vertical, 12 * u)
@@ -153,12 +180,13 @@ private struct MoodMiniRow: View {
 /// left and right through the served briefs (user, 2026-08-22); the
 /// active dot follows the page. Text comes from NewsBriefFeed.
 private struct BriefCarousel: View {
+	/// The briefs on this ride - the search's hits, or every brief.
+	let briefs: [NewsBriefFeed.Brief]
 	let onRead: (Int) -> Void
 	@State private var page: Int? = 0
 
 	var body: some View {
 		let u = figmaUnit
-		let briefs = NewsBriefFeed.briefs()
 		VStack(spacing: 12 * u) {
 			ScrollView(.horizontal, showsIndicators: false) {
 				LazyHStack(spacing: 0) {
@@ -255,8 +283,7 @@ private struct StoryGrid: View {
 	var query: String = ""
 
 	private func visible(_ a: NewsArticleFeed.Article) -> Bool {
-		NewsArticleFeed.isStockNews(a) &&
-			(query.isEmpty || a.headline.range(of: query, options: .caseInsensitive) != nil)
+		NewsArticleFeed.isStockNews(a) && articleMatches(a, query)
 	}
 
 	var body: some View {

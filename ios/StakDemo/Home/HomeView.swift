@@ -256,8 +256,8 @@ private struct MarketMoodCard: View {
 					// Backend-served with the mood score in production (the words
 					// change with the market); authored demo copy this phase.
 					(
-						Text(MarketMoodFeed.demoStatusLead).foregroundColor(Home.teal)
-							+ Text(MarketMoodFeed.demoStatusRest).foregroundColor(Color.white)
+						Text(MarketMoodFeed.statusLead).foregroundColor(Home.teal)
+							+ Text(MarketMoodFeed.statusRest).foregroundColor(Color.white)
 					)
 					.font(StakFont.geist(12 * u))
 					.lineSpacing((16 - 12) * u)
@@ -518,7 +518,10 @@ private struct FirstRunOverlay: View {
 /// (28.0396, 28.2577)/(26.7526, 25.6491) - with the pivot blob at
 /// (27.8686, 26.7203) r1.5806. Rest = the authored pose verbatim (axis
 /// 26.27 deg from the blob); live values rotate about the blob center.
-private struct MarketMoodGauge: View {
+struct MarketMoodGauge: View {
+	/// Shared with the News mood row (Codex audit 2026-09-04), which passes
+	/// 40.97 / 56.9018 so the compact gauge is this same drawing.
+	var scale: CGFloat = 1
 	/// Needle pose in math degrees CCW from +x — rests at the authored
 	/// default; no entry sweep (the frame's pose is the rest state).
 	@State private var sweepDeg: Double = MarketMoodFeed.demoAngleDeg
@@ -526,7 +529,7 @@ private struct MarketMoodGauge: View {
 	@State private var wobbleDeg: Double = -0.8
 
 	var body: some View {
-		let u = figmaUnit
+		let u = figmaUnit * scale
 		let k = u   // canvas pt per authored unit (canvas width = 56.9018u)
 		ZStack {
 			GaugeArc(startDeg: 180)

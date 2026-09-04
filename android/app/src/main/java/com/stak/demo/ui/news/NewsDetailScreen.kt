@@ -255,14 +255,14 @@ fun NewsDetailScreen(articleId: String = NewsArticleFeed.APPLE, onBack: () -> Un
 		}
 		// Authored (101:1005 Motion): Back -> News detail page saved,
 		// DISSOLVE 300 EaseOut; View in My STAK -> My STAK Overview,
-		// Push Right 300 (hoisted to the nav). Entry stays instant (its
-		// authored animate type is still unreadable from the file).
+		// Push Right 300 (hoisted to the nav). Entry is authored Smart
+		// Animate 350 (Codex parity audit 2026-09-04).
 		AnimatedVisibility(
 			visible = showSuccess,
 			// Designer's call (2026-08-22): the sheet appears with a
 			// SCALE-IN animation; it still dissolves out per 101:1005.
-			enter = scaleIn(initialScale = 0.92f, animationSpec = tween(300, easing = EaseOut)) +
-				fadeIn(tween(300, easing = EaseOut)),
+			enter = scaleIn(initialScale = 0.92f, animationSpec = tween(350, easing = EaseOut)) +
+				fadeIn(tween(350, easing = EaseOut)),
 			exit = fadeOut(tween(300, easing = EaseOut)),
 		) {
 			SaveSuccessOverlay(
@@ -786,7 +786,8 @@ private fun StockCard(saved: Boolean, ticker: String, facts: NewsArticleFeed.Sto
 				Text(
 					text = "View $ticker in My STAK",
 					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp, lineHeight = (17 * u).sp),
-					color = News.Teal,
+					// 1:1359: the link reads #AEAEAE, not teal (Codex parity audit 2026-09-04).
+					color = Color(0xFFAEAEAE),
 				)
 				Spacer(modifier = Modifier.weight(1f))
 				Image(

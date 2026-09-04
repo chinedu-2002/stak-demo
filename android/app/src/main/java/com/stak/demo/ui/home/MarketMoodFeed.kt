@@ -50,6 +50,30 @@ object MarketMoodFeed {
 	const val DEMO_STATUS_LEAD = "High volatility"
 	const val DEMO_STATUS_REST = ", you should consider being cautious."
 
+	/**
+	 * The status line BOTH mood cards read - Home's and the News mood row
+	 * (Codex audit 2026-09-04: News hard-coded "Low volatility" against the
+	 * same needle resting in the red band). The served score's band once
+	 * LIVE; the authored demo copy until then. Bands follow the gauge
+	 * arcs: red (score < 33) = high, neutral = moderate, green (> 66) = low.
+	 * Copy for the two non-demo bands is a stand-in until the backend
+	 * serves the status line with the score (designer, 2026-08-22).
+	 */
+	val statusLead: String get() = score?.let { leadFor(it) } ?: DEMO_STATUS_LEAD
+	val statusRest: String get() = score?.let { restFor(it) } ?: DEMO_STATUS_REST
+
+	fun leadFor(score: Float): String = when {
+		score < 33f -> "High volatility"
+		score <= 66f -> "Moderate volatility"
+		else -> "Low volatility"
+	}
+
+	fun restFor(score: Float): String = when {
+		score < 33f -> DEMO_STATUS_REST
+		score <= 66f -> ", a mixed picture - stay selective."
+		else -> ", markets are calm right now."
+	}
+
 	fun angleFor(score: Float): Float = (score.coerceIn(0f, 100f) / 100f) * 180f
 
 	suspend fun refresh() {

@@ -1,6 +1,7 @@
 package com.stak.demo.ui.mystak
 
 import com.stak.demo.R
+import com.stak.demo.ui.MyStakHoldings
 
 /**
  * The My STAK collection catalogue - what every chip on the Overview
@@ -19,6 +20,9 @@ internal data class CollStock(
 internal data class StakCollection(
 	val id: String,
 	val name: String,
+	// The authored 1:3155 chip text, kept for the record only - nothing
+	// renders it since the holdings store drives every count (Codex audit
+	// 2026-09-04); see held() / heldCountLabel().
 	val countLabel: String,
 	val blurb: String,
 	val imageRes: Int? = null,
@@ -106,3 +110,16 @@ internal val COLLECTIONS = listOf(
 /** The served collection - an unknown id falls back to the authored AI & Tech frame. */
 internal fun collection(id: String): StakCollection =
 	COLLECTIONS.firstOrNull { it.id == id } ?: COLLECTIONS.first()
+
+/**
+ * The collection's stocks the user actually holds. Codex audit
+ * (2026-09-04): MyStakHoldings is the single source of truth - Unsave on
+ * a tile's Stock Detail drops the stock here, from the chip count and
+ * from the Breakdown at once. Reads the observable set, so a composable
+ * calling it recomposes when the store changes.
+ * Mirrors ios/StakDemo/MyStak/Collections.swift.
+ */
+internal fun StakCollection.held(): List<CollStock> = stocks.filter { it.ticker in MyStakHoldings.tickers }
+
+/** "1 stock" / "N stocks" - the chip, the Collection hero and the Breakdown share it. */
+internal fun heldCountLabel(n: Int): String = if (n == 1) "1 stock" else "$n stocks"

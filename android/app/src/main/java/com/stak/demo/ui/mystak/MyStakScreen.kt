@@ -1,5 +1,6 @@
 package com.stak.demo.ui.mystak
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -27,8 +28,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -38,10 +43,12 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.stak.demo.R
+import com.stak.demo.ui.MyStakHoldings
 import com.stak.demo.ui.theme.Geist
 import com.stak.demo.ui.theme.Sora
 import com.stak.demo.ui.theme.StakColors
 import com.stak.demo.ui.theme.ADVANCE_ROUNDING
+import kotlin.math.roundToInt
 
 private val CardBg = Color(0xFF181F30)
 private val Muted = Color(0xFF819ABB)
@@ -112,7 +119,10 @@ fun MyStakScreen(onOpenCollection: (String) -> Unit, onStartSwiping: () -> Unit)
 				COLLECTIONS.chunked(2).forEach { pair ->
 					Row(horizontalArrangement = Arrangement.spacedBy((10 * u).dp), modifier = Modifier.fillMaxWidth()) {
 						pair.forEach { c ->
-							CollectionChip(c.name, c.countLabel, imageRes = c.imageRes, iconRes = c.iconRes, onClick = { onOpenCollection(c.id) }, modifier = Modifier.weight(1f))
+							// Codex audit (2026-09-04): the count is the HELD count from
+							// the holdings store, not the authored countLabel - Unsave
+							// drops it here too.
+							CollectionChip(c.name, heldCountLabel(c.held().size), imageRes = c.imageRes, iconRes = c.iconRes, onClick = { onOpenCollection(c.id) }, modifier = Modifier.weight(1f))
 						}
 					}
 				}
@@ -160,8 +170,12 @@ fun MyStakScreen(onOpenCollection: (String) -> Unit, onStartSwiping: () -> Unit)
 					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp, lineHeight = (19 * u).sp),
 					color = Color.White,
 				)
+				// Codex audit (2026-09-04): the authored "six of fourteen" was a
+				// third count that agreed with nothing; the sentence now reads
+				// the store - Tech & AI held of all held, as words.
+				val techAi = numberWord(collection("aitech").held().size).replaceFirstChar { it.uppercase() }
 				Text(
-					text = "Six of your fourteen picks are tech or AI names. Your STAK skews high-growth, with a small hedge in real estate.",
+					text = "$techAi of your ${numberWord(MyStakHoldings.count)} picks are tech or AI names. Your STAK skews high-growth, with a small hedge in real estate.",
 					// Codex parity audit (2026-09-04): 1:3155 sets the body at 13.
 					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (13 * u).sp, lineHeight = (19 * u).sp),
 					color = Body,
@@ -312,7 +326,9 @@ private fun PortfolioSummary() {
 			)
 			Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy((10 * u).dp)) {
 				Text(
-					text = "Across 14 stocks",
+					// Codex audit (2026-09-04): the authored "14" was a third
+					// total; the holdings store is the one count.
+					text = "Across ${MyStakHoldings.count} stocks",
 					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp, lineHeight = (18 * u).sp),
 					color = Green,
 				)
@@ -376,10 +392,17 @@ private fun PortfolioSummary() {
 	}
 }
 
-/** Allocation — the 150dp donut render + sector bars. */
+/**
+ * Allocation — the 150 ring + sector bars. Codex audit (2026-09-04): the
+ * authored 1:3155 buckets ("Tech & AI 42% · 6 stocks" ... "Other 5% · 1
+ * stock") were yet another set of numbers the holdings store could not
+ * follow, so they derive from it now - see allocationBuckets().
+ */
 @Composable
 private fun AllocationCard() {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
+	val buckets = allocationBuckets()
+	val pcts = bucketPercents(buckets)
 	Column(
 		horizontalAlignment = Alignment.CenterHorizontally,
 		verticalArrangement = Arrangement.spacedBy((16 * u).dp),
@@ -394,13 +417,95 @@ private fun AllocationCard() {
 			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp, lineHeight = (19 * u).sp),
 			color = Color.White,
 		)
-		Image(painterResource(R.drawable.ms_donut), null, modifier = Modifier.size((150 * u).dp))
+		AllocationRing(buckets, pcts)
 		Column(verticalArrangement = Arrangement.spacedBy((12 * u).dp), modifier = Modifier.fillMaxWidth()) {
-			SectorBar("Tech & AI", "42% · 6 stocks", Teal, (132 * u).dp)
-			SectorBar("Finance", "21% · 3 stocks", Color(0xFF7AB3F0), (66 * u).dp)
-			SectorBar("Green Energy", "20% · 3 stocks", Green, (63 * u).dp)
-			SectorBar("Real Estate", "12% · 2 stocks", Color(0xFF9E8CE5), (38 * u).dp)
-			SectorBar("Other", "5% · 1 stock", Faint, (16 * u).dp)
+			buckets.forEachIndexed { i, b ->
+				// The authored Tech & AI fill, 132 of the 314 track, IS its
+				// 42% - so fill = track * pct for every bucket.
+				SectorBar(b.name, "${pcts[i]}% · ${heldCountLabel(b.count)}", b.color, (314 * u).dp * pcts[i] / 100)
+			}
+		}
+	}
+}
+
+/**
+ * Codex audit (2026-09-04): 0...30 as words for the "Your read" sentence
+ * (zero, one ... twenty, twenty-one ... thirty); anything beyond stays
+ * digits. At rest: "Five of your twenty-one picks".
+ * Mirrors ios/StakDemo/MyStak/MyStakView.swift.
+ */
+private fun numberWord(n: Int): String {
+	val small = listOf(
+		"zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten",
+		"eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen", "twenty",
+	)
+	return when {
+		n < 0 || n > 30 -> n.toString()
+		n <= 20 -> small[n]
+		n == 30 -> "thirty"
+		else -> "twenty-" + small[n - 20]
+	}
+}
+
+/** One Breakdown bucket - the authored name and swatch, and the held count behind it. */
+private data class Bucket(val name: String, val color: Color, val count: Int)
+
+/**
+ * Codex audit (2026-09-04): Tech & AI / Finance / Green Energy / Real
+ * Estate are those collections' HELD counts; Other = Healthcare + Consumer
+ * held + any held ticker no collection lists (TSLA, SNOW). Buckets with no
+ * stocks are skipped. Mirrors ios/StakDemo/MyStak/MyStakView.swift.
+ */
+private fun allocationBuckets(): List<Bucket> {
+	val listed = COLLECTIONS.flatMap { c -> c.stocks.map { it.ticker } }.toSet()
+	val unlisted = MyStakHoldings.tickers.count { it !in listed }
+	fun heldIn(id: String) = collection(id).held().size
+	return listOf(
+		Bucket("Tech & AI", Teal, heldIn("aitech")),
+		Bucket("Finance", Color(0xFF7AB3F0), heldIn("finance")),
+		Bucket("Green Energy", Green, heldIn("green")),
+		Bucket("Real Estate", Color(0xFF9E8CE5), heldIn("realestate")),
+		Bucket("Other", Faint, heldIn("health") + heldIn("consumer") + unlisted),
+	).filter { it.count > 0 }
+}
+
+/**
+ * round(count / total * 100) per bucket; the LAST non-zero bucket absorbs
+ * the rounding remainder so the shares sum to 100 and the ring closes.
+ */
+private fun bucketPercents(buckets: List<Bucket>): List<Int> {
+	val total = buckets.sumOf { it.count }
+	if (total == 0) return emptyList()
+	val pcts = buckets.map { (it.count * 100f / total).roundToInt() }
+	val last = pcts.indexOfLast { it > 0 }
+	return pcts.mapIndexed { i, p -> if (i == last) p + 100 - pcts.sum() else p }
+}
+
+/**
+ * The 150 allocation ring (1:3155). Codex audit (2026-09-04): the baked
+ * ms_donut render is gone - a PNG could not follow the store once Unsave
+ * drops a stock. Drawn in the same 150 box: stroke 22, butt caps, segments
+ * in bucket order from -90 degrees (12 o'clock) clockwise with 2-degree
+ * gaps between them; a single bucket draws one full ring.
+ * Mirrors ios/StakDemo/MyStak/MyStakView.swift.
+ */
+@Composable
+private fun AllocationRing(buckets: List<Bucket>, pcts: List<Int>) {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
+	Canvas(modifier = Modifier.size((150 * u).dp)) {
+		val stroke = Stroke(width = (22 * u).dp.toPx(), cap = StrokeCap.Butt)
+		val inset = stroke.width / 2
+		val topLeft = Offset(inset, inset)
+		val arc = Size(size.width - stroke.width, size.height - stroke.width)
+		if (buckets.size == 1) {
+			drawArc(buckets[0].color, -90f, 360f, useCenter = false, topLeft = topLeft, size = arc, style = stroke)
+			return@Canvas
+		}
+		var start = -90f
+		buckets.forEachIndexed { i, b ->
+			val slot = 360f * pcts[i] / 100f
+			drawArc(b.color, start, (slot - 2f).coerceAtLeast(0f), useCenter = false, topLeft = topLeft, size = arc, style = stroke)
+			start += slot
 		}
 	}
 }

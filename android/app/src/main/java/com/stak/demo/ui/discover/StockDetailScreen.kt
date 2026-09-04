@@ -96,7 +96,9 @@ fun StockDetailScreen(
 ) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	val f = DETAIL_FACTS[symbol] ?: DETAIL_FACTS.getValue("AAPL")
-	var saved by rememberSaveable { mutableStateOf(fromMyStak) }
+	// Codex audit (2026-09-04): a held stock opens already saved from any
+	// entry - the holdings store, not the entry flag alone, decides.
+	var saved by rememberSaveable { mutableStateOf(fromMyStak || f.symbol in com.stak.demo.ui.MyStakHoldings.tickers) }
 	var showSuccess by rememberSaveable { mutableStateOf(false) }
 	var showBuy by rememberSaveable { mutableStateOf(false) }
 	// B9/B13: hoisted Analyst state - the open state carries the tab bar
@@ -217,7 +219,9 @@ fun StockDetailScreen(
 				) {
 					if (fromMyStak) {
 						DetailCta("Practice buy") { showBuy = true }
-						DetailSecondary("Unsave") { onBack() }
+						// Codex audit (2026-09-04): Unsave drops the stock from the
+						// holdings store, so the collection page and every count follow.
+						DetailSecondary("Unsave") { com.stak.demo.ui.MyStakHoldings.remove(f.symbol); onBack() }
 					} else if (saved) {
 						Box(
 							contentAlignment = Alignment.Center,

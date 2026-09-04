@@ -140,10 +140,13 @@ internal data class BuySpec(
 	 * round-trip byte-identically (25/122.10 -> 0.2048, 25/229.35 -> 0.1090,
 	 * 25/178.90 -> 0.1397, 25/28.40 -> 0.8803, 25/947.20 -> 0.0264; $8,800 - 25
 	 * -> $8,775.00), so the frames (1:1970 / 85:1205 et al) still render exact.
+	 * `cash` is the live paper balance the ticket opened on (Simulate audit,
+	 * same day): "Cash available" before and after both follow it.
 	 */
-	fun withAmount(amount: Double): BuySpec = copy(
+	fun withAmount(amount: Double, cash: Double): BuySpec = copy(
 		shares = String.format(java.util.Locale.US, "%.4f", if (price > 0.0) amount / price else 0.0),
-		cashAfter = "$" + String.format(java.util.Locale.US, "%,.2f", 8800.0 - amount),
+		cashBefore = "$" + String.format(java.util.Locale.US, "%,.2f", cash),
+		cashAfter = "$" + String.format(java.util.Locale.US, "%,.2f", cash - amount),
 	)
 }
 
@@ -950,9 +953,6 @@ private fun SheetSecondary(text: String, onClick: () -> Unit) {
 /** The authored amount pills (1:1970): $10 / $25 / $50 / $100 / Custom. */
 private val AMOUNT_PILLS = listOf("$10" to 10.0, "$25" to 25.0, "$50" to 50.0, "$100" to 100.0, "Custom" to null)
 
-/** The demo cash balance ($8,800.00 on every ticket) - the Custom ceiling. */
-private const val DEMO_CASH = 8800.0
-
 /**
  * "Buy NVDA?" practice ticket content (frame 1:1970, sheet 1:2159).
  * Codex audit (2026-09-04): the pills drive `amount` through `onAmount`;
@@ -1020,7 +1020,7 @@ private fun PracticeBuyContent(
 								// Custom re-applies whatever valid amount its field already
 								// holds; else the last pill's amount stands until one is typed.
 								if (value != null) onAmount(value)
-								else custom.toDoubleOrNull()?.takeIf { it > 0.0 && it <= DEMO_CASH }?.let(onAmount)
+								else custom.toDoubleOrNull()?.takeIf { it > 0.0 && it <= com.stak.demo.ui.simulate.PaperPortfolio.cash }?.let(onAmount)
 							}
 							.padding(vertical = (8 * u).dp),
 					) {
@@ -1036,14 +1036,14 @@ private fun PracticeBuyContent(
 				// Codex audit (2026-09-04): Custom opens an inline amount under
 				// the row. 1:1970 authors no field, so it borrows the pill
 				// chrome (AmountBg + the selected border). A value > 0 and
-				// within the $8,800 cash drives the ticket; anything else
+				// within the cash available drives the ticket; anything else
 				// leaves the amount where it was.
 				BasicTextField(
 					value = custom,
 					onValueChange = { raw ->
 						val text = raw.filter { it.isDigit() || it == '.' }.take(9)
 						custom = text
-						text.toDoubleOrNull()?.takeIf { it > 0.0 && it <= DEMO_CASH }?.let(onAmount)
+						text.toDoubleOrNull()?.takeIf { it > 0.0 && it <= com.stak.demo.ui.simulate.PaperPortfolio.cash }?.let(onAmount)
 					},
 					singleLine = true,
 					keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
@@ -1323,7 +1323,11 @@ internal fun DiscoverBuyFlow(
 	// default; both sheets read spec.withAmount(amount), so "You get",
 	// "Cash available" after and "You now hold" follow the pills.
 	var amount by rememberSaveable { mutableDoubleStateOf(25.0) }
-	val live = spec.withAmount(amount)
+	// Codex audit (2026-09-04, Simulate): "Cash available" is the live paper
+	// cash, snapshotted as the ticket opens - Confirm moves the cash into
+	// the position, so the receipt's after must stay "before - amount".
+	val cashBefore by rememberSaveable { mutableDoubleStateOf(com.stak.demo.ui.simulate.PaperPortfolio.cash) }
+	val live = spec.withAmount(amount, cashBefore)
 	// The scrim tap is unauthored - it keeps the per-state plain dismiss.
 	SheetScaffold(onDismiss = { if (filled) onFilledSecondary() else onClose() }) {
 		AnimatedContent(
@@ -1340,7 +1344,9 @@ internal fun DiscoverBuyFlow(
 		) { isFilled ->
 			if (!isFilled) {
 				PracticeBuyContent(
-					onConfirm = { if (!filled) { filled = true; onFilled() } },
+					// Every host's Confirm (Discover, Simulate, Stock Detail) fills
+					// the order into the shared paper portfolio, then tells the host.
+					onConfirm = { if (!filled) { filled = true; com.stak.demo.ui.simulate.PaperPortfolio.buy(spec, amount); onFilled() } },
 					onDismiss = onClose,
 					spec = live,
 					secondary = ticketSecondary,
@@ -1348,7 +1354,10 @@ internal fun DiscoverBuyFlow(
 					onAmount = { amount = it },
 				)
 			} else {
-				OrderFilledContent(onPrimary = onFilledPrimary, onSecondary = onFilledSecondary, spec = live, primary = filledPrimary, secondary = filledSecondary)
+				// Review 2026-09-04: "You now hold" is the whole holding after the
+				// fill - a top-up shows the summed shares, not just this order's.
+				val heldShares = com.stak.demo.ui.simulate.PaperPortfolio.pickSpec(spec.symbol)?.shares ?: live.shares
+				OrderFilledContent(onPrimary = onFilledPrimary, onSecondary = onFilledSecondary, spec = live.copy(shares = heldShares), primary = filledPrimary, secondary = filledSecondary)
 			}
 		}
 	}

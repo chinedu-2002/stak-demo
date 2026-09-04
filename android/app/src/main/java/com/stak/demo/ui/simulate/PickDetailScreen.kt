@@ -46,7 +46,7 @@ import com.stak.demo.ui.theme.ADVANCE_ROUNDING
 import androidx.compose.foundation.layout.requiredSize
 
 /**
- * One paper pick's numbers - every pick is a $100 stake. NVDA is frame
+ * One paper pick's numbers - the six authored picks are $100 stakes. NVDA is frame
  * 1:4631 (and its sell sheets 1:4698 / 73:855) verbatim; the others derive
  * from the shared demo table - Codex parity audit (2026-09-04). Mirrors
  * ios/StakDemo/Simulate/PickDetailView.swift.
@@ -71,6 +71,10 @@ internal data class PickSpec(
 	val ahead: Boolean,
 	/** The day move on the sell row - the same figure the My STAK tile shows. */
 	val dayChange: String,
+	/** Cost basis label - "$100" for the six authored picks; a paper order carries its own (review 2026-09-04). */
+	val stakeBasis: String = "$100",
+	/** The This-week stat (1:4673) - authored "+$3.80"; a fresh order starts at "+$0.00". */
+	val weekGain: String = "+$3.80",
 )
 
 internal val PICK_SPECS = listOf(
@@ -83,8 +87,13 @@ internal val PICK_SPECS = listOf(
 	PickSpec("MSFT", "M", "Microsoft", "$438.20", "Picked Jun 26 at $451.75", "$451.75", "-$3.00", "3.0%", false, "0.2214", "$97.00", "-6.2% behind", false, "▼ 0.4%"),
 )
 
-/** The tapped pick's numbers; an unknown symbol falls back to the frame's NVDA. */
-internal fun pickSpec(symbol: String): PickSpec = PICK_SPECS.firstOrNull { it.symbol == symbol } ?: PICK_SPECS.first()
+/**
+ * The tapped pick's numbers: the live position first (Codex audit
+ * 2026-09-04 - a fresh buy has no authored entry), then the authored
+ * table; an unknown symbol falls back to the frame's NVDA.
+ */
+internal fun pickSpec(symbol: String): PickSpec =
+	PaperPortfolio.pickSpec(symbol) ?: PICK_SPECS.firstOrNull { it.symbol == symbol } ?: PICK_SPECS.first()
 
 /**
  * 07 · Simulate — "Pick detail · paper" (CHINEDU 1:4631). The position
@@ -105,7 +114,9 @@ fun PickDetailScreen(
 	onViewPortfolio: (() -> Unit)? = null,
 ) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
-	val p = pickSpec(symbol)
+	// Pinned for the page's life: once Confirm sell removes the position,
+	// the Position-closed sheet must still show THIS pick, not the fallback.
+	val p = remember(symbol) { pickSpec(symbol) }
 	// "+$24.00" -> "+$24" in the 48 box and ".00" in its own 16/20 box (1:4654).
 	val gainWhole = p.gain.substringBefore('.')
 	// "" when a gain carries no cents, ".00" otherwise - never an index crash.
@@ -182,7 +193,7 @@ fun PickDetailScreen(
 						)
 					}
 					Text(
-						"That is ${if (p.up) "up" else "down"} ${p.gainPct} on a $100 paper stake",
+						"That is ${if (p.up) "up" else "down"} ${p.gainPct} on a ${p.stakeBasis} paper stake",
 						style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
 						color = Sim.Muted,
 						modifier = Modifier.padding(top = (11 * u).dp),
@@ -219,9 +230,9 @@ fun PickDetailScreen(
 				// Stats (1:4673): two 61-tall rows, 10 apart, 170-wide cells.
 				Column(verticalArrangement = Arrangement.spacedBy((10 * u).dp)) {
 					Row(horizontalArrangement = Arrangement.spacedBy((10 * u).dp)) {
-						// "This week" stays the authored literal for every pick - the
-						// shared demo table carries no weekly move (no invented copy).
-						StatBox("This week", "+$3.80", Sim.Green, Modifier.weight(1f))
+						// The authored "+$3.80" for every seeded pick (the demo table
+						// carries no weekly move); a fresh order starts at "+$0.00".
+						StatBox("This week", p.weekGain, Sim.Green, Modifier.weight(1f))
 						StatBox("vs the market", p.vsMarket, if (p.ahead) Sim.Green else Sim.Red, Modifier.weight(1f))
 					}
 					Row(horizontalArrangement = Arrangement.spacedBy((10 * u).dp)) {
@@ -254,22 +265,26 @@ fun PickDetailScreen(
 						color = Sim.Body,
 					)
 				}
-				Box(
-					contentAlignment = Alignment.Center,
-					modifier = Modifier
-						.fillMaxWidth()
-						.height((51 * u).dp)
-						.background(Sim.DarkCta, RoundedCornerShape((6 * u).dp))
-						.clickable(
-							interactionSource = remember { MutableInteractionSource() },
-							indication = null,
-						) { showSell = true },
-				) {
-					Text(
-						"Sell",
-						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp),
-						color = Color.White,
-					)
+				// Review 2026-09-04: a pick no longer held shows no Sell - there
+				// is nothing to close (phantom sell).
+				if (PaperPortfolio.holds(symbol)) {
+					Box(
+						contentAlignment = Alignment.Center,
+						modifier = Modifier
+							.fillMaxWidth()
+							.height((51 * u).dp)
+							.background(Sim.DarkCta, RoundedCornerShape((6 * u).dp))
+							.clickable(
+								interactionSource = remember { MutableInteractionSource() },
+								indication = null,
+							) { showSell = true },
+					) {
+						Text(
+							"Sell",
+							style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp),
+							color = Color.White,
+						)
+					}
 				}
 				Box(
 					contentAlignment = Alignment.Center,

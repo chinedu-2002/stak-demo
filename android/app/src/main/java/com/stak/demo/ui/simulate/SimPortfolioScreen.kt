@@ -54,19 +54,8 @@ import com.stak.demo.ui.theme.ADVANCE_ROUNDING
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.nativeCanvas
 
-private data class SimPick(
-	val badge: String, val ticker: String, val sub: String,
-	val amount: String, val pct: String, val up: Boolean,
-)
-
-private val PICKS = listOf(
-	SimPick("N", "NVDA", "Picked May 8 · up 24% since", "+$24.00", "+24.0%", true),
-	SimPick("T", "TSLA", "Picked Jun 3 · up 18% since", "+$18.00", "+18.0%", true),
-	SimPick("A", "AMD", "Picked May 29 · up 11% since", "+$11.00", "+11.0%", true),
-	SimPick("A", "AAPL", "Picked Apr 22 · up 6% since", "+$6.00", "+6.0%", true),
-	SimPick("J", "JPM", "Picked Jun 20 · up 2% since", "+$2.00", "+2.0%", true),
-	SimPick("M", "MSFT", "Picked Jun 26 · down 3% since", "-$3.00", "-3.0%", false),
-)
+// Codex audit (2026-09-04): SimPick and the six authored rows moved to
+// PaperPortfolio.kt - the rows are the shared portfolio's positions now.
 
 /**
  * 07 · Simulate — "Final · Portfolio · paper" (CHINEDU 1:4496) with the
@@ -126,7 +115,7 @@ fun SimPortfolioScreen(
 						.background(Sim.CardBg, RoundedCornerShape((16 * u).dp)),
 				) {
 					Text(
-						"12 picks · +$240.00 all time",
+						"${PaperPortfolio.pickCount} picks · +${PaperPortfolio.usd(PaperPortfolio.allTimeGain)} all time",
 						style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp, lineHeight = (13 * u).sp),
 						color = Sim.Muted,
 					)
@@ -136,7 +125,10 @@ fun SimPortfolioScreen(
 					FilterChip("Newest", selected = false)
 					FilterChip("Worst", selected = false)
 				}
-				PICKS.forEach { p ->
+				// Codex audit (2026-09-04): the live positions - a fresh buy sits
+				// at the top, a sold one drops to SOLD · REALIZED below.
+				PaperPortfolio.positions.forEach { pos ->
+					val p = pos.row
 					PortfolioRow(
 						badge = p.badge, ticker = p.ticker, sub = p.sub,
 						amount = p.amount, pct = p.pct, up = p.up,
@@ -157,8 +149,9 @@ fun SimPortfolioScreen(
 						color = Sim.Faint,
 					)
 				}
-				RealizedRow("S", "SHOP", "Sold May 30 · profit banked", "+$12.00", true)
-				RealizedRow("C", "COIN", "Sold Jun 15 · loss realized", "-$8.00", false)
+				PaperPortfolio.realized.forEach { r ->
+					RealizedRow(r.badge, r.ticker, r.sub, r.amount, r.up)
+				}
 				Text(
 					text = "Sell a pick and the cash returns to your balance, gain or loss.",
 					style = TextStyle(fontFamily = Geist, fontSize = (11 * u).sp, lineHeight = (14 * u).sp),
@@ -171,6 +164,8 @@ fun SimPortfolioScreen(
 		if (showSell) {
 			SellConfirmSheet(
 				pick = pickSpec("NVDA"),
+				// Review 2026-09-04: stays unwired (as on iOS) - the live sell
+				// runs in SellFlowHost from the Pick detail.
 				onConfirm = { showSell = false; showClosed = true },
 				onDismiss = { showSell = false },
 			)
@@ -331,7 +326,7 @@ private fun SellConfirmContent(pick: PickSpec, onConfirm: () -> Unit, onDismiss:
 		PickSellRow(pick)
 		Row(horizontalArrangement = Arrangement.spacedBy((6 * u).dp)) {
 			Text(
-				"You hold ${pick.shares} shares from your $100 stake.",
+				"You hold ${pick.shares} shares from your ${pick.stakeBasis} stake.",
 				style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp, lineHeight = (18 * u).sp),
 				color = Sim.Body,
 			)
@@ -440,7 +435,7 @@ private fun PositionClosedContent(pick: PickSpec, onBackToSimulate: () -> Unit, 
 		)
 		PickSellRow(pick)
 		Text(
-			"Sold ${pick.shares} shares from your $100 stake.",
+			"Sold ${pick.shares} shares from your ${pick.stakeBasis} stake.",
 			style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp, lineHeight = (18 * u).sp),
 			color = Sim.Body,
 			modifier = Modifier.fillMaxWidth(),
@@ -561,7 +556,12 @@ internal fun SellFlowHost(
 			label = "sellMorph",
 		) { isClosed ->
 			if (!isClosed) {
-				SellConfirmContent(pick = pick, onConfirm = { closed = true }, onDismiss = onClose)
+				// Codex audit (2026-09-04): Confirm sells the position exactly
+				// once - cash returns, the row moves to SOLD · REALIZED - as
+				// the sheet morphs into Position closed (73:855). Review
+				// 2026-09-04: only a real sell morphs - a pick no longer held
+				// leaves the confirm where it is.
+				SellConfirmContent(pick = pick, onConfirm = { if (!closed && PaperPortfolio.sell(pick.symbol)) closed = true }, onDismiss = onClose)
 			} else {
 				PositionClosedContent(pick = pick, onBackToSimulate = onBackToSimulate, onViewPortfolio = onViewPortfolio)
 			}

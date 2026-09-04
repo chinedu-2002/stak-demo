@@ -1,5 +1,6 @@
 package com.stak.demo.ui.simulate
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -32,7 +33,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -142,11 +149,21 @@ internal fun SimulateScreen(
 					)
 				}
 				Spacer(modifier = Modifier.weight(1f))
+				// Codex audit (2026-09-04): the clock (1:3918 "btn" / icon/clock)
+				// is the pick history - it opens the portfolio page, where the
+				// SOLD · REALIZED rows live. Same plumbing as AuthBackCircle.
 				Box(
 					contentAlignment = Alignment.Center,
-					modifier = Modifier.size((40 * u).dp).background(Sim.CardBg, CircleShape),
+					modifier = Modifier
+						.size((40 * u).dp)
+						.background(Sim.CardBg, CircleShape)
+						.clickable(
+							interactionSource = remember { MutableInteractionSource() },
+							indication = null,
+							onClick = onOpenPortfolio,
+						),
 				) {
-					Image(painterResource(R.drawable.ic_sim_clock), null, modifier = Modifier.size((18 * u).dp))
+					Image(painterResource(R.drawable.ic_sim_clock), "History", modifier = Modifier.size((18 * u).dp))
 				}
 			}
 			Column(
@@ -160,20 +177,34 @@ internal fun SimulateScreen(
 			) {
 				ScoreHero(onOpenLeaderboard = onOpenLeaderboard)
 				SectionHeader("Saved staks")
-				SavedStakRow("P", "PLTR", "Saved Jun 30 · not in portfolio yet", spec = PLTR_BUY, onBuy = practiceBuy)
-				SavedStakRow("C", "COST", "Saved Jul 2 · not in portfolio yet", spec = COST_BUY, onBuy = practiceBuy)
+				// Codex audit (2026-09-04): a saved stak that has been bought says
+				// so - the authored "not in portfolio yet" only while it is not.
+				SavedStakRow("P", "PLTR", savedStakSub("PLTR", "Saved Jun 30 · not in portfolio yet"), spec = PLTR_BUY, onBuy = practiceBuy)
+				SavedStakRow("C", "COST", savedStakSub("COST", "Saved Jul 2 · not in portfolio yet"), spec = COST_BUY, onBuy = practiceBuy)
 				CenterLink("All saved staks", onClick = onOpenMyStak)
 				InsightCard()
-				Row(horizontalArrangement = Arrangement.spacedBy((10 * u).dp)) {
-					PickDuo("BEST PICK", "+24.0%", Sim.Green, "N", "NVDA", "+$24 on $100", Modifier.weight(1f)) { onOpenPick("NVDA") }
-					PickDuo("WORST PICK", "-3.0%", Sim.Red, "M", "MSFT", "-$3 on $100", Modifier.weight(1f)) { onOpenPick("MSFT") }
+				// Review 2026-09-04: best / worst come from the live ledger (max /
+				// min gain dollars); the seeded rows still render the authored
+				// NVDA +24.0% / +$24 on $100 and MSFT -3.0% / -$3 on $100. Fewer
+				// than two positions and the duo has nothing to compare - hidden.
+				val positions = PaperPortfolio.positions
+				val best = positions.maxByOrNull { it.gainDollars }
+				val worst = positions.minByOrNull { it.gainDollars }
+				if (positions.size >= 2 && best != null && worst != null) {
+					Row(horizontalArrangement = Arrangement.spacedBy((10 * u).dp)) {
+						PickDuo("BEST PICK", best.row.pct, if (best.row.up) Sim.Green else Sim.Red, best.row.badge, best.row.ticker, best.duoLine, Modifier.weight(1f)) { onOpenPick(best.row.ticker) }
+						PickDuo("WORST PICK", worst.row.pct, if (worst.row.up) Sim.Green else Sim.Red, worst.row.badge, worst.row.ticker, worst.duoLine, Modifier.weight(1f)) { onOpenPick(worst.row.ticker) }
+					}
 				}
 				HowItWorksCard()
 				SectionHeader("Your portfolio")
-				PortfolioRow("N", "NVDA", "Picked May 8 · up 24% since", "+$24.00", "+24.0%", true, onClick = { onOpenPick("NVDA") })
-				PortfolioRow("T", "TSLA", "Picked Jun 3 · up 18% since", "+$18.00", "+18.0%", true, onClick = { onOpenPick("TSLA") })
-				PortfolioRow("M", "MSFT", "Picked Jun 26 · down 3% since", "-$3.00", "-3.0%", false, onClick = { onOpenPick("MSFT") })
-				CenterLink("See all 12 picks", onClick = onOpenPortfolio)
+				// Codex audit (2026-09-04): the first three held positions, from
+				// the shared PaperPortfolio - a fresh buy lands at the top.
+				PaperPortfolio.positions.take(3).forEach { pos ->
+					val p = pos.row
+					PortfolioRow(p.badge, p.ticker, p.sub, p.amount, p.pct, p.up, onClick = { onOpenPick(p.ticker) })
+				}
+				CenterLink("See all ${PaperPortfolio.pickCount} picks", onClick = onOpenPortfolio)
 				Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
 					Text(
 						text = "Portfolio breakdown",
@@ -223,10 +254,58 @@ private fun SectionHeader(title: String) {
 	)
 }
 
+/** "In portfolio · N shares" once a saved stak is held, else the authored saved line. */
+private fun savedStakSub(symbol: String, authored: String): String =
+	PaperPortfolio.pickSpec(symbol)?.let { "In portfolio · ${it.shares} shares" } ?: authored
+
+/**
+ * Codex audit (2026-09-04): demo stand-ins until the backend serves price
+ * history - each range's line as fractions of the chart height from the
+ * bottom (0 = bottom), spread evenly across the width. "3M" keeps the
+ * authored sim_chart_line (1:3935). Mirrors
+ * ios/StakDemo/Simulate/SimulateView.swift.
+ */
+private val RANGE_SERIES: Map<String, List<Float>> = mapOf(
+	"1D" to listOf(0.45f, 0.50f, 0.42f, 0.55f, 0.60f, 0.52f, 0.58f, 0.66f, 0.62f, 0.70f),
+	"1W" to listOf(0.30f, 0.38f, 0.35f, 0.50f, 0.46f, 0.60f, 0.72f),
+	"1M" to listOf(0.25f, 0.30f, 0.28f, 0.42f, 0.38f, 0.52f, 0.48f, 0.60f, 0.55f, 0.68f, 0.75f),
+	"YTD" to listOf(0.20f, 0.35f, 0.30f, 0.45f, 0.40f, 0.55f, 0.50f, 0.62f, 0.70f, 0.66f, 0.80f),
+	"1Y" to listOf(0.15f, 0.22f, 0.30f, 0.26f, 0.40f, 0.36f, 0.50f, 0.55f, 0.48f, 0.62f, 0.70f, 0.82f),
+)
+
+/** The chart line for a non-3M range: Sim.Teal 2-wide round stroke over a 22%-to-clear teal fill. */
+@Composable
+private fun RangeChart(series: List<Float>, modifier: Modifier) {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
+	Canvas(modifier = modifier) {
+		val w = size.width
+		val h = size.height
+		val last = series.lastIndex
+		val points = series.mapIndexed { i, f -> Offset(if (last == 0) 0f else w * i / last, h * (1f - f)) }
+		val line = Path().apply {
+			moveTo(points.first().x, points.first().y)
+			points.drop(1).forEach { lineTo(it.x, it.y) }
+		}
+		val fill = Path().apply {
+			addPath(line)
+			lineTo(points.last().x, h)
+			lineTo(points.first().x, h)
+			close()
+		}
+		drawPath(fill, Brush.verticalGradient(0f to Sim.Teal.copy(alpha = 0.22f), 1f to Color.Transparent, startY = 0f, endY = h))
+		drawPath(line, Sim.Teal, style = Stroke(width = (2 * u).dp.toPx(), cap = StrokeCap.Round, join = StrokeJoin.Round))
+	}
+}
+
 /** Portfolio value hero — $10,240.00, cash, weekly change, chart + pills. */
 @Composable
 private fun ScoreHero(onOpenLeaderboard: () -> Unit) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
+	// Codex audit (2026-09-04): the range pills select; "3M" is the authored
+	// default (1:3935) and keeps the authored chart image.
+	var range by rememberSaveable { mutableStateOf("3M") }
+	// "$10,240.00" split at the point - the figure in the 44 box, the cents in the 18.
+	val valueText = PaperPortfolio.usd(PaperPortfolio.portfolioValue)
 	Column(
 		verticalArrangement = Arrangement.spacedBy((11 * u).dp),
 		modifier = Modifier
@@ -243,22 +322,23 @@ private fun ScoreHero(onOpenLeaderboard: () -> Unit) {
 		)
 		Row(verticalAlignment = Alignment.Bottom, modifier = Modifier.padding(horizontal = (20 * u).dp)) {
 			Text(
-				text = "$10,240",
+				text = valueText.substringBefore('.'),
 				// Authored box (1:3924) is 55 tall — pin it so the stack sums.
 				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (44 * u).sp, lineHeight = (55 * u).sp, letterSpacing = (-0.44 * u).sp),
 				color = Color.White,
 			)
 			Text(
-				text = ".00",
+				text = "." + valueText.substringAfter('.'),
 				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (18 * u).sp, lineHeight = (23 * u).sp),
 				color = Sim.Muted,
-				// Authored (1:3923): ".00" starts 8 after the figure and its
-				// box bottom sits 8 above the figure's (55 vs y24+h23).
-				modifier = Modifier.padding(start = (8 * u).dp, bottom = (8 * u).dp),
+				// Authored (1:3923) box bottom sits 8 above the figure's (55 vs
+				// y24+h23). Codex audit (2026-09-04): the frame's 8 gap before
+				// ".00" is a design slip - one number reads as one number.
+				modifier = Modifier.padding(bottom = (8 * u).dp),
 			)
 		}
 		Text(
-			text = "+$240.00 all time on $10,000 paper · 12 picks",
+			text = "+${PaperPortfolio.usd(PaperPortfolio.allTimeGain)} all time on $" + String.format(java.util.Locale.US, "%,.0f", PaperPortfolio.PAPER_START) + " paper · ${PaperPortfolio.pickCount} picks",
 			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Light, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
 			color = Sim.Muted,
 			modifier = Modifier.padding(horizontal = (20 * u).dp),
@@ -270,13 +350,13 @@ private fun ScoreHero(onOpenLeaderboard: () -> Unit) {
 				color = Sim.Muted,
 			)
 			Text(
-				text = "$8,800.00",
+				text = PaperPortfolio.usd(PaperPortfolio.cash),
 				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
 				color = Sim.Bright,
 			)
 		}
 		Text(
-			text = "▲ +$186 (+1.9%) this week",
+			text = "▲ ${PaperPortfolio.WEEK_GAIN} (${PaperPortfolio.WEEK_PCT}) this week",
 			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
 			color = Sim.Green,
 			modifier = Modifier.padding(horizontal = (20 * u).dp),
@@ -294,18 +374,24 @@ private fun ScoreHero(onOpenLeaderboard: () -> Unit) {
 				.padding(horizontal = (11 * u).dp, vertical = (6 * u).dp),
 		) {
 			Text(
-				text = "#47 this week",
+				text = "#${PaperPortfolio.WEEK_RANK} this week",
 				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
 				color = Sim.Teal,
 			)
 		}
-		Image(
-			painter = painterResource(R.drawable.sim_chart_line),
-			contentDescription = null,
-			contentScale = ContentScale.Fit,
-			// Authored: ranks→chart gap is exactly the column's 11 (1:3935).
-			modifier = Modifier.align(Alignment.CenterHorizontally).size((343 * u).dp, (73.56 * u).dp),
-		)
+		// Authored: ranks→chart gap is exactly the column's 11 (1:3935).
+		val chartModifier = Modifier.align(Alignment.CenterHorizontally).size((343 * u).dp, (73.56 * u).dp)
+		val series = RANGE_SERIES[range]
+		if (series == null) {
+			Image(
+				painter = painterResource(R.drawable.sim_chart_line),
+				contentDescription = null,
+				contentScale = ContentScale.Fit,
+				modifier = chartModifier,
+			)
+		} else {
+			RangeChart(series = series, modifier = chartModifier)
+		}
 		Row(
 			verticalAlignment = Alignment.CenterVertically,
 			horizontalArrangement = Arrangement.spacedBy((37 * u).dp),
@@ -313,19 +399,24 @@ private fun ScoreHero(onOpenLeaderboard: () -> Unit) {
 			modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = (29 * u).dp),
 		) {
 			listOf("1D", "1W", "1M", "3M", "YTD", "1Y").forEach { label ->
-				if (label == "3M") {
+				val select = Modifier.clickable(
+					interactionSource = remember { MutableInteractionSource() },
+					indication = null,
+				) { range = label }
+				if (label == range) {
 					Box(
 						contentAlignment = Alignment.Center,
 						modifier = Modifier
 							.size((39 * u).dp, (22.5 * u).dp)
 							.clip(RoundedCornerShape((11.25 * u).dp))
 							.background(Color(0x292C9DBC))
-							.border((0.75 * u).dp, Color(0x662C9DBC), RoundedCornerShape((11.25 * u).dp)),
+							.border((0.75 * u).dp, Color(0x662C9DBC), RoundedCornerShape((11.25 * u).dp))
+							.then(select),
 					) {
 						Text(label, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp), color = Sim.Teal)
 					}
 				} else {
-					Text(label, style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp, lineHeight = (16 * u).sp), color = Sim.Muted)
+					Text(label, style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp, lineHeight = (16 * u).sp), color = Sim.Muted, modifier = select)
 				}
 			}
 		}
@@ -614,7 +705,9 @@ private fun BoardCard(onOpenLeaderboard: () -> Unit) {
 		}
 		BoardRow("1", "Maya A.", "+9.4%", you = false)
 		BoardRow("2", "Jide O.", "+8.8%", you = false)
-		BoardRow("47", "You", "+4.2%", you = true)
+		// Codex audit (2026-09-04): You reads the shared week figures (the
+		// hero's +1.9% / #47) instead of its own contradicting +4.2%.
+		BoardRow(PaperPortfolio.WEEK_RANK.toString(), "You", PaperPortfolio.WEEK_PCT, you = true)
 		CenterLink("Full leaderboard", onClick = onOpenLeaderboard)
 	}
 }

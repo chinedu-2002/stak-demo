@@ -49,8 +49,8 @@ private val TOP = listOf(
 	Rank("5", "K", "Kofi B.", "11 picks", "+7.0%"),
 )
 private val NEAR = listOf(
-	Rank("46", "L", "Lena S.", "8 picks", "+4.3%"),
-	Rank("48", "D", "Dami F.", "15 picks", "+4.1%"),
+	Rank("46", "L", "Lena S.", "8 picks", "+2.0%"),
+	Rank("48", "D", "Dami F.", "15 picks", "+1.8%"),
 )
 
 /**
@@ -118,18 +118,21 @@ fun LeaderboardScreen(onBack: () -> Unit) {
 					.background(Sim.TealTint)
 					.padding(horizontal = (16 * u).dp, vertical = (14 * u).dp),
 			) {
+				// Codex audit (2026-09-04): You reads the shared PaperPortfolio
+				// week figures and pick count - the same #47 / +1.9% the
+				// Simulate hero and board card show.
 				Box(modifier = Modifier.width((28 * u).dp)) {
-					Text("47", style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp, lineHeight = (20 * u).sp), color = Sim.Teal)
+					Text(PaperPortfolio.WEEK_RANK.toString(), style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp, lineHeight = (20 * u).sp), color = Sim.Teal)
 				}
 				Box(contentAlignment = Alignment.Center, modifier = Modifier.size((36 * u).dp).background(Sim.ChipBg, CircleShape)) {
 					Text("E", style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (13 * u).sp, lineHeight = (18 * u).sp), color = Sim.BadgeInk)
 				}
 				Column(verticalArrangement = Arrangement.spacedBy((2 * u).dp), modifier = Modifier.weight(1f)) {
 					Text("You", style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.SemiBold, fontSize = (12 * u).sp, lineHeight = (15 * u).sp), color = Color.White)
-					Text("12 picks this week", style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp, lineHeight = (13 * u).sp), color = Sim.Muted)
+					Text("${PaperPortfolio.pickCount} picks this week", style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp, lineHeight = (13 * u).sp), color = Sim.Muted)
 				}
 				Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy((2 * u).dp)) {
-					Text("+4.2%", style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (13 * u).sp, lineHeight = (16 * u).sp), color = Sim.Teal)
+					Text(PaperPortfolio.WEEK_PCT, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (13 * u).sp, lineHeight = (16 * u).sp), color = Sim.Teal)
 					Text("▲ 12 spots", style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp, lineHeight = (13 * u).sp), color = Sim.Green)
 				}
 			}

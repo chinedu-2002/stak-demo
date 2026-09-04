@@ -103,6 +103,10 @@ private let deck: [DeckCard] = [
 ]
 
 struct DiscoverView: View {
+	// Property order IS the memberwise-init argument order (Swift); the
+	// only call site, MainTabsView, passes resetKey first - keep it first.
+	/// 1:2330: a Discover tab re-tap from the end of the deck restarts it.
+	var resetKey: Int = 0
 	// The tapped card’s SYMBOL rides along - the detail page serves that
 	// stock, not always AAPL (user, 2026-09-01).
 	var onLearnMore: (String) -> Void = { _ in }
@@ -115,8 +119,6 @@ struct DiscoverView: View {
 	/// saves"), raised to the shell.
 	var onReviewSaves: () -> Void = {}
 	var onPracticeBuySaves: () -> Void = {}
-	/// 1:2330: a Discover tab re-tap from the end of the deck restarts it.
-	var resetKey: Int = 0
 
 	@State private var seen = 0
 	@State private var savedToast = false

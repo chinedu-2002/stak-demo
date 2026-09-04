@@ -1,3 +1,6 @@
+// In a Kotlin DSL script `java.util` would resolve against the `java` extension.
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -7,6 +10,19 @@ plugins {
     id("com.google.gms.google-services")
 
 }
+
+// Release signing (audit 2026-09-04). The upload key is NOT in the repo:
+// fill android/keystore.properties (git-ignored; template in
+// keystore.properties.example) or export STAK_KEYSTORE_FILE /
+// STAK_KEYSTORE_PASSWORD / STAK_KEY_ALIAS / STAK_KEY_PASSWORD in CI. With
+// neither, assembleRelease still builds - unsigned - exactly as before.
+val keystoreProps = Properties().apply {
+    val f = rootProject.file("keystore.properties")
+    if (f.exists()) f.inputStream().use { load(it) }
+}
+fun signingValue(key: String, env: String): String? =
+    keystoreProps.getProperty(key)?.takeIf { it.isNotBlank() } ?: System.getenv(env)?.takeIf { it.isNotBlank() }
+val releaseStoreFile = signingValue("storeFile", "STAK_KEYSTORE_FILE")
 
 android {
     namespace = "com.stak.demo"
@@ -23,8 +39,20 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        if (releaseStoreFile != null) {
+            create("release") {
+                storeFile = rootProject.file(releaseStoreFile)
+                storePassword = signingValue("storePassword", "STAK_KEYSTORE_PASSWORD")
+                keyAlias = signingValue("keyAlias", "STAK_KEY_ALIAS")
+                keyPassword = signingValue("keyPassword", "STAK_KEY_PASSWORD")
+            }
+        }
+    }
     buildTypes {
         release {
+            // Signed when a keystore is configured (see the top of this file).
+            signingConfig = signingConfigs.findByName("release")
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),

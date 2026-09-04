@@ -69,8 +69,14 @@ fun ProfileSetupScreen(onBack: () -> Unit, onProceed: () -> Unit) {
 	val context = LocalContext.current
 	// Decoded off the main thread - a large gallery image decoded inside
 	// composition can freeze the first frame after picking (audit 2026-08-25).
-	val avatar by androidx.compose.runtime.produceState<android.graphics.Bitmap?>(initialValue = null, photoUri) {
-		value = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+	// remember + LaunchedEffect rather than produceState (audit 2026-09-04):
+	// same semantics (state survives recomposition, a new photoUri cancels
+	// the previous decode and starts another), but the
+	// ProduceStateDoesNotAssignValue lint check could not see the
+	// assignment made after the suspend call and kept the quality gate red.
+	var avatar by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf<android.graphics.Bitmap?>(null) }
+	androidx.compose.runtime.LaunchedEffect(photoUri) {
+		avatar = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
 			photoUri?.let { stored ->
 				runCatching {
 					val uri = Uri.parse(stored)

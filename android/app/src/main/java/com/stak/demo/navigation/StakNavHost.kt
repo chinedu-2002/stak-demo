@@ -88,10 +88,9 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
 		tab?.let { pendingShellTab.value = it }
 		navController.popBackStack(StakRoutes.MAIN, false)
 	}
-	// Persisted session: restores sign-in state + profile before the
-	// splash decides where to go.
-	val appContext = androidx.compose.ui.platform.LocalContext.current
-	remember { com.stak.demo.ui.Session.init(appContext) }
+	// The persisted session (sign-in state + profile) is restored in
+	// StakApp.onCreate, before any composition - composition must not
+	// mutate app state (RememberReturnType lint, audit 2026-09-04).
 	NavHost(
 		navController = navController,
 		startDestination = StakRoutes.SPLASH,

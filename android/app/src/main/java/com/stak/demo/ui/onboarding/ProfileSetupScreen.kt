@@ -61,7 +61,8 @@ private const val NAME_MAX = 20
 @Composable
 fun ProfileSetupScreen(onBack: () -> Unit, onProceed: () -> Unit) {
 	val u = figmaUnit()
-	var name by rememberSaveable { mutableStateOf("") }
+	// The frame arrives with "Nedu" typed (avatar "N", counter 4 / 20) - user, 2026-09-04 (CHINEDU 01 · Onboarding 1:793): the exact frame wins.
+	var name by rememberSaveable { mutableStateOf("Nedu") }
 	// User's motion (2026-08-21): Add a photo opens the system gallery and
 	// the chosen image becomes the avatar. The photo picker carries its own
 	// permission flow, so no runtime permission is requested by the app.

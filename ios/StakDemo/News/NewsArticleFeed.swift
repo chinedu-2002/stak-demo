@@ -451,6 +451,25 @@ enum NewsArticleFeed {
 		"MSFT": StockFacts(name: "Microsoft Corp.", shortName: "Microsoft", price: "$512.40", change: "+1.45% today", up: true, marketCap: "$3.81T", peRatio: "37.5", dayRange: "$505.80–$514.20", volume: "22.8M", week52: "$385.60–$518.30", divYield: "0.66%"),
 		"XOM": StockFacts(name: "Exxon Mobil Corp.", shortName: "Exxon Mobil", price: "$109.84", change: "-1.84% today", up: false, marketCap: "$472.6B", peRatio: "13.9", dayRange: "$108.90–$112.30", volume: "18.4M", week52: "$101.40–$126.30", divYield: "3.41%"),
 		"MU": StockFacts(name: "Micron Technology", shortName: "Micron", price: "$128.66", change: "+6.21% today", up: true, marketCap: "$142.8B", peRatio: "21.3", dayRange: "$120.70–$129.40", volume: "33.9M", week52: "$61.50–$131.20", divYield: "0.36%"),
+		// Codex parity audit (2026-09-04): every My STAK collection ticker
+		// (MyStak/Collections.swift) plus the Simulate PLTR pick resolve here
+		// too, so the stock module never silently falls back to AAPL. Shared
+		// demo seed - the same strings the Android build serves.
+		"JPM": StockFacts(name: "JPMorgan Chase & Co.", shortName: "JPMorgan", price: "$245.60", change: "+0.62% today", up: true, marketCap: "$690.4B", peRatio: "13.1", dayRange: "$243.10–$246.80", volume: "8.9M", week52: "$179.20–$251.40", divYield: "2.05%"),
+		"V": StockFacts(name: "Visa Inc.", shortName: "Visa", price: "$352.10", change: "+0.31% today", up: true, marketCap: "$705.8B", peRatio: "32.4", dayRange: "$349.60–$353.40", volume: "6.1M", week52: "$252.70–$366.20", divYield: "0.67%"),
+		"GS": StockFacts(name: "Goldman Sachs Group", shortName: "Goldman Sachs", price: "$612.40", change: "-0.48% today", up: false, marketCap: "$189.3B", peRatio: "15.2", dayRange: "$609.80–$618.90", volume: "1.7M", week52: "$439.40–$630.10", divYield: "1.96%"),
+		"ENPH": StockFacts(name: "Enphase Energy", shortName: "Enphase", price: "$78.40", change: "+1.92% today", up: true, marketCap: "$10.3B", peRatio: "38.6", dayRange: "$76.10–$79.20", volume: "4.4M", week52: "$54.30–$132.60", divYield: "—"),
+		"NEE": StockFacts(name: "NextEra Energy", shortName: "NextEra", price: "$84.20", change: "+0.41% today", up: true, marketCap: "$173.2B", peRatio: "22.7", dayRange: "$83.40–$84.90", volume: "9.2M", week52: "$61.80–$86.10", divYield: "2.69%"),
+		"FSLR": StockFacts(name: "First Solar, Inc.", shortName: "First Solar", price: "$228.90", change: "-1.12% today", up: false, marketCap: "$24.5B", peRatio: "17.8", dayRange: "$226.30–$233.10", volume: "2.3M", week52: "$116.60–$262.40", divYield: "—"),
+		"PLD": StockFacts(name: "Prologis, Inc.", shortName: "Prologis", price: "$118.30", change: "+0.24% today", up: true, marketCap: "$109.6B", peRatio: "27.9", dayRange: "$117.20–$118.90", volume: "3.0M", week52: "$85.40–$127.30", divYield: "3.41%"),
+		"O": StockFacts(name: "Realty Income Corp.", shortName: "Realty Income", price: "$59.10", change: "-0.27% today", up: false, marketCap: "$53.2B", peRatio: "54.3", dayRange: "$58.70–$59.60", volume: "4.8M", week52: "$50.70–$64.90", divYield: "5.46%"),
+		"LLY": StockFacts(name: "Eli Lilly and Co.", shortName: "Eli Lilly", price: "$792.50", change: "+1.38% today", up: true, marketCap: "$751.6B", peRatio: "63.4", dayRange: "$781.90–$795.20", volume: "2.9M", week52: "$677.10–$972.50", divYield: "0.76%"),
+		"UNH": StockFacts(name: "UnitedHealth Group", shortName: "UnitedHealth", price: "$318.70", change: "-0.81% today", up: false, marketCap: "$289.1B", peRatio: "13.7", dayRange: "$316.20–$323.40", volume: "7.4M", week52: "$248.90–$630.70", divYield: "2.78%"),
+		"JNJ": StockFacts(name: "Johnson & Johnson", shortName: "J&J", price: "$162.40", change: "+0.49% today", up: true, marketCap: "$391.0B", peRatio: "16.9", dayRange: "$161.10–$163.20", volume: "6.6M", week52: "$140.70–$169.90", divYield: "3.20%"),
+		"PFE": StockFacts(name: "Pfizer Inc.", shortName: "Pfizer", price: "$25.30", change: "-0.20% today", up: false, marketCap: "$143.7B", peRatio: "13.2", dayRange: "$25.10–$25.60", volume: "38.5M", week52: "$20.90–$30.20", divYield: "6.80%"),
+		"COST": StockFacts(name: "Costco Wholesale Corp.", shortName: "Costco", price: "$947.20", change: "+0.73% today", up: true, marketCap: "$420.4B", peRatio: "52.1", dayRange: "$939.80–$951.60", volume: "1.6M", week52: "$793.40–$1,078.20", divYield: "0.55%"),
+		"NKE": StockFacts(name: "Nike, Inc.", shortName: "Nike", price: "$72.80", change: "-1.28% today", up: false, marketCap: "$107.5B", peRatio: "33.6", dayRange: "$72.10–$74.30", volume: "9.8M", week52: "$52.30–$90.60", divYield: "2.20%"),
+		"PLTR": StockFacts(name: "Palantir Technologies", shortName: "Palantir", price: "$28.40", change: "+1.10% today", up: true, marketCap: "$64.2B", peRatio: "—", dayRange: "$27.90–$28.70", volume: "51.3M", week52: "$15.70–$45.20", divYield: "—"),
 	]
 
 	/// The served stock module for a ticker - the backend resolves this in production.

@@ -4,20 +4,24 @@ import SwiftUI
 private enum PushedPage: Identifiable, Equatable {
 	case newsDetail(article: String)
 	case stockDetail(fromMyStak: Bool, symbol: String)
-	case collection
+	/// Codex parity audit (2026-09-04): carries the tapped chip's
+	/// collection id (MyStak/Collections.swift).
+	case collection(id: String)
 	case profile
 	case simPortfolio
-	case simPick
+	/// Codex parity audit (2026-09-04): carries the tapped pick's ticker
+	/// (Simulate/PickDetailView.swift PickSpecs).
+	case simPick(symbol: String)
 	case leaderboard
 
 	var id: String {
 		switch self {
 		case .newsDetail(let article): return "newsDetail-\(article)"
 		case .stockDetail(let fromMyStak, let symbol): return "stockDetail-\(fromMyStak)-\(symbol)"
-		case .collection: return "collection"
+		case .collection(let id): return "collection-\(id)"
 		case .profile: return "profile"
 		case .simPortfolio: return "simPortfolio"
-		case .simPick: return "simPick"
+		case .simPick(let symbol): return "simPick-\(symbol)"
 		case .leaderboard: return "leaderboard"
 		}
 	}
@@ -94,8 +98,9 @@ struct MainTabsView: View {
 	/// Hoisted Discover buy ticket — the sheet's scrim covers the tab bar
 	/// (frame 1:1970), so the shell owns it, mirroring Android MainShell.
 	@State private var discoverBuy: BuySpec? = nil
-	/// 1:4232 / 85:895: the Simulate ticket also covers the tab bar.
-	@State private var simulateBuy = false
+	/// 1:4232 / 85:895: the Simulate ticket also covers the tab bar. It
+	/// carries the tapped row's spec (PLTR or COST) the way discoverBuy does.
+	@State private var simulateBuy: BuySpec? = nil
 	/// 1:2330: Discover tab re-tap -> the deck restarts (from its end state).
 	@State private var discoverResetKey = 0
 
@@ -171,19 +176,20 @@ struct MainTabsView: View {
 					case .myStak:
 						MyStakView(
 							// Authored (1:3180 template): every collection card ->
-							// Collection, Instant.
-							onOpenCollection: { pushInstant(.collection) },
+							// Collection, Instant - serving the tapped collection.
+							onOpenCollection: { id in pushInstant(.collection(id: id)) },
 							onStartSwiping: { switchTab(.discover) }
 						)
 					case .simulate:
 						SimulateView(
 							// Authored (1:3898): every listed edge is Instant.
 							onOpenPortfolio: { pushInstant(.simPortfolio) },
-							onOpenPick: { pushInstant(.simPick) },
+							// Every pick tile / row opens ITS pick (Codex parity audit, 2026-09-04).
+							onOpenPick: { symbol in pushInstant(.simPick(symbol: symbol)) },
 							onOpenLeaderboard: { pushInstant(.leaderboard) },
 							// Authored (1:3964): All saved staks -> the My STAK tab.
 							onOpenMyStak: { switchTab(.myStak) },
-							onPracticeBuy: { simulateBuy = true }
+							onPracticeBuy: { simulateBuy = $0 }
 						)
 					}
 				}
@@ -213,18 +219,18 @@ struct MainTabsView: View {
 				)
 				.transition(.opacity)
 			}
-			if tab == .simulate, simulateBuy {
+			if tab == .simulate, let spec = simulateBuy {
 				DiscoverBuyFlow(
-					spec: pltrBuy,
-					onClose: { simulateBuy = false },
+					spec: spec,
+					onClose: { simulateBuy = nil },
 					filledPrimary: "View portfolio",
 					filledSecondary: "Done",
 					ticketSecondary: "Back",
 					// Authored (85:895): View portfolio -> Portfolio, PUSH LEFT
 					// 300, the ticket leaving with the Simulate page beneath
 					// it; Done -> home, DISSOLVE 300.
-					onFilledPrimary: { push(.simPortfolio) { simulateBuy = false } },
-					onFilledSecondary: { withAnimation(.easeOut(duration: 0.3)) { simulateBuy = false } }
+					onFilledPrimary: { push(.simPortfolio) { simulateBuy = nil } },
+					onFilledSecondary: { withAnimation(.easeOut(duration: 0.3)) { simulateBuy = nil } }
 				)
 				.transition(.opacity)
 			}
@@ -271,25 +277,29 @@ struct MainTabsView: View {
 				// detail instantly and land on the tapped tab.
 				onTab: { pop(.instant, all: true, landing: $0) }
 			)
-		case .collection:
+		case .collection(let id):
 			CollectionView(
+				// Unknown ids serve the authored AI & Tech sample.
+				collection: StakCollections.collection(id),
 				// Authored (1:3333): Back -> Overview Instant; every stock
-				// card -> the saved Stock Detail, Instant.
+				// card -> the saved Stock Detail of ITS ticker, Instant
+				// (Codex parity audit, 2026-09-04).
 				onBack: { pop(.instant) },
-				onOpenStock: { pushInstant(.stockDetail(fromMyStak: true, symbol: "AAPL")) }
+				onOpenStock: { ticker in pushInstant(.stockDetail(fromMyStak: true, symbol: ticker)) }
 			)
 		case .profile:
 			// Authored (171:995): Back = BACK action - the house back pop.
 			ProfileView(onBack: { pop() }, onLogOut: onLogOut)
 		case .simPortfolio:
 			SimPortfolioView(
-				// Authored (1:4496): Back -> Simulate home, Instant; Sell
-				// pills open the Pick detail, Instant.
+				// Authored (1:4496): Back -> Simulate home, Instant; rows and
+				// Sell pills open the Pick detail of THEIR ticker, Instant.
 				onBack: { pop(.instant) },
-				onOpenPick: { pushInstant(.simPick) }
+				onOpenPick: { symbol in pushInstant(.simPick(symbol: symbol)) }
 			)
-		case .simPick:
+		case .simPick(let symbol):
 			PickDetailView(
+				symbol: symbol,
 				// Authored (1:4631): both Backs land on Portfolio, Instant,
 				// however the pick was opened.
 				onBack: { backToPortfolio() },

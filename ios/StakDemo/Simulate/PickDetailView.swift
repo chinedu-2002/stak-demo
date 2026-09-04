@@ -1,13 +1,70 @@
 import SwiftUI
 
+/// One $100 paper pick served into the authored Pick detail template
+/// (1:4631) and its sell sheets (1:4698 / 73:855). Codex parity audit
+/// (2026-09-04): NVDA keeps the frame's literals byte for byte; the other
+/// picks derive from the shared demo table - the same thing the Discover
+/// deck does when "Learn more" serves the tapped stock. Mirrors android/
+/// ui/simulate/PickDetailScreen.kt.
+struct PickSpec {
+	let symbol: String
+	let badge: String
+	/// The sell row's name - NVDA's authored "NVIDIA Corp" (1:4698).
+	let company: String
+	let priceNow: String
+	let priceThen: String
+	let pickedLine: String
+	/// The hero figure split at the decimal (1:4654 sets the cents at 16/20).
+	let gainWhole: String
+	let gainCents: String
+	/// "+$24.00" - the receipt's "(+$24.00)" tail (73:855).
+	let gainSigned: String
+	/// "24.0%" - unsigned; the subtitle reads up/down from `up`.
+	let gainPct: String
+	let up: Bool
+	let shares: String
+	let vsMarket: String
+	let ahead: Bool
+	/// The sell row's day move: the ticker's shared collection-tile change
+	/// (NVDA's authored "▲ 2.4%" is its AI & Tech tile; TSLA's comes from
+	/// NewsArticleFeed.stockFacts, whose $291.30 matches the table).
+	let dayChange: String
+	let dayUp: Bool
+	/// Stake value now = $100 + gain: position value, returning, proceeds
+	/// and returned on the sell sheets.
+	let stakeValue: String
+}
+
+enum PickSpecs {
+	static let all: [PickSpec] = [
+		// Figma frame 1:4631 verbatim.
+		PickSpec(symbol: "NVDA", badge: "N", company: "NVIDIA Corp", priceNow: "$122.10", priceThen: "$98.50", pickedLine: "Picked May 8 at $98.50", gainWhole: "+$24", gainCents: ".00", gainSigned: "+$24.00", gainPct: "24.0%", up: true, shares: "1.0152", vsMarket: "+20.8% ahead", ahead: true, dayChange: "▲ 2.4%", dayUp: true, stakeValue: "$124.00"),
+		PickSpec(symbol: "TSLA", badge: "T", company: "Tesla", priceNow: "$291.30", priceThen: "$246.86", pickedLine: "Picked Jun 3 at $246.86", gainWhole: "+$18", gainCents: ".00", gainSigned: "+$18.00", gainPct: "18.0%", up: true, shares: "0.4051", vsMarket: "+14.8% ahead", ahead: true, dayChange: "▼ 7.0%", dayUp: false, stakeValue: "$118.00"),
+		PickSpec(symbol: "AMD", badge: "A", company: "AMD", priceNow: "$164.30", priceThen: "$148.02", pickedLine: "Picked May 29 at $148.02", gainWhole: "+$11", gainCents: ".00", gainSigned: "+$11.00", gainPct: "11.0%", up: true, shares: "0.6756", vsMarket: "+7.8% ahead", ahead: true, dayChange: "▲ 2.1%", dayUp: true, stakeValue: "$111.00"),
+		PickSpec(symbol: "AAPL", badge: "A", company: "Apple", priceNow: "$229.35", priceThen: "$216.37", pickedLine: "Picked Apr 22 at $216.37", gainWhole: "+$6", gainCents: ".00", gainSigned: "+$6.00", gainPct: "6.0%", up: true, shares: "0.4622", vsMarket: "+2.8% ahead", ahead: true, dayChange: "▲ 1.2%", dayUp: true, stakeValue: "$106.00"),
+		PickSpec(symbol: "JPM", badge: "J", company: "JPMorgan", priceNow: "$245.60", priceThen: "$240.78", pickedLine: "Picked Jun 20 at $240.78", gainWhole: "+$2", gainCents: ".00", gainSigned: "+$2.00", gainPct: "2.0%", up: true, shares: "0.4153", vsMarket: "-1.2% behind", ahead: false, dayChange: "▲ 0.6%", dayUp: true, stakeValue: "$102.00"),
+		PickSpec(symbol: "MSFT", badge: "M", company: "Microsoft", priceNow: "$438.20", priceThen: "$451.75", pickedLine: "Picked Jun 26 at $451.75", gainWhole: "-$3", gainCents: ".00", gainSigned: "-$3.00", gainPct: "3.0%", up: false, shares: "0.2214", vsMarket: "-6.2% behind", ahead: false, dayChange: "▼ 0.4%", dayUp: false, stakeValue: "$97.00")
+	]
+
+	/// Unknown symbols serve the authored NVDA sample (all[0]).
+	static func pick(_ symbol: String) -> PickSpec {
+		all.first { $0.symbol == symbol } ?? all[0]
+	}
+}
+
 /// 07 · Simulate — "Pick detail · paper" (CHINEDU 1:4631). The NVDA
 /// position page: picked line, the +$24.00 gain hero, chart with range
 /// pills, the This-week / vs-the-market duo, Price then/now, the WHY?
 /// insight and the dark Sell CTA (raises the sell flow from here too).
+/// Codex parity audit (2026-09-04): serves the TAPPED pick (`symbol`)
+/// into the authored template; NVDA renders exactly as before.
 /// Ported from android/ ui/simulate/PickDetailScreen.kt. Every metric
 /// is scaled by the 390pt artboard unit (`figmaUnit`), exactly like
 /// the Android build's `u` scaling.
 struct PickDetailView: View {
+	/// The pick this page serves - every row / Sell pill on Simulate home
+	/// and Portfolio passes its own ticker (PickSpecs).
+	let symbol: String
 	let onBack: () -> Void
 	/// Authored (73:855): the sell receipt's exits, raised to the shell -
 	/// Back to Simulate (the forward push) and View portfolio (dissolve 300).
@@ -16,6 +73,8 @@ struct PickDetailView: View {
 
 	@State private var showSell = false
 
+	private var pick: PickSpec { PickSpecs.pick(symbol) }
+
 	var body: some View {
 		let u = figmaUnit
 		ZStack {
@@ -23,7 +82,7 @@ struct PickDetailView: View {
 				HStack {
 					AuthBackCircle(action: onBack)
 					Spacer()
-					Text("NVDA")
+					Text(pick.symbol)
 						.font(StakFont.sora(16 * u, .semiBold))
 						.foregroundStyle(Color.white)
 					Spacer()
@@ -47,21 +106,23 @@ struct PickDetailView: View {
 							HStack(spacing: 9 * u) {
 								ZStack {
 									Circle().fill(Sim.chipBg)
-									Text("N")
+									Text(pick.badge)
 										.font(StakFont.sora(15 * u, .semiBold))
 										.foregroundStyle(Sim.badgeInk)
 								}
 								.frame(width: 38 * u, height: 38 * u)
-								Text("Picked May 8 at $98.50")
+								Text(pick.pickedLine)
 									.font(StakFont.geist(12 * u))
 									.foregroundStyle(Sim.muted)
 							}
 							HStack(alignment: .bottom, spacing: 0) {
-								Text("+$24")
+								// A losing pick's figure takes the authored red (the
+								// frame's +$24 is white); the cents stay muted.
+								Text(pick.gainWhole)
 									.font(StakFont.sora(38 * u, .semiBold))
 									.tracking(-0.38 * u)
-									.foregroundStyle(Color.white)
-								Text(".00")
+									.foregroundStyle(pick.up ? Color.white : Sim.red)
+								Text(pick.gainCents)
 									.font(StakFont.sora(16 * u, .semiBold))
 									.foregroundStyle(Sim.muted)
 									.padding(.leading, 7 * u)
@@ -69,7 +130,7 @@ struct PickDetailView: View {
 							}
 							.frame(height: 48 * u, alignment: .bottom)
 							.padding(.top, 11 * u)
-							Text("That is up 24.0% on a $100 paper stake")
+							Text("That is \(pick.up ? "up" : "down") \(pick.gainPct) on a $100 paper stake")
 								.font(StakFont.geist(12 * u))
 								.foregroundStyle(Sim.muted)
 								.frame(height: 16 * u) // Authored line box is 16 — pin it so the card sums to 271
@@ -116,12 +177,15 @@ struct PickDetailView: View {
 						// Stats (1:4673): two 61-tall rows, 10 apart, 170-wide cells.
 						VStack(alignment: .leading, spacing: 10 * u) {
 							HStack(spacing: 10 * u) {
+								// The shared demo table defines no per-pick week move, so
+								// "This week" stays as authored for every pick (same call
+								// as the collection page's "+2.4% this week").
 								StatBox(label: "This week", value: "+$3.80", valueColor: Sim.green)
-								StatBox(label: "vs the market", value: "+20.8% ahead", valueColor: Sim.green)
+								StatBox(label: "vs the market", value: pick.vsMarket, valueColor: pick.ahead ? Sim.green : Sim.red)
 							}
 							HStack(spacing: 10 * u) {
-								StatBox(label: "Price then", value: "$98.50", valueColor: Sim.bright)
-								StatBox(label: "Price now", value: "$122.10", valueColor: Sim.bright)
+								StatBox(label: "Price then", value: pick.priceThen, valueColor: Sim.bright)
+								StatBox(label: "Price now", value: pick.priceNow, valueColor: Sim.bright)
 							}
 						}
 						// WHY / insight card — teal-tinted like the deck tips.
@@ -135,7 +199,8 @@ struct PickDetailView: View {
 									.tracking(0.9 * u)
 									.foregroundStyle(Sim.faint)
 							}
-							Text("Your stake tracks the move live. If NVDA gives back gains, the dollars follow it down.")
+							// Same authored sentence for a losing pick - only the symbol swaps.
+							Text("Your stake tracks the move live. If \(pick.symbol) gives back gains, the dollars follow it down.")
 								.font(StakFont.geist(12 * u))
 								.lineSpacing((17 - 12) * u)
 								.foregroundStyle(Sim.body)
@@ -173,7 +238,9 @@ struct PickDetailView: View {
 				}
 			}
 			if showSell {
+				// The sell flow sells THIS pick (same authored template).
 				SellFlowHost(
+					pick: pick,
 					// Authored (1:4698): the confirm's Back -> Pick detail, Instant.
 					onClose: { showSell = false },
 					onBackToSimulate: { if let onSellBackToSimulate { onSellBackToSimulate() } else { showSell = false; onBack() } },

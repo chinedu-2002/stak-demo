@@ -1,0 +1,105 @@
+import SwiftUI
+
+/// One stock tile in a collection - the fields of the 1:3375 tile template.
+/// Mirrors the android/ ui/mystak CollStock.
+struct CollStock: Identifiable {
+	let badge: String
+	let change: String
+	let up: Bool
+	let ticker: String
+	let company: String
+	let price: String
+	var id: String { ticker }
+}
+
+/// One My STAK collection: what its Overview chip (1:3180) and its
+/// Collection page hero (1:3333) serve. `image` is glass art (MsColl*),
+/// `icon` a category glyph (IcCat*) - a collection carries one or the other.
+struct StakCollection: Identifiable {
+	let id: String
+	let name: String
+	/// The "5 stocks" count label - on the chip and in the hero meta.
+	let count: String
+	let blurb: String
+	var image: String? = nil
+	var icon: String? = nil
+	let stocks: [CollStock]
+}
+
+/// Codex parity audit (2026-09-04): every chip carries its own collection
+/// and the Collection page serves the tapped one through the same authored
+/// template (1:3333) - exactly as the Discover deck's "Learn more" serves
+/// the tapped stock. AI & Tech keeps the authored sample verbatim; the
+/// other five are the shared demo seed the backend would serve.
+/// Mirrors the android/ ui/mystak collection catalogue.
+enum StakCollections {
+	static let all: [StakCollection] = [
+		StakCollection(
+			id: "aitech", name: "AI & Tech", count: "5 stocks",
+			blurb: "Your highest-conviction growth and AI names.",
+			image: "MsCollAITech",
+			stocks: [
+				CollStock(badge: "N", change: "▲ 2.4%", up: true, ticker: "NVDA", company: "NVIDIA", price: "$122.10"),
+				CollStock(badge: "A", change: "▲ 1.2%", up: true, ticker: "AAPL", company: "Apple", price: "$229.35"),
+				CollStock(badge: "M", change: "▼ 0.4%", up: false, ticker: "MSFT", company: "Microsoft", price: "$438.20"),
+				CollStock(badge: "G", change: "▲ 0.8%", up: true, ticker: "GOOGL", company: "Alphabet", price: "$178.90"),
+				CollStock(badge: "A", change: "▲ 2.1%", up: true, ticker: "AMD", company: "Adv Micro", price: "$164.30")
+			]
+		),
+		StakCollection(
+			id: "finance", name: "Finance", count: "3 stocks",
+			blurb: "The banks and payment rails that move money.",
+			image: "MsCollFinance",
+			stocks: [
+				CollStock(badge: "J", change: "▲ 0.6%", up: true, ticker: "JPM", company: "JPMorgan", price: "$245.60"),
+				CollStock(badge: "V", change: "▲ 0.3%", up: true, ticker: "V", company: "Visa", price: "$352.10"),
+				CollStock(badge: "G", change: "▼ 0.5%", up: false, ticker: "GS", company: "Goldman Sachs", price: "$612.40")
+			]
+		),
+		StakCollection(
+			id: "green", name: "Green Energy", count: "3 stocks",
+			blurb: "Solar, the grid and the utilities going clean.",
+			icon: "IcCatGreen",
+			stocks: [
+				CollStock(badge: "E", change: "▲ 1.9%", up: true, ticker: "ENPH", company: "Enphase", price: "$78.40"),
+				CollStock(badge: "N", change: "▲ 0.4%", up: true, ticker: "NEE", company: "NextEra", price: "$84.20"),
+				CollStock(badge: "F", change: "▼ 1.1%", up: false, ticker: "FSLR", company: "First Solar", price: "$228.90")
+			]
+		),
+		StakCollection(
+			id: "realestate", name: "Real Estate", count: "2 stocks",
+			blurb: "Your small hedge: warehouses and rent checks.",
+			icon: "IcCatRealEstate",
+			stocks: [
+				CollStock(badge: "P", change: "▲ 0.2%", up: true, ticker: "PLD", company: "Prologis", price: "$118.30"),
+				CollStock(badge: "O", change: "▼ 0.3%", up: false, ticker: "O", company: "Realty Income", price: "$59.10")
+			]
+		),
+		StakCollection(
+			id: "health", name: "Healthcare", count: "4 stocks",
+			blurb: "Drugmakers and insurers with steady demand.",
+			icon: "IcCatHealth",
+			stocks: [
+				CollStock(badge: "L", change: "▲ 1.4%", up: true, ticker: "LLY", company: "Eli Lilly", price: "$792.50"),
+				CollStock(badge: "U", change: "▼ 0.8%", up: false, ticker: "UNH", company: "UnitedHealth", price: "$318.70"),
+				CollStock(badge: "J", change: "▲ 0.5%", up: true, ticker: "JNJ", company: "Johnson & Johnson", price: "$162.40"),
+				CollStock(badge: "P", change: "▼ 0.2%", up: false, ticker: "PFE", company: "Pfizer", price: "$25.30")
+			]
+		),
+		StakCollection(
+			id: "consumer", name: "Consumer", count: "2 stocks",
+			blurb: "Brands people keep buying, in any market.",
+			icon: "IcCatConsumer",
+			stocks: [
+				CollStock(badge: "C", change: "▲ 0.7%", up: true, ticker: "COST", company: "Costco", price: "$947.20"),
+				CollStock(badge: "N", change: "▼ 1.3%", up: false, ticker: "NKE", company: "Nike", price: "$72.80")
+			]
+		)
+	]
+
+	/// The collection an Overview chip pushed; an unknown id serves the
+	/// authored AI & Tech sample, like `stockFacts` falls back to AAPL.
+	static func collection(_ id: String) -> StakCollection {
+		all.first { $0.id == id } ?? all[0]
+	}
+}

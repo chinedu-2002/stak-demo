@@ -32,7 +32,8 @@ private let ctaGradient = LinearGradient(
 /// exactly like the Android build's `u` scaling.
 /// Ported from android/ ui/mystak/MyStakScreen.kt.
 struct MyStakView: View {
-	let onOpenCollection: () -> Void
+	/// Receives the tapped chip's collection id (MyStak/Collections.swift).
+	let onOpenCollection: (String) -> Void
 	let onStartSwiping: () -> Void
 
 	var body: some View {
@@ -73,20 +74,20 @@ struct MyStakView: View {
 	private var collectionsGrid: some View {
 		let u = figmaUnit
 		// Authored (1:3180 template): EVERY collection card opens the
-		// Collection screen, Instant - its content stays the authored
-		// AI & Tech sample.
+		// Collection screen, Instant. Codex parity audit (2026-09-04): each
+		// chip carries its own collection id so the page serves the tapped
+		// one; the six catalogue chips fill the authored three rows of two.
+		let all = StakCollections.all
+		let rows = stride(from: 0, to: all.count, by: 2).map {
+			Array(all[$0..<min($0 + 2, all.count)])
+		}
 		return VStack(spacing: 10 * u) {
-			HStack(spacing: 10 * u) {
-				CollectionChip(name: "AI & Tech", count: "5 stocks", image: "MsCollAITech", action: onOpenCollection)
-				CollectionChip(name: "Finance", count: "3 stocks", image: "MsCollFinance", action: onOpenCollection)
-			}
-			HStack(spacing: 10 * u) {
-				CollectionChip(name: "Green Energy", count: "3 stocks", icon: "IcCatGreen", action: onOpenCollection)
-				CollectionChip(name: "Real Estate", count: "2 stocks", icon: "IcCatRealEstate", action: onOpenCollection)
-			}
-			HStack(spacing: 10 * u) {
-				CollectionChip(name: "Healthcare", count: "4 stocks", icon: "IcCatHealth", action: onOpenCollection)
-				CollectionChip(name: "Consumer", count: "2 stocks", icon: "IcCatConsumer", action: onOpenCollection)
+			ForEach(Array(rows.enumerated()), id: \.offset) { _, row in
+				HStack(spacing: 10 * u) {
+					ForEach(row) { collection in
+						CollectionChip(collection: collection) { onOpenCollection(collection.id) }
+					}
+				}
 			}
 		}
 	}
@@ -95,8 +96,9 @@ struct MyStakView: View {
 		let u = figmaUnit
 		return Button(action: onStartSwiping) {
 			HStack(spacing: 8 * u) {
+				// Figma 1:3155 sets 14 (Codex parity audit, 2026-09-04).
 				Text("Add more")
-					.font(StakFont.geist(16 * u, .medium))
+					.font(StakFont.geist(14 * u, .medium))
 					.foregroundStyle(StakColors.textPrimary)
 				Image("IcPlusSmall")
 					.resizable()
@@ -127,9 +129,10 @@ struct MyStakView: View {
 			Text("You lean into growth and tech.")
 				.font(StakFont.sora(15 * u, .semiBold))
 				.foregroundStyle(StakColors.textPrimary)
+			// Figma 1:3155 sets the body at 13 (Codex parity audit, 2026-09-04).
 			Text("Six of your fourteen picks are tech or AI names. Your STAK skews high-growth, with a small hedge in real estate.")
-				.font(StakFont.geist(14 * u))
-				.lineSpacing((19 - 14) * u)
+				.font(StakFont.geist(13 * u))
+				.lineSpacing((19 - 13) * u)
 				.foregroundStyle(bodyColor)
 		}
 		.frame(maxWidth: .infinity, alignment: .leading)
@@ -185,23 +188,20 @@ private struct SectionHeader: View {
 
 /// One collection chip — art/icon, name + count, chevron (#181f30 r12).
 private struct CollectionChip: View {
-	let name: String
-	let count: String
-	var image: String? = nil
-	var icon: String? = nil
-	var action: () -> Void = {}
+	let collection: StakCollection
+	let action: () -> Void
 
 	var body: some View {
 		let u = figmaUnit
 		Button(action: action) {
 			HStack(spacing: 10 * u) {
-				if let image {
+				if let image = collection.image {
 					Image(image)
 						.resizable()
 						.scaledToFill()
 						.frame(width: 34 * u, height: 34 * u)
 						.clipped()
-				} else if let icon {
+				} else if let icon = collection.icon {
 					Image(icon)
 						.resizable()
 						.frame(width: 36 * u, height: 36 * u)
@@ -210,12 +210,12 @@ private struct CollectionChip: View {
 					// Authored: "Green Energy" (box 90) overflows its 84 column —
 					// the frame draws it past the column, so never wrap or clip it
 					// (Kotlin softWrap = false + TextOverflow.Visible).
-					Text(name)
+					Text(collection.name)
 						.font(StakFont.sora(13 * u, .semiBold))
 						.foregroundStyle(StakColors.textPrimary)
 						.lineLimit(1)
 						.fixedSize(horizontal: true, vertical: false)
-					Text(count)
+					Text(collection.count)
 						.font(StakFont.geist(11 * u))
 						.foregroundStyle(muted)
 				}

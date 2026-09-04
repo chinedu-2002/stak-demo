@@ -28,16 +28,28 @@ let pltrBuy = BuySpec(
 	change: "▲ 1.1%", cashBefore: "$8,800.00", cashAfter: "$8,775.00", shares: "0.8803", symbol: "PLTR"
 )
 
+/// Codex parity audit (2026-09-04): COST's Buy pill serves its own $25
+/// paper ticket into the authored 1:4232 template, the way the Discover
+/// deck serves the tapped stock. Mirrors android/ ui/simulate/SimulateScreen.kt.
+let costBuy = BuySpec(
+	title: "Buy COST?", badge: "C", name: "Costco Wholesale", priceLine: "$947.20 today",
+	change: "▲ 0.7%", cashBefore: "$8,800.00", cashAfter: "$8,775.00", shares: "0.0264", symbol: "COST"
+)
+
 struct SimulateView: View {
 	let onOpenPortfolio: () -> Void
-	let onOpenPick: () -> Void
+	/// Codex parity audit (2026-09-04): every pick tile / row passes its
+	/// own ticker, so Pick detail serves the tapped pick.
+	let onOpenPick: (String) -> Void
 	let onOpenLeaderboard: () -> Void
 	/// Authored (1:3964): "All saved staks ›" -> My STAK Overview (tab SWAP, Instant).
 	var onOpenMyStak: () -> Void = {}
-	/// When the shell hosts the ticket (1:4232: the sheet covers the tab bar), it raises it here.
-	var onPracticeBuy: (() -> Void)? = nil
+	/// When the shell hosts the ticket (1:4232: the sheet covers the tab bar),
+	/// it raises it here with the tapped row's spec.
+	var onPracticeBuy: ((BuySpec) -> Void)? = nil
 
-	@State private var showBuy = false
+	/// The locally hosted ticket's spec (nil = no ticket).
+	@State private var buy: BuySpec? = nil
 
 	var body: some View {
 		let u = figmaUnit
@@ -69,19 +81,19 @@ struct SimulateView: View {
 					VStack(spacing: 18 * u) {
 						ScoreHero(onOpenLeaderboard: onOpenLeaderboard)
 						sectionHeader("Saved staks")
-						SavedStakRow(badge: "P", ticker: "PLTR", sub: "Saved Jun 30 · not in portfolio yet", onBuy: { if let onPracticeBuy { onPracticeBuy() } else { showBuy = true } })
-						SavedStakRow(badge: "C", ticker: "COST", sub: "Saved Jul 2 · not in portfolio yet", onBuy: { if let onPracticeBuy { onPracticeBuy() } else { showBuy = true } })
+						SavedStakRow(badge: "P", ticker: "PLTR", sub: "Saved Jun 30 · not in portfolio yet", spec: pltrBuy, onBuy: { practiceBuy($0) })
+						SavedStakRow(badge: "C", ticker: "COST", sub: "Saved Jul 2 · not in portfolio yet", spec: costBuy, onBuy: { practiceBuy($0) })
 						CenterLink(text: "All saved staks", action: onOpenMyStak)
 						InsightCard()
 						HStack(spacing: 10 * u) {
-							PickDuo(kicker: "BEST PICK", pct: "+24.0%", pctColor: Sim.green, badge: "N", ticker: "NVDA", sub: "+$24 on $100", action: onOpenPick)
-							PickDuo(kicker: "WORST PICK", pct: "-3.0%", pctColor: Sim.red, badge: "M", ticker: "MSFT", sub: "-$3 on $100", action: onOpenPick)
+							PickDuo(kicker: "BEST PICK", pct: "+24.0%", pctColor: Sim.green, badge: "N", ticker: "NVDA", sub: "+$24 on $100", action: { onOpenPick("NVDA") })
+							PickDuo(kicker: "WORST PICK", pct: "-3.0%", pctColor: Sim.red, badge: "M", ticker: "MSFT", sub: "-$3 on $100", action: { onOpenPick("MSFT") })
 						}
 						HowItWorksCard()
 						sectionHeader("Your portfolio")
-						PortfolioRow(badge: "N", ticker: "NVDA", sub: "Picked May 8 · up 24% since", amount: "+$24.00", pct: "+24.0%", up: true, action: onOpenPick)
-						PortfolioRow(badge: "T", ticker: "TSLA", sub: "Picked Jun 3 · up 18% since", amount: "+$18.00", pct: "+18.0%", up: true, action: onOpenPick)
-						PortfolioRow(badge: "M", ticker: "MSFT", sub: "Picked Jun 26 · down 3% since", amount: "-$3.00", pct: "-3.0%", up: false, action: onOpenPick)
+						PortfolioRow(badge: "N", ticker: "NVDA", sub: "Picked May 8 · up 24% since", amount: "+$24.00", pct: "+24.0%", up: true, action: { onOpenPick("NVDA") })
+						PortfolioRow(badge: "T", ticker: "TSLA", sub: "Picked Jun 3 · up 18% since", amount: "+$18.00", pct: "+18.0%", up: true, action: { onOpenPick("TSLA") })
+						PortfolioRow(badge: "M", ticker: "MSFT", sub: "Picked Jun 26 · down 3% since", amount: "-$3.00", pct: "-3.0%", up: false, action: { onOpenPick("MSFT") })
 						CenterLink(text: "See all 12 picks", action: onOpenPortfolio)
 						HStack {
 							Text("Portfolio breakdown")
@@ -108,12 +120,18 @@ struct SimulateView: View {
 					.padding(.bottom, 26 * u)
 				}
 			}
-			if showBuy {
+			if let spec = buy {
 				// 85:895 authors "View portfolio" / "Done" on the Simulate add-success sheet.
-				DiscoverBuyFlow(spec: pltrBuy, onClose: { showBuy = false }, filledPrimary: "View portfolio", filledSecondary: "Done", ticketSecondary: "Back")
+				DiscoverBuyFlow(spec: spec, onClose: { buy = nil }, filledPrimary: "View portfolio", filledSecondary: "Done", ticketSecondary: "Back")
 			}
 		}
 		.background(StakColors.bg.ignoresSafeArea())
+	}
+
+	/// The tapped row's ticket: raised to the shell when it hosts the
+	/// sheet, else shown here.
+	private func practiceBuy(_ spec: BuySpec) {
+		if let onPracticeBuy { onPracticeBuy(spec) } else { buy = spec }
 	}
 
 	private func sectionHeader(_ title: String) -> some View {
@@ -214,11 +232,13 @@ private struct ScoreHero: View {
 }
 
 /// Saved stak row — badge, ticker + saved line, teal Buy pill (60x30).
+/// The row's Buy hands over ITS ticket spec.
 private struct SavedStakRow: View {
 	let badge: String
 	let ticker: String
 	let sub: String
-	let onBuy: () -> Void
+	let spec: BuySpec
+	let onBuy: (BuySpec) -> Void
 
 	var body: some View {
 		let u = figmaUnit
@@ -239,7 +259,7 @@ private struct SavedStakRow: View {
 					.foregroundStyle(Sim.muted)
 			}
 			.frame(maxWidth: .infinity, alignment: .leading)
-			BuyPill(text: "Buy", action: onBuy)
+			BuyPill(text: "Buy", action: { onBuy(spec) })
 		}
 		.padding(.horizontal, 14 * u)
 		.padding(.vertical, 11 * u)

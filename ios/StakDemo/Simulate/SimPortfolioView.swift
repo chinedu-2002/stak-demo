@@ -25,7 +25,9 @@ private let picks: [SimPick] = [
 
 struct SimPortfolioView: View {
 	let onBack: () -> Void
-	let onOpenPick: () -> Void
+	/// Codex parity audit (2026-09-04): every row / Sell pill opens ITS
+	/// pick - the tapped ticker rides to PickDetailView(symbol:).
+	let onOpenPick: (String) -> Void
 
 	@State private var showSell = false
 	@State private var showClosed = false
@@ -72,11 +74,11 @@ struct SimPortfolioView: View {
 							PortfolioRow(
 								badge: p.badge, ticker: p.ticker, sub: p.sub,
 								amount: p.amount, pct: p.pct, up: p.up,
-								action: onOpenPick,
+								action: { onOpenPick(p.ticker) },
 								// Authored (1:4548 template): every Sell pill opens
-								// the Pick detail, Instant - the authored sell flow
-								// lives there; this page's sheets stay unwired.
-								trailing: { SellPill(action: onOpenPick) }
+								// the Pick detail of ITS ticker, Instant - the authored
+								// sell flow lives there; this page's sheets stay unwired.
+								trailing: { SellPill(action: { onOpenPick(p.ticker) }) }
 							)
 						}
 						Text("SOLD · REALIZED")
@@ -102,6 +104,8 @@ struct SimPortfolioView: View {
 			if showSell {
 				SimSheet(onDismiss: { showSell = false }) {
 					SellConfirmSheet(
+						// Unwired on this page - the authored NVDA sample.
+						pick: PickSpecs.pick("NVDA"),
 						onConfirm: { showSell = false; showClosed = true },
 						onDismiss: { showSell = false }
 					)
@@ -110,6 +114,7 @@ struct SimPortfolioView: View {
 			if showClosed {
 				SimSheet(onDismiss: { showClosed = false }) {
 					PositionClosedSheet(
+						pick: PickSpecs.pick("NVDA"),
 						onBackToSimulate: { showClosed = false; onBack() },
 						onViewPortfolio: { showClosed = false }
 					)
@@ -223,30 +228,34 @@ private struct SimSheet<Content: View>: View {
 	}
 }
 
-/// NVDA row used by the sell sheets — teal-tinted, badge + price + change.
-private struct NvdaSellRow: View {
+/// The pick's row on the sell sheets — teal-tinted, badge + price + change.
+/// Authored as the NVDA row (1:4698); Codex parity audit (2026-09-04):
+/// serves the tapped pick (PickSpec) into the same row.
+private struct PickSellRow: View {
+	let pick: PickSpec
+
 	var body: some View {
 		let u = figmaUnit
 		HStack(spacing: 11 * u) {
 			ZStack {
 				Circle().fill(Sim.chipBg)
-				Text("N")
+				Text(pick.badge)
 					.font(StakFont.sora(15 * u, .semiBold))
 					.foregroundStyle(Sim.badgeInk)
 			}
 			.frame(width: 38 * u, height: 38 * u)
 			VStack(alignment: .leading, spacing: 2 * u) {
-				Text("NVIDIA Corp")
+				Text(pick.company)
 					.font(StakFont.geist(13 * u, .medium))
 					.foregroundStyle(Color.white)
-				Text("$122.10 today")
+				Text("\(pick.priceNow) today")
 					.font(StakFont.geist(10 * u))
 					.foregroundStyle(Sim.muted)
 			}
 			.frame(maxWidth: .infinity, alignment: .leading)
-			Text("▲ 2.4%")
+			Text(pick.dayChange)
 				.font(StakFont.geist(12 * u, .medium))
-				.foregroundStyle(Sim.green)
+				.foregroundStyle(pick.dayUp ? Sim.green : Sim.red)
 		}
 		.padding(.horizontal, 14 * u)
 		.padding(.vertical, 12 * u)
@@ -257,6 +266,8 @@ private struct NvdaSellRow: View {
 /// "Sell NVDA?" confirm ticket (1:4698) — content only; its host (the
 /// SellFlowHost morph or a bare SimSheet) provides scrim + sheet.
 struct SellConfirmSheet: View {
+	/// The pick being sold - NVDA renders the frame's literals verbatim.
+	let pick: PickSpec
 	let onConfirm: () -> Void
 	let onDismiss: () -> Void
 
@@ -266,11 +277,11 @@ struct SellConfirmSheet: View {
 		let u = figmaUnit
 		Group {
 			VStack(alignment: .leading, spacing: 14 * u) {
-				Text("Sell NVDA?")
+				Text("Sell \(pick.symbol)?")
 					.font(StakFont.sora(18 * u, .semiBold))
 					.foregroundStyle(Color.white)
-				NvdaSellRow()
-				Text("You hold 1.0152 shares from your $100 stake.")
+				PickSellRow(pick: pick)
+				Text("You hold \(pick.shares) shares from your $100 stake.")
 					.font(StakFont.geist(12 * u))
 					.lineSpacing((18 - 12) * u)
 					.foregroundStyle(Sim.body)
@@ -278,7 +289,7 @@ struct SellConfirmSheet: View {
 					Text("Position value")
 						.font(StakFont.geist(12 * u))
 						.foregroundStyle(Sim.muted)
-					Text("$124.00")
+					Text(pick.stakeValue)
 						.font(StakFont.geist(12 * u, .medium))
 						.foregroundStyle(Sim.bright)
 				}
@@ -311,7 +322,7 @@ struct SellConfirmSheet: View {
 					Text("Returning")
 						.font(StakFont.geist(12 * u))
 						.foregroundStyle(Sim.muted)
-					Text("$124.00")
+					Text(pick.stakeValue)
 						.font(StakFont.sora(15 * u, .semiBold))
 						.foregroundStyle(Sim.bright)
 					Text("to your cash")
@@ -364,6 +375,8 @@ private struct SimSheetSecondary: View {
 /// "Position closed" receipt (73:855) — content only; its host (the
 /// SellFlowHost morph or a bare SimSheet) provides scrim + sheet.
 struct PositionClosedSheet: View {
+	/// The pick just sold - NVDA renders the frame's literals verbatim.
+	let pick: PickSpec
 	let onBackToSimulate: () -> Void
 	let onViewPortfolio: () -> Void
 
@@ -377,8 +390,8 @@ struct PositionClosedSheet: View {
 				Text("Position closed")
 					.font(StakFont.sora(18 * u, .semiBold))
 					.foregroundStyle(Color.white)
-				NvdaSellRow()
-				Text("Sold 1.0152 shares from your $100 stake.")
+				PickSellRow(pick: pick)
+				Text("Sold \(pick.shares) shares from your $100 stake.")
 					.font(StakFont.geist(12 * u))
 					.lineSpacing((18 - 12) * u)
 					.foregroundStyle(Sim.body)
@@ -387,7 +400,7 @@ struct PositionClosedSheet: View {
 					Text("Proceeds")
 						.font(StakFont.geist(12 * u))
 						.foregroundStyle(Sim.muted)
-					Text("$124.00")
+					Text(pick.stakeValue)
 						.font(StakFont.geist(12 * u, .medium))
 						.foregroundStyle(Sim.bright)
 					Spacer()
@@ -398,10 +411,10 @@ struct PositionClosedSheet: View {
 					Text("Returned")
 						.font(StakFont.geist(12 * u))
 						.foregroundStyle(Sim.muted)
-					Text("$124.00")
+					Text(pick.stakeValue)
 						.font(StakFont.sora(15 * u, .semiBold))
 						.foregroundStyle(Sim.bright)
-					Text("to your cash (+$24.00)")
+					Text("to your cash (\(pick.gainSigned))")
 						.font(StakFont.geist(12 * u))
 						.foregroundStyle(Sim.muted)
 					Spacer()
@@ -440,6 +453,8 @@ struct PositionClosedSheet: View {
 /// SMART_ANIMATE 350 (1:4698 -> 73:855): ONE sheet stays put while the
 /// confirm cross-fades into the receipt and the height eases along.
 struct SellFlowHost: View {
+	/// The pick this flow sells (PickDetailView's tapped symbol).
+	let pick: PickSpec
 	let onClose: () -> Void
 	/// Authored exits for the receipt CTAs (73:855); nil falls back to onClose.
 	var onBackToSimulate: (() -> Void)? = nil
@@ -453,10 +468,11 @@ struct SellFlowHost: View {
 		}) {
 			ZStack(alignment: .top) {
 				if !closed {
-					SellConfirmSheet(onConfirm: { closed = true }, onDismiss: onClose)
+					SellConfirmSheet(pick: pick, onConfirm: { closed = true }, onDismiss: onClose)
 						.transition(.opacity)
 				} else {
 					PositionClosedSheet(
+						pick: pick,
 						onBackToSimulate: onBackToSimulate ?? onClose,
 						onViewPortfolio: onViewPortfolio ?? onClose
 					)

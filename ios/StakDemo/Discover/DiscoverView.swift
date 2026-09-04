@@ -11,6 +11,8 @@ enum Disc {
 	static let faint = Color(argb: 0xFF5C6B85)
 	static let body = Color(argb: 0xFFC8D2E0)
 	static let green = Color(argb: 0xFF2FD08A)
+	/// Down moves on a ticket (Codex parity audit 2026-09-04) - the Simulate red.
+	static let red = Color(argb: 0xFFFF5A6A)
 	static let teal = Color(argb: 0xFF69B3CA)
 	static let tealTint = Color(argb: 0x1A69B3CA)
 	static let chipBg = Color(argb: 0xFF242B3D)
@@ -684,7 +686,7 @@ struct SheetStockRow: View {
 			.frame(maxWidth: .infinity, alignment: .leading)
 			Text(spec.change)
 				.font(StakFont.geist(12 * u, .medium))
-				.foregroundStyle(Disc.green)
+				.foregroundStyle(spec.change.hasPrefix("▼") ? Disc.red : Disc.green)
 		}
 		.padding(.horizontal, 14 * u)
 		.padding(.vertical, 12 * u)

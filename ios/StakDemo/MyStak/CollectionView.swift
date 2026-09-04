@@ -8,39 +8,27 @@ private let green = Color(argb: 0xFF2FD08A)
 private let redDown = Color(argb: 0xFFE5484D)
 private let badgeInk = Color(argb: 0xFF9EADC7)
 
-private struct CollStock: Identifiable {
-	let badge: String
-	let change: String
-	let up: Bool
-	let ticker: String
-	let company: String
-	let price: String
-	var id: String { ticker }
-}
-
-private let stocks = [
-	CollStock(badge: "N", change: "▲ 2.4%", up: true, ticker: "NVDA", company: "NVIDIA", price: "$122.10"),
-	CollStock(badge: "A", change: "▲ 1.2%", up: true, ticker: "AAPL", company: "Apple", price: "$229.35"),
-	CollStock(badge: "M", change: "▼ 0.4%", up: false, ticker: "MSFT", company: "Microsoft", price: "$438.20"),
-	CollStock(badge: "G", change: "▲ 0.8%", up: true, ticker: "GOOGL", company: "Alphabet", price: "$178.90"),
-	CollStock(badge: "A", change: "▲ 2.1%", up: true, ticker: "AMD", company: "Adv Micro", price: "$164.30")
-]
-
-/// The Android `chunked(2)` rows — pairs of tiles, the odd tail row hosts the Add-stock card.
-private let stockRows: [[CollStock]] = stride(from: 0, to: stocks.count, by: 2).map {
-	Array(stocks[$0..<min($0 + 2, stocks.count)])
-}
-
 /// 06 · My STAK — "Collection · Cards A · corrected" (CHINEDU 1:3333).
-/// The AI & Tech collection: hero (glass art, title, meta, blurb) and
-/// the stock-tile grid with the dashed Add-stock card. Tapping AAPL
-/// opens the saved Stock Detail.
+/// The Collection page: hero (art, title, meta, blurb) and the stock-tile
+/// grid with the dashed Add-stock card. Codex parity audit (2026-09-04):
+/// the authored AI & Tech frame is the template - it serves whichever
+/// collection the Overview chip carried (MyStak/Collections.swift), and
+/// tapping a tile opens THAT stock's saved Stock Detail.
 /// Every metric is scaled by the 390pt artboard unit (`figmaUnit`),
 /// exactly like the Android build's `u` scaling.
 /// Ported from android/ ui/mystak/CollectionScreen.kt.
 struct CollectionView: View {
+	let collection: StakCollection
 	let onBack: () -> Void
-	let onOpenStock: () -> Void
+	let onOpenStock: (String) -> Void
+
+	/// The Android `chunked(2)` rows — pairs of tiles, the odd tail row hosts the Add-stock card.
+	private var stockRows: [[CollStock]] {
+		let stocks = collection.stocks
+		return stride(from: 0, to: stocks.count, by: 2).map {
+			Array(stocks[$0..<min($0 + 2, stocks.count)])
+		}
+	}
 
 	var body: some View {
 		let u = figmaUnit
@@ -48,7 +36,7 @@ struct CollectionView: View {
 			HStack {
 				AuthBackCircle(action: onBack)
 				Spacer()
-				Text("AI & Tech")
+				Text(collection.name)
 					.font(StakFont.sora(16 * u, .semiBold))
 					.foregroundStyle(StakColors.textPrimary)
 				Spacer()
@@ -80,26 +68,41 @@ struct CollectionView: View {
 	private var hero: some View {
 		let u = figmaUnit
 		return VStack(alignment: .leading, spacing: 10 * u) {
-			Image("MsCollAITech")
-				.resizable()
-				.scaledToFill()
-				.frame(width: 60 * u, height: 60 * u)
-				.clipped()
-			Text("AI & Tech")
+			// The authored 60u art frame. A collection with a category icon
+			// instead of glass art centres the chip's own 36u icon in that
+			// same frame, so title / meta / blurb keep their authored
+			// positions (Codex parity audit, 2026-09-04).
+			ZStack {
+				if let image = collection.image {
+					Image(image)
+						.resizable()
+						.scaledToFill()
+						.frame(width: 60 * u, height: 60 * u)
+						.clipped()
+				} else if let icon = collection.icon {
+					Image(icon)
+						.resizable()
+						.frame(width: 36 * u, height: 36 * u)
+				}
+			}
+			.frame(width: 60 * u, height: 60 * u)
+			Text(collection.name)
 				.font(StakFont.sora(26 * u, .semiBold))
 				.foregroundStyle(StakColors.textPrimary)
 			HStack(spacing: 7 * u) {
-				Text("5 stocks")
+				Text(collection.count)
 					.font(StakFont.geist(13 * u))
 					.foregroundStyle(muted)
 				Text("·")
 					.font(StakFont.geist(13 * u))
 					.foregroundStyle(faint)
+				// The week move is authored copy (1:3333) the shared demo
+				// data does not define per collection - it stays as drawn.
 				Text("+2.4% this week")
 					.font(StakFont.geist(13 * u, .medium))
 					.foregroundStyle(green)
 			}
-			Text("Your highest-conviction growth and AI names.")
+			Text(collection.blurb)
 				.font(StakFont.geist(13 * u))
 				.foregroundStyle(Color(argb: 0xFFC8D2E0))
 		}
@@ -115,9 +118,10 @@ struct CollectionView: View {
 				HStack(spacing: 10 * u) {
 					ForEach(row) { stock in
 						// Authored (1:3375 template): EVERY card opens the saved
-						// Stock Detail, Instant (the authored AAPL sample content).
+						// Stock Detail, Instant - serving the tapped ticker
+						// (Codex parity audit, 2026-09-04).
 						StockTile(stock: stock) {
-							onOpenStock()
+							onOpenStock(stock.ticker)
 						}
 					}
 					if row.count == 1 {

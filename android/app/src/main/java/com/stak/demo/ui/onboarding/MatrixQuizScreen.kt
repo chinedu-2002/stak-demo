@@ -69,9 +69,13 @@ internal fun MatrixQuizScreen(
 	options: List<MatrixOption>,
 	onBack: () -> Unit,
 	onContinue: () -> Unit,
+	// The frames arrive with one card already selected (04 Goal 1554:8828,
+	// 05 Risk 1554:8913); the caller names it (Codex parity audit
+	// 2026-09-04). -1 = start unselected.
+	initialSelection: Int = -1,
 ) {
 	val u = figmaUnit()
-	var selected by rememberSaveable { mutableIntStateOf(-1) }
+	var selected by rememberSaveable { mutableIntStateOf(initialSelection) }
 
 	Artboard(modifier = Modifier.background(StakColors.Bg)) {
 		Row(

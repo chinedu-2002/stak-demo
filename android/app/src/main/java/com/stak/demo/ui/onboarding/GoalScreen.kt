@@ -22,5 +22,7 @@ fun GoalScreen(onBack: () -> Unit, onContinue: () -> Unit) {
 		),
 		onBack = onBack,
 		onContinue = onContinue,
+		// 1554:8828 arrives with "Find my first stocks" selected.
+		initialSelection = 2,
 	)
 }

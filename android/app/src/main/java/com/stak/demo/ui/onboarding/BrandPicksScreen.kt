@@ -40,6 +40,9 @@ import com.stak.demo.ui.theme.ADVANCE_ROUNDING
 private data class Brand(val name: String, val iconRes: Int)
 
 /** The 12 brand tiles of Figma "Onboarding · 02 Brand picks" (1554:8541), in grid order. */
+/** The five tiles selected on the authored frame, by brand name. */
+private val FIGMA_PICKS = setOf("Apple", "Tesla", "Nike", "Spotify", "Coinbase")
+
 private val BRANDS = listOf(
 	Brand("Apple", R.drawable.brand_apple),
 	Brand("Tesla", R.drawable.brand_tesla),
@@ -67,7 +70,10 @@ private val BRANDS = listOf(
 @Composable
 fun BrandPicksScreen(onBack: () -> Unit, onContinue: () -> Unit) {
 	val u = figmaUnit()
-	var picked by rememberSaveable { mutableStateOf(setOf<String>()) }
+	// The frame (1554:8541) arrives with five brands already picked and the
+	// CTA reading "Continue · 5 picked"; the build starts in that state
+	// (Codex parity audit 2026-09-04). Every tile stays toggleable.
+	var picked by rememberSaveable { mutableStateOf(FIGMA_PICKS) }
 
 	Artboard(modifier = Modifier.background(StakColors.Bg)) {
 		// Nav row — back circle + step label.

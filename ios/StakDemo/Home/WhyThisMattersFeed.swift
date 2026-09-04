@@ -17,7 +17,7 @@ enum WhyThisMattersFeed {
 	/// Production switch - keep false while reviews compare build vs frame.
 	static let live = false
 
-	static let demoBody = "Your STAK collections houses 80% of stocks from effected industries."
+	static let demoBody = "Your STAK collections house 80% of stocks from affected industries."
 
 	/// The current summary - the served personalized copy once the backend exists.
 	static func body() -> String { demoBody }

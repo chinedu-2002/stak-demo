@@ -180,9 +180,19 @@ private struct TopNav: View {
 				Button(action: onProfile) {
 					ZStack {
 						Circle().fill(Home.navCircle)
-						Image("IcNavPerson")
-							.resizable()
-							.frame(width: 12.99 * u, height: 13.64 * u)
+						// The picked photo when one exists (Codex audit 2026-09-04),
+						// as on the Profile hub; else the authored glyph (118:1633).
+						if let data = profile.photoData, let photo = UIImage(data: data) {
+							Image(uiImage: photo)
+								.resizable()
+								.scaledToFill()
+								.frame(width: 35 * u, height: 35 * u)
+								.clipShape(Circle())
+						} else {
+							Image("IcNavPerson")
+								.resizable()
+								.frame(width: 12.99 * u, height: 13.64 * u)
+						}
 					}
 					.frame(width: 35 * u, height: 35 * u)
 				}
@@ -486,7 +496,7 @@ private struct FirstRunOverlay: View {
 				StakColors.bg
 			}
 			Button(action: onSeeTodaysPick) {
-				Text("See Todays Pick")
+				Text("See Today’s Pick")
 					.font(StakFont.geist(12 * u, .medium))
 					.foregroundStyle(Color.white)
 					.frame(width: 136 * u, height: 51 * u)

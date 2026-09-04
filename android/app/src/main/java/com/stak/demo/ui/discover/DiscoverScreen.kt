@@ -231,20 +231,16 @@ internal val DECK = listOf(
 )
 
 /**
- * Codex audit (2026-09-04): the frame (1:1627) authors a 12-count ring over
- * THREE designed cards. The build counts the real deck - the ring, the
- * queue and the end-of-deck receipt never claim cards that do not exist,
- * and nothing wraps around. Mirrors ios/StakDemo/Discover/DiscoverView.swift.
+ * A run is TWELVE cards cycling the three designed ones - the frame's
+ * "1/12" ring and its 12/12 receipt (user, 2026-09-04, DE-STAK 04 ·
+ * Discover 1:1916: the authored deck look wins). Every card lookup wraps
+ * with `% DECK.size`. Mirrors ios/StakDemo/Discover/DiscoverView.swift.
  */
-internal val DECK_SIZE: Int get() = DECK.size
-
-/** 1..12 as a word ("three"); larger decks fall back to the numeral. */
-private fun numberWord(n: Int): String =
-	listOf("one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve").getOrNull(n - 1) ?: n.toString()
+internal const val DECK_SIZE = 12
 
 /**
  * 04 · Discover — "first run" (CHINEDU 1:1627) with its states: the
- * swipe deck (the three designed cards, counted honestly), the Save chip
+ * swipe deck (twelve cards cycling the three designed ones), the Save chip
  * toast (1:1796), the Buy-NVDA practice sheet (1:1970) and the Order
  * filled sheet (85:1205). Swiping down advances the deck and the ring
  * counts along. Practice buy raises the ticket; confirming fills the
@@ -265,8 +261,9 @@ internal fun DiscoverScreen(
 	// Prototype: tapping the front card itself also opens the Stock Detail.
 	// The buy ticket itself is raised by the shell (over the tab bar).
 	var seen by DeckSession::seen
-	// Codex audit (2026-09-04): THIS deck run's save counter (the end-of-deck
-	// "Saved"). The chip state itself reads My STAK (see the front card).
+	// THIS deck run's saves: the end-of-deck "Saved" count AND the chip
+	// state - the chip follows this run, not My STAK (1:1916 shows Save on
+	// NVDA even though My STAK lists it; user, 2026-09-04).
 	var savedCards by DeckSession::saved
 	// 1:2330: Discover tab re-tap from the end of the deck restarts it - and
 	// the run's counters with it.
@@ -317,7 +314,7 @@ internal fun DiscoverScreen(
 						modifier = Modifier.offset(y = if (seen >= DECK_SIZE) (-7 * u).dp else 0.dp),
 					)
 					Spacer(modifier = Modifier.weight(1f))
-					// Codex audit (2026-09-04): "1/3" over the real deck, not the frame's 12.
+					// "1/12" over the twelve-card run (user, 2026-09-04: the authored deck look wins).
 					val count = (seen + 1).coerceAtMost(DECK_SIZE)
 					Box(contentAlignment = Alignment.Center, modifier = Modifier.size((44 * u).dp)) {
 						ProgressRing(progress = count / DECK_SIZE.toFloat(), u = u)
@@ -347,9 +344,8 @@ internal fun DiscoverScreen(
 					onReviewSaves = onReviewSaves,
 				)
 			} else {
-			// Codex audit (2026-09-04): the front card, clamped - no wrap-around.
-			val front = seen.coerceAtMost(DECK_SIZE - 1)
-			val frontCard = DECK[front]
+			// The front card cycles the three designs across the twelve-card run.
+			val frontCard = DECK[seen % DECK.size]
 			// Deck — a fixed composition: every dimension scales by the 390dp
 			// artboard unit so proportions match the frame on any device.
 			Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f).fillMaxWidth()) {
@@ -395,7 +391,7 @@ internal fun DiscoverScreen(
 												// the swiped card becomes the ghost and the deck
 												// advances NOW - a second swipe grabs the next
 												// card even while the ghost is still flying.
-												flyingCard = DECK[seen]
+												flyingCard = DECK[seen % DECK.size]
 												flyFade.snapTo(1f)
 												flyOffset.snapTo(committed)
 												seen += 1
@@ -433,58 +429,57 @@ internal fun DiscoverScreen(
 					// The authored deck (1:1627): the layers behind the front
 					// card ARE the real next cards (1:1701 = the next card,
 					// 1:1660 = the one after - confirmed in the file metadata,
-					// 2026-09-02). Codex audit (2026-09-04): both are drawn
-					// LIVE at the authored slab geometry - the frame's exports
-					// (disc_peek_top / disc_peek_mid) carried baked Save pills
-					// and never changed with the queue, so they are gone and
-					// the crossfade with them. Top slab: 273.66 wide = 0.7819
-					// of the 350 card, its 12.39 top pad scaled to 10.83. Mid
-					// slab: 313.14 wide = 0.8947, y 36.39. Neither shows a
-					// chip - the Save chip belongs to the front card only. A
-					// slot past the end of the deck simply stays empty.
-					DECK.getOrNull(seen + 2)?.let { twoAhead ->
-						FrontDeckCard(
-							card = twoAhead,
-							onSave = {},
-							saved = twoAhead.symbol in com.stak.demo.ui.MyStakHoldings.tickers,
-							u = u,
-							modifier = Modifier
-								.align(Alignment.TopCenter)
-								.offset(y = (10.83 * u).dp)
-								.graphicsLayer {
-									transformOrigin = androidx.compose.ui.graphics.TransformOrigin(0.5f, 0f)
-									scaleX = 0.7819f
-									scaleY = 0.7819f
-								},
-							showSave = false,
-						)
-					}
-					DECK.getOrNull(seen + 1)?.let { next ->
+					// 2026-09-02). At rest the baked exports keep the frame
+					// pixel-exact - the next card's own Save pill peeking at
+					// the top is authored (user, 2026-09-04, DE-STAK 04 ·
+					// Discover 1:1916: the authored deck look wins); as the
+					// drag exposes the mid slab it crossfades into the LIVE
+					// next card at the SAME authored geometry, so the queue
+					// always tells the truth.
+					val commitPx = with(density) { (110 * u).dp.toPx() }
+					Image(
+						painter = painterResource(R.drawable.disc_peek_top),
+						contentDescription = null,
+						modifier = Modifier
+							.align(Alignment.TopStart)
+							.offset(x = (39 * u).dp, y = 0.dp)
+							.size((273.66 * u).dp, (336.66 * u).dp),
+					)
+					Image(
+						painter = painterResource(R.drawable.disc_peek_mid),
+						contentDescription = null,
+						modifier = Modifier
+							.align(Alignment.TopStart)
+							.offset(x = (18 * u).dp, y = (24 * u).dp)
+							.size((313.14 * u).dp, (352.87 * u).dp)
+							.graphicsLayer { alpha = 1f - (topOffset.value / commitPx).coerceIn(0f, 1f) },
+					)
+					if (seen < DECK_SIZE - 1) {
+						val next = DECK[(seen + 1) % DECK.size]
 						FrontDeckCard(
 							card = next,
 							onSave = {},
-							saved = next.symbol in com.stak.demo.ui.MyStakHoldings.tickers,
+							saved = next.symbol in savedCards,
 							u = u,
 							modifier = Modifier
 								.align(Alignment.TopCenter)
 								.offset(y = (36.39 * u).dp)
 								.graphicsLayer {
+									alpha = (topOffset.value / commitPx).coerceIn(0f, 1f)
 									transformOrigin = androidx.compose.ui.graphics.TransformOrigin(0.5f, 0f)
 									scaleX = 0.8947f
 									scaleY = 0.8947f
 								},
-							showSave = false,
 						)
 					}
-					// Codex audit (2026-09-04): the chip state IS My STAK - a stock
-					// already held never shows Save. The seeded My STAK holds the
-					// three authored cards, so under the demo seed they open in
-					// their saved state (1:1796); the chip returns for any card not
-					// held. `savedCards` only counts this run's saves.
+					// The Save chip follows THIS run: it shows until the card is
+					// saved in this deck, whatever My STAK already holds (1:1916
+					// shows Save on NVDA even though My STAK lists it; user,
+					// 2026-09-04). Saving still lands the pick in My STAK.
 					FrontDeckCard(
 						card = frontCard,
 						onSave = { savedCards = savedCards + frontCard.symbol; com.stak.demo.ui.MyStakHoldings.add(frontCard.symbol); savedToast = true },
-						saved = frontCard.symbol in com.stak.demo.ui.MyStakHoldings.tickers,
+						saved = frontCard.symbol in savedCards,
 						u = u,
 						modifier = Modifier
 							.align(Alignment.TopCenter)
@@ -514,7 +509,7 @@ internal fun DiscoverScreen(
 						FrontDeckCard(
 							card = ghost,
 							onSave = {},
-							saved = ghost.symbol in com.stak.demo.ui.MyStakHoldings.tickers,
+							saved = ghost.symbol in savedCards,
 							u = u,
 							modifier = Modifier
 								.align(Alignment.TopCenter)
@@ -626,9 +621,9 @@ internal fun FrontDeckCard(
 	u: Float,
 	modifier: Modifier = Modifier,
 	rows: DeckRowTweaks = DeckRowTweaks(),
-	// Codex audit (2026-09-04): the queued cards behind the front one draw
-	// without a chip (1:1701 / 1:1660 carry none) - the Save chip belongs
-	// to the front card only.
+	// Hosts may hide the chip; the deck leaves it on - the live next card
+	// crossfades into the authored mid slab, whose export carries its own
+	// Save pill (user, 2026-09-04: the authored deck look wins).
 	showSave: Boolean = true,
 ) {
 	Box(
@@ -1193,16 +1188,14 @@ private fun ProgressRing(progress: Float, u: Float) {
 }
 
 /**
- * Discover · End of deck (CHINEDU 1:2330) — receipt stats + CTAs.
- * Codex audit (2026-09-04): the frame authors "12 / 7 / 2" and "Twelve
- * cards, twelve signals" as placeholder numbers; the build reports THIS
- * run (cards seen, saves made, practice orders filled) over the real deck.
+ * Discover · End of deck (CHINEDU 1:2330) — receipt stats + CTAs. The
+ * authored copy stands ("Twelve cards, twelve signals" over the 12/12 run);
+ * the tiles report THIS run's real Seen / Saved / Bought (user, 2026-09-04,
+ * DE-STAK 04 · Discover 1:1916: the authored deck look wins).
  */
 @Composable
 private fun EndOfDeck(seen: Int, saved: Int, bought: Int, onPracticeBuySaves: () -> Unit, onSwipeAgain: () -> Unit, onReviewSaves: () -> Unit) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
-	val word = numberWord(DECK_SIZE)
-	val plural = if (DECK_SIZE == 1) "" else "s"
 	Column(
 		horizontalAlignment = Alignment.CenterHorizontally,
 		modifier = Modifier.fillMaxWidth().padding(horizontal = (20 * u).dp),
@@ -1217,7 +1210,7 @@ private fun EndOfDeck(seen: Int, saved: Int, bought: Int, onPracticeBuySaves: ()
 		)
 		Spacer(modifier = Modifier.height((8 * u).dp))
 		Text(
-			text = "${word.replaceFirstChar { it.uppercase() }} card$plural, $word signal$plural. Your taste graph got smarter.",
+			text = "Twelve cards, twelve signals. Your taste graph got smarter.",
 			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
 			color = Disc.Muted,
 		)

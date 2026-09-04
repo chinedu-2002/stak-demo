@@ -19,7 +19,11 @@ struct ProfileSetupView: View {
 	@State private var name = ""
 	@State private var showPhotoPicker = false
 	@State private var pickedItem: PhotosPickerItem? = nil
+	/// The picked photo as a ~512px JPEG (tens of KB) - never the original.
 	@State private var photoData: Data? = nil
+	/// The same thumbnail decoded once, so the avatar does not re-decode
+	/// on every keystroke of the name field.
+	@State private var photo: UIImage? = nil
 
 	var body: some View {
 		let u = figmaUnit
@@ -51,7 +55,7 @@ struct ProfileSetupView: View {
 					Button(action: { showPhotoPicker = true }) {
 						ZStack {
 							Circle().fill(Color(argb: 0xFF242B3D))
-							if let photoData, let photo = UIImage(data: photoData) {
+							if let photo {
 								Image(uiImage: photo)
 									.resizable()
 									.scaledToFill()
@@ -128,9 +132,17 @@ struct ProfileSetupView: View {
 		.onChange(of: pickedItem) { _, item in
 			guard let item else { return }
 			Task {
-				if let data = try? await item.loadTransferable(type: Data.self) {
-					photoData = data
-				}
+				// A camera-roll original is tens of MB once decoded, so only a
+				// 512px thumbnail survives the pick (ImageIO downsample, EXIF
+				// orientation applied) as an 85% JPEG of a few tens of KB -
+				// the avatar circle, the session file and the leaderboards
+				// need nothing larger (audit 2026-09-04; mirrors android's
+				// inSampleSize decode in ProfileSetupScreen).
+				guard let data = try? await item.loadTransferable(type: Data.self),
+					let thumb = await UIImage(data: data)?.byPreparingThumbnail(ofSize: CGSize(width: 512, height: 512)),
+					let jpeg = thumb.jpegData(compressionQuality: 0.85) else { return }
+				photo = thumb
+				photoData = jpeg
 			}
 		}
 	}

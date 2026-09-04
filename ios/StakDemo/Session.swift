@@ -12,6 +12,8 @@ final class Session: ObservableObject {
 	private static let keySignedIn = "stak.signedIn"
 	private static let keyName = "stak.displayName"
 	private static let keyRisk = "stak.riskStyle"
+	/// Legacy: earlier builds kept the photo bytes here; read once and moved
+	/// to the photo file (see loadPhoto).
 	private static let keyPhoto = "stak.photoData"
 
 	@Published private(set) var signedIn: Bool
@@ -29,7 +31,7 @@ final class Session: ObservableObject {
 		resumedSignedIn = wasSignedIn
 		UserProfile.shared.displayName = d.string(forKey: Self.keyName) ?? ""
 		if let risk = d.string(forKey: Self.keyRisk) { UserProfile.shared.riskStyle = risk }
-		UserProfile.shared.photoData = d.data(forKey: Self.keyPhoto)
+		UserProfile.shared.photoData = Self.loadPhoto()
 	}
 
 	/// Sign-in CTA or account creation (09 Proceed) - remembered across launches.
@@ -53,6 +55,7 @@ final class Session: ObservableObject {
 		d.removeObject(forKey: Self.keyName)
 		d.removeObject(forKey: Self.keyRisk)
 		d.removeObject(forKey: Self.keyPhoto)
+		Self.savePhoto(nil)
 	}
 
 	private func persist() {
@@ -60,6 +63,46 @@ final class Session: ObservableObject {
 		d.set(signedIn, forKey: Self.keySignedIn)
 		d.set(UserProfile.shared.displayName, forKey: Self.keyName)
 		d.set(UserProfile.shared.riskStyle, forKey: Self.keyRisk)
-		d.set(UserProfile.shared.photoData, forKey: Self.keyPhoto)
+		Self.savePhoto(UserProfile.shared.photoData)
+	}
+
+	// MARK: - Profile photo file
+
+	/// The (downsampled, tens-of-KB) profile photo lives as a FILE in
+	/// Application Support, not as a UserDefaults blob (audit 2026-09-04):
+	/// defaults are for small values - a multi-MB blob there is flagged at
+	/// 4 MB and re-read on every launch. Mirrors android's URI-backed
+	/// UserProfile.photoUri.
+	private static let photoFileName = "stak_profile_photo.jpg"
+
+	private static var photoFileURL: URL? {
+		guard let dir = try? FileManager.default.url(
+			for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: true
+		) else { return nil }
+		return dir.appendingPathComponent(photoFileName)
+	}
+
+	private static func loadPhoto() -> Data? {
+		if let url = photoFileURL, let data = try? Data(contentsOf: url) { return data }
+		// A blob an earlier build kept in defaults moves to the file once -
+		// shrunk the way the picker now shrinks a pick, since that blob may
+		// be a full-size original.
+		let d = UserDefaults.standard
+		guard let legacy = d.data(forKey: keyPhoto) else { return nil }
+		d.removeObject(forKey: keyPhoto)
+		let data = UIImage(data: legacy)?
+			.preparingThumbnail(of: CGSize(width: 512, height: 512))?
+			.jpegData(compressionQuality: 0.85) ?? legacy
+		savePhoto(data)
+		return data
+	}
+
+	private static func savePhoto(_ data: Data?) {
+		guard let url = photoFileURL else { return }
+		if let data {
+			try? data.write(to: url, options: .atomic)
+		} else {
+			try? FileManager.default.removeItem(at: url)
+		}
 	}
 }

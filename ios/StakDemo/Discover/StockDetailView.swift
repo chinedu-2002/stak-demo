@@ -56,7 +56,8 @@ struct StockDetailView: View {
 		self.onKeepExploring = onKeepExploring
 		self.onPracticeBuyToSimulate = onPracticeBuyToSimulate
 		self.onTab = onTab
-		self._saved = State(initialValue: fromMyStak)
+		// Codex audit (2026-09-04): saved follows the holdings store, like the deck card.
+		self._saved = State(initialValue: fromMyStak || MyStakHoldings.shared.tickers.contains(symbol))
 	}
 
 	var body: some View {
@@ -157,7 +158,14 @@ struct StockDetailView: View {
 						VStack(spacing: 10 * u) {
 							if fromMyStak {
 								DetailCta(text: "Practice buy") { showBuy = true }
-								DetailSecondary(text: "Unsave", action: onBack)
+								// Codex audit (2026-09-04): Unsave drops the stock from the
+								// store so the Collection page and every count follow, then
+								// the authored Back -> Collection, Instant (16:1012).
+								// Mirrors android ui/discover/StockDetailScreen.kt.
+								DetailSecondary(text: "Unsave") {
+									MyStakHoldings.shared.remove(f.symbol)
+									onBack()
+								}
 							} else if saved {
 								HStack(spacing: 6 * u) {
 									Image("IcSavedBookmark")

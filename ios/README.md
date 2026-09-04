@@ -108,3 +108,4 @@ in both apps (the authored frames themselves are untouched):
   into the authored template, the way the Discover deck's "Learn more"
   already serves the tapped stock (Codex parity audit 2026-09-04).
 - Portrait lock: the design is a fixed 390x844 portrait artboard (2026-09-04).
+- The My STAK holdings store decides every saved state (Codex audit 2026-09-04): chip counts, allocation, collection contents, Unsave, and the stock page's saved/unsaved state - so the seeded demo (which holds the three deck stocks) opens the deck's Learn more pages already saved; Unsave one from AI & Tech to demo the authored Save flow.

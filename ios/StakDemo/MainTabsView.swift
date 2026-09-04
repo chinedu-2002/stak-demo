@@ -290,7 +290,11 @@ struct MainTabsView: View {
 				// card -> the saved Stock Detail of ITS ticker, Instant
 				// (Codex parity audit, 2026-09-04).
 				onBack: { pop(.instant) },
-				onOpenStock: { ticker in pushInstant(.stockDetail(fromMyStak: true, symbol: ticker)) }
+				onOpenStock: { ticker in pushInstant(.stockDetail(fromMyStak: true, symbol: ticker)) },
+				// Codex audit (2026-09-04): Add stock -> the Discover deck,
+				// Instant - swiping the deck is the app's only add path, so
+				// the tile hops there like the open state's tab-bar SWAPs.
+				onAddStock: { pop(.instant, all: true, landing: .discover) }
 			)
 		case .profile:
 			// Authored (171:995): Back = BACK action - the house back pop.

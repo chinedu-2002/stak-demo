@@ -18,12 +18,28 @@ struct CollStock: Identifiable {
 struct StakCollection: Identifiable {
 	let id: String
 	let name: String
-	/// The "5 stocks" count label - on the chip and in the hero meta.
+	/// The authored "5 stocks" label (1:3180 / 1:3333) - kept as the record
+	/// of what was drawn; nothing renders it since the holdings store drives
+	/// every count (Codex audit 2026-09-04).
 	let count: String
 	let blurb: String
 	var image: String? = nil
 	var icon: String? = nil
 	let stocks: [CollStock]
+
+	/// Codex audit (2026-09-04): the stocks of this collection the user
+	/// still holds - the chip count, the hero count and the tile grid all
+	/// read this, so a deck save or an Unsave moves every number at once.
+	/// Mirrors android ui/mystak/Collections.kt.
+	func held(in holdings: Set<String>) -> [CollStock] {
+		stocks.filter { holdings.contains($0.ticker) }
+	}
+}
+
+/// "1 stock" / "N stocks" - the chip, hero and allocation count text.
+/// Mirrors android ui/mystak/Collections.kt heldCountLabel.
+func heldCountLabel(_ n: Int) -> String {
+	n == 1 ? "1 stock" : "\(n) stocks"
 }
 
 /// Codex parity audit (2026-09-04): every chip carries its own collection

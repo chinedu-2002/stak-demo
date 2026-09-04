@@ -8,6 +8,9 @@ private let green = Color(argb: 0xFF2FD08A)
 private let redDown = Color(argb: 0xFFE5484D)
 private let badgeInk = Color(argb: 0xFF9EADC7)
 
+/// The stock-sized template a lone Add-stock row measures against (hidden).
+private let ghostStock = CollStock(badge: "A", change: "▲ 0.0%", up: true, ticker: "AAPL", company: "Apple", price: "$0.00")
+
 /// 06 · My STAK — "Collection · Cards A · corrected" (CHINEDU 1:3333).
 /// The Collection page: hero (art, title, meta, blurb) and the stock-tile
 /// grid with the dashed Add-stock card. Codex parity audit (2026-09-04):
@@ -21,13 +24,37 @@ struct CollectionView: View {
 	let collection: StakCollection
 	let onBack: () -> Void
 	let onOpenStock: (String) -> Void
+	/// Add stock -> the Discover deck, the app's only add path (Codex audit 2026-09-04).
+	var onAddStock: () -> Void = {}
+	/// Codex audit (2026-09-04): the hero count and the grid render the
+	/// held stocks, so a deck save or an Unsave updates the page live.
+	@ObservedObject private var holdings = MyStakHoldings.shared
 
-	/// The Android `chunked(2)` rows — pairs of tiles, the odd tail row hosts the Add-stock card.
-	private var stockRows: [[CollStock]] {
-		let stocks = collection.stocks
-		return stride(from: 0, to: stocks.count, by: 2).map {
-			Array(stocks[$0..<min($0 + 2, stocks.count)])
+	private var held: [CollStock] { collection.held(in: holdings.tickers) }
+
+	/// One grid cell. `ghost` is an invisible stock-sized filler: it keeps a
+	/// lone Add-stock tile at the authored half width and tile height.
+	private enum GridCell: Identifiable {
+		case stock(CollStock)
+		case add
+		case ghost
+		var id: String {
+			switch self {
+			case .stock(let s): return s.ticker
+			case .add: return "add"
+			case .ghost: return "ghost"
+			}
 		}
+	}
+
+	/// The Android `chunked(2)` rows — pairs of tiles. Codex audit
+	/// (2026-09-04): the Add-stock tile is ALWAYS the last cell, on a new
+	/// row when the held count is even (or zero), so an emptied collection
+	/// still offers "Add stock". Mirrors android ui/mystak/CollectionScreen.kt.
+	private var gridRows: [[GridCell]] {
+		var cells: [GridCell] = held.map { .stock($0) } + [.add]
+		if cells.count % 2 == 1 { cells.append(.ghost) }
+		return stride(from: 0, to: cells.count, by: 2).map { Array(cells[$0..<$0 + 2]) }
 	}
 
 	var body: some View {
@@ -40,6 +67,7 @@ struct CollectionView: View {
 					.font(StakFont.sora(16 * u, .semiBold))
 					.foregroundStyle(StakColors.textPrimary)
 				Spacer()
+				// No designed menu yet (Codex audit 2026-09-04) - decorative until the designer draws one.
 				ZStack {
 					Circle().fill(cardBg)
 					Image("IcMoreDots")
@@ -47,6 +75,7 @@ struct CollectionView: View {
 						.frame(width: 24 * u, height: 24 * u)
 				}
 				.frame(width: 40 * u, height: 40 * u)
+				.accessibilityHidden(true)
 			}
 			.padding(.leading, 16 * u)
 			.padding(.trailing, 18 * u)
@@ -90,7 +119,7 @@ struct CollectionView: View {
 				.font(StakFont.sora(26 * u, .semiBold))
 				.foregroundStyle(StakColors.textPrimary)
 			HStack(spacing: 7 * u) {
-				Text(collection.count)
+				Text(heldCountLabel(held.count))
 					.font(StakFont.geist(13 * u))
 					.foregroundStyle(muted)
 				Text("·")
@@ -112,20 +141,26 @@ struct CollectionView: View {
 	private var grid: some View {
 		let u = figmaUnit
 		return VStack(spacing: 10 * u) {
-			ForEach(Array(stockRows.enumerated()), id: \.offset) { _, row in
+			ForEach(Array(gridRows.enumerated()), id: \.offset) { _, row in
 				// `.fixedSize(vertical: true)` = Compose IntrinsicSize.Min: tiles in a
 				// row share the tallest tile's height, so the Add card stretches to match.
 				HStack(spacing: 10 * u) {
-					ForEach(row) { stock in
-						// Authored (1:3375 template): EVERY card opens the saved
-						// Stock Detail, Instant - serving the tapped ticker
-						// (Codex parity audit, 2026-09-04).
-						StockTile(stock: stock) {
-							onOpenStock(stock.ticker)
+					ForEach(row) { cell in
+						switch cell {
+						case .stock(let stock):
+							// Authored (1:3375 template): EVERY card opens the saved
+							// Stock Detail, Instant - serving the tapped ticker
+							// (Codex parity audit, 2026-09-04).
+							StockTile(stock: stock) {
+								onOpenStock(stock.ticker)
+							}
+						case .add:
+							AddStockTile(action: onAddStock)
+						case .ghost:
+							// Hidden template tile - layout only, never hit or read.
+							StockTile(stock: ghostStock) {}
+								.hidden()
 						}
-					}
-					if row.count == 1 {
-						AddStockTile()
 					}
 				}
 				.fixedSize(horizontal: false, vertical: true)
@@ -177,22 +212,28 @@ private struct StockTile: View {
 }
 
 /// Dashed 1.5u #2a3346 r16 add card — 6 on / 5 off dash pattern.
+/// A plain Button (Codex audit 2026-09-04): adding = the Discover deck.
 private struct AddStockTile: View {
+	var action: () -> Void = {}
+
 	var body: some View {
 		let u = figmaUnit
-		VStack(spacing: 8 * u) {
-			Image("IcPlusCircle")
-				.resizable()
-				.frame(width: 24 * u, height: 24 * u)
-			Text("Add stock")
-				.font(StakFont.geist(13 * u, .medium))
-				.foregroundStyle(muted)
+		Button(action: action) {
+			VStack(spacing: 8 * u) {
+				Image("IcPlusCircle")
+					.resizable()
+					.frame(width: 24 * u, height: 24 * u)
+				Text("Add stock")
+					.font(StakFont.geist(13 * u, .medium))
+					.foregroundStyle(muted)
+			}
+			.padding(14 * u)
+			.frame(maxWidth: .infinity, maxHeight: .infinity)
+			.overlay(
+				RoundedRectangle(cornerRadius: 16 * u)
+					.stroke(Color(argb: 0xFF2A3346), style: StrokeStyle(lineWidth: 1.5 * u, dash: [6 * u, 5 * u]))
+			)
 		}
-		.padding(14 * u)
-		.frame(maxWidth: .infinity, maxHeight: .infinity)
-		.overlay(
-			RoundedRectangle(cornerRadius: 16 * u)
-				.stroke(Color(argb: 0xFF2A3346), style: StrokeStyle(lineWidth: 1.5 * u, dash: [6 * u, 5 * u]))
-		)
+		.buttonStyle(.plain)
 	}
 }

@@ -204,7 +204,8 @@ internal fun SimulateScreen(
 					val p = pos.row
 					PortfolioRow(p.badge, p.ticker, p.sub, p.amount, p.pct, p.up, onClick = { onOpenPick(p.ticker) })
 				}
-				CenterLink("See all ${PaperPortfolio.pickCount} picks", onClick = onOpenPortfolio)
+				// Authored copy (user, 2026-09-04 (CHINEDU 07 · Simulate 423:1007): the authored look wins); the ledger still drives the rows above.
+				CenterLink("See all 12 picks", onClick = onOpenPortfolio)
 				Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
 					Text(
 						text = "Portfolio breakdown",
@@ -331,14 +332,14 @@ private fun ScoreHero(onOpenLeaderboard: () -> Unit) {
 				text = "." + valueText.substringAfter('.'),
 				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (18 * u).sp, lineHeight = (23 * u).sp),
 				color = Sim.Muted,
-				// Authored (1:3923) box bottom sits 8 above the figure's (55 vs
-				// y24+h23). Codex audit (2026-09-04): the frame's 8 gap before
-				// ".00" is a design slip - one number reads as one number.
-				modifier = Modifier.padding(bottom = (8 * u).dp),
+				// Authored (1:3923): ".00" starts 8 after the figure and its box
+				// bottom sits 8 above the figure's (55 vs y24+h23). The gap is
+				// the design (user, 2026-09-04 (CHINEDU 07 · Simulate 423:1007): the authored look wins).
+				modifier = Modifier.padding(start = (8 * u).dp, bottom = (8 * u).dp),
 			)
 		}
 		Text(
-			text = "+${PaperPortfolio.usd(PaperPortfolio.allTimeGain)} all time on $" + String.format(java.util.Locale.US, "%,.0f", PaperPortfolio.PAPER_START) + " paper · ${PaperPortfolio.pickCount} picks",
+			text = "+${PaperPortfolio.usd(PaperPortfolio.allTimeGain)} all time on $" + String.format(java.util.Locale.US, "%,.0f", PaperPortfolio.PAPER_START) + " paper · 12 picks",
 			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Light, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
 			color = Sim.Muted,
 			modifier = Modifier.padding(horizontal = (20 * u).dp),
@@ -707,7 +708,8 @@ private fun BoardCard(onOpenLeaderboard: () -> Unit) {
 		BoardRow("2", "Jide O.", "+8.8%", you = false)
 		// Codex audit (2026-09-04): You reads the shared week figures (the
 		// hero's +1.9% / #47) instead of its own contradicting +4.2%.
-		BoardRow(PaperPortfolio.WEEK_RANK.toString(), "You", PaperPortfolio.WEEK_PCT, you = true)
+		// Authored board figures (1:4111 +4.2%; user, 2026-09-04 (CHINEDU 07 · Simulate 423:1007): the authored look wins).
+		BoardRow("47", "You", "+4.2%", you = true)
 		CenterLink("Full leaderboard", onClick = onOpenLeaderboard)
 	}
 }

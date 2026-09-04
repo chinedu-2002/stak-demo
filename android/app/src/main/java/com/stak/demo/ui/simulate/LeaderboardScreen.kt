@@ -49,8 +49,8 @@ private val TOP = listOf(
 	Rank("5", "K", "Kofi B.", "11 picks", "+7.0%"),
 )
 private val NEAR = listOf(
-	Rank("46", "L", "Lena S.", "8 picks", "+2.0%"),
-	Rank("48", "D", "Dami F.", "15 picks", "+1.8%"),
+	Rank("46", "L", "Lena S.", "8 picks", "+4.3%"),
+	Rank("48", "D", "Dami F.", "15 picks", "+4.1%"),
 )
 
 /**
@@ -129,10 +129,11 @@ fun LeaderboardScreen(onBack: () -> Unit) {
 				}
 				Column(verticalArrangement = Arrangement.spacedBy((2 * u).dp), modifier = Modifier.weight(1f)) {
 					Text("You", style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.SemiBold, fontSize = (12 * u).sp, lineHeight = (15 * u).sp), color = Color.White)
-					Text("${PaperPortfolio.pickCount} picks this week", style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp, lineHeight = (13 * u).sp), color = Sim.Muted)
+					Text("12 picks this week", style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp, lineHeight = (13 * u).sp), color = Sim.Muted)
 				}
 				Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy((2 * u).dp)) {
-					Text(PaperPortfolio.WEEK_PCT, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (13 * u).sp, lineHeight = (16 * u).sp), color = Sim.Teal)
+					// Authored You row (user, 2026-09-04 (CHINEDU 07 · Simulate 423:1007): the authored look wins).
+					Text("+4.2%", style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (13 * u).sp, lineHeight = (16 * u).sp), color = Sim.Teal)
 					Text("▲ 12 spots", style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp, lineHeight = (13 * u).sp), color = Sim.Green)
 				}
 			}

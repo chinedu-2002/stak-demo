@@ -115,7 +115,8 @@ fun SimPortfolioScreen(
 						.background(Sim.CardBg, RoundedCornerShape((16 * u).dp)),
 				) {
 					Text(
-						"${PaperPortfolio.pickCount} picks · +${PaperPortfolio.usd(PaperPortfolio.allTimeGain)} all time",
+						// Authored copy (user, 2026-09-04 (CHINEDU 07 · Simulate 423:1007): the authored look wins).
+						"12 picks · +$240.00 all time",
 						style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp, lineHeight = (13 * u).sp),
 						color = Sim.Muted,
 					)

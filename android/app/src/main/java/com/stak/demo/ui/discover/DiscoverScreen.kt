@@ -24,14 +24,18 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.animation.AnimatedContent
@@ -53,6 +57,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
@@ -65,6 +70,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
@@ -124,11 +130,66 @@ internal data class BuySpec(
 	val cashAfter: String,
 	val shares: String,
 	val symbol: String,
-)
+) {
+	/** "$122.10 today" -> 122.10: the price the paper order fills at. */
+	val price: Double get() = priceLine.substringBefore(' ').removePrefix("$").replace(",", "").toDoubleOrNull() ?: 0.0
+
+	/**
+	 * Codex audit (2026-09-04): the ticket's shares and cash-after follow the
+	 * chosen amount instead of the baked $25 strings. The authored $25 tickets
+	 * round-trip byte-identically (25/122.10 -> 0.2048, 25/229.35 -> 0.1090,
+	 * 25/178.90 -> 0.1397, 25/28.40 -> 0.8803, 25/947.20 -> 0.0264; $8,800 - 25
+	 * -> $8,775.00), so the frames (1:1970 / 85:1205 et al) still render exact.
+	 */
+	fun withAmount(amount: Double): BuySpec = copy(
+		shares = String.format(java.util.Locale.US, "%.4f", if (price > 0.0) amount / price else 0.0),
+		cashAfter = "$" + String.format(java.util.Locale.US, "%,.2f", 8800.0 - amount),
+	)
+}
 
 internal val NVDA_BUY = BuySpec("Buy NVDA?", "N", "NVIDIA Corp", "$122.10 today", "\u25b2 2.4%", "$8,800.00", "$8,775.00", "0.2048", "NVDA")
 internal val AAPL_BUY = BuySpec("Buy AAPL?", "A", "Apple", "$229.35 today", "\u25b2 1.2%", "$8,800.00", "$8,775.00", "0.1090", "AAPL")
 internal val GOOGL_BUY = BuySpec("Buy GOOGL?", "G", "Alphabet", "$178.90 today", "\u25b2 0.8%", "$8,800.00", "$8,775.00", "0.1397", "GOOGL")
+
+/**
+ * Codex audit (2026-09-04): the deck's Practice buy serves the FRONT card's
+ * ticket (NVDA / AAPL / GOOGL into the 1:1970 template); an unknown symbol
+ * falls back to the frame's NVDA. Mirrors ios/StakDemo/Discover/DiscoverView.swift.
+ */
+internal fun buySpecFor(symbol: String): BuySpec = listOf(NVDA_BUY, AAPL_BUY, GOOGL_BUY).firstOrNull { it.symbol == symbol } ?: NVDA_BUY
+
+// A BuySpec is not Saveable - a raised deck ticket survives by its symbol
+// and is re-served from buySpecFor on restore (like SimBuySpecSaver).
+internal val DiscoverBuySpecSaver: Saver<BuySpec?, String> = Saver(
+	save = { it?.symbol },
+	restore = { buySpecFor(it) },
+)
+
+/**
+ * Codex audit (2026-09-04): the end-of-deck "Bought" (1:2330) counts the
+ * practice orders THIS deck run filled - the shell's Discover ticket
+ * reports each fill here (the Simulate / Stock Detail tickets do not).
+ * Reset with the deck.
+ */
+internal object DeckSession {
+	/**
+	 * The whole run lives here, not in the screen's remember state
+	 * (review, 2026-09-04): the Discover page leaves composition on every
+	 * tab hop - Confirm -> "View in My STAK" -> back to the deck - and a
+	 * screen-local `seen` would restart the deck while `bought` kept
+	 * counting. One lifetime, one reset.
+	 */
+	var seen by mutableIntStateOf(0)
+	var saved by mutableStateOf(setOf<String>())
+	var bought by mutableIntStateOf(0)
+
+	/** "Swipe today's deck again" and the tab re-tap from the end. */
+	fun restart() {
+		seen = 0
+		saved = emptySet()
+		bought = 0
+	}
+}
 
 /** One deck card's designed content (art + copy at the front-card scale). */
 internal data class DeckCard(
@@ -167,32 +228,51 @@ internal val DECK = listOf(
 )
 
 /**
+ * Codex audit (2026-09-04): the frame (1:1627) authors a 12-count ring over
+ * THREE designed cards. The build counts the real deck - the ring, the
+ * queue and the end-of-deck receipt never claim cards that do not exist,
+ * and nothing wraps around. Mirrors ios/StakDemo/Discover/DiscoverView.swift.
+ */
+internal val DECK_SIZE: Int get() = DECK.size
+
+/** 1..12 as a word ("three"); larger decks fall back to the numeral. */
+private fun numberWord(n: Int): String =
+	listOf("one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve").getOrNull(n - 1) ?: n.toString()
+
+/**
  * 04 · Discover — "first run" (CHINEDU 1:1627) with its states: the
- * swipe deck (12 cards cycling the three designed ones), the Save chip
+ * swipe deck (the three designed cards, counted honestly), the Save chip
  * toast (1:1796), the Buy-NVDA practice sheet (1:1970) and the Order
  * filled sheet (85:1205). Swiping down advances the deck and the ring
  * counts along. Practice buy raises the ticket; confirming fills the
  * paper order.
  */
 @Composable
-fun DiscoverScreen(
+internal fun DiscoverScreen(
 	resetKey: Int = 0,
 	// The tapped card's SYMBOL rides along - the detail page serves that
 	// stock, not always AAPL (user, 2026-09-01).
 	onLearnMore: (String) -> Unit = {},
-	onPracticeBuy: () -> Unit = {},
+	// Codex audit (2026-09-04): the CTA raises the FRONT card's ticket.
+	onPracticeBuy: (BuySpec) -> Unit = {},
 	// B4 (1:2330 Motion): the end-of-deck CTAs hop tabs via the shell.
 	onPracticeBuySaves: () -> Unit = {},
 	onReviewSaves: () -> Unit = {},
 ) {
 	// Prototype: tapping the front card itself also opens the Stock Detail.
 	// The buy ticket itself is raised by the shell (over the tab bar).
-	var seen by rememberSaveable { mutableIntStateOf(0) }
-	// 1:2330: Discover tab re-tap from the end of the deck restarts it.
-	LaunchedEffect(resetKey) { if (resetKey > 0 && seen >= 12) seen = 0 }
+	var seen by DeckSession::seen
+	// Codex audit (2026-09-04): THIS deck run's save counter (the end-of-deck
+	// "Saved"). The chip state itself reads My STAK (see the front card).
+	var savedCards by DeckSession::saved
+	// 1:2330: Discover tab re-tap from the end of the deck restarts it - and
+	// the run's counters with it.
+	LaunchedEffect(resetKey) {
+		if (resetKey > 0 && seen >= DECK_SIZE) {
+			DeckSession.restart()
+		}
+	}
 	var savedToast by remember { mutableStateOf(false) }
-	// 1:1627 vs 1:1796: the front card's Save chip disappears once its stock is saved.
-	var savedCards by remember { mutableStateOf(setOf<String>()) }
 	// Swipes must NEVER be eaten (user, 2026-09-02 "when swiping card i
 	// feel there is an error"): the deck advances the moment a swipe
 	// commits, and the swiped card flies off as a non-interactive GHOST
@@ -231,14 +311,15 @@ fun DiscoverScreen(
 						text = "Discover",
 						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (26 * u).sp, lineHeight = (33 * u).sp),
 						color = Color.White,
-						modifier = Modifier.offset(y = if (seen >= 12) (-7 * u).dp else 0.dp),
+						modifier = Modifier.offset(y = if (seen >= DECK_SIZE) (-7 * u).dp else 0.dp),
 					)
 					Spacer(modifier = Modifier.weight(1f))
-					val count = (seen + 1).coerceAtMost(12)
+					// Codex audit (2026-09-04): "1/3" over the real deck, not the frame's 12.
+					val count = (seen + 1).coerceAtMost(DECK_SIZE)
 					Box(contentAlignment = Alignment.Center, modifier = Modifier.size((44 * u).dp)) {
-						ProgressRing(progress = count / 12f, u = u)
+						ProgressRing(progress = count / DECK_SIZE.toFloat(), u = u)
 						Text(
-							text = "$count/12",
+							text = "$count/$DECK_SIZE",
 							style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp, lineHeight = (14 * u).sp),
 							color = Color.White,
 						)
@@ -252,13 +333,20 @@ fun DiscoverScreen(
 				)
 			}
 			Spacer(modifier = Modifier.height((27 * u).dp))
-			if (seen >= 12) {
+			if (seen >= DECK_SIZE) {
 				EndOfDeck(
+					seen = seen.coerceAtMost(DECK_SIZE),
+					saved = savedCards.size,
+					bought = DeckSession.bought,
 					onPracticeBuySaves = onPracticeBuySaves,
-					onSwipeAgain = { seen = 0 },
+					// A fresh run: the deck AND its counters start over.
+					onSwipeAgain = { DeckSession.restart() },
 					onReviewSaves = onReviewSaves,
 				)
 			} else {
+			// Codex audit (2026-09-04): the front card, clamped - no wrap-around.
+			val front = seen.coerceAtMost(DECK_SIZE - 1)
+			val frontCard = DECK[front]
 			// Deck — a fixed composition: every dimension scales by the 390dp
 			// artboard unit so proportions match the frame on any device.
 			Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f).fillMaxWidth()) {
@@ -291,7 +379,7 @@ fun DiscoverScreen(
 										if (committed > with(density) { (110 * u).dp.toPx() } ||
 											(flung && committed > with(density) { (20 * u).dp.toPx() })
 										) {
-											if (seen >= 11) {
+											if (seen >= DECK_SIZE - 1) {
 												// The final card: the authored fly-off finishes
 												// before the end-of-deck receipt lands (1:2330).
 												launch { topOffset.animateTo(with(density) { (500 * u).dp.toPx() }, tween(280, easing = EaseOut)) }
@@ -304,7 +392,7 @@ fun DiscoverScreen(
 												// the swiped card becomes the ghost and the deck
 												// advances NOW - a second swipe grabs the next
 												// card even while the ghost is still flying.
-												flyingCard = DECK[seen % 3]
+												flyingCard = DECK[seen]
 												flyFade.snapTo(1f)
 												flyOffset.snapTo(committed)
 												seen += 1
@@ -342,50 +430,58 @@ fun DiscoverScreen(
 					// The authored deck (1:1627): the layers behind the front
 					// card ARE the real next cards (1:1701 = the next card,
 					// 1:1660 = the one after - confirmed in the file metadata,
-					// 2026-09-02). At rest the baked exports keep the frame
-					// pixel-exact; as the drag exposes the mid slab it
-					// crossfades into the LIVE next card at the SAME authored
-					// geometry, so the queue always tells the truth.
-					val commitPx = with(density) { (110 * u).dp.toPx() }
-					Image(
-						painter = painterResource(R.drawable.disc_peek_top),
-						contentDescription = null,
-						modifier = Modifier
-							.align(Alignment.TopStart)
-							.offset(x = (39 * u).dp, y = 0.dp)
-							.size((273.66 * u).dp, (336.66 * u).dp),
-					)
-					Image(
-						painter = painterResource(R.drawable.disc_peek_mid),
-						contentDescription = null,
-						modifier = Modifier
-							.align(Alignment.TopStart)
-							.offset(x = (18 * u).dp, y = (24 * u).dp)
-							.size((313.14 * u).dp, (352.87 * u).dp)
-							.graphicsLayer { alpha = 1f - (topOffset.value / commitPx).coerceIn(0f, 1f) },
-					)
-					if (seen < 11) {
-						val next = DECK[(seen + 1) % 3]
+					// 2026-09-02). Codex audit (2026-09-04): both are drawn
+					// LIVE at the authored slab geometry - the frame's exports
+					// (disc_peek_top / disc_peek_mid) carried baked Save pills
+					// and never changed with the queue, so they are gone and
+					// the crossfade with them. Top slab: 273.66 wide = 0.7819
+					// of the 350 card, its 12.39 top pad scaled to 10.83. Mid
+					// slab: 313.14 wide = 0.8947, y 36.39. Neither shows a
+					// chip - the Save chip belongs to the front card only. A
+					// slot past the end of the deck simply stays empty.
+					DECK.getOrNull(seen + 2)?.let { twoAhead ->
+						FrontDeckCard(
+							card = twoAhead,
+							onSave = {},
+							saved = twoAhead.symbol in com.stak.demo.ui.MyStakHoldings.tickers,
+							u = u,
+							modifier = Modifier
+								.align(Alignment.TopCenter)
+								.offset(y = (10.83 * u).dp)
+								.graphicsLayer {
+									transformOrigin = androidx.compose.ui.graphics.TransformOrigin(0.5f, 0f)
+									scaleX = 0.7819f
+									scaleY = 0.7819f
+								},
+							showSave = false,
+						)
+					}
+					DECK.getOrNull(seen + 1)?.let { next ->
 						FrontDeckCard(
 							card = next,
 							onSave = {},
-							saved = next.ticker in savedCards,
+							saved = next.symbol in com.stak.demo.ui.MyStakHoldings.tickers,
 							u = u,
 							modifier = Modifier
 								.align(Alignment.TopCenter)
 								.offset(y = (36.39 * u).dp)
 								.graphicsLayer {
-									alpha = (topOffset.value / commitPx).coerceIn(0f, 1f)
 									transformOrigin = androidx.compose.ui.graphics.TransformOrigin(0.5f, 0f)
 									scaleX = 0.8947f
 									scaleY = 0.8947f
 								},
+							showSave = false,
 						)
 					}
+					// Codex audit (2026-09-04): the chip state IS My STAK - a stock
+					// already held never shows Save. The seeded My STAK holds the
+					// three authored cards, so under the demo seed they open in
+					// their saved state (1:1796); the chip returns for any card not
+					// held. `savedCards` only counts this run's saves.
 					FrontDeckCard(
-						card = DECK[seen % 3],
-						onSave = { savedCards = savedCards + DECK[seen % 3].ticker; com.stak.demo.ui.MyStakHoldings.add(DECK[seen % 3].ticker); savedToast = true },
-						saved = DECK[seen % 3].ticker in savedCards,
+						card = frontCard,
+						onSave = { savedCards = savedCards + frontCard.symbol; com.stak.demo.ui.MyStakHoldings.add(frontCard.symbol); savedToast = true },
+						saved = frontCard.symbol in com.stak.demo.ui.MyStakHoldings.tickers,
 						u = u,
 						modifier = Modifier
 							.align(Alignment.TopCenter)
@@ -406,7 +502,7 @@ fun DiscoverScreen(
 							.clickable(
 								interactionSource = remember { MutableInteractionSource() },
 								indication = null,
-								onClick = { onLearnMore(DECK[seen % 3].symbol) },
+								onClick = { onLearnMore(frontCard.symbol) },
 							),
 					)
 					flyingCard?.let { ghost ->
@@ -415,7 +511,7 @@ fun DiscoverScreen(
 						FrontDeckCard(
 							card = ghost,
 							onSave = {},
-							saved = ghost.ticker in savedCards,
+							saved = ghost.symbol in com.stak.demo.ui.MyStakHoldings.tickers,
 							u = u,
 							modifier = Modifier
 								.align(Alignment.TopCenter)
@@ -462,7 +558,7 @@ fun DiscoverScreen(
 							.clickable(
 								interactionSource = remember { MutableInteractionSource() },
 								indication = null,
-							) { onPracticeBuy() },
+							) { onPracticeBuy(buySpecFor(frontCard.symbol)) },
 					) {
 						Text(
 							text = "Practice buy",
@@ -478,7 +574,7 @@ fun DiscoverScreen(
 							.clickable(
 								interactionSource = remember { MutableInteractionSource() },
 								indication = null,
-								onClick = { onLearnMore(DECK[seen % 3].symbol) },
+								onClick = { onLearnMore(frontCard.symbol) },
 							),
 					) {
 						Text(
@@ -527,6 +623,10 @@ internal fun FrontDeckCard(
 	u: Float,
 	modifier: Modifier = Modifier,
 	rows: DeckRowTweaks = DeckRowTweaks(),
+	// Codex audit (2026-09-04): the queued cards behind the front one draw
+	// without a chip (1:1701 / 1:1660 carry none) - the Save chip belongs
+	// to the front card only.
+	showSave: Boolean = true,
 ) {
 	Box(
 		modifier = modifier
@@ -554,7 +654,7 @@ internal fun FrontDeckCard(
 				}
 			},
 	) {
-		DeckCardBody(card = card, onSave = onSave, u = u, rows = rows, saved = saved)
+		DeckCardBody(card = card, onSave = onSave, u = u, rows = rows, saved = saved, showSave = showSave)
 	}
 }
 
@@ -572,7 +672,7 @@ internal class DeckRowTweaks(
 )
 
 @Composable
-private fun DeckCardBody(card: DeckCard, onSave: (() -> Unit)?, u: Float, rows: DeckRowTweaks = DeckRowTweaks(), saved: Boolean = false) {
+private fun DeckCardBody(card: DeckCard, onSave: (() -> Unit)?, u: Float, rows: DeckRowTweaks = DeckRowTweaks(), saved: Boolean = false, showSave: Boolean = true) {
 	Column(
 		horizontalAlignment = Alignment.CenterHorizontally,
 		// The authored card template (1:1740, shared by all three designs):
@@ -596,13 +696,13 @@ private fun DeckCardBody(card: DeckCard, onSave: (() -> Unit)?, u: Float, rows: 
 				contentScale = ContentScale.Crop,
 				modifier = Modifier.size((340 * u).dp, (229 * u).dp),
 			)
-			if (!saved) {
+			if (showSave && !saved) {
 				// Every card draws the chip live at the template's authored spot
 				// (art x264 y6); the saved deck (1:1796) has none. The NVDA art
 				// is the chip-less export of 1:1910.
 				SaveChip(u = u, modifier = Modifier.align(Alignment.TopEnd).padding(top = (6 * u).dp, end = (4 * u).dp))
 			}
-			if (onSave != null && !saved) {
+			if (onSave != null && showSave && !saved) {
 				Box(
 					modifier = Modifier
 						.align(Alignment.TopEnd)
@@ -847,10 +947,28 @@ private fun SheetSecondary(text: String, onClick: () -> Unit) {
 	}
 }
 
-/** "Buy NVDA?" practice ticket content (frame 1:1970, sheet 1:2159). */
+/** The authored amount pills (1:1970): $10 / $25 / $50 / $100 / Custom. */
+private val AMOUNT_PILLS = listOf("$10" to 10.0, "$25" to 25.0, "$50" to 50.0, "$100" to 100.0, "Custom" to null)
+
+/** The demo cash balance ($8,800.00 on every ticket) - the Custom ceiling. */
+private const val DEMO_CASH = 8800.0
+
+/**
+ * "Buy NVDA?" practice ticket content (frame 1:1970, sheet 1:2159).
+ * Codex audit (2026-09-04): the pills drive `amount` through `onAmount`;
+ * the host hands back `spec.withAmount(amount)` so "You get" follows.
+ */
 @Composable
-private fun PracticeBuyContent(onConfirm: () -> Unit, onDismiss: () -> Unit, spec: BuySpec = NVDA_BUY, secondary: String = "Not yet") {
-	var selected by rememberSaveable { mutableIntStateOf(1) }
+private fun PracticeBuyContent(
+	onConfirm: () -> Unit,
+	onDismiss: () -> Unit,
+	spec: BuySpec = NVDA_BUY,
+	secondary: String = "Not yet",
+	amount: Double,
+	onAmount: (Double) -> Unit,
+) {
+	var selected by rememberSaveable { mutableIntStateOf(listOf(10.0, 25.0, 50.0, 100.0).indexOf(amount).let { if (it >= 0) it else AMOUNT_PILLS.lastIndex }) }
+	var custom by rememberSaveable { mutableStateOf("") }
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Column(verticalArrangement = Arrangement.spacedBy((14 * u).dp), modifier = Modifier.fillMaxWidth()) {
 		Text(
@@ -881,7 +999,7 @@ private fun PracticeBuyContent(onConfirm: () -> Unit, onDismiss: () -> Unit, spe
 				)
 			}
 			Row(horizontalArrangement = Arrangement.spacedBy((8 * u).dp), modifier = Modifier.fillMaxWidth()) {
-				listOf("$10", "$25", "$50", "$100", "Custom").forEachIndexed { i, label ->
+				AMOUNT_PILLS.forEachIndexed { i, (label, value) ->
 					val sel = i == selected
 					Box(
 						contentAlignment = Alignment.Center,
@@ -897,7 +1015,13 @@ private fun PracticeBuyContent(onConfirm: () -> Unit, onDismiss: () -> Unit, spe
 							.clickable(
 								interactionSource = remember { MutableInteractionSource() },
 								indication = null,
-							) { selected = i }
+							) {
+								selected = i
+								// Custom re-applies whatever valid amount its field already
+								// holds; else the last pill's amount stands until one is typed.
+								if (value != null) onAmount(value)
+								else custom.toDoubleOrNull()?.takeIf { it > 0.0 && it <= DEMO_CASH }?.let(onAmount)
+							}
 							.padding(vertical = (8 * u).dp),
 					) {
 						Text(
@@ -907,6 +1031,50 @@ private fun PracticeBuyContent(onConfirm: () -> Unit, onDismiss: () -> Unit, spe
 						)
 					}
 				}
+			}
+			if (selected == AMOUNT_PILLS.lastIndex) {
+				// Codex audit (2026-09-04): Custom opens an inline amount under
+				// the row. 1:1970 authors no field, so it borrows the pill
+				// chrome (AmountBg + the selected border). A value > 0 and
+				// within the $8,800 cash drives the ticket; anything else
+				// leaves the amount where it was.
+				BasicTextField(
+					value = custom,
+					onValueChange = { raw ->
+						val text = raw.filter { it.isDigit() || it == '.' }.take(9)
+						custom = text
+						text.toDoubleOrNull()?.takeIf { it > 0.0 && it <= DEMO_CASH }?.let(onAmount)
+					},
+					singleLine = true,
+					keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+					textStyle = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, color = Disc.AmountInk),
+					cursorBrush = SolidColor(Disc.AmountSelBorder),
+					decorationBox = { inner ->
+						Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy((4 * u).dp)) {
+							Text(
+								text = "$",
+								style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
+								color = Disc.AmountInk,
+							)
+							Box(contentAlignment = Alignment.CenterStart, modifier = Modifier.weight(1f)) {
+								if (custom.isEmpty()) {
+									Text(
+										text = "0.00",
+										style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
+										color = Disc.Muted,
+									)
+								}
+								inner()
+							}
+						}
+					},
+					modifier = Modifier
+						.fillMaxWidth()
+						.clip(RoundedCornerShape((10 * u).dp))
+						.background(Disc.AmountBg)
+						.border((0.5 * u).dp, Disc.AmountSelBorder, RoundedCornerShape((10 * u).dp))
+						.padding(horizontal = (12 * u).dp, vertical = (8 * u).dp),
+				)
 			}
 		}
 		Row(
@@ -1024,10 +1192,17 @@ private fun ProgressRing(progress: Float, u: Float) {
 	}
 }
 
-/** Discover · End of deck (CHINEDU 1:2330) — receipt stats + CTAs. */
+/**
+ * Discover · End of deck (CHINEDU 1:2330) — receipt stats + CTAs.
+ * Codex audit (2026-09-04): the frame authors "12 / 7 / 2" and "Twelve
+ * cards, twelve signals" as placeholder numbers; the build reports THIS
+ * run (cards seen, saves made, practice orders filled) over the real deck.
+ */
 @Composable
-private fun EndOfDeck(onPracticeBuySaves: () -> Unit, onSwipeAgain: () -> Unit, onReviewSaves: () -> Unit) {
+private fun EndOfDeck(seen: Int, saved: Int, bought: Int, onPracticeBuySaves: () -> Unit, onSwipeAgain: () -> Unit, onReviewSaves: () -> Unit) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
+	val word = numberWord(DECK_SIZE)
+	val plural = if (DECK_SIZE == 1) "" else "s"
 	Column(
 		horizontalAlignment = Alignment.CenterHorizontally,
 		modifier = Modifier.fillMaxWidth().padding(horizontal = (20 * u).dp),
@@ -1042,13 +1217,13 @@ private fun EndOfDeck(onPracticeBuySaves: () -> Unit, onSwipeAgain: () -> Unit, 
 		)
 		Spacer(modifier = Modifier.height((8 * u).dp))
 		Text(
-			text = "Twelve cards, twelve signals. Your taste graph got smarter.",
+			text = "${word.replaceFirstChar { it.uppercase() }} card$plural, $word signal$plural. Your taste graph got smarter.",
 			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
 			color = Disc.Muted,
 		)
 		Spacer(modifier = Modifier.height((32 * u).dp))
 		Row(horizontalArrangement = Arrangement.spacedBy((10 * u).dp)) {
-			listOf("Seen" to "12", "Saved" to "7", "Bought" to "2").forEach { (label, value) ->
+			listOf("Seen" to "$seen", "Saved" to "$saved", "Bought" to "$bought").forEach { (label, value) ->
 				Column(
 					horizontalAlignment = Alignment.CenterHorizontally,
 					verticalArrangement = Arrangement.spacedBy((4 * u).dp),
@@ -1138,8 +1313,17 @@ internal fun DiscoverBuyFlow(
 	// B20); left alone they fall back to a plain close.
 	onFilledPrimary: () -> Unit = onClose,
 	onFilledSecondary: () -> Unit = onClose,
+	// Codex audit (2026-09-04): fired exactly once when Confirm fills the
+	// paper order - the shell's Discover ticket counts it into
+	// DeckSession.bought; the Simulate / Stock Detail tickets leave it alone.
+	onFilled: () -> Unit = {},
 ) {
 	var filled by rememberSaveable { mutableStateOf(false) }
+	// Codex audit (2026-09-04): the chosen stake - the authored $25 by
+	// default; both sheets read spec.withAmount(amount), so "You get",
+	// "Cash available" after and "You now hold" follow the pills.
+	var amount by rememberSaveable { mutableDoubleStateOf(25.0) }
+	val live = spec.withAmount(amount)
 	// The scrim tap is unauthored - it keeps the per-state plain dismiss.
 	SheetScaffold(onDismiss = { if (filled) onFilledSecondary() else onClose() }) {
 		AnimatedContent(
@@ -1155,9 +1339,16 @@ internal fun DiscoverBuyFlow(
 			label = "buyMorph",
 		) { isFilled ->
 			if (!isFilled) {
-				PracticeBuyContent(onConfirm = { filled = true }, onDismiss = onClose, spec = spec, secondary = ticketSecondary)
+				PracticeBuyContent(
+					onConfirm = { if (!filled) { filled = true; onFilled() } },
+					onDismiss = onClose,
+					spec = live,
+					secondary = ticketSecondary,
+					amount = amount,
+					onAmount = { amount = it },
+				)
 			} else {
-				OrderFilledContent(onPrimary = onFilledPrimary, onSecondary = onFilledSecondary, spec = spec, primary = filledPrimary, secondary = filledSecondary)
+				OrderFilledContent(onPrimary = onFilledPrimary, onSecondary = onFilledSecondary, spec = live, primary = filledPrimary, secondary = filledSecondary)
 			}
 		}
 	}

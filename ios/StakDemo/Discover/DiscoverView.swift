@@ -1,10 +1,10 @@
 import SwiftUI
 
 /// 04 · Discover — "first run" (CHINEDU 1:1627) with its states: the
-/// swipe deck (the three designed cards - the frame authored a 12-count
-/// over them; the build counts the real deck, Codex audit 2026-09-04),
-/// the Save toast (1:1796), the Buy practice ticket (1:1970) and Order
-/// filled (85:1205), and the End-of-deck receipt (1:2330).
+/// swipe deck (twelve cards cycling the three designed ones - the
+/// authored deck look wins; user, 2026-09-04, DE-STAK 04 · Discover
+/// 1:1916), the Save toast (1:1796), the Buy practice ticket (1:1970)
+/// and Order filled (85:1205), and the End-of-deck receipt (1:2330).
 /// Ported from android/ ui/discover/DiscoverScreen.kt.
 enum Disc {
 	static let sheetBg = Color(argb: 0xFF181F30)
@@ -160,18 +160,10 @@ private let deck: [DeckCard] = [
 	)
 ]
 
-/// Codex audit (2026-09-04): the frame (1:1627) authored a 12-card counter
-/// over three designed cards; the build counts the real deck - no 12 / 11 /
-/// modulo wrap anywhere.
-private let deckSize = deck.count
-
-/// Codex audit (2026-09-04): 1:2330 authors "Twelve cards, twelve signals"
-/// for a 12-card day - the receipt spells the real deck size (1...12 covers
-/// a day's deck; larger decks fall back to digits).
-private func numberWord(_ n: Int) -> String {
-	let words = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve"]
-	return words.indices.contains(n) ? words[n] : "\(n)"
-}
+/// user, 2026-09-04 (DE-STAK 04 · Discover 1:1916): the authored deck look
+/// wins - a twelve-card run ("1/12") cycling the three designed cards, as
+/// the frames author it.
+private let deckSize = 12
 
 struct DiscoverView: View {
 	// Property order IS the memberwise-init argument order (Swift); the
@@ -197,19 +189,16 @@ struct DiscoverView: View {
 		nonmutating set { session.seen = newValue }
 	}
 	@State private var savedToast = false
-	// Codex audit (2026-09-04): THIS RUN's saves (symbols) - only the
-	// receipt's Saved count reads it; the chip state is My STAK below.
-	/// This run's saves (the chip itself reads MyStakHoldings) - proxies DeckSession.
+	/// THIS RUN's saves (symbols) - the Save chip AND the receipt's Saved
+	/// count read it; proxies DeckSession. The chip follows this run, not
+	/// My STAK: 1:1916 shows Save on NVDA even though My STAK lists it
+	/// (user, 2026-09-04) - 1:1627 vs 1:1796, the chip goes once the card
+	/// is saved here. Private wrapped defaults stay out of the memberwise
+	/// init - resetKey remains the first argument.
 	private var savedCards: Set<String> {
 		get { session.saved }
 		nonmutating set { session.saved = newValue }
 	}
-	// Codex audit (2026-09-04): the Save chip's state IS My STAK (1:1627 vs
-	// 1:1796) - the seeded My STAK already holds the three authored cards,
-	// so under the demo seed they open in their saved state; the chip
-	// returns for any card not held. Private wrapped defaults stay out of
-	// the memberwise init - resetKey remains the first argument.
-	@ObservedObject private var holdings = MyStakHoldings.shared
 	// Codex audit (2026-09-04): the shell's DISCOVER ticket reports fills here.
 	@ObservedObject private var session = DeckSession.shared
 	@State private var dragOffset: CGFloat = 0
@@ -226,9 +215,10 @@ struct DiscoverView: View {
 	@State private var flyFade: Double = 0
 	@State private var flyGen = 0
 
-	/// Codex audit (2026-09-04): the front card's index - clamped, never
-	/// wrapped; past the last card the receipt (1:2330) replaces the deck.
-	private var front: Int { min(seen, deckSize - 1) }
+	/// The front card's index - the twelve-card run cycles the three designed
+	/// cards (user, 2026-09-04, 1:1916); past the twelfth the receipt (1:2330)
+	/// replaces the deck.
+	private var front: Int { seen % deck.count }
 
 	/// 1:2330 "Swipe today's deck again" and the tab re-tap restart the run:
 	/// the deck, this run's saves and its fills all return to zero.
@@ -249,8 +239,7 @@ struct DiscoverView: View {
 							.foregroundStyle(Color.white)
 							.offset(y: seen >= deckSize ? -7 * u : 0)
 						Spacer()
-						// Codex audit (2026-09-04): the ring counts the real deck (3),
-						// not the frame's authored 12.
+						// The authored "1/12" counter and ring (1:1627; user, 2026-09-04).
 						let count = min(seen + 1, deckSize)
 						ZStack {
 							ProgressRing(progress: CGFloat(count) / CGFloat(deckSize))
@@ -287,35 +276,38 @@ struct DiscoverView: View {
 					// diving card must never cover the gesture/CTA zone.
 					VStack(spacing: 0) {
 						ZStack(alignment: .top) {
-							// Codex audit (2026-09-04): the queue behind the front
-							// card is LIVE. The frame's peek slabs (1:1627) were
-							// exports with baked Save pills that never changed as
-							// the deck advanced. Back to front: the card two ahead
-							// at the authored top-slab geometry (273.66/350 =
-							// 0.7819; the export's 12.39 top pad scaled = 10.83),
-							// then the next card at the authored mid-slab geometry
-							// (1:1701: y 36.39, 313.14/350 = 0.8947) - ALWAYS fully
-							// opaque, so what a drag reveals is the real next
-							// card. Neither rear card draws a Save chip: only the
-							// front card is actionable. Each renders only while
-							// its index exists - no wrap-around. Mirrors android
-							// ui/discover/DiscoverScreen.kt.
-							if seen + 2 < deckSize {
-								let farther = deck[seen + 2]
-								FrontDeckCard(card: farther, onSave: {}, u: u, saved: holdings.tickers.contains(farther.symbol), showSave: false)
-									.scaleEffect(0.7819, anchor: .top)
-									.offset(y: 10.83 * u)
-									.allowsHitTesting(false)
-							}
-							if seen + 1 < deckSize {
-								let next = deck[seen + 1]
-								FrontDeckCard(card: next, onSave: {}, u: u, saved: holdings.tickers.contains(next.symbol), showSave: false)
+							// The authored deck (1:1627): the queued cards behind
+							// are the DESIGNED ILLUSION — the exact authored
+							// slabs, always (they give the illusion of a queue).
+							// user, 2026-09-04 (DE-STAK 04 · Discover 1:1916): the
+							// authored deck look wins - the baked exports, the next
+							// card's own Save pill peeking at the top included.
+							Image("DiscPeekTop")
+								.resizable()
+								.frame(width: 273.66 * u, height: 336.66 * u)
+								.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+								.offset(x: 39 * u, y: 0)
+							Image("DiscPeekMid")
+								.resizable()
+								.frame(width: 313.14 * u, height: 352.87 * u)
+								.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+								.offset(x: 18 * u, y: 24 * u)
+								.opacity(1 - min(1, max(0, dragOffset / (110 * u))))
+							if seen < deckSize - 1 {
+								// The design's queue is REAL cards (1:1701 = the next
+								// card behind the front one - file metadata,
+								// 2026-09-02): as the drag exposes the mid slab it
+								// crossfades into the LIVE next card at the SAME
+								// authored geometry, so the queue tells the truth.
+								let next = deck[(seen + 1) % deck.count]
+								FrontDeckCard(card: next, onSave: {}, u: u, saved: savedCards.contains(next.symbol))
 									.scaleEffect(0.8947, anchor: .top)
+									.opacity(min(1, max(0, dragOffset / (110 * u))))
 									.offset(y: 36.39 * u)
 									.allowsHitTesting(false)
 							}
 							let frontCard = deck[front]
-							FrontDeckCard(card: frontCard, onSave: { savedCards.insert(frontCard.symbol); MyStakHoldings.shared.add(frontCard.symbol); savedToast = true }, u: u, saved: holdings.tickers.contains(frontCard.symbol))
+							FrontDeckCard(card: frontCard, onSave: { savedCards.insert(frontCard.symbol); MyStakHoldings.shared.add(frontCard.symbol); savedToast = true }, u: u, saved: savedCards.contains(frontCard.symbol))
 								.scaleEffect(0.8947 + 0.1053 * promote, anchor: .top)
 								.opacity(frontOpacity)
 								.offset(y: 54.65 * u - 18.26 * u * (1 - promote) + dragOffset)
@@ -323,7 +315,7 @@ struct DiscoverView: View {
 							if let ghost = flyingCard {
 								// The swiped-away card flying off above the live
 								// deck; input falls through to the front card.
-								FrontDeckCard(card: ghost, onSave: {}, u: u, saved: holdings.tickers.contains(ghost.symbol))
+								FrontDeckCard(card: ghost, onSave: {}, u: u, saved: savedCards.contains(ghost.symbol))
 									.opacity(flyFade)
 									.offset(y: 54.65 * u + flyOffset)
 									.allowsHitTesting(false)
@@ -507,9 +499,9 @@ private struct FrontDeckCard: View {
 	let onSave: () -> Void
 	let u: CGFloat
 	var saved: Bool = false
-	/// Codex audit (2026-09-04): the rear queue cards draw no Save chip -
-	/// only the front card is actionable (the frame's peek slabs, 1:1627,
-	/// carried pills only because they were exports).
+	/// A card drawn without its Save chip. Unused since the rear stack went
+	/// back to the authored exports (user, 2026-09-04, 1:1916) - every live
+	/// card takes the default.
 	var showSave = true
 
 	var body: some View {
@@ -543,8 +535,8 @@ private struct DeckCardBody: View {
 	let onSave: (() -> Void)?
 	let u: CGFloat
 	var saved: Bool = false
-	/// Codex audit (2026-09-04): false on the rear queue cards - no chip, no
-	/// hidden Save hit-target. Declared last; callers pass it last.
+	/// False draws no chip and no hidden Save hit-target. Declared last;
+	/// callers pass it last.
 	var showSave = true
 
 	var body: some View {
@@ -687,9 +679,9 @@ private struct EndOfDeck: View {
 				.font(StakFont.sora(22 * u, .semiBold))
 				.foregroundStyle(Disc.brightInk)
 			Spacer().frame(height: 8 * u)
-			// Codex audit (2026-09-04): 1:2330 authored "Twelve cards, twelve
-			// signals" for a 12-card day; the copy spells the real deck size.
-			Text("\(numberWord(deckSize).capitalized) cards, \(numberWord(deckSize)) signals. Your taste graph got smarter.")
+			// Authored copy (1:2330) - the twelve-card run reads it literally
+			// (user, 2026-09-04, 1:1916).
+			Text("Twelve cards, twelve signals. Your taste graph got smarter.")
 				.font(StakFont.geist(12 * u))
 				.foregroundStyle(Disc.muted)
 			Spacer().frame(height: 32 * u)

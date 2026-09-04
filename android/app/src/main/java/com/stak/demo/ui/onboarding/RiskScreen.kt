@@ -23,5 +23,7 @@ fun RiskScreen(onBack: () -> Unit, onContinue: () -> Unit) {
 		),
 		onBack = onBack,
 		onContinue = onContinue,
+		// 1554:8913 arrives with "Sell some, reduce risk" selected.
+		initialSelection = 3,
 	)
 }

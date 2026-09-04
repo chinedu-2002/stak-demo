@@ -34,6 +34,7 @@ import androidx.navigation.compose.rememberNavController
 import com.stak.demo.ui.components.MainTab
 import com.stak.demo.ui.components.MainTabBar
 import com.stak.demo.ui.discover.BuySpec
+import com.stak.demo.ui.discover.DiscoverBuySpecSaver
 import com.stak.demo.ui.discover.DiscoverBuyFlow
 import com.stak.demo.ui.discover.DiscoverScreen
 import com.stak.demo.ui.discover.StockDetailScreen
@@ -644,7 +645,13 @@ private fun MainShell(
 	// First run shows only in the session that signed in / created the
 	// account; a launch that resumed a saved session lands on Home Main.
 	var homeFirstRun by rememberSaveable { mutableStateOf(!com.stak.demo.ui.Session.resumedSignedIn) }
-	var discoverBuy by rememberSaveable { mutableStateOf(false) }
+	// Codex audit (2026-09-04): the Discover ticket serves the FRONT card's
+	// stock (NVDA / AAPL / GOOGL into the 1:1970 template) - the raised spec
+	// IS the open flag; null = no ticket.
+	var discoverBuySpec by rememberSaveable(stateSaver = DiscoverBuySpecSaver) { mutableStateOf<BuySpec?>(null) }
+	// The last served stock outlives the close so a sheet riding out with
+	// the page (B2) keeps it instead of snapping back to the frame's NVDA.
+	var discoverBuyShown by remember { mutableStateOf(com.stak.demo.ui.discover.NVDA_BUY) }
 	var simulateBuy by rememberSaveable { mutableStateOf(false) }
 	// Codex parity audit (2026-09-04): the Simulate ticket serves the TAPPED
 	// saved stak (PLTR_BUY / COST_BUY into the 1:4232 template). Held past
@@ -706,7 +713,7 @@ private fun MainShell(
 						MainTab.Discover -> DiscoverScreen(
 							resetKey = discoverResetKey,
 							onLearnMore = onOpenStock,
-							onPracticeBuy = { discoverBuyGen++; discoverBuyDissolve = false; discoverBuy = true },
+							onPracticeBuy = { spec -> discoverBuyGen++; discoverBuyDissolve = false; discoverBuyShown = spec; discoverBuySpec = spec },
 							// B4 (1:2330 Motion): the end-of-deck CTAs are
 							// instant tab hops to Simulate / My STAK.
 							onPracticeBuySaves = { switchTab(MainTab.Simulate) },
@@ -739,22 +746,28 @@ private fun MainShell(
 			// with its own page so a forward push carries it out too (B2).
 			if (page == MainTab.Discover) {
 				AnimatedVisibility(
-					visible = discoverBuy || discoverBuyLeaving,
+					visible = discoverBuySpec != null || discoverBuyLeaving,
 					enter = EnterTransition.None,
 					exit = if (discoverBuyDissolve) fadeOut(tween(300, easing = EaseOut)) else ExitTransition.None,
 				) {
 					androidx.compose.runtime.key(discoverBuyGen) {
 					DiscoverBuyFlow(
-						onClose = { discoverBuy = false },
+						onClose = { discoverBuySpec = null },
+						// A closed ticket (null) still riding out with the page
+						// (B2) keeps the stock it served.
+						spec = discoverBuySpec ?: discoverBuyShown,
+						// Codex audit (2026-09-04): only the DECK's fills count
+						// into the end-of-deck "Bought" (1:2330).
+						onFilled = { com.stak.demo.ui.discover.DeckSession.bought += 1 },
 						// B2 (85:1205 Motion): View in My STAK = forward-push tab
 						// switch; the deck + sheet slide out right together.
 						onFilledPrimary = {
-							discoverBuy = false
+							discoverBuySpec = null
 							discoverBuyLeaving = true
 							switchTab(MainTab.MySTAK, TabPushStyle.FORWARD_PUSH)
 						},
 						// B3: Keep exploring dissolves the overlay over the deck.
-						onFilledSecondary = { discoverBuyDissolve = true; discoverBuy = false },
+						onFilledSecondary = { discoverBuyDissolve = true; discoverBuySpec = null },
 					)
 					}
 				}

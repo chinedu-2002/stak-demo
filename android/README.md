@@ -84,6 +84,27 @@ up after 1200ms with a 350ms ease-out dissolve, per the file's
 prototype wiring. `MainTabsShell` is the phase-3 placeholder with the
 real Figma tab bar (`StakTabBar`).
 
+## Beyond the prototype (intentional)
+
+The Figma prototype authors every screen and transition; the build adds
+a few interactions on top of it. Each is deliberate, with its source:
+
+- Swipe between stories on the article screen — `NewsDetailScreen` is a
+  `HorizontalPager` over the feed's canonical order, opened on the
+  tapped story (user, 2026-08-31).
+- Every news card, brief page and list row opens its own article — the
+  feed is holdings-driven, so the authored Apple page is the template
+  each story is served into (user, 2026-09-01).
+- READ NEXT chains articles: each row opens its own article, which has
+  its own READ NEXT.
+- Native hero video players (ExoPlayer, in-app PiP, fullscreen) where
+  the frame shows a poster + play glyph.
+- The Discover save toast auto-dismisses after 2.2s.
+- Collection, stock and pick detail pages serve the tapped item's data
+  into the authored template — the same thing the Discover deck's
+  "Learn more" already does (Codex parity audit, 2026-09-04).
+- Portrait lock (2026-09-04).
+
 ## Fonts & assets
 
 `res/font/` carries the Sora and Geist variable TTFs (weights

@@ -16,7 +16,8 @@ struct ProfileSetupView: View {
 	let onBack: () -> Void
 	let onProceed: () -> Void
 
-	@State private var name = ""
+	// The frame arrives with "Nedu" typed (avatar "N", counter 4 / 20) - user, 2026-09-04 (CHINEDU 01 · Onboarding 1:793): the exact frame wins.
+	@State private var name = "Nedu"
 	@State private var showPhotoPicker = false
 	@State private var pickedItem: PhotosPickerItem? = nil
 	/// The picked photo as a ~512px JPEG (tens of KB) - never the original.

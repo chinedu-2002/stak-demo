@@ -1,7 +1,5 @@
 package com.stak.demo.ui.onboarding
 
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -19,11 +17,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -52,15 +46,14 @@ private val BARS = listOf(
  * Onboarding · 07 Taste reveal — Figma node 1554:9051 ("STEP 6 OF 6").
  *
  * The quiz result: teal eyebrow, "Here's what you're into." headline,
- * the #181f30 taste card with four strength bars (fills animate in on
- * entry, landing on the exact Figma widths), the Risk style chip
- * ("Growth-Oriented" ›) and the "Lets go!" / Back CTAs.
+ * the #181f30 taste card with four strength bars drawn at their exact
+ * Figma widths - the frame arrives already filled, so there is no
+ * entry animation (Codex parity audit 2026-09-04) - the Risk style
+ * chip ("Growth-Oriented" ›) and the "Lets go!" / Back CTAs.
  */
 @Composable
 fun TasteRevealScreen(onBack: () -> Unit, onLetsGo: () -> Unit) {
 	val u = figmaUnit()
-	var revealed by remember { mutableStateOf(false) }
-	LaunchedEffect(Unit) { revealed = true }
 
 	Artboard(modifier = Modifier.background(StakColors.Bg)) {
 		Row(
@@ -111,12 +104,7 @@ fun TasteRevealScreen(onBack: () -> Unit, onLetsGo: () -> Unit) {
 					.background(Auth.InputBg, RoundedCornerShape((16 * u).dp))
 					.padding((16 * u).dp),
 			) {
-				BARS.forEachIndexed { index, bar ->
-					val fill by animateFloatAsState(
-						targetValue = if (revealed) bar.fraction else 0f,
-						animationSpec = tween(durationMillis = 550, delayMillis = 120 * index),
-						label = "tasteFill$index",
-					)
+				BARS.forEach { bar ->
 					Column(verticalArrangement = Arrangement.spacedBy((6 * u).dp)) {
 						Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
 							Text(
@@ -139,7 +127,7 @@ fun TasteRevealScreen(onBack: () -> Unit, onLetsGo: () -> Unit) {
 						) {
 							Box(
 								modifier = Modifier
-									.fillMaxWidth(fill)
+									.fillMaxWidth(bar.fraction)
 									.height((5 * u).dp)
 									.background(Auth.LinkTeal, RoundedCornerShape((2.5 * u).dp)),
 							)

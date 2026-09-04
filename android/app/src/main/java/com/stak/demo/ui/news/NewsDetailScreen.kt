@@ -1274,19 +1274,30 @@ private fun NewsVideoPlayer(video: NewsMedia.Video, modifier: Modifier = Modifie
 private object NewsVideoCache {
 	private var cache: androidx.media3.datasource.cache.SimpleCache? = null
 
+	/**
+	 * The disk cache, or null when its storage cannot be set up (no space,
+	 * a corrupt or locked index, a folder another instance holds): the
+	 * story still plays, straight from the network (audit 2026-09-04).
+	 */
 	@Synchronized
-	private fun cache(ctx: android.content.Context): androidx.media3.datasource.cache.SimpleCache =
-		cache ?: androidx.media3.datasource.cache.SimpleCache(
-			java.io.File(ctx.applicationContext.cacheDir, "news_video"),
-			androidx.media3.datasource.cache.LeastRecentlyUsedCacheEvictor(200L * 1024 * 1024),
-			androidx.media3.database.StandaloneDatabaseProvider(ctx.applicationContext),
-		).also { cache = it }
+	private fun cache(ctx: android.content.Context): androidx.media3.datasource.cache.SimpleCache? =
+		cache ?: runCatching {
+			androidx.media3.datasource.cache.SimpleCache(
+				java.io.File(ctx.applicationContext.cacheDir, "news_video"),
+				androidx.media3.datasource.cache.LeastRecentlyUsedCacheEvictor(200L * 1024 * 1024),
+				androidx.media3.database.StandaloneDatabaseProvider(ctx.applicationContext),
+			)
+		}.onFailure { android.util.Log.w("NewsVideoCache", "video cache unavailable - playing uncached", it) }
+			.getOrNull()?.also { cache = it }
 
 	fun preparedPlayer(ctx: android.content.Context, url: String): androidx.media3.exoplayer.ExoPlayer {
-		val dataSources = androidx.media3.datasource.cache.CacheDataSource.Factory()
-			.setCache(cache(ctx))
-			.setUpstreamDataSourceFactory(androidx.media3.datasource.DefaultDataSource.Factory(ctx))
-			.setFlags(androidx.media3.datasource.cache.CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
+		val upstream = androidx.media3.datasource.DefaultDataSource.Factory(ctx)
+		val dataSources: androidx.media3.datasource.DataSource.Factory = cache(ctx)?.let { disk ->
+			androidx.media3.datasource.cache.CacheDataSource.Factory()
+				.setCache(disk)
+				.setUpstreamDataSourceFactory(upstream)
+				.setFlags(androidx.media3.datasource.cache.CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
+		} ?: upstream
 		return androidx.media3.exoplayer.ExoPlayer.Builder(ctx)
 			.setMediaSourceFactory(androidx.media3.exoplayer.source.DefaultMediaSourceFactory(dataSources))
 			.setLoadControl(
@@ -1415,7 +1426,16 @@ private fun rememberHeroPlayer(media: NewsMedia, enabled: Boolean = true): HeroP
 	// the player; swiping away recreates an empty holder, and the old
 	// player is released by this DisposableEffect's key change.
 	val player = remember(directUrl, enabled) {
-		HeroPlayer(if (enabled && directUrl != null) NewsVideoCache.preparedPlayer(ctx, directUrl) else null)
+		// Belt and braces over the cache fallback: a player stack that cannot
+		// be built leaves the hero on its poster + glyph instead of crashing
+		// the article (audit 2026-09-04).
+		HeroPlayer(
+			if (enabled && directUrl != null) {
+				runCatching { NewsVideoCache.preparedPlayer(ctx, directUrl) }
+					.onFailure { android.util.Log.w("NewsVideoCache", "hero player unavailable", it) }
+					.getOrNull()
+			} else null,
+		)
 	}
 	val exo = player.exo
 	DisposableEffect(player) {

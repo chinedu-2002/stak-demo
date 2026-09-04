@@ -304,8 +304,8 @@ private fun MarketMoodCard(onOpenNews: () -> Unit) {
 					// Backend-served with the mood score in production (the words
 					// change with the market); authored demo copy this phase.
 					text = buildAnnotatedString {
-						withStyle(SpanStyle(color = Home.Teal)) { append(MarketMoodFeed.DEMO_STATUS_LEAD) }
-						append(MarketMoodFeed.DEMO_STATUS_REST)
+						withStyle(SpanStyle(color = Home.Teal)) { append(MarketMoodFeed.statusLead) }
+						append(MarketMoodFeed.statusRest)
 					},
 					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
 					color = Color.White,
@@ -640,7 +640,9 @@ private fun FirstRunOverlay(onSeeTodaysPick: () -> Unit, modifier: Modifier = Mo
  * blob); live values rotate the needle group about the blob center.
  */
 @Composable
-private fun MarketMoodGauge(u: Float) {
+internal fun MarketMoodGauge(u: Float) {
+	// Shared with the News mood row (Codex audit 2026-09-04), which passes a
+	// scaled unit so the compact 40.97x20.76 gauge is this same drawing.
 	// Starts at the design's default pose; moves to the live worldwide
 	// reading once it arrives (user's call, 2026-08-21).
 	val sweep = androidx.compose.runtime.remember { androidx.compose.animation.core.Animatable(MarketMoodFeed.DEMO_ANGLE_DEG) }

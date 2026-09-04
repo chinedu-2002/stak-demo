@@ -75,6 +75,10 @@ fun NewsScreen(onOpenArticle: (String) -> Unit) {
 	var query by rememberSaveable { mutableStateOf("") }
 	val q = query.trim()
 	fun matches(text: String) = q.isEmpty() || text.contains(q, ignoreCase = true)
+	// Search reads the whole story, not just its headline (Codex audit
+	// 2026-09-04): subtitle, source, tags and ticker too.
+	fun matchesArticle(a: NewsArticleFeed.Article) = articleMatches(a, q)
+	fun matchesBrief(b: NewsBriefFeed.Brief) = matches(b.title) || matches(b.body) || matches(b.source)
 	Column(modifier = Modifier.fillMaxSize().background(StakColors.Bg)) {
 		Row(
 			verticalAlignment = Alignment.CenterVertically,
@@ -91,8 +95,14 @@ fun NewsScreen(onOpenArticle: (String) -> Unit) {
 					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (26 * u).sp, lineHeight = (33 * u).sp),
 					color = Color.White,
 				)
+				// The frame's "Saturday, July 4" is the authored example; the
+				// screen shows today (Codex audit 2026-09-04), in the frame's
+				// English format whatever the device locale.
+				val today = androidx.compose.runtime.remember {
+					java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("EEEE, MMMM d", java.util.Locale.US))
+				}
 				Text(
-					text = "Saturday, July 4",
+					text = today,
 					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (13 * u).sp, lineHeight = (17 * u).sp),
 					color = News.Muted,
 				)
@@ -158,26 +168,44 @@ fun NewsScreen(onOpenArticle: (String) -> Unit) {
 			if (q.isEmpty()) MoodMiniRow()
 			// Designer's call (2026-08-22): today's brief on tap leads to the
 			// News info page (the Story tile stays wired per panel 1:1228).
-			if (NewsBriefFeed.briefs().any { matches(it.title) }) {
+			// Only the briefs that match ride the carousel (Codex audit
+			// 2026-09-04: one hit used to show all four pages).
+			val briefHits = NewsBriefFeed.briefs().withIndex().filter { matchesBrief(it.value) }
+			if (briefHits.isNotEmpty()) {
 				// Each brief opens ITS OWN article (user, 2026-08-25). The
 				// index guard covers a served brief without a mapped article.
-				BriefCarousel(onRead = { page -> NewsArticleFeed.BRIEF_ARTICLES.getOrNull(page)?.let(onOpenArticle) })
+				BriefCarousel(
+					briefs = briefHits.map { it.value },
+					onRead = { page -> NewsArticleFeed.BRIEF_ARTICLES.getOrNull(briefHits[page].index)?.let(onOpenArticle) },
+				)
 			}
 			StoryGrid(onOpenArticle = onOpenArticle, query = q)
 			// The rows render from the served section feeds - STRICT stock
 			// news only (user, 2026-08-25); EVERY story opens its article.
 			// Each story names the stocks it relates to; the "In your STAK"
 			// chip shows only when one of them is in the user's My STAK.
-			val forYou = NewsArticleFeed.forYou().filter { matches(it.headline) }
+			val forYou = NewsArticleFeed.forYou().filter { matchesArticle(it) }
 			if (forYou.isNotEmpty()) NewsSection(title = "For You", rows = forYou, onOpen = onOpenArticle)
-			val markets = NewsArticleFeed.markets().filter { matches(it.headline) }
+			val markets = NewsArticleFeed.markets().filter { matchesArticle(it) }
 			if (markets.isNotEmpty()) NewsSection(title = "Markets", rows = markets, onOpen = onOpenArticle)
 			Spacer(modifier = Modifier.height(0.dp))
 		}
 	}
 }
 
-/** Compact Market Mood row — #171d2c r12 with the small low-volatility gauge. */
+/** Search over the whole story: headline, subtitle, source, tags, ticker. */
+private fun articleMatches(a: NewsArticleFeed.Article, q: String): Boolean {
+	if (q.isEmpty()) return true
+	fun hit(t: String) = t.contains(q, ignoreCase = true)
+	return hit(a.headline) || hit(a.subtitle) || hit(a.source) || a.tags.any(::hit) || (a.ticker?.let(::hit) ?: false)
+}
+
+/**
+ * Compact Market Mood row — #171d2c r12 with the small gauge. Both the
+ * status line and the needle are the SAME shared mood state Home shows
+ * (Codex audit 2026-09-04): the row used to hard-code "Low volatility"
+ * over a baked needle resting in the red band.
+ */
 @Composable
 private fun MoodMiniRow() {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
@@ -196,17 +224,14 @@ private fun MoodMiniRow() {
 				color = Color.White,
 			)
 			Text(
-				text = "Low volatility",
+				text = com.stak.demo.ui.home.MarketMoodFeed.statusLead,
 				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp, lineHeight = (14 * u).sp),
 				color = News.Teal,
 			)
 		}
 		Spacer(modifier = Modifier.weight(1f))
-		Image(
-			painter = painterResource(R.drawable.news_gauge_small),
-			contentDescription = null,
-			modifier = Modifier.size((40.97 * u).dp, (20.76 * u).dp),
-		)
+		// The Home gauge drawn at the authored compact size (40.97 x 20.76).
+		com.stak.demo.ui.home.MarketMoodGauge(u = u * (40.97f / 56.9018f))
 	}
 }
 
@@ -216,10 +241,13 @@ private fun MoodMiniRow() {
  * active dot follows the page. Text comes from NewsBriefFeed.
  */
 @Composable
-private fun BriefCarousel(onRead: (Int) -> Unit) {
+private fun BriefCarousel(briefs: List<NewsBriefFeed.Brief>, onRead: (Int) -> Unit) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
-	val briefs = NewsBriefFeed.briefs()
-	val pager = androidx.compose.foundation.pager.rememberPagerState(pageCount = { briefs.size })
+	// Keyed on the page count so a narrowing search never leaves the pager
+	// parked past its last page.
+	val pager = androidx.compose.runtime.key(briefs.size) {
+		androidx.compose.foundation.pager.rememberPagerState(pageCount = { briefs.size })
+	}
 	Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy((12 * u).dp)) {
 		androidx.compose.foundation.pager.HorizontalPager(
 			state = pager,
@@ -320,8 +348,7 @@ private fun StoryGrid(onOpenArticle: (String) -> Unit, query: String = "") {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	val market = NewsArticleFeed.article(NewsArticleFeed.MARKET_TILE)
 	val yours = NewsArticleFeed.article(NewsArticleFeed.APPLE)
-	fun visible(a: NewsArticleFeed.Article) =
-		NewsArticleFeed.isStockNews(a) && (query.isEmpty() || a.headline.contains(query, ignoreCase = true))
+	fun visible(a: NewsArticleFeed.Article) = NewsArticleFeed.isStockNews(a) && articleMatches(a, query)
 	val showMarket = visible(market)
 	val showYours = visible(yours)
 	if (!showMarket && !showYours) return

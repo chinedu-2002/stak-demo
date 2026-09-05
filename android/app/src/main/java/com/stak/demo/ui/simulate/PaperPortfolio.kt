@@ -136,6 +136,50 @@ internal object PaperPortfolio {
 			baseCash = PAPER_START
 		}
 		baseHoldings = positions.sumOf { it.stake }
+		// The persisted ledger (buys, sells, cash) wins over the seed - product
+		// audit 2026-09-05; the seed baseline above is what value grows from.
+		com.stak.demo.ui.StakStore.getString("portfolio")?.let { runCatching { restore(org.json.JSONObject(it)) } }
+	}
+
+	// ---- persistence ------------------------------------------------------------------------
+	private fun persist() {
+		val o = org.json.JSONObject()
+		o.put("cash", cash)
+		o.put("positions", org.json.JSONArray().also { arr ->
+			positions.forEach { p -> arr.put(org.json.JSONObject().put("spec", specJson(p.spec)).put("row", org.json.JSONObject().put("badge", p.row.badge).put("ticker", p.row.ticker).put("sub", p.row.sub).put("amount", p.row.amount).put("pct", p.row.pct).put("up", p.row.up))) }
+		})
+		o.put("realized", org.json.JSONArray().also { arr ->
+			realized.forEach { r -> arr.put(org.json.JSONObject().put("badge", r.badge).put("ticker", r.ticker).put("sub", r.sub).put("amount", r.amount).put("up", r.up)) }
+		})
+		com.stak.demo.ui.StakStore.putString("portfolio", o.toString())
+	}
+
+	private fun specJson(s: PickSpec): org.json.JSONObject = org.json.JSONObject()
+		.put("symbol", s.symbol).put("badge", s.badge).put("company", s.company).put("priceNow", s.priceNow)
+		.put("pickedLine", s.pickedLine).put("priceThen", s.priceThen).put("gain", s.gain).put("gainPct", s.gainPct)
+		.put("up", s.up).put("shares", s.shares).put("stakeValue", s.stakeValue).put("vsMarket", s.vsMarket)
+		.put("ahead", s.ahead).put("dayChange", s.dayChange).put("stakeBasis", s.stakeBasis).put("weekGain", s.weekGain)
+
+	private fun restore(o: org.json.JSONObject) {
+		val pos = o.getJSONArray("positions")
+		positions = (0 until pos.length()).map { i ->
+			val p = pos.getJSONObject(i); val s = p.getJSONObject("spec"); val r = p.getJSONObject("row")
+			Position(
+				spec = PickSpec(
+					symbol = s.getString("symbol"), badge = s.getString("badge"), company = s.getString("company"), priceNow = s.getString("priceNow"),
+					pickedLine = s.getString("pickedLine"), priceThen = s.getString("priceThen"), gain = s.getString("gain"), gainPct = s.getString("gainPct"),
+					up = s.getBoolean("up"), shares = s.getString("shares"), stakeValue = s.getString("stakeValue"), vsMarket = s.getString("vsMarket"),
+					ahead = s.getBoolean("ahead"), dayChange = s.getString("dayChange"), stakeBasis = s.getString("stakeBasis"), weekGain = s.getString("weekGain"),
+				),
+				row = SimPick(r.getString("badge"), r.getString("ticker"), r.getString("sub"), r.getString("amount"), r.getString("pct"), r.getBoolean("up")),
+			)
+		}
+		val rea = o.getJSONArray("realized")
+		realized = (0 until rea.length()).map { i ->
+			val r = rea.getJSONObject(i)
+			Realized(r.getString("badge"), r.getString("ticker"), r.getString("sub"), r.getString("amount"), r.getBoolean("up"))
+		}
+		cash = o.getDouble("cash")
 	}
 
 	fun signedWhole(amount: Double): String = (if (amount < 0) "-$" else "+$") + String.format(Locale.US, "%,.0f", kotlin.math.abs(amount))
@@ -189,6 +233,7 @@ internal object PaperPortfolio {
 				),
 			)
 			positions = positions.map { if (it === held) grown else it }
+			persist()
 			return
 		}
 		val priceText = usd(price)
@@ -215,6 +260,7 @@ internal object PaperPortfolio {
 			row = SimPick(spec.badge, spec.symbol, "Picked $day · just bought", "+$0.00", "+0.0%", true),
 		)
 		positions = listOf(fresh) + positions
+		persist()
 	}
 
 	/**
@@ -235,6 +281,7 @@ internal object PaperPortfolio {
 			up = banked,
 		)
 		realized = listOf(sold) + realized
+		persist()
 		return true
 	}
 }

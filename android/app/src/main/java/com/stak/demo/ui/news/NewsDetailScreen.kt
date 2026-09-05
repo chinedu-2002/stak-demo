@@ -143,11 +143,6 @@ private val CtaBorder = Brush.verticalGradient(
  */
 private const val REVERSE_SWIPE = false
 
-/** The per-story saved flags survive process death like the old single flag did. */
-private val SavedIdsSaver = listSaver<SnapshotStateList<String>, String>(
-	save = { it.toList() },
-	restore = { it.toMutableStateList() },
-)
 
 /**
  * 03 · News — the article page in its three frames: "News detail page
@@ -180,7 +175,8 @@ fun NewsDetailScreen(articleId: String = NewsArticleFeed.APPLE, onBack: () -> Un
 	val current = NewsArticleFeed.article(pages[pagerState.currentPage])
 	// Saved / save-success state is PER STORY, keyed by id, so it never
 	// bleeds between pages and survives a page being disposed off-screen.
-	val savedIds = rememberSaveable(saver = SavedIdsSaver) { mutableStateListOf<String>() }
+	// Product audit (2026-09-05): saves live in NewsSaves, shared and persisted.
+	val savedIds = NewsSaves.ids
 	var showSuccess by rememberSaveable { mutableStateOf(false) }
 	// The story whose sheet is up: it stays valid through the dissolve-out,
 	// and if the user swipes on while the sheet is up the save still lands
@@ -188,7 +184,7 @@ fun NewsDetailScreen(articleId: String = NewsArticleFeed.APPLE, onBack: () -> Un
 	var successId by rememberSaveable { mutableStateOf<String?>(null) }
 	val successArticle = successId?.let { NewsArticleFeed.article(it) } ?: current
 	fun save(target: NewsArticleFeed.Article) {
-		if (target.id !in savedIds) savedIds += target.id
+		NewsSaves.add(target.id)
 		target.ticker?.let { com.stak.demo.ui.MyStakHoldings.add(it) }
 	}
 

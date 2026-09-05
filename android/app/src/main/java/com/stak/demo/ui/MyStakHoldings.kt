@@ -37,8 +37,11 @@ object MyStakHoldings {
 
 	/** Product audit (2026-09-05): a NEW account holds nothing until the user saves; the demo account keeps the seed. */
 	fun reset(demo: Boolean) {
-		tickers = if (demo) SEED else emptySet()
+		// The persisted set wins over the seed (product audit, 2026-09-05).
+		tickers = StakStore.getSet("holdings") ?: if (demo) SEED else emptySet()
 	}
+
+	private fun persist() = StakStore.putSet("holdings", tickers)
 
 	/** How many stocks the user holds - the Overview's "Across N stocks". */
 	val count: Int get() = tickers.size
@@ -48,11 +51,13 @@ object MyStakHoldings {
 
 	fun add(ticker: String) {
 		tickers = tickers + symbolOf(ticker)
+		persist()
 	}
 
 	/** Unsave (Stock Detail from My STAK) - the same bare-symbol normalisation as add. */
 	fun remove(ticker: String) {
 		tickers = tickers - symbolOf(ticker)
+		persist()
 	}
 
 	// Deck cards carry "NVDA · NVIDIA Corp" - hold the bare symbol.

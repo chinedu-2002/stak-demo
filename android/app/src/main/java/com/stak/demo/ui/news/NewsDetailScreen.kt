@@ -93,6 +93,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -102,8 +104,6 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import androidx.media3.common.C
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.PlaybackParameters
@@ -192,6 +192,10 @@ fun NewsDetailScreen(articleId: String = NewsArticleFeed.APPLE, onBack: () -> Un
 		target.ticker?.let { com.stak.demo.ui.MyStakHoldings.add(it) }
 	}
 
+	// The hero's fullscreen player renders here, over everything in this
+	// screen (edge to edge - the activity window, not a Dialog).
+	val fullscreenSlot = remember { androidx.compose.runtime.mutableStateOf<Pair<HeroPlayer, ExoPlayer>?>(null) }
+	androidx.compose.runtime.CompositionLocalProvider(LocalFullscreenSlot provides fullscreenSlot) {
 	Box(modifier = Modifier.fillMaxSize().background(StakColors.Bg)) {
 		Column(modifier = Modifier.fillMaxSize()) {
 			// Fixed top bar — back circle + share.
@@ -272,6 +276,8 @@ fun NewsDetailScreen(articleId: String = NewsArticleFeed.APPLE, onBack: () -> Un
 				onDismiss = { showSuccess = false; save(successArticle) },
 			)
 		}
+		fullscreenSlot.value?.let { (fsPlayer, fsExo) -> FullscreenPlayer(player = fsPlayer, exo = fsExo) }
+	}
 	}
 }
 
@@ -424,28 +430,24 @@ private fun HeroImage(media: NewsMedia, category: String, saved: Boolean, player
 				} else if (!player.fullscreen) {
 					AndroidView(
 						modifier = Modifier.matchParentSize(),
-						factory = { c -> android.view.TextureView(c).also { exo.setVideoTextureView(it) } },
+						// The clip fills the hero at ITS aspect ratio, cropped
+						// like the frame's hero image - a raw TextureView
+						// stretched it to the 350x208 box (user, 2026-09-05).
+						factory = { c -> VideoSurfaceHost(c, exo, zoom = true) },
 						// Per-view clear (never clearVideoSurface): the mini
 						// player, the OS PiP overlay or the fullscreen view may
 						// already own the surface.
-						onRelease = { v -> exo.clearVideoTextureView(v) },
+						onRelease = { v -> v.release() },
 					)
 					HeroControls(player = player, u = u, modifier = Modifier.matchParentSize())
-				} else {
-					Dialog(
-						onDismissRequest = { player.fullscreen = false },
-						properties = DialogProperties(usePlatformDefaultWidth = false),
-					) {
-						Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
-							AndroidView(
-								modifier = Modifier.matchParentSize(),
-								factory = { c -> android.view.TextureView(c).also { exo.setVideoTextureView(it) } },
-								onRelease = { v -> exo.clearVideoTextureView(v) },
-							)
-							HeroControls(player = player, u = u, fullscreen = true, modifier = Modifier.matchParentSize())
-						}
-					}
 				}
+				// Fullscreen renders in the SCREEN's overlay slot (over the whole
+				// activity window), not a Dialog: Compose sizes a dialog window
+				// to the display minus bars and cutout, so a Dialog can never be
+				// edge to edge (StakTest, 2026-09-05: 70px article strips).
+				val fullscreenSlot = LocalFullscreenSlot.current
+				LaunchedEffect(player.fullscreen) { fullscreenSlot.value = if (player.fullscreen) player to exo else null }
+				DisposableEffect(player) { onDispose { if (fullscreenSlot.value?.first === player) fullscreenSlot.value = null } }
 				if (!player.firstFrame && !NewsPip.inPip && !player.pip) {
 					// Poster holds until onRenderedFirstFrame.
 					val posterRes2 = video.posterRes
@@ -1248,7 +1250,6 @@ private fun NewsVideoPlayer(video: NewsMedia.Video, modifier: Modifier = Modifie
 		androidx.compose.ui.viewinterop.AndroidView(
 			modifier = modifier,
 			factory = { ctx ->
-				val texture = android.view.TextureView(ctx)
 				val player = androidx.media3.exoplayer.ExoPlayer.Builder(ctx).build().apply {
 					setMediaItem(androidx.media3.common.MediaItem.fromUri(video.url))
 					addListener(object : androidx.media3.common.Player.Listener {
@@ -1263,7 +1264,6 @@ private fun NewsVideoPlayer(video: NewsMedia.Video, modifier: Modifier = Modifie
 							if (playbackState == androidx.media3.common.Player.STATE_ENDED) onDone()
 						}
 					})
-					setVideoTextureView(texture)
 					// Exactly 1x (user, 2026-08-26: "put it on 1x speed" -
 					// not sluggish, not fast). Clip SOURCES must also be
 					// real-time footage; see NewsArticleFeed's media notes.
@@ -1271,8 +1271,8 @@ private fun NewsVideoPlayer(video: NewsMedia.Video, modifier: Modifier = Modifie
 					prepare()
 					playWhenReady = true
 				}
-				texture.tag = player
-				texture
+				// Aspect-correct, cropped to the hero (never stretched).
+				VideoSurfaceHost(ctx, player, zoom = true).also { it.tag = player }
 			},
 			// Play/pause toggle: ExoPlayer.pause keeps the position, so
 			// resuming continues where the clip stopped.
@@ -1319,10 +1319,22 @@ private object NewsVideoCache {
 		} ?: upstream
 		return androidx.media3.exoplayer.ExoPlayer.Builder(ctx)
 			.setMediaSourceFactory(androidx.media3.exoplayer.source.DefaultMediaSourceFactory(dataSources))
+			// Netflix-smooth, not stall-cycling (user, 2026-09-05 "cracking
+			// and breaking"): keep 30-120s ahead, start once 2s is in hand
+			// and resume a stall only with 4s (the old 600ms/1.5s starts
+			// stuttered on a bursty link). The start still feels instant -
+			// the player buffers from the moment the article opens, and a
+			// cached replay is local. Time thresholds win over byte sizes.
 			.setLoadControl(
 				androidx.media3.exoplayer.DefaultLoadControl.Builder()
-					.setBufferDurationsMs(20000, 60000, 600, 1500)
+					.setBufferDurationsMs(30000, 120000, 2000, 4000)
+					.setPrioritizeTimeOverSizeThresholds(true)
 					.build(),
+			)
+			// A decoder that fails to init (emulators, odd devices) falls
+			// back to the next one instead of killing the clip.
+			.setRenderersFactory(
+				androidx.media3.exoplayer.DefaultRenderersFactory(ctx).setEnableDecoderFallback(true),
 			)
 			.build().apply {
 				// Audible by default: media usage + audio focus (user,
@@ -1366,6 +1378,8 @@ private class HeroPlayer(val exo: ExoPlayer?) {
 	/** The clip floats in the in-app mini player. */
 	var pip by mutableStateOf(false)
 	var fullscreen by mutableStateOf(false)
+	/** Set by exitFullscreen(): the fullscreen player turns the phone back to portrait, THEN drops. */
+	var leavingFullscreen by mutableStateOf(false)
 	var playWhenReady by mutableStateOf(exo?.playWhenReady == true)
 	var buffering by mutableStateOf(false)
 	var muted by mutableStateOf(exo?.volume == 0f)
@@ -1380,13 +1394,18 @@ private class HeroPlayer(val exo: ExoPlayer?) {
 	var cue by mutableStateOf<String?>(null)
 
 	fun start() {
-		active = true; pip = false; fullscreen = false
+		active = true; pip = false; fullscreen = false; leavingFullscreen = false
 		exo?.playWhenReady = true
+	}
+
+	/** The fullscreen glyph / back: restores portrait first, then leaves (FullscreenPlayer runs the sequence). */
+	fun exitFullscreen() {
+		if (fullscreen) leavingFullscreen = true else fullscreen = false
 	}
 
 	/** Back to the rest state: poster + glyph, rewound so the next tap starts instantly from the top. */
 	fun stop() {
-		active = false; pip = false; fullscreen = false; firstFrame = false; cue = null
+		active = false; pip = false; fullscreen = false; leavingFullscreen = false; firstFrame = false; cue = null
 		exo?.playWhenReady = false
 		exo?.seekTo(0)
 	}
@@ -1674,7 +1693,7 @@ private fun HeroControls(
 				ControlGlyph(
 					icon = if (fullscreen) Icons.Filled.FullscreenExit else Icons.Filled.Fullscreen,
 					size = 20f, u = u, description = if (fullscreen) "Exit fullscreen" else "Fullscreen",
-				) { player.fullscreen = !fullscreen }
+				) { if (fullscreen) player.exitFullscreen() else player.fullscreen = true }
 				Spacer(modifier = Modifier.width((18 * u).dp))
 				ControlGlyph(icon = Icons.Filled.MoreHoriz, size = 22f, u = u, description = "More options") {
 					sheet = PlayerSheet.Menu; poke()
@@ -1936,8 +1955,8 @@ private fun MiniPlayer(player: HeroPlayer, u: Float) {
 			// (now gone) view clears itself per-view, so the order is safe.
 			AndroidView(
 				modifier = Modifier.matchParentSize(),
-				factory = { c -> android.view.TextureView(c).also { exo.setVideoTextureView(it) } },
-				onRelease = { v -> exo.clearVideoTextureView(v) },
+				factory = { c -> VideoSurfaceHost(c, exo, zoom = true) },
+				onRelease = { v -> v.release() },
 			)
 			if (chrome) {
 				Box(modifier = Modifier.matchParentSize().background(Color(0x40000000)))
@@ -2016,6 +2035,69 @@ private fun trackLabel(group: Tracks.Group, index: Int): String {
 	return format.label
 		?: format.language?.let { java.util.Locale.forLanguageTag(it).displayLanguage }
 		?: "Track ${index + 1}"
+}
+
+/**
+ * Fullscreen = a Netflix-style player (user, 2026-09-05 screenshot: the
+ * old raw TextureView stretched the 16:9 clip over the portrait screen):
+ * the activity turns to landscape (either way up), the system bars hide,
+ * and the clip sits letterboxed on black at its own aspect ratio. It is an
+ * OVERLAY in the activity window (LocalFullscreenSlot) - a Dialog window is
+ * sized to the display minus bars and cutout and left article strips. The
+ * controls keep their portrait size - the artboard unit comes from the
+ * SHORT side, not the now-wide width. Leaving restores portrait FIRST and
+ * drops the dialog once the turn has played, so the article underneath
+ * never shows in landscape (its 390-wide artboard scaling is portrait-only).
+ */
+@Composable
+private fun FullscreenPlayer(player: HeroPlayer, exo: ExoPlayer) {
+	val activity = LocalContext.current.findActivity()
+	val cfg = LocalConfiguration.current
+	val u = minOf(cfg.screenWidthDp, cfg.screenHeightDp) / 390f
+	DisposableEffect(Unit) {
+		activity?.requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+		// Every exit path (glyph, back, PiP glyph, clip end) lands back in portrait.
+		onDispose { activity?.requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT }
+	}
+	LaunchedEffect(player.leavingFullscreen) {
+		if (player.leavingFullscreen) {
+			activity?.requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+			delay(350)
+			player.fullscreen = false
+			player.leavingFullscreen = false
+		}
+	}
+	androidx.activity.compose.BackHandler { player.exitFullscreen() }
+	val view = LocalView.current
+	DisposableEffect(view) {
+		// Immersive: the activity window hides status + navigation bars; a
+		// swipe shows them transiently, like a video app. The activity is
+		// already edge to edge, so this overlay spans the whole display.
+		val controller = activity?.window?.let { androidx.core.view.WindowInsetsControllerCompat(it, view) }
+		controller?.systemBarsBehavior = androidx.core.view.WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+		controller?.hide(androidx.core.view.WindowInsetsCompat.Type.systemBars())
+		onDispose { controller?.show(androidx.core.view.WindowInsetsCompat.Type.systemBars()) }
+	}
+	Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
+		AndroidView(
+			modifier = Modifier.matchParentSize(),
+			// Letterboxed at the video's aspect ratio (fit), never cropped or stretched.
+			factory = { c -> VideoSurfaceHost(c, exo, zoom = false) },
+			onRelease = { v -> v.release() },
+		)
+		HeroControls(player = player, u = u, fullscreen = true, modifier = Modifier.matchParentSize())
+	}
+}
+
+/** The screen-level slot the hero publishes its fullscreen player into (see FullscreenPlayer). */
+private val LocalFullscreenSlot = androidx.compose.runtime.compositionLocalOf<androidx.compose.runtime.MutableState<Pair<HeroPlayer, ExoPlayer>?>> {
+	error("NewsDetailScreen provides the fullscreen slot")
+}
+
+private fun android.content.Context.findActivity(): android.app.Activity? = when (this) {
+	is android.app.Activity -> this
+	is android.content.ContextWrapper -> baseContext.findActivity()
+	else -> null
 }
 
 /**

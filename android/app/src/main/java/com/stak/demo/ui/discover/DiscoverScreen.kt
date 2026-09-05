@@ -98,7 +98,10 @@ private object Disc {
 	val Divider = Color(0xFF2A3346)
 	val BadgeInk = Color(0xFF9EADC7)
 	val TipBg = Color(0x1A69B3CA)
-	val SaveChipBg = Color(0x26FFFFFF)
+	// #FFFFFF @ 9% - the Save pill on BOTH Discover frames (DE-STAK 1:2048,
+	// CHINEDU 1:1759). 882ee783's "authored 15%" no longer reads anywhere
+	// (user crop, 2026-09-04).
+	val SaveChipBg = Color(0x17FFFFFF)
 	val AmountBg = Color(0xFF0B1430)
 	val AmountBorder = Color(0x1FFFFFFF)
 	val AmountInk = Color(0xFFDCE7F7)
@@ -807,7 +810,9 @@ private fun SaveChip(u: Float, modifier: Modifier = Modifier) {
 			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 			color = Color.White,
 		)
-		Image(painterResource(R.drawable.ic_hero_bookmark), null, modifier = Modifier.size((12 * u).dp))
+		// The pill's own glyph (1:2050): 12 box, 8x10 bookmark, #AEAEAE stroke 1 -
+		// not the hero's dark #0A1020 export (user crop, 2026-09-04).
+		Image(painterResource(R.drawable.ic_save_bookmark), null, modifier = Modifier.size((12 * u).dp))
 	}
 }
 

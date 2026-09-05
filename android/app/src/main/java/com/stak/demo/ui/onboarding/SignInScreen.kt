@@ -32,6 +32,7 @@ import com.stak.demo.R
 import com.stak.demo.ui.theme.Geist
 import com.stak.demo.ui.theme.Sora
 import com.stak.demo.ui.theme.StakColors
+import com.stak.demo.ui.theme.ADVANCE_ROUNDING
 
 /**
  * Auth · Sign in — Figma node 1554:11288. Same kit as Sign up:
@@ -71,12 +72,12 @@ fun SignInScreen(
 				Column(verticalArrangement = Arrangement.spacedBy((12 * u).dp)) {
 					Text(
 						text = "Welcome back",
-						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (26 * u).sp, lineHeight = (33 * u).sp),
+						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (26 * u).sp, lineHeight = (33 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 						color = StakColors.TextPrimary,
 					)
 					Text(
 						text = "Your deck kept learning while you were away.",
-						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
+						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 						color = Auth.SubtitleGray,
 					)
 				}
@@ -98,7 +99,7 @@ fun SignInScreen(
 				)
 				Text(
 					text = "Forgot password?",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 					color = Auth.LinkTeal,
 					modifier = Modifier.clickable(
 						interactionSource = remember { MutableInteractionSource() },

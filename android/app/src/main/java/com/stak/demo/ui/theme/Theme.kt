@@ -29,8 +29,12 @@ private val StakColorScheme = darkColorScheme(
  * a constant ~0.6 device px lost per glyph across Sora 26 / Geist 13 /
  * Geist 10 (runs 1.5-3% tighter than the frame with identical glyphs;
  * the bundled fonts shape to Figma's widths in HarfBuzz). A constant
- * 0.24sp of tracking, inherited by every Text through LocalTextStyle,
- * gives the frame's run widths back. Android-only — do not mirror to iOS.
+ * 0.24sp of tracking gives the frame's run widths back. It is carried by
+ * the StakTypography styles below AND by every explicit
+ * Text(style = TextStyle(...)) literal in ui/ (M3 Text never merges
+ * LocalTextStyle into an explicit style literal, so the value is not
+ * inherited there - 2026-09-04 audit). Tracked runs add it as
+ * (X * u + ADVANCE_ROUNDING.value).sp. Android-only — do not mirror to iOS.
  */
 val ADVANCE_ROUNDING = 0.24.sp
 

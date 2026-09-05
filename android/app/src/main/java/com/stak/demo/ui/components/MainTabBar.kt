@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.stak.demo.R
 import com.stak.demo.ui.theme.Inter
+import com.stak.demo.ui.theme.ADVANCE_ROUNDING
 
 /** The five CHINEDU tabs - all built. */
 enum class MainTab(val label: String, val activeIcon: Int, val inactiveIcon: Int) {
@@ -83,7 +84,7 @@ fun MainTabBar(selected: MainTab, onSelect: (MainTab) -> Unit) {
 					)
 					Text(
 						text = tab.label,
-						style = TextStyle(fontFamily = Inter, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp),
+						style = TextStyle(fontFamily = Inter, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 						color = Color.White,
 					)
 				}

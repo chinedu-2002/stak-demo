@@ -28,6 +28,7 @@ import com.stak.demo.R
 import com.stak.demo.ui.theme.Geist
 import com.stak.demo.ui.theme.Sora
 import com.stak.demo.ui.theme.StakColors
+import com.stak.demo.ui.theme.ADVANCE_ROUNDING
 import kotlinx.coroutines.delay
 
 /**
@@ -95,7 +96,7 @@ fun SplashScreen(onContinue: () -> Unit) {
 					)
 					Text(
 						text = "Welcome to STAK",
-						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 29.87.sp),
+						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 29.87.sp, letterSpacing = ADVANCE_ROUNDING),
 						color = StakColors.TextPrimary,
 					)
 				}
@@ -106,6 +107,7 @@ fun SplashScreen(onContinue: () -> Unit) {
 						fontWeight = FontWeight.Light,
 						fontSize = 16.sp,
 						textAlign = TextAlign.Center,
+						letterSpacing = ADVANCE_ROUNDING,
 					),
 					color = StakColors.TextPrimary.copy(alpha = 0.7f),
 				)

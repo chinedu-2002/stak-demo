@@ -102,13 +102,13 @@ fun BrandPicksScreen(onBack: () -> Unit, onContinue: () -> Unit) {
 			Column(verticalArrangement = Arrangement.spacedBy((12 * u).dp)) {
 				Text(
 					text = "Which brands do you know or use?",
-					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (24 * u).sp, lineHeight = (31 * u).sp),
+					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (24 * u).sp, lineHeight = (31 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 					color = StakColors.TextPrimary,
 				)
 				Text(
 					text = "Pick a few. STAK uses this to learn what feels familiar to you.",
 					// Authored box (1:255): 303 wide -> the designed two-line wrap.
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 					color = Auth.SubtitleGray,
 					modifier = Modifier.width((303 * u).dp),
 				)
@@ -150,7 +150,7 @@ fun BrandPicksScreen(onBack: () -> Unit, onContinue: () -> Unit) {
 			AuthSecondaryButton(text = "Back", onClick = onBack)
 			Text(
 				text = "You can change this later",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 				color = Auth.FaintText,
 			)
 		}
@@ -189,7 +189,7 @@ private fun BrandTile(
 		)
 		Text(
 			text = brand.name,
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp, lineHeight = (14 * u).sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp, lineHeight = (14 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 			color = if (selected) StakColors.TextPrimary else StakColors.Muted,
 		)
 	}

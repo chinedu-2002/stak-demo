@@ -24,6 +24,7 @@ import com.stak.demo.R
 import com.stak.demo.ui.theme.Geist
 import com.stak.demo.ui.theme.Sora
 import com.stak.demo.ui.theme.StakColors
+import com.stak.demo.ui.theme.ADVANCE_ROUNDING
 
 /**
  * Onboarding · 01 Welcome — Figma node 1554:8475.
@@ -48,7 +49,7 @@ fun IntroScreen(onGetStarted: () -> Unit) {
 			Column(verticalArrangement = Arrangement.spacedBy((12 * u).dp)) {
 				Text(
 					text = "Find stocks you actually understand.",
-					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (26 * u).sp, lineHeight = (31 * u).sp),
+					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (26 * u).sp, lineHeight = (31 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 					color = StakColors.TextPrimary,
 				)
 				Text(
@@ -57,7 +58,7 @@ fun IntroScreen(onGetStarted: () -> Unit) {
 					// "simple," (frame line1 ink 922, line2 991). At the authored 14 the
 					// build pulls "clear" up - the 342u (authored column) width pin forces the
 					// authored wrap (the earlier comment had the break backwards).
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp, lineHeight = (21 * u).sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp, lineHeight = (21 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 					color = Auth.SubtitleGray,
 					modifier = Modifier.width((342 * u).dp),
 				)
@@ -87,7 +88,7 @@ fun IntroScreen(onGetStarted: () -> Unit) {
 			AuthCta(text = "Get started", onClick = onGetStarted)
 			Text(
 				text = "Takes about a minute",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 				color = Auth.FaintText,
 			)
 		}

@@ -313,7 +313,7 @@ internal fun DiscoverScreen(
 				Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
 					Text(
 						text = "Discover",
-						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (26 * u).sp, lineHeight = (33 * u).sp),
+						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (26 * u).sp, lineHeight = (33 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 						color = if (atEnd) Disc.BrightInk else Color.White,
 						modifier = Modifier.offset(y = if (atEnd) (-7.5 * u).dp else 0.dp),
 					)
@@ -324,7 +324,7 @@ internal fun DiscoverScreen(
 						ProgressRing(progress = count / DECK_SIZE.toFloat(), u = u)
 						Text(
 							text = "$count/$DECK_SIZE",
-							style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp, lineHeight = (14 * u).sp),
+							style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp, lineHeight = (14 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 							color = Color.White,
 						)
 					}
@@ -538,7 +538,7 @@ internal fun DiscoverScreen(
 					}
 					Text(
 						text = "Swipe down",
-						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (10 * u).sp, lineHeight = (13 * u).sp),
+						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (10 * u).sp, lineHeight = (13 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 						color = Disc.Faint,
 					)
 				}
@@ -569,7 +569,7 @@ internal fun DiscoverScreen(
 						Text(
 							text = "Practice buy",
 							// 1:1784 authors lh 20.69 - exact-design audit 2026-09-04.
-							style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp, lineHeight = (20.69 * u).sp),
+							style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp, lineHeight = (20.69 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 							color = Color.White,
 						)
 					}
@@ -586,7 +586,7 @@ internal fun DiscoverScreen(
 					) {
 						Text(
 							text = "Learn more",
-							style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (15 * u).sp),
+							style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (15 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 							color = Disc.Muted,
 						)
 					}
@@ -615,7 +615,7 @@ internal fun DiscoverScreen(
 				Image(painterResource(R.drawable.ic_saved_bookmark), null, modifier = Modifier.size((17 * u).dp))
 				Text(
 					text = "Saved to My STAK",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 					color = Color.White,
 				)
 			}
@@ -732,12 +732,12 @@ private fun DeckCardBody(card: DeckCard, onSave: (() -> Unit)?, u: Float, rows: 
 			Column(verticalArrangement = Arrangement.spacedBy((8 * u).dp)) {
 				Text(
 					text = card.ticker,
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (10 * u).sp, lineHeight = (13 * u).sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (10 * u).sp, lineHeight = (13 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 					color = Disc.Muted,
 				)
 				Text(
 					text = card.headline,
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (16 * u).sp, lineHeight = (23 * u).sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (16 * u).sp, lineHeight = (23 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 					color = Color.White,
 					modifier = Modifier.padding(top = (rows.headline * u).dp),
 				)
@@ -748,12 +748,12 @@ private fun DeckCardBody(card: DeckCard, onSave: (() -> Unit)?, u: Float, rows: 
 				) {
 					Text(
 						text = card.price,
-						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (20 * u).sp, lineHeight = (25 * u).sp),
+						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (20 * u).sp, lineHeight = (25 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 						color = Color.White,
 					)
 					Text(
 						text = card.change,
-						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (11 * u).sp, lineHeight = (14 * u).sp),
+						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (11 * u).sp, lineHeight = (14 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 						color = Disc.Green,
 						modifier = Modifier.padding(bottom = (2 * u).dp),
 					)
@@ -776,7 +776,7 @@ private fun DeckCardBody(card: DeckCard, onSave: (() -> Unit)?, u: Float, rows: 
 				)
 				Text(
 					text = card.tip,
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp, lineHeight = (15 * u).sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp, lineHeight = (15 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 					color = Disc.Body,
 					modifier = Modifier.weight(1f),
 				)
@@ -798,7 +798,7 @@ private fun SaveChip(u: Float, modifier: Modifier = Modifier) {
 	) {
 		Text(
 			text = "Save",
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 			color = Color.White,
 		)
 		Image(painterResource(R.drawable.ic_hero_bookmark), null, modifier = Modifier.size((12 * u).dp))
@@ -880,25 +880,25 @@ private fun NvdaStockRow(spec: BuySpec = NVDA_BUY) {
 		Box(contentAlignment = Alignment.Center, modifier = Modifier.size((38 * u).dp).background(Disc.ChipBg, CircleShape)) {
 			Text(
 				text = spec.badge,
-				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp),
+				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 				color = Disc.BadgeInk,
 			)
 		}
 		Column(verticalArrangement = Arrangement.spacedBy((2 * u).dp), modifier = Modifier.weight(1f)) {
 			Text(
 				text = spec.name,
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp, lineHeight = (17 * u).sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp, lineHeight = (17 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 				color = Color.White,
 			)
 			Text(
 				text = spec.priceLine,
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (10 * u).sp, lineHeight = (13 * u).sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (10 * u).sp, lineHeight = (13 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 				color = Disc.Muted,
 			)
 		}
 		Text(
 			text = spec.change,
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 			color = if (spec.change.startsWith("▼")) Disc.Red else Disc.Green,
 		)
 	}
@@ -929,7 +929,7 @@ private fun SheetCta(text: String, onClick: () -> Unit) {
 	) {
 		Text(
 			text = text,
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 			color = Color.White,
 		)
 	}
@@ -954,7 +954,7 @@ private fun SheetSecondary(text: String, onClick: () -> Unit) {
 	) {
 		Text(
 			text = text,
-			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp),
+			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 			color = Disc.Muted,
 		)
 	}
@@ -983,7 +983,7 @@ private fun PracticeBuyContent(
 	Column(verticalArrangement = Arrangement.spacedBy((14 * u).dp), modifier = Modifier.fillMaxWidth()) {
 		Text(
 			text = spec.title,
-			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (18 * u).sp, lineHeight = (23 * u).sp),
+			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (18 * u).sp, lineHeight = (23 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 			color = Color.White,
 		)
 		NvdaStockRow(spec)
@@ -991,7 +991,7 @@ private fun PracticeBuyContent(
 		// the cash block 1.5 lower than the 14 column gap alone gives.
 		Text(
 			text = "Your paper stake starts at today’s price and tracks the real move live, in either direction.",
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (18 * u).sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (18 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 			color = Disc.Body,
 			modifier = Modifier.padding(top = (1 * u).dp),
 		)
@@ -999,12 +999,12 @@ private fun PracticeBuyContent(
 			Row(horizontalArrangement = Arrangement.spacedBy((6 * u).dp)) {
 				Text(
 					text = "Cash available",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 					color = Disc.Muted,
 				)
 				Text(
 					text = spec.cashBefore,
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 					color = Disc.BrightInk,
 				)
 			}
@@ -1036,7 +1036,7 @@ private fun PracticeBuyContent(
 					) {
 						Text(
 							text = label,
-							style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
+							style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 							color = if (sel) Disc.AmountSelInk else Disc.AmountInk,
 						)
 					}
@@ -1057,20 +1057,20 @@ private fun PracticeBuyContent(
 					},
 					singleLine = true,
 					keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-					textStyle = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, color = Disc.AmountInk),
+					textStyle = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, color = Disc.AmountInk, letterSpacing = ADVANCE_ROUNDING),
 					cursorBrush = SolidColor(Disc.AmountSelBorder),
 					decorationBox = { inner ->
 						Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy((4 * u).dp)) {
 							Text(
 								text = "$",
-								style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
+								style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 								color = Disc.AmountInk,
 							)
 							Box(contentAlignment = Alignment.CenterStart, modifier = Modifier.weight(1f)) {
 								if (custom.isEmpty()) {
 									Text(
 										text = "0.00",
-										style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
+										style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 										color = Disc.Muted,
 									)
 								}
@@ -1095,17 +1095,17 @@ private fun PracticeBuyContent(
 		) {
 			Text(
 				text = "You get",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 				color = Disc.Muted,
 			)
 			Text(
 				text = spec.shares,
-				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp, lineHeight = (19 * u).sp),
+				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp, lineHeight = (19 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 				color = Disc.BrightInk,
 			)
 			Text(
 				text = "shares of ${spec.symbol}",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 				color = Disc.Muted,
 			)
 		}
@@ -1128,7 +1128,7 @@ private fun OrderFilledContent(onPrimary: () -> Unit, onSecondary: () -> Unit, s
 		Image(painterResource(R.drawable.ic_sheet_check), null, modifier = Modifier.size((47 * u).dp))
 		Text(
 			text = "Order filled",
-			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (18 * u).sp, lineHeight = (23 * u).sp),
+			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (18 * u).sp, lineHeight = (23 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 			color = Color.White,
 		)
 		NvdaStockRow(spec)
@@ -1136,19 +1136,19 @@ private fun OrderFilledContent(onPrimary: () -> Unit, onSecondary: () -> Unit, s
 		// the stock row - exact-design audit 2026-09-04 (was 14).
 		Text(
 			text = "Filled instantly · paper order",
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (18 * u).sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (18 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 			color = Disc.Body,
 			modifier = Modifier.fillMaxWidth(),
 		)
 		Row(horizontalArrangement = Arrangement.spacedBy((6 * u).dp), modifier = Modifier.fillMaxWidth()) {
 			Text(
 				text = "Cash available",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 				color = Disc.Muted,
 			)
 			Text(
 				text = spec.cashAfter,
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 				color = Disc.BrightInk,
 			)
 		}
@@ -1160,17 +1160,17 @@ private fun OrderFilledContent(onPrimary: () -> Unit, onSecondary: () -> Unit, s
 		) {
 			Text(
 				text = "You now hold",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 				color = Disc.Muted,
 			)
 			Text(
 				text = spec.shares,
-				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp, lineHeight = (19 * u).sp),
+				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp, lineHeight = (19 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 				color = Disc.BrightInk,
 			)
 			Text(
 				text = "shares of ${spec.symbol}",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 				color = Disc.Muted,
 			)
 		}
@@ -1221,13 +1221,13 @@ private fun EndOfDeck(seen: Int, saved: Int, bought: Int, onPracticeBuySaves: ()
 		Spacer(modifier = Modifier.height((34 * u).dp))
 		Text(
 			text = "Deck complete",
-			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (22 * u).sp, lineHeight = (28 * u).sp),
+			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (22 * u).sp, lineHeight = (28 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 			color = Disc.BrightInk,
 		)
 		Spacer(modifier = Modifier.height((8 * u).dp))
 		Text(
 			text = "Twelve cards, twelve signals. Your taste graph got smarter.",
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 			color = Disc.Muted,
 		)
 		Spacer(modifier = Modifier.height((32 * u).dp))
@@ -1244,12 +1244,12 @@ private fun EndOfDeck(seen: Int, saved: Int, bought: Int, onPracticeBuySaves: ()
 				) {
 					Text(
 						text = label,
-						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (10 * u).sp, lineHeight = (13 * u).sp),
+						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (10 * u).sp, lineHeight = (13 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 						color = Disc.Muted,
 					)
 					Text(
 						text = value,
-						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (20 * u).sp, lineHeight = (25 * u).sp),
+						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (20 * u).sp, lineHeight = (25 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 						color = Disc.BrightInk,
 					)
 				}
@@ -1273,14 +1273,14 @@ private fun EndOfDeck(seen: Int, saved: Int, bought: Int, onPracticeBuySaves: ()
 		) {
 			Text(
 				text = "Review saves in My STAK",
-				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = (13 * u).sp),
+				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = (13 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 				color = Disc.Muted,
 			)
 		}
 		Spacer(modifier = Modifier.height((14 * u).dp))
 		Text(
 			text = "A new deck lands tomorrow with your morning brief.",
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (10 * u).sp, lineHeight = (13 * u).sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (10 * u).sp, lineHeight = (13 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 			color = Disc.Muted,
 		)
 		Spacer(modifier = Modifier.height((40.5 * u).dp))
@@ -1298,7 +1298,7 @@ private fun EndOfDeck(seen: Int, saved: Int, bought: Int, onPracticeBuySaves: ()
 		) {
 			Text(
 				text = "Swipe today’s deck again",
-				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = (13 * u).sp),
+				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = (13 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 				color = Disc.Muted,
 			)
 		}

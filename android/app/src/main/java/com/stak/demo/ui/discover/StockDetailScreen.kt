@@ -119,7 +119,7 @@ fun StockDetailScreen(
 				Spacer(modifier = Modifier.weight(1f))
 				Text(
 					text = f.symbol,
-					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp),
+					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 					color = Color.White,
 				)
 				Spacer(modifier = Modifier.weight(1f))
@@ -135,15 +135,15 @@ fun StockDetailScreen(
 					verticalArrangement = Arrangement.spacedBy((4 * u).dp),
 					modifier = Modifier.fillMaxWidth().padding(horizontal = (20 * u).dp).padding(top = (10 * u).dp, bottom = (6 * u).dp),
 				) {
-					Text(f.title, style = TextStyle(fontFamily = Geist, fontSize = (11 * u).sp), color = Muted)
+					Text(f.title, style = TextStyle(fontFamily = Geist, fontSize = (11 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Muted)
 					Text(
 						f.price,
-						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (26 * u).sp),
+						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (26 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 						color = Bright,
 					)
 					Text(
 						f.change,
-						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp),
+						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 						color = if (f.change.startsWith("▼")) Red else Green,
 					)
 				}
@@ -171,12 +171,12 @@ fun StockDetailScreen(
 							) {
 								Text(
 									label,
-									style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp),
+									style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 									color = Teal,
 								)
 							}
 						} else {
-							Text(label, style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp), color = Muted)
+							Text(label, style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Muted)
 						}
 					}
 				}
@@ -202,12 +202,12 @@ fun StockDetailScreen(
 					) {
 						Text(
 							"TIP",
-							style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (11 * u).sp),
+							style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (11 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 							color = Color(0xFF5BD7E4),
 						)
 						Text(
 							f.tip,
-							style = TextStyle(fontFamily = Geist, fontSize = (11 * u).sp),
+							style = TextStyle(fontFamily = Geist, fontSize = (11 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 							color = Muted,
 							modifier = Modifier.width((260 * u).dp),
 						)
@@ -234,7 +234,7 @@ fun StockDetailScreen(
 								Image(painterResource(R.drawable.ic_saved_bookmark), null, modifier = Modifier.size((12 * u).dp))
 								Text(
 									"Saved to My STAK",
-									style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp),
+									style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 									color = Color.White,
 								)
 							}
@@ -309,7 +309,7 @@ private fun RiskFitCard(f: DetailFacts) {
 		Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().height((24 * u).dp)) {
 			Text(
 				"Risk fit",
-				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp),
+				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 				color = Bright,
 			)
 			Spacer(modifier = Modifier.weight(1f))
@@ -321,7 +321,7 @@ private fun RiskFitCard(f: DetailFacts) {
 			) {
 				Text(
 					"Matches you",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (11 * u).sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (11 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 					color = Color(0xFFA6E4F7),
 				)
 			}
@@ -331,13 +331,13 @@ private fun RiskFitCard(f: DetailFacts) {
 			Box(modifier = Modifier.offset(x = (f.riskPillX * u).dp).size((14 * u).dp, (8 * u).dp).background(Color(0xFFA6E4F7), RoundedCornerShape((4 * u).dp)))
 		}
 		Row(modifier = Modifier.fillMaxWidth()) {
-			Text("Low", style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp), color = Muted)
+			Text("Low", style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Muted)
 			Spacer(modifier = Modifier.weight(1f))
-			Text("High", style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp), color = Muted)
+			Text("High", style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Muted)
 		}
 		Text(
 			f.riskCopy,
-			style = TextStyle(fontFamily = Geist, fontSize = (11 * u).sp),
+			style = TextStyle(fontFamily = Geist, fontSize = (11 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 			color = Muted,
 		)
 	}
@@ -353,7 +353,7 @@ private fun NumbersCard(f: DetailFacts) {
 	) {
 		Text(
 			"Numbers that matter",
-			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp),
+			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 			color = Bright,
 		)
 		Row(horizontalArrangement = Arrangement.spacedBy((8 * u).dp), modifier = Modifier.fillMaxWidth()) {
@@ -363,7 +363,7 @@ private fun NumbersCard(f: DetailFacts) {
 		}
 		Text(
 			"Tap a stat for sector and peer benchmarks",
-			style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp),
+			style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 			color = Muted,
 		)
 	}
@@ -380,9 +380,9 @@ private fun StatCell(label: String, value: String, verdict: String, verdictColor
 			.then(if (border) Modifier.border((1 * u).dp, Color(0xFF212D4B), RoundedCornerShape((12 * u).dp)) else Modifier)
 			.padding((10 * u).dp),
 	) {
-		Text(label, style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp), color = Muted)
-		Text(value, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (17 * u).sp), color = Bright)
-		Text(verdict, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp), color = verdictColor)
+		Text(label, style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Muted)
+		Text(value, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (17 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Bright)
+		Text(verdict, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = verdictColor)
 	}
 }
 
@@ -397,7 +397,7 @@ private fun CollapsedCard(title: String, sub: String, subColor: Color) {
 		Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
 			Text(
 				title,
-				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp),
+				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 				color = Bright,
 			)
 			Spacer(modifier = Modifier.weight(1f))
@@ -405,7 +405,7 @@ private fun CollapsedCard(title: String, sub: String, subColor: Color) {
 		}
 		Text(
 			sub,
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (11 * u).sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (11 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 			color = subColor,
 		)
 	}
@@ -421,20 +421,20 @@ private fun NewsSignalCard(f: DetailFacts) {
 	) {
 		Text(
 			"News signal",
-			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp),
+			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 			color = Bright,
 		)
 		Text(
 			f.newsClose,
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (11 * u).sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (11 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 			color = Green,
 		)
 		Text(
 			f.newsSignal,
-			style = TextStyle(fontFamily = Geist, fontSize = (11 * u).sp),
+			style = TextStyle(fontFamily = Geist, fontSize = (11 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 			color = Muted,
 		)
-		Text(f.newsEarnings, style = TextStyle(fontFamily = Geist, fontSize = (11 * u).sp), color = Muted)
+		Text(f.newsEarnings, style = TextStyle(fontFamily = Geist, fontSize = (11 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Muted)
 		Row(
 			horizontalArrangement = Arrangement.spacedBy((12 * u).dp),
 			modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
@@ -451,7 +451,7 @@ private fun NewsSignalCard(f: DetailFacts) {
 					Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
 						Text(
 							src,
-							style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp),
+							style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 							color = Muted,
 						)
 						Spacer(modifier = Modifier.weight(1f))
@@ -463,14 +463,14 @@ private fun NewsSignalCard(f: DetailFacts) {
 						) {
 							Text(
 								tag,
-								style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp),
+								style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 								color = Muted,
 							)
 						}
 					}
 					Text(
 						f.newsHeadline,
-						style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp),
+						style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 						color = Bright,
 						modifier = Modifier.width((173 * u).dp),
 					)
@@ -504,7 +504,7 @@ private fun DetailCta(text: String, onClick: () -> Unit) {
 				onClick = onClick,
 			),
 	) {
-		Text(text, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp), color = Color.White)
+		Text(text, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Color.White)
 	}
 }
 
@@ -527,7 +527,7 @@ private fun DetailSecondary(text: String, size: Float = 13f, onClick: () -> Unit
 				onClick = onClick,
 			),
 	) {
-		Text(text, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = (size * u).sp), color = Muted)
+		Text(text, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = (size * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Muted)
 	}
 }
 
@@ -568,7 +568,7 @@ private fun DetailSavedSheet(f: DetailFacts, onDone: () -> Unit, onViewInMyStak:
 			Image(painterResource(R.drawable.ic_sheet_check), null, modifier = Modifier.size((47 * u).dp))
 			Text(
 				"Saved to My STAK",
-				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (18 * u).sp),
+				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (18 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 				color = Color.White,
 			)
 			Row(
@@ -581,17 +581,17 @@ private fun DetailSavedSheet(f: DetailFacts, onDone: () -> Unit, onViewInMyStak:
 					.padding(horizontal = (14 * u).dp, vertical = (12 * u).dp),
 			) {
 				Box(contentAlignment = Alignment.Center, modifier = Modifier.size((38 * u).dp).background(Color(0xFF242B3D), CircleShape)) {
-					Text(f.sheetBadge, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp), color = Color(0xFF9EADC7))
+					Text(f.sheetBadge, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Color(0xFF9EADC7))
 				}
 				Column(verticalArrangement = Arrangement.spacedBy((2 * u).dp), modifier = Modifier.weight(1f)) {
-					Text(f.sheetName, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp), color = Color.White)
-					Text(f.sheetPrice, style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp), color = Muted)
+					Text(f.sheetName, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Color.White)
+					Text(f.sheetPrice, style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Muted)
 				}
-				Text(f.sheetChange, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp), color = if (f.sheetChange.startsWith("▼")) Red else Green)
+				Text(f.sheetChange, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = if (f.sheetChange.startsWith("▼")) Red else Green)
 			}
 			Text(
 				"Watching from today · no money committed",
-				style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp, lineHeight = (18 * u).sp),
+				style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp, lineHeight = (18 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 				color = Color(0xFFC8D2E0),
 				modifier = Modifier.fillMaxWidth(),
 			)
@@ -651,7 +651,7 @@ private fun AnalystCard(f: DetailFacts, open: Boolean, onToggle: () -> Unit) {
 		Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().then(if (!open) Modifier.height((22 * u).dp) else Modifier)) {
 			Text(
 				"Analyst view",
-				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp),
+				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 				color = Bright,
 			)
 			Spacer(modifier = Modifier.weight(1f))
@@ -662,7 +662,7 @@ private fun AnalystCard(f: DetailFacts, open: Boolean, onToggle: () -> Unit) {
 		if (!open) {
 			Text(
 				f.upside,
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (11 * u).sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (11 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 				color = Green,
 			)
 		} else {
@@ -675,23 +675,23 @@ private fun AnalystCard(f: DetailFacts, open: Boolean, onToggle: () -> Unit) {
 			}
 			Row(modifier = Modifier.fillMaxWidth()) {
 				Column(verticalArrangement = Arrangement.spacedBy((1 * u).dp)) {
-					Text("Low", style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp), color = Muted)
-					Text(f.targetLow, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp), color = Bright)
+					Text("Low", style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Muted)
+					Text(f.targetLow, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Bright)
 				}
 				Spacer(modifier = Modifier.weight(1f))
 				Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy((1 * u).dp)) {
-					Text("Avg", style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp), color = Muted)
-					Text(f.targetAvg, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp), color = Bright)
+					Text("Avg", style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Muted)
+					Text(f.targetAvg, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Bright)
 				}
 				Spacer(modifier = Modifier.weight(1f))
 				Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy((1 * u).dp)) {
-					Text("High", style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp), color = Muted)
-					Text(f.targetHigh, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp), color = Bright)
+					Text("High", style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Muted)
+					Text(f.targetHigh, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Bright)
 				}
 			}
 			Text(
 				f.upside,
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (11 * u).sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (11 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 				color = Green,
 			)
 			Kicker(f.consensus)
@@ -701,11 +701,11 @@ private fun AnalystCard(f: DetailFacts, open: Boolean, onToggle: () -> Unit) {
 				Box(modifier = Modifier.width((f.buyBarW * u).dp).height((8 * u).dp).background(Green, RoundedCornerShape((4 * u).dp)))
 			}
 			Row(modifier = Modifier.fillMaxWidth()) {
-				Text(f.buyCount, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (11 * u).sp), color = Green)
+				Text(f.buyCount, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (11 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Green)
 				Spacer(modifier = Modifier.weight(1f))
-				Text(f.holdCount, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (11 * u).sp), color = Muted)
+				Text(f.holdCount, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (11 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Muted)
 				Spacer(modifier = Modifier.weight(1f))
-				Text(f.sellCount, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (11 * u).sp), color = Muted)
+				Text(f.sellCount, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (11 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Muted)
 			}
 			Kicker("RECENT ACTIONS")
 			f.actions.forEach { (name, action, target) ->
@@ -720,15 +720,15 @@ private fun AnalystCard(f: DetailFacts, open: Boolean, onToggle: () -> Unit) {
 						.background(Card)
 						.padding(horizontal = (12 * u).dp),
 				) {
-					Text(name, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp), color = Bright)
+					Text(name, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Bright)
 					Spacer(modifier = Modifier.weight(1f))
 					Text(
 						action,
-						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (11 * u).sp),
+						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (11 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 						color = if (action == "Buy") Green else Muted,
 					)
 					Spacer(modifier = Modifier.width((10 * u).dp))
-					Text(target, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp), color = Bright)
+					Text(target, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Bright)
 				}
 			}
 		}
@@ -755,7 +755,7 @@ private fun CompareCard(f: DetailFacts) {
 		Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().then(if (!open) Modifier.height((22 * u).dp) else Modifier)) {
 			Text(
 				"Compare and learn",
-				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp),
+				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 				color = Bright,
 			)
 			Spacer(modifier = Modifier.weight(1f))
@@ -767,7 +767,7 @@ private fun CompareCard(f: DetailFacts) {
 			// 1:2531 authors Geist Regular - exact-design audit 2026-09-04 (was Medium).
 			Text(
 				f.peersLabel,
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 				color = Muted,
 			)
 		} else {
@@ -798,7 +798,7 @@ private fun CompareCard(f: DetailFacts) {
 				}
 				Text(
 					"Cultural context only, not financial advice.",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 					color = Muted,
 				)
 			}
@@ -812,27 +812,27 @@ private fun CompareRow(label: String, a: String, m: String, g: String, header: B
 	Row(horizontalArrangement = Arrangement.spacedBy((8 * u).dp), modifier = Modifier.fillMaxWidth().height((20 * u).dp)) {
 		Text(
 			label,
-			style = TextStyle(fontFamily = Geist, fontSize = (11 * u).sp),
+			style = TextStyle(fontFamily = Geist, fontSize = (11 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 			color = Muted,
 			modifier = Modifier.weight(1f),
 		)
 		Text(
 			a,
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (11 * u).sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (11 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 			color = valueColor ?: Bright,
 			textAlign = androidx.compose.ui.text.style.TextAlign.Center,
 			modifier = Modifier.weight(1f),
 		)
 		Text(
 			m,
-			style = TextStyle(fontFamily = Geist, fontWeight = if (header) FontWeight.Medium else FontWeight.Normal, fontSize = (11 * u).sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = if (header) FontWeight.Medium else FontWeight.Normal, fontSize = (11 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 			color = valueColor ?: Bright,
 			textAlign = androidx.compose.ui.text.style.TextAlign.Center,
 			modifier = Modifier.weight(1f),
 		)
 		Text(
 			g,
-			style = TextStyle(fontFamily = Geist, fontWeight = if (header) FontWeight.Medium else FontWeight.Normal, fontSize = (11 * u).sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = if (header) FontWeight.Medium else FontWeight.Normal, fontSize = (11 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 			color = valueColor ?: Bright,
 			textAlign = androidx.compose.ui.text.style.TextAlign.Center,
 			modifier = Modifier.weight(1f),
@@ -861,13 +861,13 @@ private fun SinceYouSavedCard() {
 			)
 			Text(
 				"+4.6%",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 				color = Green,
 			)
 		}
 		Text(
 			"Saved 5 weeks ago. AAPL is up 4.6% since, moving roughly with the market. Steady giants tend to.",
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp, lineHeight = (14 * u).sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp, lineHeight = (14 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 			color = Muted,
 		)
 	}

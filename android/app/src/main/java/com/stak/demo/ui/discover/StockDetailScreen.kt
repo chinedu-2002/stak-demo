@@ -1,6 +1,7 @@
 package com.stak.demo.ui.discover
 
 import com.stak.demo.ui.theme.FIGMA_LINE_BOX
+import com.stak.demo.ui.theme.fractionalSpacedBy
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
@@ -140,7 +141,9 @@ fun StockDetailScreen(
 					contentAlignment = Alignment.Center,
 					modifier = Modifier.size((40 * u).dp).background(Card, CircleShape),
 				) {
-					Image(painterResource(R.drawable.ic_news_share), null, modifier = Modifier.size((17 * u).dp))
+					// 1:2382 authors the share glyph WHITE (1.5 strokes); the News page's
+					// asset is its own #AEAEAE - tinted here (StakTest audit, 2026-09-05).
+					Image(painterResource(R.drawable.ic_news_share), null, modifier = Modifier.size((17 * u).dp), colorFilter = androidx.compose.ui.graphics.ColorFilter.tint(Color.White))
 				}
 			}
 			Column(modifier = Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState())) {
@@ -205,7 +208,9 @@ fun StockDetailScreen(
 					}
 				}
 				Column(
-					verticalArrangement = Arrangement.spacedBy((14 * u).dp),
+					// Fractional gaps: Compose's per-gap px rounding drifted the last
+					// modules 2.5 below the frame (StakTest, 2026-09-05).
+					verticalArrangement = fractionalSpacedBy((14 * u).dp),
 					modifier = Modifier.fillMaxWidth().padding(horizontal = (20 * u).dp, vertical = (12 * u).dp),
 				) {
 					if (fromMyStak) {

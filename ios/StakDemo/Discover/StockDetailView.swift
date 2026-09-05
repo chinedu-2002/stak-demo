@@ -152,18 +152,17 @@ struct StockDetailView: View {
 									onBack()
 								}
 							} else if saved {
-								HStack(spacing: 6 * u) {
-									Image("IcSavedBookmark")
-										.resizable()
-										.frame(width: 12 * u, height: 12 * u)
-									Text("Saved to My STAK")
-										.font(StakFont.geist(14 * u, .medium))
-										.foregroundStyle(Color.white)
+								// A saved stock reads the same from every entry: the authored
+								// saved block (16:1012) - Practice buy + Unsave. The "Saved to
+								// My STAK" outline button was never in a frame (user, 2026-09-05).
+								// Unsave drops the stock from this run's saves and the holdings
+								// store and stays on the page with the Save CTA back. Mirrors android.
+								DetailCta(text: "Practice buy", action: practiceBuy)
+								DetailSecondary(text: "Unsave") {
+									saved = false
+									DeckSession.shared.saved.remove(f.symbol)
+									MyStakHoldings.shared.remove(f.symbol)
 								}
-								.frame(maxWidth: .infinity)
-								.frame(height: 52 * u)
-								.overlay(RoundedRectangle(cornerRadius: 6 * u).strokeBorder(StakColors.ctaBorderGradient, lineWidth: 0.36 * u))
-								DetailSecondary(text: "Practice buy", action: practiceBuy)
 							} else {
 								// Authored (1:2382 -> 92:969, SMART_ANIMATE 350): the
 								// save-success sheet scale-fades in like the News one.

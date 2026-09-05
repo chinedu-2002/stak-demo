@@ -126,7 +126,8 @@ struct ProfileView: View {
 							ProfileStat(value: "12", label: "Picks")
 						}
 						.frame(maxWidth: .infinity)
-						.frame(height: 40 * u)
+						// Stat columns sit at the top of the 40u row (171:1013 items-start), not centred - exact-design audit 2026-09-04.
+						.frame(height: 40 * u, alignment: .top)
 						Text("▲ +$240.00 all time on $10,000 paper")
 							.font(StakFont.geist(12 * u, .medium))
 							.foregroundStyle(StakColors.positive)

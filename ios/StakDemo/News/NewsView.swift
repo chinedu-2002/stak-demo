@@ -233,9 +233,10 @@ private struct BriefCard: View {
 					.lineSpacing((25 - 19) * u)
 					.foregroundStyle(News.ink)
 				Text(brief.body)
-					// 12.2 restores the authored 3-line wrap (12.5 wraps to 4).
-					.font(StakFont.geist(12.2 * u))
-					.lineSpacing((17 - 12.2) * u)
+					// Authored Geist Regular 12 / lh17 (1:1265; the earlier 12.2 wrap
+					// tweak assumed 13) - exact-design audit 2026-09-04.
+					.font(StakFont.geist(12 * u))
+					.lineSpacing((17 - 12) * u)
 					.foregroundStyle(News.ink)
 				HStack {
 					Text(brief.source)
@@ -251,7 +252,9 @@ private struct BriefCard: View {
 							.foregroundStyle(News.ink)
 					}
 				}
-				.frame(height: 21 * u)
+				// Authored hf row is 21 tall with a 4 top pad (1:1266) - exact-design audit 2026-09-04.
+				.frame(height: 17 * u)
+				.padding(.top, 4 * u)
 			}
 			.frame(maxWidth: .infinity, alignment: .leading)
 			.padding(.top, 18 * u)
@@ -288,6 +291,8 @@ private struct StoryGrid: View {
 				if showMarket {
 					StoryTile(
 						tag: "Markets",
+						// Authored Geist Regular (1:1280) - exact-design audit 2026-09-04.
+						tagWeight: .regular,
 						headline: market.headline,
 						source: "\(market.source) · \(market.age)",
 						onTap: { onOpenArticle(market.id) }
@@ -296,6 +301,8 @@ private struct StoryGrid: View {
 				if showYours {
 					StoryTile(
 						tag: "Your stocks",
+						// Authored Geist Light (1:1288) - exact-design audit 2026-09-04.
+						tagWeight: .light,
 						headline: yours.headline,
 						source: "\(yours.source) · \(yours.age)",
 						onTap: { onOpenArticle(yours.id) }
@@ -309,6 +316,8 @@ private struct StoryGrid: View {
 
 private struct StoryTile: View {
 	let tag: String
+	/// The authored tag face - Regular on "Markets", Light on "Your stocks".
+	let tagWeight: StakFont.Weight
 	let headline: String
 	let source: String
 	let onTap: () -> Void
@@ -317,7 +326,7 @@ private struct StoryTile: View {
 		let u = figmaUnit
 		Button(action: onTap) {
 			VStack(alignment: .leading, spacing: 8 * u) {
-				NewsTag(text: tag, tracking: 0.4 * u)
+				NewsTag(text: tag, tracking: 0.4 * u, weight: tagWeight)
 				Text(headline)
 					// Authored (1:1277): Sora Light 12 in the 20 line box.
 					.font(StakFont.sora(12 * u, .light))
@@ -337,15 +346,18 @@ private struct StoryTile: View {
 	}
 }
 
-/// #242b3d r5 chip — Geist Medium 8 #819abb.
+/// #242b3d r5 chip — Geist 8 #819abb. Medium for the row chips (1:1302);
+/// the tile tags are authored Regular / Light (1:1280 / 1:1288) -
+/// exact-design audit 2026-09-04.
 struct NewsTag: View {
 	let text: String
 	var tracking: CGFloat = 0
+	var weight: StakFont.Weight = .medium
 
 	var body: some View {
 		let u = figmaUnit
 		Text(text)
-			.font(StakFont.geist(8 * u, .medium))
+			.font(StakFont.geist(8 * u, weight))
 			.tracking(tracking)
 			.foregroundStyle(News.muted)
 			.padding(.horizontal, 7 * u)
@@ -382,6 +394,8 @@ private struct NewsSectionView: View {
 			Text(title)
 				.font(StakFont.sora(16 * u, .semiBold))
 				.foregroundStyle(News.headerGray)
+				// Authored header: the 20-tall Sora 16 box + a 2 bottom pad (1:1293) - exact-design audit 2026-09-04.
+				.padding(.bottom, 2 * u)
 			ForEach(rows, id: \.id) { row in
 				// Every row opens its story's article (user, 2026-08-25).
 				Button {
@@ -416,6 +430,9 @@ private struct NewsSectionView: View {
 									NewsTag(text: "In your STAK")
 								}
 							}
+							// Authored meta row is 16 tall (1:1298, the chip's height) whether or
+							// not the chip shows, so the card holds 84 - exact-design audit 2026-09-04.
+							.frame(height: 16 * u)
 							Text(row.headline)
 								// Authored (1:1295): Sora Light 12 in the 19 line box.
 								.font(StakFont.sora(12 * u, .light))

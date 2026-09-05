@@ -24,14 +24,17 @@ enum NewsDeckFeed {
 		let body: String
 	}
 
+	// exact-design audit 2026-09-04 (1:1166 / 1:1170): the frame's " ...." and
+	// "...." truncation marks are typos - normalised to the three-dot ellipsis
+	// the third card (1:1174) already uses; the story copy itself is verbatim.
 	static let demoStories = [
 		Story(
 			title: "Wall Street's fear gauge reads 32",
-			body: "The Fear & Greed Index is firmly in Fear territory. Money is rotating out of the ...."
+			body: "The Fear & Greed Index is firmly in Fear territory. Money is rotating out of the..."
 		),
 		Story(
 			title: "Fed meeting notes drop Wednesday",
-			body: "Minutes from the last Fed meeting land July 8. A market this tense moves on every word...."
+			body: "Minutes from the last Fed meeting land July 8. A market this tense moves on every word..."
 		),
 		Story(
 			title: "The OpenAI IPO is reportedly delayed",

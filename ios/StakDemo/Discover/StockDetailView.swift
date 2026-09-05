@@ -15,7 +15,6 @@ private let green = Color(argb: 0xFF2FD08A)
 /// tickers; the same red the Simulate rows use, keyed on the ▼ glyph.
 private let red = Color(argb: 0xFFFF5A6A)
 private let teal = Color(argb: 0xFF69B3CA)
-private let wellBg = Color(argb: 0xFF10182B)
 
 struct StockDetailView: View {
 	let onBack: () -> Void
@@ -282,15 +281,19 @@ private struct DetailCta: View {
 	}
 }
 
+/// Hairline secondary. The page CTA (1:2568) authors Sora 13; the save-success
+/// sheet's "Keep exploring" (92:1205) authors Sora 14 - exact-design audit
+/// 2026-09-04. `size` is declared last (memberwise order); callers pass it last.
 private struct DetailSecondary: View {
 	let text: String
 	let action: () -> Void
+	var size: CGFloat = 13
 
 	var body: some View {
 		let u = figmaUnit
 		Button(action: action) {
 			Text(text)
-				.font(StakFont.sora(13 * u))
+				.font(StakFont.sora(size * u))
 				.foregroundStyle(muted)
 				.frame(maxWidth: .infinity)
 				.frame(height: 52 * u)
@@ -300,14 +303,17 @@ private struct DetailSecondary: View {
 	}
 }
 
-/// Kicker label — Geist Medium 10, tracking 0.8, muted.
+/// Kicker label — Geist 10, tracking 0.8, muted. 1:2653 "PRICE TARGET RANGE"
+/// authors Regular; the consensus / RECENT ACTIONS kickers (1:2668 / 1:2675)
+/// author Medium - exact-design audit 2026-09-04. `weight` declared last.
 private struct Kicker: View {
 	let text: String
+	var weight: StakFont.Weight = .medium
 
 	var body: some View {
 		let u = figmaUnit
 		Text(text)
-			.font(StakFont.geist(10 * u, .medium))
+			.font(StakFont.geist(10 * u, weight))
 			.tracking(0.8 * u)
 			.foregroundStyle(muted)
 	}
@@ -319,6 +325,7 @@ private struct RiskFitCard: View {
 	var body: some View {
 		let u = figmaUnit
 		VStack(alignment: .leading, spacing: 12 * u) {
+			// 1:2427 authors a 24-tall head row - exact-design audit 2026-09-04.
 			HStack {
 				Text("Risk fit")
 					.font(StakFont.sora(15 * u, .semiBold))
@@ -331,6 +338,7 @@ private struct RiskFitCard: View {
 					.padding(.vertical, 4 * u)
 					.background(Color(argb: 0x1F5DA8BF), in: Capsule())
 			}
+			.frame(height: 24 * u)
 			// Authored (1:2382): a lone 14x8 pill indicator - the frame draws no track.
 			ZStack(alignment: .topLeading) {
 				Color.clear.frame(height: 8 * u)
@@ -413,6 +421,7 @@ private struct AnalystCard: View {
 	var body: some View {
 		let u = figmaUnit
 		VStack(alignment: .leading, spacing: 12 * u) {
+			// Collapsed head (1:2455) authors a 22-tall row - exact-design audit 2026-09-04.
 			HStack {
 				Text("Analyst view")
 					.font(StakFont.sora(15 * u, .semiBold))
@@ -424,13 +433,15 @@ private struct AnalystCard: View {
 						.frame(width: 20 * u, height: 20 * u)
 				}
 			}
+			.frame(height: open ? nil : 22 * u)
 			if !open {
 				Text(f.upside)
 					.font(StakFont.geist(11 * u, .medium))
 					.foregroundStyle(green)
 			} else {
-				Kicker(text: "PRICE TARGET RANGE")
-				// Authored (16:1253): 180-wide teal fill plus a 13x8 end cap - no track.
+				Kicker(text: "PRICE TARGET RANGE", weight: .regular)
+				// 1:2656: a 14 circle at y-3 inside the 8-tall clipped track renders as
+				// a 14x8 cap over the 180 fill - exact-design audit 2026-09-04 (was 13).
 				ZStack(alignment: .topLeading) {
 					Color.clear.frame(height: 8 * u)
 					RoundedRectangle(cornerRadius: 4 * u)
@@ -438,7 +449,7 @@ private struct AnalystCard: View {
 						.frame(width: 180 * u, height: 8 * u)
 					RoundedRectangle(cornerRadius: 4 * u)
 						.fill(Color(argb: 0xFFA6E4F7))
-						.frame(width: 13 * u, height: 8 * u)
+						.frame(width: 14 * u, height: 8 * u)
 						.offset(x: f.targetMarkerX * u)
 				}
 				HStack {
@@ -461,8 +472,10 @@ private struct AnalystCard: View {
 					.font(StakFont.geist(11 * u, .medium))
 					.foregroundStyle(green)
 				Kicker(text: f.consensus)
+				// 1:2669 authors the consensus track in the card's own #181F30 (the
+				// render shows only the green fill) - exact-design audit 2026-09-04.
 				ZStack(alignment: .leading) {
-					RoundedRectangle(cornerRadius: 4 * u).fill(wellBg).frame(height: 8 * u)
+					RoundedRectangle(cornerRadius: 4 * u).fill(card).frame(height: 8 * u)
 					RoundedRectangle(cornerRadius: 4 * u).fill(green).frame(width: f.buyBarW * u, height: 8 * u)
 				}
 				HStack {
@@ -488,7 +501,9 @@ private struct AnalystCard: View {
 					}
 					.padding(.horizontal, 12 * u)
 					.frame(height: 38 * u)
-					.background(wellBg, in: RoundedRectangle(cornerRadius: 10 * u))
+					// 1:2676..1:2696 author the rows in the card's own #181F30 (flat in
+					// the render, no darker wells) - exact-design audit 2026-09-04.
+					.background(card, in: RoundedRectangle(cornerRadius: 10 * u))
 				}
 			}
 		}
@@ -563,7 +578,10 @@ private struct CompareCard: View {
 
 	var body: some View {
 		let u = figmaUnit
-		VStack(alignment: .leading, spacing: open ? 21 * u : 12 * u) {
+		// Both states author a 23 gap under the title (1:2526 / 1:2719); the open
+		// table and its footnote sit 21 apart (1:2723) - exact-design audit 2026-09-04.
+		VStack(alignment: .leading, spacing: 23 * u) {
+			// Collapsed head (1:2527) authors a 22-tall row - exact-design audit 2026-09-04.
 			HStack {
 				Text("Compare and learn")
 					.font(StakFont.sora(15 * u, .semiBold))
@@ -575,27 +593,38 @@ private struct CompareCard: View {
 						.frame(width: 20 * u, height: 20 * u)
 				}
 			}
+			.frame(height: open ? nil : 22 * u)
 			if !open {
+				// 1:2531 authors Geist Regular - exact-design audit 2026-09-04 (was Medium).
 				Text(f.peersLabel)
-					.font(StakFont.geist(11 * u, .medium))
+					.font(StakFont.geist(11 * u))
 					.foregroundStyle(muted)
 			} else {
-				ZStack(alignment: .topLeading) {
-					// AAPL column tint spans the table rows (frame 1:2721).
-					RoundedRectangle(cornerRadius: 8 * u)
-						.fill(Color(argb: 0x125DA8BF))
-						.frame(width: 81 * u, height: 170 * u)
-						.offset(x: 78 * u)
-					VStack(spacing: 12 * u) {
-						compareRow("", f.symbol, f.peerA, f.peerB, header: true)
-						ForEach(f.compareRows, id: \.label) { r in
-							compareRow(r.label, r.a, r.b, r.c, valueColor: r.green ? green : nil)
+				VStack(alignment: .leading, spacing: 21 * u) {
+					ZStack(alignment: .topLeading) {
+						// AAPL column tint (1:2721): 81x170 r8 at card (94, 43.94) - 12
+						// above the table top - exact-design audit 2026-09-04.
+						RoundedRectangle(cornerRadius: 8 * u)
+							.fill(Color(argb: 0x125DA8BF))
+							.frame(width: 81 * u, height: 170 * u)
+							.offset(x: 78 * u, y: -12 * u)
+						// 1:2722: a 0.5-wide #272F40 hairline between the MSFT and GOOGL
+						// columns, card x257 y49.94, 134.5 tall - exact-design audit 2026-09-04.
+						Rectangle()
+							.fill(Color(argb: 0xFF272F40))
+							.frame(width: 0.5 * u, height: 134.5 * u)
+							.offset(x: 241 * u, y: -6 * u)
+						VStack(spacing: 12 * u) {
+							compareRow("", f.symbol, f.peerA, f.peerB, header: true)
+							ForEach(f.compareRows, id: \.label) { r in
+								compareRow(r.label, r.a, r.b, r.c, valueColor: r.green ? green : nil)
+							}
 						}
 					}
+					Text("Cultural context only, not financial advice.")
+						.font(StakFont.geist(10 * u, .medium))
+						.foregroundStyle(muted)
 				}
-				Text("Cultural context only, not financial advice.")
-					.font(StakFont.geist(10 * u, .medium))
-					.foregroundStyle(muted)
 			}
 		}
 		.padding(.horizontal, 16 * u)
@@ -715,7 +744,8 @@ private struct DetailSavedSheet: View {
 					.frame(maxWidth: .infinity, alignment: .leading)
 				VStack(spacing: 16 * u) {
 					DetailCta(text: "View in My STAK", action: onViewInMyStak)
-					DetailSecondary(text: "Keep exploring", action: onKeepExploring)
+					// 92:1205 authors Sora 14 - exact-design audit 2026-09-04.
+					DetailSecondary(text: "Keep exploring", action: onKeepExploring, size: 14)
 				}
 			}
 			.padding(.horizontal, 20 * u)
@@ -802,7 +832,8 @@ private let detailFacts: [String: DetailFacts] = [
 			DetailStat(label: "Profit margin", value: "24.3%", verdict: "Excellent", good: true, border: true),
 		],
 		upside: "↑ 6.7% upside",
-		targetLow: "$180", targetAvg: "$248", targetHigh: "$300", targetMarkerX: 167,
+		// 1:2656 authors the marker at x173 - exact-design audit 2026-09-04 (was 167).
+		targetLow: "$180", targetAvg: "$248", targetHigh: "$300", targetMarkerX: 173,
 		consensus: "WALL ST. CONSENSUS · 42 ANALYSTS",
 		buyCount: "● Buy 28", holdCount: "Hold 12", sellCount: "Sell 2", buyBarW: 212,
 		actions: [

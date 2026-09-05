@@ -104,7 +104,7 @@ struct PickDetailView: View {
 						Circle().fill(Sim.cardBg)
 						Image("IcNewsShare")
 							.resizable()
-							.frame(width: 17 * u, height: 17 * u)
+							.frame(width: 18 * u, height: 18 * u) // 1:4652 icon/share is 18 (exact-design audit 2026-09-04)
 					}
 					.frame(width: 40 * u, height: 40 * u)
 				}
@@ -113,7 +113,7 @@ struct PickDetailView: View {
 
 				ScrollView(showsIndicators: false) {
 					VStack(alignment: .leading, spacing: 16 * u) {
-						// Authored hero card (1:4654): 350x307 r24 with 18 padding - avatar row,
+						// Authored hero card (1:4654): 350x307 r16 with 18 padding - avatar row,
 						// +$24 in a 48-tall box with the .00 at 16/20, subtitle, the 343x73.5 chart
 						// line bleeding 14.5 past the padding, range tabs 40 below the line.
 						VStack(alignment: .leading, spacing: 0) {
@@ -134,7 +134,7 @@ struct PickDetailView: View {
 								// frame's +$24 is white); the cents stay muted.
 								Text(pick.gainWhole)
 									.font(StakFont.sora(38 * u, .semiBold))
-									.tracking(-0.38 * u)
+									// 1:4660 (exact-design audit 2026-09-04): no tracking - the -0.38 was never authored.
 									.foregroundStyle(pick.up ? Color.white : Sim.red)
 								Text(pick.gainCents)
 									.font(StakFont.sora(16 * u, .semiBold))
@@ -146,7 +146,8 @@ struct PickDetailView: View {
 							.padding(.top, 11 * u)
 							// Review (2026-09-04): the pick's own cost basis ("$100" authored).
 							Text("That is \(pick.up ? "up" : "down") \(pick.gainPct) on a \(pick.stakeBasis) paper stake")
-								.font(StakFont.geist(12 * u))
+								// 1:4662 (exact-design audit 2026-09-04): Geist Light, like the hero's all-time line.
+								.font(StakFont.geist(12 * u, .light))
 								.foregroundStyle(Sim.muted)
 								.frame(height: 16 * u) // Authored line box is 16 — pin it so the card sums to 271
 								.padding(.top, 11 * u)
@@ -187,8 +188,9 @@ struct PickDetailView: View {
 						.padding(18 * u)
 						.frame(maxWidth: .infinity, alignment: .leading)
 						.frame(height: 307 * u, alignment: .top)
-						.background(Sim.cardBg, in: RoundedRectangle(cornerRadius: 24 * u))
-						.clipShape(RoundedRectangle(cornerRadius: 24 * u))
+						// 1:4654 (exact-design audit 2026-09-04): the hero is r16 - the r24 was never authored.
+						.background(Sim.cardBg, in: RoundedRectangle(cornerRadius: 16 * u))
+						.clipShape(RoundedRectangle(cornerRadius: 16 * u))
 						// Stats (1:4673): two 61-tall rows, 10 apart, 170-wide cells.
 						VStack(alignment: .leading, spacing: 10 * u) {
 							HStack(spacing: 10 * u) {
@@ -198,13 +200,15 @@ struct PickDetailView: View {
 								StatBox(label: "vs the market", value: pick.vsMarket, valueColor: pick.ahead ? Sim.green : Sim.red)
 							}
 							HStack(spacing: 10 * u) {
-								StatBox(label: "Price then", value: pick.priceThen, valueColor: Sim.bright)
-								StatBox(label: "Price now", value: pick.priceNow, valueColor: Sim.bright)
+								// 1:4684 / 1:4687 (exact-design audit 2026-09-04): the prices are plain white, not #f2f6fc.
+								StatBox(label: "Price then", value: pick.priceThen, valueColor: Color.white)
+								StatBox(label: "Price now", value: pick.priceNow, valueColor: Color.white)
 							}
 						}
 						// WHY / insight card — teal-tinted like the deck tips.
 						VStack(alignment: .leading, spacing: 9 * u) {
-							HStack(spacing: 7 * u) {
+							// 1:4689 (exact-design audit 2026-09-04): sparkle and kicker share the row's top edge.
+							HStack(alignment: .top, spacing: 7 * u) {
 								Image("IcGistSparkle")
 									.resizable()
 									.frame(width: 16 * u, height: 16 * u)
@@ -223,17 +227,22 @@ struct PickDetailView: View {
 						.padding(.horizontal, 14 * u)
 						.padding(.vertical, 12 * u)
 						.frame(maxWidth: .infinity, alignment: .leading)
-						.background(Sim.tealTint, in: RoundedRectangle(cornerRadius: 16 * u))
+						// 1:4688 (exact-design audit 2026-09-04): the live note is r14.
+						.background(Sim.tealTint, in: RoundedRectangle(cornerRadius: 14 * u))
 						// Review (2026-09-04): no Sell for a pick the ledger no longer
 						// holds (sold, or an authored fallback) - no phantom sell.
 						if portfolio.holds(symbol) {
 							Button { selling = pick } label: {
 								Text("Sell")
-									.font(StakFont.geist(14 * u, .medium))
+									// 1:4695 (exact-design audit 2026-09-04): Sora Regular 14 - was Geist Medium.
+									.font(StakFont.sora(14 * u))
 									.foregroundStyle(Color.white)
 									.frame(maxWidth: .infinity)
 									.frame(height: 51 * u)
 									.background(Sim.darkCta, in: RoundedRectangle(cornerRadius: 6 * u))
+									// 1:4694 (exact-design audit 2026-09-04): the 0.361 CTA hairline and the 4% teal wash under #12203e.
+									.overlay(RoundedRectangle(cornerRadius: 6 * u).strokeBorder(Sim.ctaBorder, lineWidth: 0.361 * u))
+									.tealShadow(dy: 12.285, blur: 12.285, alpha: 0.04)
 							}
 							.buttonStyle(.plain)
 						}
@@ -252,7 +261,7 @@ struct PickDetailView: View {
 					}
 					.padding(.horizontal, 20 * u)
 					.padding(.top, 6 * u)
-					.padding(.bottom, 20 * u)
+					.padding(.bottom, 26 * u) // 1:4653 pb 26 (exact-design audit 2026-09-04)
 				}
 			}
 			if let sellingPick = selling {
@@ -277,20 +286,22 @@ private struct StatBox: View {
 
 	var body: some View {
 		let u = figmaUnit
+		// 1:4675 cell (exact-design audit 2026-09-04): r14, label Geist 10 #819abb, value
+		// Geist Regular 14 - was r12 / #5c6b85 / Sora SemiBold 15.
 		VStack(alignment: .leading, spacing: 4 * u) {
 			Text(label)
 				.font(StakFont.geist(10 * u))
-				.foregroundStyle(Sim.faint)
+				.foregroundStyle(Sim.muted)
 				.frame(height: 13 * u) // Authored 10/13 line box — pin so the cell sums to 35
 			Text(value)
-				.font(StakFont.sora(15 * u, .semiBold))
+				.font(StakFont.geist(14 * u))
 				.foregroundStyle(valueColor)
-				.frame(height: 18 * u) // Authored 15/18 line box
+				.frame(height: 18 * u) // Authored 14/18 line box
 		}
 		.padding(.horizontal, 14 * u)
 		.padding(.vertical, 13 * u)
 		.frame(maxWidth: .infinity, alignment: .leading)
 		.frame(height: 61 * u, alignment: .top)
-		.background(Sim.cardBg, in: RoundedRectangle(cornerRadius: 12 * u))
+		.background(Sim.cardBg, in: RoundedRectangle(cornerRadius: 14 * u))
 	}
 }

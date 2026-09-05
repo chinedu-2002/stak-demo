@@ -17,8 +17,8 @@ enum WhyThisMattersFeed {
 	/// Production switch - keep false while reviews compare build vs frame.
 	static let live = false
 
-	// Authored copy verbatim (user, 2026-09-04 (CHINEDU 02 · Home dev 118:1633): the exact frame wins, spelling included).
-	static let demoBody = "Your STAK collections houses 80% of stocks from effected industries."
+	// user, 2026-09-04: grammar fixed, frame typo not copied.
+	static let demoBody = "Your STAK collections house 80% of stocks from affected industries."
 
 	/// The current summary - the served personalized copy once the backend exists.
 	static func body() -> String { demoBody }

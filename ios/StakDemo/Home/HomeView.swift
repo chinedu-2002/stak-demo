@@ -192,6 +192,11 @@ private struct TopNav: View {
 							Image("IcNavPerson")
 								.resizable()
 								.frame(width: 12.99 * u, height: 13.64 * u)
+								// 118:1683/1684: the 24 icon box sits at circle centre
+								// (+0.5, -0.5) and the glyph at (+0.49, -0.18) inside it,
+								// so the glyph rests at (+0.99, -0.68), not dead centre -
+								// exact-design audit 2026-09-04.
+								.offset(x: 0.99 * u, y: -0.68 * u)
 						}
 					}
 					.frame(width: 35 * u, height: 35 * u)
@@ -260,12 +265,19 @@ private struct MarketMoodCard: View {
 							+ Text(MarketMoodFeed.statusRest).foregroundColor(Color.white)
 					)
 					.font(StakFont.geist(12 * u))
-					.lineSpacing((16 - 12) * u)
+					// 118:1693 renders a 16 pitch (32 for two lines). SwiftUI
+					// lineSpacing is ADDITIVE over the face's natural line height
+					// (Geist 1.30 x 12 = 15.6), so the extra is 0.4, not 4 -
+					// exact-design audit 2026-09-04.
+					.lineSpacing(0.4 * u)
 				}
 				.frame(width: 180 * u, alignment: .leading)
 				Spacer().frame(width: 46 * u)
 				MarketMoodGauge()
 			}
+			// 118:1690 centres at 50%+0.45 (row left 34, gauge at 260 in the
+			// render); plain centring lands at 33.55 - exact-design audit 2026-09-04.
+			.offset(x: 0.45 * u)
 			.padding(.top, 25 * u)
 			.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
 		}
@@ -402,13 +414,20 @@ private struct WhyThisMattersCard: View {
 				Text("Why this matters to you")
 					// Authored (1:1040): Sora Regular 14 / lh15.
 					.font(StakFont.sora(14 * u))
-					.lineSpacing((15 - 14) * u)
+					// 118:1715 line box 15 < Sora's natural 17.64 (1.26 x 14): a
+					// fixed-height frame gives the authored box with the glyphs
+					// centred and overflowing symmetrically, as Figma lays it out -
+					// exact-design audit 2026-09-04.
+					.frame(height: 15 * u)
 					.foregroundStyle(Color.white)
 				// Backend-served summary of why today's news matters to THIS
 				// user (holdings + risk profile); authored demo copy this phase.
 				Text(WhyThisMattersFeed.body())
 					.font(StakFont.geist(12 * u, .light))
-					.lineSpacing((15 - 12) * u)
+					// 118:1717 pitch 15 vs Geist's natural 15.6: lineSpacing is
+					// additive and cannot go negative, so 0 is the closest (the old
+					// +3 gave an 18.6 pitch); 0.6/line residual - exact-design audit
+					// 2026-09-04.
 					.foregroundStyle(Color.white)
 					.frame(width: 198 * u, alignment: .leading)
 			}
@@ -444,7 +463,9 @@ private struct DeckBanner: View {
 			VStack(alignment: .leading, spacing: 10 * u) {
 				Text("Take your first deck to build your taste")
 					.font(StakFont.geist(12 * u, .light))
-					.lineSpacing((15 - 12) * u)
+					// 118:1722 pitch 15 vs Geist's natural 15.6: additive lineSpacing
+					// cannot go negative, so 0 (was +3 -> 18.6) - exact-design audit
+					// 2026-09-04.
 					.foregroundStyle(Color.black)
 				// No button of its own: the authored connection is on the whole
 				// banner (1:1184), whose tap target includes this chip.
@@ -496,10 +517,15 @@ private struct FirstRunOverlay: View {
 				StakColors.bg
 			}
 			Button(action: onSeeTodaysPick) {
-				// Authored copy verbatim (user, 2026-09-04 (CHINEDU 02 · Home dev 118:1633): the exact frame wins, spelling included).
-				Text("See Todays Pick")
+				// user, 2026-09-04: grammar fixed, frame typo not copied.
+				Text("See Today’s Pick")
 					.font(StakFont.geist(12 * u, .medium))
 					.foregroundStyle(Color.white)
+					// 1:1083/1:1093: the label box sits at pill centre +0.5 with a
+					// 7.524/5.643 top/bottom padding split, so its cap box rests
+					// 1.44 below centre (render: caps at 128-136 in the 105-156
+					// pill) - exact-design audit 2026-09-04.
+					.offset(y: 1.44 * u)
 					.frame(width: 136 * u, height: 51 * u)
 					.background(Color(argb: 0x0FFFFFFF), in: Capsule())
 					.overlay(Capsule().strokeBorder(Color(argb: 0x66FFFFFF), lineWidth: 0.94 * u))

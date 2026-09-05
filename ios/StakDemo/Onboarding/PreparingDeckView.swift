@@ -59,6 +59,9 @@ private struct Spinner: View {
 			.trim(from: 0, to: 0.75)
 			.stroke(Auth.faintText, style: StrokeStyle(lineWidth: 2.94 * u, lineCap: .butt))
 			.frame(width: 14 * u, height: 14 * u)
+			// The authored ring (1:683) opens at the top-left quadrant: the arc
+			// runs from 12 o'clock clockwise to 9 (exact-design audit 2026-09-04).
+			.rotationEffect(.degrees(-90))
 			.rotationEffect(.degrees(spinning ? 360 : 0))
 			.animation(.linear(duration: 0.9).repeatForever(autoreverses: false), value: spinning)
 			.onAppear { spinning = true }

@@ -33,7 +33,7 @@ struct SimPortfolioView: View {
 						Circle().fill(Sim.cardBg)
 						Image("IcNewsShare")
 							.resizable()
-							.frame(width: 17 * u, height: 17 * u)
+							.frame(width: 18 * u, height: 18 * u) // 1:4517 icon/share is 18 (exact-design audit 2026-09-04)
 					}
 					.frame(width: 40 * u, height: 40 * u)
 				}
@@ -42,15 +42,17 @@ struct SimPortfolioView: View {
 
 				ScrollView(showsIndicators: false) {
 					VStack(alignment: .leading, spacing: 16 * u) {
-						// 1:4496 hides the Portfolio-value/$10,240/cash layers —
-						// the visible summary is this one centered 158x32 pill,
-						// filled with the card colour (no hairline).
+						// 1:4496 hides the Portfolio-value/$10,240/cash layers — the visible
+						// summary is this one centred 158x32 box.
+						// 1:4519 (exact-design audit 2026-09-04): a r13 OUTLINE in #181f30 (1px, no
+						// fill) with the line inset 16 - was a filled r16 pill.
 						// Authored copy (user, 2026-09-04 (CHINEDU 07 · Simulate 423:1007): the authored look wins).
 						Text("12 picks · +$240.00 all time")
 							.font(StakFont.geist(10 * u))
 							.foregroundStyle(Sim.muted)
-							.frame(width: 158 * u, height: 32 * u)
-							.background(Sim.cardBg, in: RoundedRectangle(cornerRadius: 16 * u))
+							.padding(.horizontal, 16 * u)
+							.frame(width: 158 * u, height: 32 * u, alignment: .leading)
+							.overlay(RoundedRectangle(cornerRadius: 13 * u).strokeBorder(Sim.cardBg, lineWidth: 1 * u))
 							.frame(maxWidth: .infinity)
 						HStack(spacing: 8 * u) {
 							FilterChip(label: "Top gainers", selected: true)
@@ -66,14 +68,17 @@ struct SimPortfolioView: View {
 								// Authored (1:4548 template): every Sell pill opens
 								// the Pick detail of ITS ticker, Instant - the authored
 								// sell flow lives there; this page's sheets stay unwired.
-								trailing: { SellPill(action: { onOpenPick(p.ticker) }) }
+								trailing: { SellPill(action: { onOpenPick(p.ticker) }) },
+								// 1:4539 (exact-design audit 2026-09-04): this page's picked line is Geist Light.
+								subLight: true
 							)
 						}
 						Text("SOLD · REALIZED")
 							.font(StakFont.geist(10 * u, .medium))
 							.tracking(0.9 * u)
 							.foregroundStyle(Sim.faint)
-							.frame(height: 17 * u)
+							// 1:4605 gk (exact-design audit 2026-09-04): the kicker sits 4 below the box top (13 in a 17), not centred.
+							.frame(height: 17 * u, alignment: .bottom)
 							.frame(maxWidth: .infinity, alignment: .leading)
 							.padding(.leading, 2 * u)
 						ForEach(portfolio.realized) { r in
@@ -83,11 +88,13 @@ struct SimPortfolioView: View {
 							.font(StakFont.geist(11 * u))
 							.lineSpacing((14 - 11) * u)
 							.foregroundStyle(Sim.faint)
+							// 1:4621 (exact-design audit 2026-09-04): centre-aligned, so a wrap stays centred.
+							.multilineTextAlignment(.center)
 							.frame(maxWidth: .infinity)
 					}
 					.padding(.horizontal, 20 * u)
 					.padding(.top, 6 * u)
-					.padding(.bottom, 20 * u)
+					.padding(.bottom, 26 * u) // 1:4518 pb 26 (exact-design audit 2026-09-04)
 				}
 			}
 			if showSell {
@@ -130,7 +137,9 @@ private struct FilterChip: View {
 	}
 }
 
-/// 60x30 outlined Sell pill — transparent bg with the app's secondary hairline.
+/// 60x30 outlined Sell pill (1:4543) — transparent bg under a 1px white-14%
+/// hairline, Sora 12 muted (exact-design audit 2026-09-04: was Sora Medium
+/// #DCE7F7 under the sheets' 0.36 #343B4F).
 private struct SellPill: View {
 	let action: () -> Void
 
@@ -138,12 +147,12 @@ private struct SellPill: View {
 		let u = figmaUnit
 		Button(action: action) {
 			Text("Sell")
-				.font(StakFont.sora(12 * u, .medium))
-				.foregroundStyle(Color(argb: 0xFFDCE7F7))
+				.font(StakFont.sora(12 * u))
+				.foregroundStyle(Sim.muted)
 				.frame(width: 60 * u, height: 30 * u)
 				.overlay(
 					RoundedRectangle(cornerRadius: 6 * u)
-						.strokeBorder(Color(argb: 0x54343B4F), lineWidth: 0.36 * u)
+						.strokeBorder(Color(argb: 0x24FFFFFF), lineWidth: 1 * u)
 				)
 		}
 		.buttonStyle(.plain)
@@ -159,6 +168,10 @@ private struct RealizedRow: View {
 
 	var body: some View {
 		let u = figmaUnit
+		// 1:4607 Banked (exact-design audit 2026-09-04): the whole row renders at 72%,
+		// its badge at 55% inside that; ticker Sora SemiBold 12 #d3d3dd, sold line
+		// Geist Light 10 #5c6b85, the banked figure Geist Regular 14 - the row used
+		// to be drawn at full strength in the live rows' type.
 		HStack(spacing: 12 * u) {
 			ZStack {
 				Circle().fill(Sim.chipBg)
@@ -167,22 +180,24 @@ private struct RealizedRow: View {
 					.foregroundStyle(Sim.badgeInk)
 			}
 			.frame(width: 36 * u, height: 36 * u)
+			.opacity(0.55)
 			VStack(alignment: .leading, spacing: 2 * u) {
 				Text(ticker)
-					.font(StakFont.sora(12 * u, .medium))
-					.foregroundStyle(Color.white)
+					.font(StakFont.sora(12 * u, .semiBold))
+					.foregroundStyle(Sim.headerGray)
 				Text(sub)
-					.font(StakFont.geist(10 * u))
-					.foregroundStyle(Sim.muted)
+					.font(StakFont.geist(10 * u, .light))
+					.foregroundStyle(Sim.faint)
 			}
 			.frame(maxWidth: .infinity, alignment: .leading)
 			Text(amount)
-				.font(StakFont.sora(13 * u, .semiBold))
+				.font(StakFont.geist(14 * u))
 				.foregroundStyle(up ? Sim.green : Sim.red)
 		}
 		.padding(.horizontal, 14 * u)
 		.padding(.vertical, 12 * u)
 		.background(Sim.cardBg, in: RoundedRectangle(cornerRadius: 12 * u))
+		.opacity(0.72)
 	}
 }
 
@@ -275,60 +290,69 @@ struct SellConfirmSheet: View {
 					.font(StakFont.geist(12 * u))
 					.lineSpacing((18 - 12) * u)
 					.foregroundStyle(Sim.body)
-				HStack(spacing: 6 * u) {
-					Text("Position value")
-						.font(StakFont.geist(12 * u))
-						.foregroundStyle(Sim.muted)
-					Text(pick.stakeValue)
-						.font(StakFont.geist(12 * u, .medium))
-						.foregroundStyle(Sim.bright)
-				}
-				HStack(spacing: 8 * u) {
-					ForEach(Array(["All", "Half", "Custom"].enumerated()), id: \.offset) { i, label in
-						let sel = i == mode
-						Button { mode = i } label: {
-							Text(label)
-								.font(StakFont.geist(12 * u, .medium))
-								.foregroundStyle(sel ? Color(argb: 0xFFA6E4F7) : Color(argb: 0xFFDCE7F7))
-								.frame(maxWidth: .infinity)
-								.padding(.vertical, 8 * u)
-								.background(
-									sel ? Color(argb: 0xFF0F2A38) : Color(argb: 0xFF0B1430),
-									in: RoundedRectangle(cornerRadius: 10 * u)
-								)
-								.overlay(
-									RoundedRectangle(cornerRadius: 10 * u)
-										.strokeBorder(
-											sel ? Color(argb: 0xFF5DA8BF) : Color(argb: 0x1FFFFFFF),
-											lineWidth: (sel ? 0.5 : 1) * u
-										)
-								)
+				// 1:4846 Practice ticket (exact-design audit 2026-09-04): the value line, the
+				// quick amounts and the Returning line sit 12 apart inside the sheet's 14 rhythm.
+				VStack(alignment: .leading, spacing: 12 * u) {
+					HStack(spacing: 6 * u) {
+						Text("Position value")
+							.font(StakFont.geist(12 * u))
+							.foregroundStyle(Sim.muted)
+						Text(pick.stakeValue)
+							.font(StakFont.geist(12 * u, .medium))
+							.foregroundStyle(Sim.bright)
+					}
+					HStack(spacing: 8 * u) {
+						ForEach(Array(["All", "Half", "Custom"].enumerated()), id: \.offset) { i, label in
+							let sel = i == mode
+							Button { mode = i } label: {
+								Text(label)
+									.font(StakFont.geist(12 * u, .medium))
+									.foregroundStyle(sel ? Color(argb: 0xFFA6E4F7) : Color(argb: 0xFFDCE7F7))
+									.frame(maxWidth: .infinity)
+									.padding(.vertical, 8 * u)
+									// 1:4853 (exact-design audit 2026-09-04): the sell chips are r6 - the buy ticket's r10 had been carried over.
+									.background(
+										sel ? Color(argb: 0xFF0F2A38) : Color(argb: 0xFF0B1430),
+										in: RoundedRectangle(cornerRadius: 6 * u)
+									)
+									.overlay(
+										RoundedRectangle(cornerRadius: 6 * u)
+											.strokeBorder(
+												sel ? Color(argb: 0xFF5DA8BF) : Color(argb: 0x1FFFFFFF),
+												lineWidth: (sel ? 0.5 : 1) * u
+											)
+									)
+							}
+							.buttonStyle(.plain)
 						}
-						.buttonStyle(.plain)
+					}
+					// 1:4861 (exact-design audit 2026-09-04): the three runs share one baseline.
+					HStack(alignment: .firstTextBaseline, spacing: 6 * u) {
+						Spacer()
+						Text("Returning")
+							.font(StakFont.geist(12 * u))
+							.foregroundStyle(Sim.muted)
+						Text(pick.stakeValue)
+							.font(StakFont.sora(15 * u, .semiBold))
+							.foregroundStyle(Sim.bright)
+						Text("to your cash")
+							.font(StakFont.geist(12 * u))
+							.foregroundStyle(Sim.muted)
+						Spacer()
 					}
 				}
-				HStack(alignment: .top, spacing: 6 * u) {
-					Spacer()
-					Text("Returning")
-						.font(StakFont.geist(12 * u))
-						.foregroundStyle(Sim.muted)
-					Text(pick.stakeValue)
-						.font(StakFont.sora(15 * u, .semiBold))
-						.foregroundStyle(Sim.bright)
-					Text("to your cash")
-						.font(StakFont.geist(12 * u))
-						.foregroundStyle(Sim.muted)
-					Spacer()
-				}
 				VStack(spacing: 16 * u) {
-					// Dark navy confirm — #12203e per the frame.
+					// 1:4866 (exact-design audit 2026-09-04): #12203e, 51 tall, under the 0.361 CTA
+					// hairline and the 4% teal wash; the label is Sora Regular 14 (was Geist Medium, 52, no hairline).
 					Button(action: onConfirm) {
 						Text("Confirm sell")
-							.font(StakFont.geist(14 * u, .medium))
+							.font(StakFont.sora(14 * u))
 							.foregroundStyle(Color.white)
 							.frame(maxWidth: .infinity)
-							.frame(height: 52 * u)
+							.frame(height: 51 * u)
 							.background(Sim.darkCta, in: RoundedRectangle(cornerRadius: 6 * u))
+							.overlay(RoundedRectangle(cornerRadius: 6 * u).strokeBorder(Sim.ctaBorder, lineWidth: 0.361 * u))
+							.tealShadow(dy: 12.285, blur: 12.285, alpha: 0.04)
 					}
 					.buttonStyle(.plain)
 					SimSheetSecondary(text: "Back", action: onDismiss)
@@ -338,8 +362,9 @@ struct SellConfirmSheet: View {
 	}
 }
 
-/// h52 secondary button used inside the sell sheets — faint 4% white
-/// fill under the app's 0.36 hairline.
+/// h52 secondary button used inside the sell sheets — the app's 0.36
+/// hairline only (1:4868 / 73:1025, exact-design audit 2026-09-04: the 4%
+/// white fill was never authored).
 private struct SimSheetSecondary: View {
 	let text: String
 	let action: () -> Void
@@ -352,7 +377,6 @@ private struct SimSheetSecondary: View {
 				.foregroundStyle(Sim.muted)
 				.frame(maxWidth: .infinity)
 				.frame(height: 52 * u)
-				.background(Color(argb: 0x0AFFFFFF), in: RoundedRectangle(cornerRadius: 6 * u))
 				.overlay(
 					RoundedRectangle(cornerRadius: 6 * u)
 						.strokeBorder(Color(argb: 0x54343B4F), lineWidth: 0.36 * u)
@@ -386,28 +410,32 @@ struct PositionClosedSheet: View {
 					.lineSpacing((18 - 12) * u)
 					.foregroundStyle(Sim.body)
 					.frame(maxWidth: .infinity, alignment: .leading)
-				HStack(spacing: 6 * u) {
-					Text("Proceeds")
-						.font(StakFont.geist(12 * u))
-						.foregroundStyle(Sim.muted)
-					Text(pick.stakeValue)
-						.font(StakFont.geist(12 * u, .medium))
-						.foregroundStyle(Sim.bright)
-					Spacer()
-				}
-				// 73:855 centres the Returned line (Proceeds above stays left-aligned).
-				HStack(alignment: .top, spacing: 6 * u) {
-					Spacer()
-					Text("Returned")
-						.font(StakFont.geist(12 * u))
-						.foregroundStyle(Sim.muted)
-					Text(pick.stakeValue)
-						.font(StakFont.sora(15 * u, .semiBold))
-						.foregroundStyle(Sim.bright)
-					Text("to your cash (\(pick.gainSigned))")
-						.font(StakFont.geist(12 * u))
-						.foregroundStyle(Sim.muted)
-					Spacer()
+				// 73:1003 Practice ticket (exact-design audit 2026-09-04): Proceeds and the Returned line sit 12 apart.
+				VStack(alignment: .leading, spacing: 12 * u) {
+					HStack(spacing: 6 * u) {
+						Text("Proceeds")
+							.font(StakFont.geist(12 * u))
+							.foregroundStyle(Sim.muted)
+						Text(pick.stakeValue)
+							// 73:1006 (exact-design audit 2026-09-04): the proceeds figure is Sora SemiBold 12 - was Geist Medium.
+							.font(StakFont.sora(12 * u, .semiBold))
+							.foregroundStyle(Sim.bright)
+						Spacer()
+					}
+					// 73:1018 centres the Returned line on one baseline (Proceeds above stays left-aligned).
+					HStack(alignment: .firstTextBaseline, spacing: 6 * u) {
+						Spacer()
+						Text("Returned")
+							.font(StakFont.geist(12 * u))
+							.foregroundStyle(Sim.muted)
+						Text(pick.stakeValue)
+							.font(StakFont.sora(15 * u, .semiBold))
+							.foregroundStyle(Sim.bright)
+						Text("to your cash (\(pick.gainSigned))")
+							.font(StakFont.geist(12 * u))
+							.foregroundStyle(Sim.muted)
+						Spacer()
+					}
 				}
 				VStack(spacing: 16 * u) {
 					Button(action: onBackToSimulate) {
@@ -416,20 +444,15 @@ struct PositionClosedSheet: View {
 							.foregroundStyle(Color.white)
 							.frame(maxWidth: .infinity)
 							.frame(height: 52 * u)
-							// Authored teal drop shadow — same glow as the Discover
-							// deck CTA: #52AAC7 at 9% (23/255), blur 12.28, dy 12.28.
-							.background {
-								RoundedRectangle(cornerRadius: 6 * u)
-									.fill(Color(argb: 0xFF52AAC7))
-									.opacity(0.09)
-									.blur(radius: 12.28 * u)
-									.offset(y: 12.28 * u)
-							}
 							.background(discCtaGradient, in: RoundedRectangle(cornerRadius: 6 * u))
 							.overlay(
 								RoundedRectangle(cornerRadius: 6 * u)
-									.strokeBorder(Sim.ctaBorder, lineWidth: 0.36 * u)
+									.strokeBorder(Sim.ctaBorder, lineWidth: 0.361 * u)
 							)
+							// 73:1023 (exact-design audit 2026-09-04): the authored shadow stack is the 1% (dy
+							// 49.86, blur 19.51) and 3% (dy 28.18, blur 16.62) teal layers - not the deck CTA's 9% at 12.28.
+							.tealShadow(dy: 28.183, blur: 16.62, alpha: 0.03)
+							.tealShadow(dy: 49.862, blur: 19.512, alpha: 0.01)
 					}
 					.buttonStyle(.plain)
 					SimSheetSecondary(text: "View portfolio", action: onViewPortfolio)

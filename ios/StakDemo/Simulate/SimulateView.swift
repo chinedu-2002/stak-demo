@@ -63,9 +63,11 @@ struct SimulateView: View {
 						Text("Simulate")
 							.font(StakFont.sora(26 * u, .semiBold))
 							.foregroundStyle(Color.white)
+							.frame(height: 33 * u) // 1:3916 line box (exact-design audit 2026-09-04)
 						Text("Pick from your saves. Paper money does the talking.")
 							.font(StakFont.geist(12 * u))
 							.foregroundStyle(Sim.muted)
+							.frame(height: 16 * u) // 1:3917 line box
 					}
 					Spacer()
 					// Codex audit (2026-09-04): the clock (1:3918 "btn") opens the
@@ -83,15 +85,19 @@ struct SimulateView: View {
 					.accessibilityLabel("History")
 				}
 				.padding(.horizontal, 20 * u)
+				// 1:3914 (exact-design audit 2026-09-04): the 52-tall header sits 8 below the
+				// status bar with no bottom inset - the 18 above the hero is the Main column's own.
 				.padding(.top, 8 * u)
-				.padding(.bottom, 8 * u)
 
 				ScrollView(showsIndicators: false) {
 					VStack(spacing: 18 * u) {
 						ScoreHero(onOpenLeaderboard: onOpenLeaderboard)
 						sectionHeader("Saved staks")
-						SavedStakRow(badge: "P", ticker: "PLTR", sub: savedSub("PLTR", authored: "Saved Jun 30 · not in portfolio yet"), spec: pltrBuy, onBuy: { practiceBuy($0) })
-						SavedStakRow(badge: "C", ticker: "COST", sub: savedSub("COST", authored: "Saved Jul 2 · not in portfolio yet"), spec: costBuy, onBuy: { practiceBuy($0) })
+						// 1:3947 slist (exact-design audit 2026-09-04): the saved rows sit 10 apart, not the column's 18.
+						VStack(spacing: 10 * u) {
+							SavedStakRow(badge: "P", ticker: "PLTR", sub: savedSub("PLTR", authored: "Saved Jun 30 · not in portfolio yet"), spec: pltrBuy, onBuy: { practiceBuy($0) })
+							SavedStakRow(badge: "C", ticker: "COST", sub: savedSub("COST", authored: "Saved Jul 2 · not in portfolio yet"), spec: costBuy, onBuy: { practiceBuy($0) })
+						}
 						CenterLink(text: "All saved staks", action: onOpenMyStak)
 						InsightCard()
 						// Review (2026-09-04): the tiles follow the ledger - largest and
@@ -108,30 +114,40 @@ struct SimulateView: View {
 						// Codex audit (2026-09-04): the ledger's first three rows - a
 						// fresh buy lands at the top (1:3898 authored NVDA/TSLA/MSFT
 						// from a 12-pick sample; the seeded six lead NVDA/TSLA/AMD).
-						ForEach(Array(portfolio.positions.prefix(3))) { position in
-							let p = position.row
-							PortfolioRow(badge: p.badge, ticker: p.ticker, sub: p.sub, amount: p.amount, pct: p.pct, up: p.up, action: { onOpenPick(p.ticker) })
+						// 1:4009 plist (exact-design audit 2026-09-04): the three rows sit 10 apart, not the column's 18.
+						VStack(spacing: 10 * u) {
+							ForEach(Array(portfolio.positions.prefix(3))) { position in
+								let p = position.row
+								PortfolioRow(badge: p.badge, ticker: p.ticker, sub: p.sub, amount: p.amount, pct: p.pct, up: p.up, action: { onOpenPick(p.ticker) })
+							}
 						}
 						// Authored copy (user, 2026-09-04 (CHINEDU 07 · Simulate 423:1007): the authored look wins); the ledger still drives the rows above.
 						CenterLink(text: "See all 12 picks", action: onOpenPortfolio)
-						HStack {
-							Text("Portfolio breakdown")
-								.font(StakFont.sora(16 * u, .semiBold))
-								.foregroundStyle(Sim.headerGray)
-							Spacer()
-							Button(action: onOpenPortfolio) {
-								HStack(spacing: 5 * u) {
-									Text("Portfolio")
-										.font(StakFont.geist(14 * u))
-										.foregroundStyle(Color.white)
-									Text("›")
-										.font(StakFont.geist(14 * u))
-										.foregroundStyle(Sim.muted)
+						// 1:4040 Points breakdown (exact-design audit 2026-09-04): the section header
+						// and the Allocation card are 15 apart, not the column's 18.
+						VStack(spacing: 15 * u) {
+							HStack {
+								Text("Portfolio breakdown")
+									.font(StakFont.sora(16 * u, .semiBold))
+									.foregroundStyle(Sim.headerGray)
+								Spacer()
+								Button(action: onOpenPortfolio) {
+									HStack(spacing: 5 * u) {
+										Text("Portfolio")
+											.font(StakFont.geist(14 * u))
+											// 1:4044 (exact-design audit 2026-09-04): teal at 80% - was white.
+											.foregroundStyle(Color(argb: 0xCC69B3CA))
+										// 1:4045 (exact-design audit 2026-09-04): the exported 4.909x9 chevron asset, not a "›" glyph.
+										Image("IcSimChevron")
+											.resizable()
+											.frame(width: 4.909 * u, height: 9 * u)
+									}
 								}
+								.buttonStyle(.plain)
 							}
-							.buttonStyle(.plain)
+							.frame(height: 21 * u) // 1:4041 header row (Sora 16 on a 1.34 line)
+							SimAllocationCard()
 						}
-						SimAllocationCard()
 						BoardCard(onOpenLeaderboard: onOpenLeaderboard)
 					}
 					.padding(.horizontal, 20 * u)
@@ -197,7 +213,7 @@ private struct ScoreHero: View {
 				HStack(alignment: .bottom, spacing: 0) {
 					Text(figure.whole)
 						.font(StakFont.sora(44 * u, .semiBold))
-						.tracking(-0.44 * u)
+						// 1:3924 (exact-design audit 2026-09-04): no tracking - the -0.44 was never authored.
 						// Authored box (1:3924) is 55 tall — pin it so the stack sums.
 						.frame(height: 55 * u)
 						.foregroundStyle(Color.white)
@@ -384,27 +400,36 @@ struct BuyPill: View {
 				.frame(width: 60 * u, height: 30 * u)
 				.background(discCtaGradient, in: RoundedRectangle(cornerRadius: 6 * u))
 				.overlay(RoundedRectangle(cornerRadius: 6 * u).strokeBorder(Sim.ctaBorder, lineWidth: 0.36 * u))
+				// 1:3954 (exact-design audit 2026-09-04): the authored drop shadow - #52AAC7 at 4%, dy 12.285, blur 12.285.
+				.tealShadow(dy: 12.285, blur: 12.285, alpha: 0.04)
 		}
 		.buttonStyle(.plain)
 	}
 }
 
+/// The authored teal link (1:3964 / 1:4037 / 1:4112 - exact-design audit
+/// 2026-09-04): Geist Medium 13 + "›" 14, both #69b3ca (were white / muted
+/// Regular). Centred across the column unless the host lays it at its own
+/// left edge (the board card's "Full leaderboard"). `centered` is declared
+/// last with a default - memberwise order.
 struct CenterLink: View {
 	let text: String
 	let action: () -> Void
+	var centered: Bool = true
 
 	var body: some View {
 		let u = figmaUnit
 		Button(action: action) {
 			HStack(spacing: 6 * u) {
 				Text(text)
-					.font(StakFont.geist(13 * u))
-					.foregroundStyle(Color.white)
+					.font(StakFont.geist(13 * u, .medium))
+					.foregroundStyle(Sim.teal)
 				Text("›")
-					.font(StakFont.geist(14 * u))
-					.foregroundStyle(Sim.muted)
+					.font(StakFont.geist(14 * u, .medium))
+					.foregroundStyle(Sim.teal)
 			}
-			.frame(maxWidth: .infinity)
+			.frame(height: 18 * u)
+			.frame(maxWidth: centered ? CGFloat.infinity : nil)
 		}
 		.buttonStyle(.plain)
 	}
@@ -458,6 +483,8 @@ private struct PickDuo: View {
 						.font(StakFont.geist(12 * u))
 						.foregroundStyle(pctColor)
 				}
+				// 1:3977 / 1:3982 (exact-design audit 2026-09-04): the badge row carries only the
+				// ticker; the "+$24 on $100" line is the card's own third row, 7 below it.
 				HStack(spacing: 9 * u) {
 					ZStack {
 						Circle().fill(Sim.chipBg)
@@ -466,15 +493,13 @@ private struct PickDuo: View {
 							.foregroundStyle(Sim.badgeInk)
 					}
 					.frame(width: 34 * u, height: 34 * u)
-					VStack(alignment: .leading, spacing: 2 * u) {
-						Text(ticker)
-							.font(StakFont.sora(12 * u, .medium))
-							.foregroundStyle(Color.white)
-						Text(sub)
-							.font(StakFont.geist(11 * u))
-							.foregroundStyle(Sim.faint)
-					}
+					Text(ticker)
+						.font(StakFont.sora(12 * u, .medium))
+						.foregroundStyle(Color.white)
 				}
+				Text(sub)
+					.font(StakFont.geist(11 * u))
+					.foregroundStyle(Sim.faint)
 			}
 			.padding(14 * u)
 			.frame(maxWidth: .infinity, alignment: .leading)
@@ -499,7 +524,8 @@ private struct HowItWorksCard: View {
 				.tracking(0.9 * u)
 				.foregroundStyle(Sim.faint)
 			ForEach(rules, id: \.0) { n, rule in
-				HStack(spacing: 10 * u) {
+				// 1:3995 (exact-design audit 2026-09-04): pill and line share the row's top edge.
+				HStack(alignment: .top, spacing: 10 * u) {
 					ZStack {
 						RoundedRectangle(cornerRadius: 10 * u).fill(Sim.tealTint)
 						Text(n)
@@ -531,12 +557,17 @@ struct PortfolioRow<Trailing: View>: View {
 	let up: Bool
 	var action: () -> Void = {}
 	var trailing: Trailing
+	/// 1:4539 (exact-design audit 2026-09-04): the Portfolio page's picked line is
+	/// Geist Light; Simulate home's (1:4015) is Regular. Declared last with a
+	/// default - memberwise order.
+	var subLight: Bool = false
 
 	init(
 		badge: String, ticker: String, sub: String,
 		amount: String, pct: String, up: Bool,
 		action: @escaping () -> Void = {},
-		@ViewBuilder trailing: () -> Trailing
+		@ViewBuilder trailing: () -> Trailing,
+		subLight: Bool = false
 	) {
 		self.badge = badge
 		self.ticker = ticker
@@ -546,6 +577,7 @@ struct PortfolioRow<Trailing: View>: View {
 		self.up = up
 		self.action = action
 		self.trailing = trailing()
+		self.subLight = subLight
 	}
 
 	var body: some View {
@@ -564,13 +596,14 @@ struct PortfolioRow<Trailing: View>: View {
 						.font(StakFont.sora(12 * u, .medium))
 						.foregroundStyle(Color.white)
 					Text(sub)
-						.font(StakFont.geist(10 * u))
+						.font(StakFont.geist(10 * u, subLight ? .light : .regular))
 						.foregroundStyle(Sim.muted)
 				}
 				.frame(maxWidth: .infinity, alignment: .leading)
 				VStack(alignment: .trailing, spacing: 2 * u) {
 					Text(amount)
-						.font(StakFont.geist(12 * u, .medium))
+						// 1:4017 (exact-design audit 2026-09-04): the P&L is Geist Regular, not Medium.
+						.font(StakFont.geist(12 * u))
 						.foregroundStyle(up ? Sim.green : Sim.red)
 					Text(pct)
 						.font(StakFont.geist(10 * u))
@@ -675,7 +708,9 @@ private struct BoardCard: View {
 			// Audit item 6: the You row quotes the hero's week (1:3898 authored +4.2% here, +1.9% above).
 			// Authored board figures (1:4111 +4.2%; user, 2026-09-04 (CHINEDU 07 · Simulate 423:1007): the authored look wins).
 			boardRow(rank: "47", name: "You", pct: "+4.2%", you: true)
-			CenterLink(text: "Full leaderboard", action: onOpenLeaderboard)
+			// 1:4112 (exact-design audit 2026-09-04): the frame lays this link at the card's
+			// left edge (x16, hug width), not centred like the column links.
+			CenterLink(text: "Full leaderboard", action: onOpenLeaderboard, centered: false)
 		}
 		.padding(16 * u)
 		.frame(maxWidth: .infinity, alignment: .leading)
@@ -688,6 +723,8 @@ private struct BoardCard: View {
 			Text(rank)
 				.font(StakFont.sora(12 * u, .semiBold))
 				.foregroundStyle(you ? Sim.teal : Sim.faint)
+				// 1:4101 (exact-design audit 2026-09-04): the rank sits in a 22-wide box so the names line up.
+				.frame(width: 22 * u, alignment: .leading)
 			Text(name)
 				.font(StakFont.geist(13 * u, you ? .semiBold : .medium))
 				.foregroundStyle(Color.white)
@@ -699,5 +736,22 @@ private struct BoardCard: View {
 		.padding(.horizontal, 10 * u)
 		.padding(.vertical, 7 * u)
 		.background(you ? Sim.tealTint : Color.clear, in: RoundedRectangle(cornerRadius: 10 * u))
+	}
+}
+
+/// The authored teal drop shadow under the CTAs (#52AAC7) - `dy` / `blur`
+/// in artboard units, `alpha` 0..1 - laid behind the r6 box the way the
+/// Discover deck CTA does it (exact-design audit 2026-09-04). Chain it
+/// after the fill so the wash sits under it.
+extension View {
+	func tealShadow(dy: CGFloat, blur: CGFloat, alpha: Double, radius: CGFloat = 6) -> some View {
+		let u = figmaUnit
+		return background {
+			RoundedRectangle(cornerRadius: radius * u)
+				.fill(Color(argb: 0xFF52AAC7))
+				.opacity(alpha)
+				.blur(radius: blur * u)
+				.offset(y: dy * u)
+		}
 	}
 }

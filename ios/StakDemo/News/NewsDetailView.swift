@@ -235,7 +235,7 @@ private struct NewsArticlePage: View {
 	}
 }
 
-/// 360x208 r10 hero — phone art, Tech & Ai toast, play badge, bookmark/saved
+/// 360x208 r10 hero — phone art, Tech & AI toast, play badge, bookmark/saved
 /// chip. The authored image is oversized (407x271.18 in the 360x208 card,
 /// top-left at -24,-15) — it keeps its exact authored frame (the Compose
 /// requiredSize + Crop becomes .scaledToFill + explicit .frame + .clipped)
@@ -325,7 +325,9 @@ private struct HeroImage: View {
 							.rotationEffect(.degrees(90))
 					}
 					.buttonStyle(.plain)
-					.offset(x: -0.5 * u, y: 12.5 * u)
+					// 1:1522: the polygon sits 8.64%/25% inset in its 81 box, so the rotated
+					// glyph's centre is 6.63 right of the box centre - exact-design audit 2026-09-04.
+					.offset(x: 6.13 * u, y: 12.5 * u)
 				}
 				// An image with an embedded link (served contract): tapping
 				// the hero opens the story's own dynamic link.
@@ -344,7 +346,8 @@ private struct HeroImage: View {
 					.foregroundStyle(StakColors.textPrimary)
 					.padding(.horizontal, 7 * u)
 					.padding(.vertical, 5 * u)
-					.background(Color(argb: 0x40242B3D), in: RoundedRectangle(cornerRadius: 7.88 * u))
+					// Authored r7.875 (1:1519) - exact-design audit 2026-09-04.
+					.background(Color(argb: 0x40242B3D), in: RoundedRectangle(cornerRadius: 7.875 * u))
 					.padding(.leading, 9 * u)
 					.padding(.bottom, 10 * u)
 					.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
@@ -364,7 +367,8 @@ private struct HeroImage: View {
 					.padding(.horizontal, 7 * u)
 					// Authored toast is 21 tall (1:1386): 13 text + 4/4 pads.
 					.padding(.vertical, 4 * u)
-					.background(Color(argb: 0x40242B3D), in: RoundedRectangle(cornerRadius: 7.88 * u))
+					// Authored r7.875 (1:1386) - exact-design audit 2026-09-04.
+					.background(Color(argb: 0x40242B3D), in: RoundedRectangle(cornerRadius: 7.875 * u))
 					.padding(.top, 8 * u)
 					.padding(.trailing, 7 * u)
 					.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
@@ -376,7 +380,8 @@ private struct HeroImage: View {
 					}
 					.buttonStyle(.plain)
 					.padding(.top, 8 * u)
-					.padding(.trailing, 11 * u)
+					// 1:1523 sits at x 330.77 in the 360 hero: 11.44 from the right - exact-design audit 2026-09-04.
+					.padding(.trailing, 11.44 * u)
 					.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
 				}
 			}
@@ -547,11 +552,16 @@ private struct StockCard: View {
 						// 1:1359: the link reads #AEAEAE, not teal (Codex parity audit 2026-09-04).
 						.foregroundStyle(Color(argb: 0xFFAEAEAE))
 					Spacer()
+					// The rotated chevron occupies its authored 3.75x6.875 box (1:1422), so its
+					// visual edge meets the card's padding - exact-design audit 2026-09-04.
 					Image("IcDailyChevron")
 						.resizable()
-						.frame(width: 6.88 * u, height: 3.75 * u)
+						.frame(width: 6.875 * u, height: 3.75 * u)
 						.rotationEffect(.degrees(-90))
+						.frame(width: 3.75 * u, height: 6.875 * u)
 				}
+				// Authored CTA row carries a 2 vertical pad (1:1420) - exact-design audit 2026-09-04.
+				.padding(.vertical, 2 * u)
 			}
 		}
 		.frame(maxWidth: .infinity, alignment: .leading)

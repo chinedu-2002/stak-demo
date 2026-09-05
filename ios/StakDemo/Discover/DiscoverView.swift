@@ -229,15 +229,19 @@ struct DiscoverView: View {
 		ZStack {
 			VStack(spacing: 0) {
 				// Header — Discover + progress ring, kicker below.
-				VStack(alignment: .leading, spacing: 5 * u) {
+				// 1:2330 authors the whole header 10 lower than 1:1627 (ring y64 vs
+				// 54) with an 8 kicker gap (y116) - exact-design audit 2026-09-04.
+				let atEnd = seen >= deckSize
+				VStack(alignment: .leading, spacing: (atEnd ? 8 : 5) * u) {
 					// 1:1627 centres the 33-tall title in the 44-tall ring row (measured exact);
-					// the end-of-deck frame (1:2330) authors the title 7 higher against the ring.
+					// the end-of-deck frame (1:2330) authors the title 7.5 higher against the
+					// ring (y62 vs ring y64) in #F2F6FC (1:2354) - exact-design audit 2026-09-04.
 					HStack {
 						Text("Discover")
 							.font(StakFont.sora(26 * u, .semiBold))
 							.lineSpacing((33 - 26) * u)
-							.foregroundStyle(Color.white)
-							.offset(y: seen >= deckSize ? -7 * u : 0)
+							.foregroundStyle(atEnd ? Disc.brightInk : Color.white)
+							.offset(y: atEnd ? -7.5 * u : 0)
 						Spacer()
 						// The authored "1/12" counter and ring (1:1627; user, 2026-09-04).
 						let count = min(seen + 1, deckSize)
@@ -249,13 +253,17 @@ struct DiscoverView: View {
 						}
 						.frame(width: 44 * u, height: 44 * u)
 					}
+					// 1:1656 authors the kicker #5C6B85 / tracking 0.9, inset 2 (Context
+					// row px-2); 1:2362 authors it #819ABB / tracking 0.8, flush at x20 -
+					// exact-design audit 2026-09-04.
 					Text("TODAY · AI & CHIPS")
 						.font(StakFont.geist(10 * u, .medium))
-						.tracking(0.9 * u)
-						.foregroundStyle(Disc.muted)
+						.tracking((atEnd ? 0.8 : 0.9) * u)
+						.foregroundStyle(atEnd ? Disc.muted : Disc.faint)
+						.padding(.leading, (atEnd ? 0 : 2) * u)
 				}
 				.padding(.horizontal, 20 * u)
-				.padding(.top, 10 * u)
+				.padding(.top, (atEnd ? 20 : 10) * u)
 
 				Spacer().frame(height: 27 * u)
 
@@ -437,19 +445,20 @@ struct DiscoverView: View {
 			// Saved toast (frame 1:1796) — centered pill under the header.
 			if savedToast {
 				VStack {
-					HStack(spacing: 13.5 * u) {
+					// Toast 1:1965 authors rgba(36,43,61,0.48), r18, px16 py11, gap 9
+					// and a 17 bookmark (1:1966) - exact-design audit 2026-09-04.
+					HStack(spacing: 9 * u) {
 						Image("IcSavedBookmark")
 							.resizable()
-							.frame(width: 14 * u, height: 14 * u)
+							.frame(width: 17 * u, height: 17 * u)
 						Text("Saved to My STAK")
 							.font(StakFont.geist(12 * u, .medium))
 							.foregroundStyle(Color.white)
 					}
-					.padding(.leading, 14 * u)
-					.padding(.trailing, 12 * u)
+					.padding(.horizontal, 16 * u)
 					.frame(height: 39 * u)
-					// Authored (1:1796): 148.5x39 translucent pill — the peek slab shows through.
-					.background(Disc.chipBg.opacity(0.5), in: RoundedRectangle(cornerRadius: 19.5 * u))
+					// Authored (1:1796): translucent pill — the peek slab shows through.
+					.background(Disc.chipBg.opacity(0.48), in: RoundedRectangle(cornerRadius: 18 * u))
 					.padding(.top, 78 * u)
 					Spacer()
 				}
@@ -637,23 +646,25 @@ private struct SaveChip: View {
 	}
 }
 
-/// 16x8 down-chevron stroke (muted).
+/// 16x8 down-chevron: the authored export (1:1777) is a 2-wide #5C6B85
+/// round stroke M2 1 L8 7 L14 1 - exact-design audit 2026-09-04.
 private struct GestureChevron: View {
 	let u: CGFloat
 
 	var body: some View {
 		ChevronShape()
-			.stroke(StakColors.muted, style: StrokeStyle(lineWidth: 1.6 * u, lineCap: .round, lineJoin: .round))
+			.stroke(Disc.faint, style: StrokeStyle(lineWidth: 2 * u, lineCap: .round, lineJoin: .round))
 			.frame(width: 16 * u, height: 8 * u)
 	}
 }
 
 private struct ChevronShape: Shape {
 	func path(in rect: CGRect) -> Path {
+		let px = rect.width / 16
 		var p = Path()
-		p.move(to: CGPoint(x: 0, y: 0))
-		p.addLine(to: CGPoint(x: rect.midX, y: rect.maxY))
-		p.addLine(to: CGPoint(x: rect.maxX, y: 0))
+		p.move(to: CGPoint(x: 2 * px, y: 1 * px))
+		p.addLine(to: CGPoint(x: 8 * px, y: 7 * px))
+		p.addLine(to: CGPoint(x: 14 * px, y: 1 * px))
 		return p
 	}
 }
@@ -842,8 +853,9 @@ struct SheetSecondary: View {
 				.foregroundStyle(Disc.muted)
 				.frame(maxWidth: .infinity)
 				.frame(height: 52 * u)
-				// Authored (1:1970): faint 4% white fill under the hairline.
-				.background(RoundedRectangle(cornerRadius: 6 * u).fill(Color.white.opacity(0.04)))
+				// 1:2197 authors NO fill - the render's lighter band under Confirm is
+				// the CTA's own glow (exact-design audit 2026-09-04); hairline only.
+				.contentShape(Rectangle())
 				.overlay(RoundedRectangle(cornerRadius: 6 * u).strokeBorder(Color(argb: 0x54343B4F), lineWidth: 0.36 * u))
 		}
 		.buttonStyle(.plain)
@@ -1004,10 +1016,11 @@ struct OrderFilledSheet: View {
 					.font(StakFont.sora(18 * u, .semiBold))
 					.foregroundStyle(Color.white)
 				SheetStockRow(spec: spec)
-				// Authored status line (85:1407): 18-tall, left-aligned, 14 below the stock row.
+				// Authored status line (85:1407): Geist 12 / lh 18, left-aligned, 14 below
+				// the stock row - exact-design audit 2026-09-04 (was 14).
 				Text("Filled instantly · paper order")
-					.font(StakFont.geist(14 * u))
-					.lineSpacing((18 - 14) * u)
+					.font(StakFont.geist(12 * u))
+					.lineSpacing((18 - 12) * u)
 					.foregroundStyle(Disc.body)
 					.frame(maxWidth: .infinity, alignment: .leading)
 				HStack(spacing: 6 * u) {

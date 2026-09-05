@@ -47,7 +47,7 @@ struct LeaderboardView: View {
 					Circle().fill(Sim.cardBg)
 					Image("IcNewsShare")
 						.resizable()
-						.frame(width: 17 * u, height: 17 * u)
+						.frame(width: 18 * u, height: 18 * u) // 1:4145 icon/share is 18 (exact-design audit 2026-09-04)
 				}
 				.frame(width: 40 * u, height: 40 * u)
 			}
@@ -60,17 +60,18 @@ struct LeaderboardView: View {
 						PeriodChip(label: "This week", selected: true)
 						PeriodChip(label: "All time", selected: false)
 					}
+					// 1:4152 season (exact-design audit 2026-09-04): the row is inset 2 on both sides.
 					HStack {
 						Text("RANKED BY RETURN")
 							.font(StakFont.geist(10 * u, .medium))
 							.tracking(0.9 * u)
 							.foregroundStyle(Sim.faint)
-							.padding(.leading, 2 * u)
 						Spacer()
 						Text("Trailing 7 days")
 							.font(StakFont.geist(10 * u))
 							.foregroundStyle(Sim.faint)
 					}
+					.padding(.horizontal, 2 * u)
 
 					// You — highlighted with the ▲ spots delta. Teal-tint bg
 					// only, no border (1:4124).
@@ -82,13 +83,13 @@ struct LeaderboardView: View {
 						ZStack {
 							Circle().fill(Sim.chipBg)
 							Text("E")
-								.font(StakFont.sora(13 * u, .semiBold))
+								.font(StakFont.sora(14 * u, .semiBold)) // 1:4158 is 14 (exact-design audit 2026-09-04)
 								.foregroundStyle(Sim.badgeInk)
 						}
 						.frame(width: 36 * u, height: 36 * u)
 						VStack(alignment: .leading, spacing: 2 * u) {
 							Text("You")
-								.font(StakFont.geist(12 * u, .semiBold))
+								.font(StakFont.sora(12 * u, .medium)) // 1:4160 Sora Medium (exact-design audit 2026-09-04)
 								.foregroundStyle(Color.white)
 							Text("12 picks this week")
 								.font(StakFont.geist(10 * u))
@@ -107,11 +108,13 @@ struct LeaderboardView: View {
 					}
 					.padding(.horizontal, 16 * u)
 					.padding(.vertical, 14 * u)
-					.background(Sim.tealTint, in: RoundedRectangle(cornerRadius: 12 * u))
+					// 1:4155 (exact-design audit 2026-09-04): the You card is r14.
+					.background(Sim.tealTint, in: RoundedRectangle(cornerRadius: 14 * u))
 
 					ForEach(top, id: \.rank) { LeaderRow(r: $0) }
 					Text("· · ·")
-						.font(StakFont.geist(12 * u))
+						// 1:4205 (exact-design audit 2026-09-04): Geist Medium 13 - was Regular 12.
+						.font(StakFont.geist(13 * u, .medium))
 						.foregroundStyle(Sim.faint)
 						.frame(maxWidth: .infinity)
 					ForEach(near, id: \.rank) { LeaderRow(r: $0) }
@@ -125,7 +128,7 @@ struct LeaderboardView: View {
 				}
 				.padding(.horizontal, 20 * u)
 				.padding(.top, 6 * u)
-				.padding(.bottom, 24 * u)
+				.padding(.bottom, 26 * u) // 1:4146 pb 26 (exact-design audit 2026-09-04)
 			}
 		}
 		.background(StakColors.bg.ignoresSafeArea())
@@ -143,12 +146,8 @@ private struct PeriodChip: View {
 			.foregroundStyle(selected ? Sim.teal : Sim.muted)
 			.padding(.horizontal, 13 * u)
 			.padding(.vertical, 7 * u)
-			.background(selected ? Sim.tealTint : Sim.cardBg, in: RoundedRectangle(cornerRadius: 14 * u))
-			.overlay(
-				selected
-					? RoundedRectangle(cornerRadius: 14 * u).strokeBorder(Color(argb: 0x662C9DBC), lineWidth: 0.75 * u)
-					: nil
-			)
+			// 1:4148 (exact-design audit 2026-09-04): r15, fill only - the selected chip carries no hairline.
+			.background(selected ? Sim.tealTint : Sim.cardBg, in: RoundedRectangle(cornerRadius: 15 * u))
 	}
 }
 
@@ -171,11 +170,11 @@ private struct LeaderRow: View {
 			.frame(width: 32 * u, height: 32 * u)
 			VStack(alignment: .leading, spacing: 2 * u) {
 				Text(r.name)
-					.font(StakFont.geist(12 * u, .medium))
+					.font(StakFont.sora(12 * u, .medium)) // 1:4170 Sora Medium, not Geist (exact-design audit 2026-09-04)
 					.foregroundStyle(Color.white)
 				Text(r.picks)
 					.font(StakFont.geist(10 * u))
-					.foregroundStyle(Sim.muted)
+					.foregroundStyle(Sim.faint) // 1:4171 #5c6b85 (exact-design audit 2026-09-04)
 			}
 			.frame(maxWidth: .infinity, alignment: .leading)
 			Text(r.pct)

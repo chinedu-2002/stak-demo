@@ -23,7 +23,7 @@ private let bars: [TasteBar] = [
 /// the #181f30 taste card with four strength bars at their exact Figma
 /// widths (the frame arrives already filled - no entry animation; Codex
 /// parity audit 2026-09-04), the Risk style chip ("Growth-Oriented" ›)
-/// and the "Lets go!" / Back CTAs.
+/// and the "Let's go!" / Back CTAs.
 struct TasteRevealView: View {
 	let onBack: () -> Void
 	let onLetsGo: () -> Void
@@ -117,7 +117,8 @@ struct TasteRevealView: View {
 			}
 
 			VStack(spacing: 10 * u) {
-				AuthCta(text: "Lets go!", action: onLetsGo)
+				// Copy fix: 1:746 authors "Lets go!" -> "Let's go!" (exact-design audit 2026-09-04).
+				AuthCta(text: "Let's go!", action: onLetsGo)
 				AuthSecondaryButton(text: "Back", action: onBack)
 			}
 			.padding(.top, 8 * u)

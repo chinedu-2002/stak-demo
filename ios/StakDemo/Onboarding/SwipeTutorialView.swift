@@ -312,27 +312,21 @@ private struct SaveChip: View {
 		}
 		.padding(.horizontal, 13 * u)
 		.padding(.vertical, 7 * u)
-		.background(Color(argb: 0x26FFFFFF), in: RoundedRectangle(cornerRadius: 16 * u))
+		// 1:402 / 1:441 / 1:469 author the chip at rgba(255,255,255,0.09); was 0.15 (exact-design audit 2026-09-04).
+		.background(Color(argb: 0x17FFFFFF), in: RoundedRectangle(cornerRadius: 16 * u))
 	}
 }
 
-/// 13.97x6.98 down-chevron stroke (artboard-scaled), StakColors.muted.
+/// The authored 13.97x6.98 down-chevron (1:487 / 1:489): the exported
+/// vector - stroke #5C6B85 at 1.75, round caps, the glyph inset inside
+/// its frame. Was a hand-drawn corner-to-corner #819ABB 1.6 stroke
+/// (exact-design audit 2026-09-04).
 private struct ChevronDown: View {
 	let u: CGFloat
 
 	var body: some View {
-		ChevronShape()
-			.stroke(StakColors.muted, style: StrokeStyle(lineWidth: 1.6 * u, lineCap: .round, lineJoin: .round))
+		Image("SwipeChevron")
+			.resizable()
 			.frame(width: 13.97 * u, height: 6.98 * u)
-	}
-}
-
-private struct ChevronShape: Shape {
-	func path(in rect: CGRect) -> Path {
-		var p = Path()
-		p.move(to: CGPoint(x: 0, y: 0))
-		p.addLine(to: CGPoint(x: rect.width / 2, y: rect.height))
-		p.addLine(to: CGPoint(x: rect.width, y: 0))
-		return p
 	}
 }

@@ -65,8 +65,8 @@ struct MyStakView: View {
 					SectionHeader(title: "Breakdown")
 					AllocationCard()
 					discoverBanner
-					// Mirrors the Android trailing 0dp spacer — buys one extra 20u gap.
-					Color.clear.frame(height: 0)
+					// 1:3156: the Sections column ends at the Discover CTA and the 86 bottom
+					// padding IS the tab bar, so no trailing gap - exact-design audit 2026-09-04.
 				}
 				.padding(.horizontal, 20 * u)
 				.padding(.top, 20 * u)
@@ -116,7 +116,8 @@ struct MyStakView: View {
 			.background(ctaGradient, in: RoundedRectangle(cornerRadius: 6 * u))
 			.overlay(
 				RoundedRectangle(cornerRadius: 6 * u)
-					.strokeBorder(StakColors.ctaBorder, lineWidth: 0.36 * u)
+					// 1:3225 authored gradient hairline (the Android CtaBorderBrush) - exact-design audit 2026-09-04.
+					.strokeBorder(StakColors.ctaBorderGradient, lineWidth: 0.36 * u)
 			)
 		}
 		.buttonStyle(.plain)
@@ -162,11 +163,12 @@ struct MyStakView: View {
 				Text("More like your STAK")
 					.font(StakFont.sora(18 * u, .semiBold))
 					.foregroundStyle(ink)
+				// 1:3322 Geist Regular 12 / 17 (was 13) - exact-design audit 2026-09-04.
 				Text("Based on your taste, 8 fresh picks are waiting in the deck.")
-					.font(StakFont.geist(13 * u))
-					.lineSpacing((17 - 13) * u)
+					.font(StakFont.geist(12 * u))
+					.lineSpacing((17 - 12) * u)
 					.foregroundStyle(ink)
-				// The Android row's 22sp line height makes it a 22u-tall strip.
+				// 1:3323 "b": pt 4 over the natural runs (was a 22u strip) - exact-design audit 2026-09-04.
 				HStack(spacing: 4 * u) {
 					Text("Start swiping")
 						.font(StakFont.geist(13 * u, .medium))
@@ -175,7 +177,7 @@ struct MyStakView: View {
 						.font(StakFont.geist(14 * u, .medium))
 						.foregroundStyle(ink)
 				}
-				.frame(height: 22 * u)
+				.padding(.top, 4 * u)
 			}
 			.frame(maxWidth: .infinity, alignment: .leading)
 			.padding(18 * u)
@@ -356,7 +358,8 @@ private struct AllocationCard: View {
 				SectorBar(name: "Tech & AI", share: "42% · 6 stocks", color: teal, fill: 132)
 				SectorBar(name: "Finance", share: "21% · 3 stocks", color: Color(argb: 0xFF7AB3F0), fill: 66)
 				SectorBar(name: "Green Energy", share: "20% · 3 stocks", color: green, fill: 63)
-				SectorBar(name: "Real Estate", share: "12% · 2 stocks", color: Color(argb: 0xFF9E8CE5), fill: 38)
+				// 1:3306 legend dot is #9E8CE6 while the 1:3310 bar is #9E8CE5 - exact-design audit 2026-09-04.
+				SectorBar(name: "Real Estate", share: "12% · 2 stocks", color: Color(argb: 0xFF9E8CE5), fill: 38, dot: Color(argb: 0xFF9E8CE6))
 				SectorBar(name: "Other", share: "5% · 1 stock", color: faint, fill: 16)
 			}
 			.frame(maxWidth: .infinity)
@@ -373,13 +376,16 @@ private struct SectorBar: View {
 	let color: Color
 	/// Exact Figma fill width in artboard units (scaled by `figmaUnit`).
 	let fill: CGFloat
+	/// The legend dot when it is not the bar colour (1:3306 vs 1:3310) - a new
+	/// stored property LAST with a default, so the memberwise init keeps its order.
+	var dot: Color? = nil
 
 	var body: some View {
 		let u = figmaUnit
 		VStack(spacing: 6 * u) {
 			HStack(spacing: 0) {
 				Circle()
-					.fill(color)
+					.fill(dot ?? color)
 					.frame(width: 9 * u, height: 9 * u)
 				Spacer().frame(width: 8 * u)
 				Text(name)

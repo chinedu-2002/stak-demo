@@ -184,17 +184,53 @@ internal object DeckSession {
 	 * (review, 2026-09-04): the Discover page leaves composition on every
 	 * tab hop - Confirm -> "View in My STAK" -> back to the deck - and a
 	 * screen-local `seen` would restart the deck while `bought` kept
-	 * counting. One lifetime, one reset.
+	 * counting. One lifetime, one reset. Persisted per day (product audit,
+	 * 2026-09-05): a relaunch resumes today's run, tomorrow lands a new deck.
 	 */
-	var seen by mutableIntStateOf(0)
-	var saved by mutableStateOf(setOf<String>())
-	var bought by mutableIntStateOf(0)
+	private val seenState = mutableIntStateOf(0)
+	private val savedState = mutableStateOf(setOf<String>())
+	private val boughtState = mutableIntStateOf(0)
+
+	var seen: Int
+		get() = seenState.intValue
+		set(value) { seenState.intValue = value; persist() }
+	var saved: Set<String>
+		get() = savedState.value
+		set(value) { savedState.value = value; persist() }
+	var bought: Int
+		get() = boughtState.intValue
+		set(value) { boughtState.intValue = value; persist() }
 
 	/** "Swipe today's deck again" and the tab re-tap from the end. */
 	fun restart() {
-		seen = 0
-		saved = emptySet()
-		bought = 0
+		seenState.intValue = 0
+		savedState.value = emptySet()
+		boughtState.intValue = 0
+		persist()
+	}
+
+	private fun today(): String = java.time.LocalDate.now().toString()
+
+	/** Today's run, if one was saved; otherwise a fresh deck. */
+	fun load() {
+		val store = com.stak.demo.ui.StakStore
+		if (store.getString("deck.day") == today()) {
+			seenState.intValue = store.getInt("deck.seen", 0)
+			savedState.value = store.getSet("deck.saved") ?: emptySet()
+			boughtState.intValue = store.getInt("deck.bought", 0)
+		} else {
+			seenState.intValue = 0
+			savedState.value = emptySet()
+			boughtState.intValue = 0
+		}
+	}
+
+	private fun persist() {
+		val store = com.stak.demo.ui.StakStore
+		store.putString("deck.day", today())
+		store.putInt("deck.seen", seenState.intValue)
+		store.putSet("deck.saved", savedState.value)
+		store.putInt("deck.bought", boughtState.intValue)
 	}
 }
 

@@ -47,6 +47,7 @@ object Session {
 		if (prefs != null) return
 		val p = context.applicationContext.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
 		prefs = p
+		StakStore.init(context)
 		signedIn = p.getBoolean(KEY_SIGNED_IN, false)
 		resumedSignedIn = signedIn
 		demoAccount = p.getBoolean(KEY_DEMO, true)
@@ -65,6 +66,9 @@ object Session {
 		signedIn = true
 		demoAccount = demo
 		persist()
+		// A brand-new account starts from nothing; the demo account keeps
+		// whatever it did last time it was signed in.
+		if (!demo) StakStore.clearAccount(demo = false)
 		applyAccount()
 	}
 
@@ -72,6 +76,9 @@ object Session {
 	fun applyAccount() {
 		MyStakHoldings.reset(demo = demoAccount)
 		com.stak.demo.ui.simulate.PaperPortfolio.reset(demo = demoAccount)
+		com.stak.demo.ui.discover.DeckSession.load()
+		StakNotifications.load()
+		com.stak.demo.ui.news.NewsSaves.load()
 	}
 
 	/** Profile edits after sign-in (name/photo) stay with the session. */

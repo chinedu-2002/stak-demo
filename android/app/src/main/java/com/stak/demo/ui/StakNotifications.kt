@@ -27,5 +27,11 @@ object StakNotifications {
 
 	fun markAllRead() {
 		hasUnread = false
+		com.stak.demo.ui.StakStore.putBoolean("notif.unread", false)
+	}
+
+	/** Restores the badge for the current account (product audit, 2026-09-05). */
+	fun load() {
+		hasUnread = com.stak.demo.ui.StakStore.getBoolean("notif.unread", true)
 	}
 }

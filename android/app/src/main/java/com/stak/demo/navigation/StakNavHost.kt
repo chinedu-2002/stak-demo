@@ -708,11 +708,16 @@ private fun MainShell(
 							// Authored (1:958/1:1097 Motion): the pill and the deck
 							// banner jump to the Discover deck ("first run" frame),
 							// the mood card to News, the why-card to My STAK - all
-							// Instant; first-run ends once the pick is seen.
+							// Instant. First run ends on ANY tab hop, not only the
+							// pick: every tab bar's Home tab is authored to Home
+							// Main (1:1354 -> 1:1097), so 1:958 Market Mood -> News
+							// -> Home must land on Main, never back on the scrim
+							// (prototype walk, 2026-09-05). Only the avatar's
+							// Profile push (1:1003, BACK) returns to first run.
 							onSeeTodaysPick = { homeFirstRun = false; switchTab(MainTab.Discover) },
 							onProfile = onOpenProfile,
-							onOpenNews = { switchTab(MainTab.News) },
-							onOpenMyStak = { switchTab(MainTab.MySTAK) },
+							onOpenNews = { homeFirstRun = false; switchTab(MainTab.News) },
+							onOpenMyStak = { homeFirstRun = false; switchTab(MainTab.MySTAK) },
 							onOpenDeck = { homeFirstRun = false; switchTab(MainTab.Discover) },
 						)
 						MainTab.News -> NewsScreen(onOpenArticle = onOpenArticle)

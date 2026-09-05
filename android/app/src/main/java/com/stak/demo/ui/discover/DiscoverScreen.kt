@@ -272,9 +272,15 @@ internal fun DiscoverScreen(
 	// NVDA even though My STAK lists it; user, 2026-09-04).
 	var savedCards by DeckSession::saved
 	// 1:2330: Discover tab re-tap from the end of the deck restarts it - and
-	// the run's counters with it.
+	// the run's counters with it. Only a CHANGE of the key counts: the deck is
+	// re-composed every time the tab is re-entered, and a key left >0 by an
+	// earlier re-tap must not restart a finished deck the user merely came
+	// back to from My STAK / Simulate (prototype walk, 2026-09-05: "Review
+	// saves in My STAK" -> Discover tab showed 1/12 instead of the kept end;
+	// mirrors iOS's onChange(of: resetKey)).
+	val initialResetKey = remember { resetKey }
 	LaunchedEffect(resetKey) {
-		if (resetKey > 0 && seen >= DECK_SIZE) {
+		if (resetKey != initialResetKey && seen >= DECK_SIZE) {
 			DeckSession.restart()
 		}
 	}

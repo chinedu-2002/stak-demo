@@ -1010,15 +1010,16 @@ private fun PracticeBuyContent(
 			color = Color.White,
 		)
 		NvdaStockRow(spec)
-		// Ink-measured against 1:1970 / 1:4232: the paragraph sits 1 lower and
-		// the cash block 1.5 lower than the 14 column gap alone gives.
+		// The authored 14 column gap alone (1:1970 / 1:4232). The old +1 / +1.5
+		// ink nudges were measured under the trimmed line boxes; with
+		// FIGMA_LINE_BOX they pushed the title 3.6 and the pill 3.2 above the
+		// frame (StakTest vs the 2x export, 2026-09-05).
 		Text(
 			text = "Your paper stake starts at today’s price and tracks the real move live, in either direction.",
 			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (18 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
 			color = Disc.Body,
-			modifier = Modifier.padding(top = (1 * u).dp),
 		)
-		Column(verticalArrangement = Arrangement.spacedBy((12 * u).dp), modifier = Modifier.fillMaxWidth().padding(top = (1.5 * u).dp)) {
+		Column(verticalArrangement = Arrangement.spacedBy((12 * u).dp), modifier = Modifier.fillMaxWidth()) {
 			Row(horizontalArrangement = Arrangement.spacedBy((6 * u).dp)) {
 				Text(
 					text = "Cash available",

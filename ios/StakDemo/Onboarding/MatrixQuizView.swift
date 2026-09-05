@@ -141,6 +141,6 @@ private struct MatrixCard: View {
 				}
 			}
 		}
-		.buttonStyle(.plain)
+		.buttonStyle(.pressDim)
 	}
 }

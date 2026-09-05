@@ -83,7 +83,7 @@ struct SimulateView: View {
 						}
 						.frame(width: 40 * u, height: 40 * u)
 					}
-					.buttonStyle(.plain)
+					.buttonStyle(.pressDim)
 					.accessibilityLabel("History")
 				}
 				.padding(.horizontal, 20 * u)
@@ -156,7 +156,7 @@ struct SimulateView: View {
 											.frame(width: 4.909 * u, height: 9 * u)
 									}
 								}
-								.buttonStyle(.plain)
+								.buttonStyle(.pressDim)
 							}
 							.frame(height: 21 * u) // 1:4041 header row (Sora 16 on a 1.34 line)
 							SimAllocationCard()
@@ -280,7 +280,7 @@ private struct ScoreHero: View {
 						.padding(.vertical, 6 * u)
 						.background(Sim.tealTint, in: RoundedRectangle(cornerRadius: 13 * u))
 				}
-				.buttonStyle(.plain)
+				.buttonStyle(.pressDim)
 			}
 			.padding(.horizontal, 20 * u)
 
@@ -308,7 +308,7 @@ private struct ScoreHero: View {
 								.foregroundStyle(Sim.muted)
 						}
 					}
-					.buttonStyle(.plain)
+					.buttonStyle(.pressDim)
 				}
 			}
 			.frame(maxWidth: .infinity)
@@ -373,7 +373,7 @@ struct BuyPill: View {
 				// 1:3954 (exact-design audit 2026-09-04): the authored drop shadow - #52AAC7 at 4%, dy 12.285, blur 12.285.
 				.tealShadow(dy: 12.285, blur: 12.285, alpha: 0.04)
 		}
-		.buttonStyle(.plain)
+		.buttonStyle(.pressDim)
 	}
 }
 
@@ -401,7 +401,7 @@ struct CenterLink: View {
 			.frame(height: 18 * u)
 			.frame(maxWidth: centered ? CGFloat.infinity : nil)
 		}
-		.buttonStyle(.plain)
+		.buttonStyle(.pressDim)
 	}
 }
 
@@ -475,7 +475,7 @@ private struct PickDuo: View {
 			.frame(maxWidth: .infinity, alignment: .leading)
 			.background(Sim.cardBg, in: RoundedRectangle(cornerRadius: 16 * u))
 		}
-		.buttonStyle(.plain)
+		.buttonStyle(.pressDim)
 	}
 }
 
@@ -585,7 +585,7 @@ struct PortfolioRow<Trailing: View>: View {
 			.padding(.vertical, 12 * u)
 			.background(Sim.cardBg, in: RoundedRectangle(cornerRadius: 12 * u))
 		}
-		.buttonStyle(.plain)
+		.buttonStyle(.pressDim)
 	}
 }
 
@@ -750,7 +750,7 @@ struct EmptyStateCard: View {
 						.font(StakFont.geist(13 * u, .medium))
 						.foregroundStyle(Sim.teal)
 				}
-				.buttonStyle(.plain)
+				.buttonStyle(.pressDim)
 				.padding(.top, 4 * u)
 			}
 		}

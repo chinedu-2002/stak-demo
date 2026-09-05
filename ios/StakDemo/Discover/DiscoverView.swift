@@ -459,7 +459,7 @@ struct DiscoverView: View {
 									.background(discCtaGradient, in: RoundedRectangle(cornerRadius: 6 * u))
 									.overlay(RoundedRectangle(cornerRadius: 6 * u).strokeBorder(Disc.ctaBorder, lineWidth: 0.36 * u))
 							}
-							.buttonStyle(.plain)
+							.buttonStyle(.pressDim)
 							Button(action: { onLearnMore(deck[front].symbol) }) {
 								Text("Learn more")
 									.font(StakFont.sora(12 * u))
@@ -467,7 +467,7 @@ struct DiscoverView: View {
 									.frame(width: 120 * u, height: 52 * u)
 									.overlay(RoundedRectangle(cornerRadius: 6 * u).strokeBorder(Color(argb: 0x54343B4F), lineWidth: 0.36 * u))
 							}
-							.buttonStyle(.plain)
+							.buttonStyle(.pressDim)
 						}
 						Spacer(minLength: 19 * u)
 					}
@@ -613,7 +613,7 @@ private struct DeckCardBody: View {
 					Button(action: onSave) {
 						Color.clear.frame(width: 86 * u, height: 38 * u)
 					}
-					.buttonStyle(.plain)
+					.buttonStyle(.pressDim)
 					.padding(.top, 2 * u)
 					.padding(.trailing, 6 * u)
 				}
@@ -757,7 +757,7 @@ private struct EndOfDeck: View {
 					.frame(height: 52 * u)
 					.overlay(RoundedRectangle(cornerRadius: 6 * u).strokeBorder(Color(argb: 0x54343B4F), lineWidth: 0.36 * u))
 			}
-			.buttonStyle(.plain)
+			.buttonStyle(.pressDim)
 			Spacer().frame(height: 14 * u)
 			Text("A new deck lands tomorrow with your morning brief.")
 				.font(StakFont.geist(10 * u))
@@ -770,7 +770,7 @@ private struct EndOfDeck: View {
 					.frame(maxWidth: .infinity)
 					.frame(height: 32 * u)
 			}
-			.buttonStyle(.plain)
+			.buttonStyle(.pressDim)
 		}
 		.padding(.horizontal, 20 * u)
 	}
@@ -881,7 +881,7 @@ struct SheetCta: View {
 				.background(discCtaGradient, in: RoundedRectangle(cornerRadius: 6 * u))
 				.overlay(RoundedRectangle(cornerRadius: 6 * u).strokeBorder(Disc.ctaBorder, lineWidth: 0.36 * u))
 		}
-		.buttonStyle(.plain)
+		.buttonStyle(.pressDim)
 	}
 }
 
@@ -902,7 +902,7 @@ struct SheetSecondary: View {
 				.contentShape(Rectangle())
 				.overlay(RoundedRectangle(cornerRadius: 6 * u).strokeBorder(Color(argb: 0x54343B4F), lineWidth: 0.36 * u))
 		}
-		.buttonStyle(.plain)
+		.buttonStyle(.pressDim)
 	}
 }
 
@@ -983,7 +983,7 @@ struct PracticeBuySheet: View {
 											.strokeBorder(sel ? Disc.amountSelBorder : Disc.amountBorder, lineWidth: sel ? 0.5 * u : 1 * u)
 									)
 							}
-							.buttonStyle(.plain)
+							.buttonStyle(.pressDim)
 						}
 					}
 					if selected == 4 {

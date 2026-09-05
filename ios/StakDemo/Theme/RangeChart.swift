@@ -83,7 +83,7 @@ struct RangePills: View {
 							.foregroundStyle(muted)
 					}
 				}
-				.buttonStyle(.plain)
+				.buttonStyle(.pressDim)
 			}
 		}
 	}

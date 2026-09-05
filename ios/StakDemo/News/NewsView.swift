@@ -35,6 +35,8 @@ struct NewsView: View {
 	// Designer's call (2026-08-22): the search icon opens a search bar that
 	// word-matches the news content; empty when nothing matches.
 	@State private var searching = false
+	/// Product audit (2026-09-05): opening search focuses the field and raises the keyboard.
+	@FocusState private var searchFocused: Bool
 	@State private var query = ""
 
 	private var q: String { query.trimmingCharacters(in: .whitespaces) }
@@ -65,6 +67,7 @@ struct NewsView: View {
 				Button {
 					searching.toggle()
 					if !searching { query = "" }
+					if searching { DispatchQueue.main.async { searchFocused = true } }
 				} label: {
 					ZStack {
 						Circle().fill(News.cardBg)
@@ -74,7 +77,7 @@ struct NewsView: View {
 					}
 					.frame(width: 40 * u, height: 40 * u)
 				}
-				.buttonStyle(.plain)
+				.buttonStyle(.pressDim)
 				.accessibilityLabel("Search")
 			}
 			.padding(.horizontal, 20 * u)
@@ -82,6 +85,7 @@ struct NewsView: View {
 
 			if searching {
 				TextField("Search news", text: $query)
+					.focused($searchFocused)
 					.font(StakFont.geist(13 * u))
 					.foregroundStyle(StakColors.textPrimary)
 					.tint(News.teal)
@@ -262,7 +266,7 @@ private struct BriefCard: View {
 			.padding(.bottom, 16 * u)
 			.background(News.teal, in: RoundedRectangle(cornerRadius: 18 * u))
 		}
-		.buttonStyle(.plain)
+		.buttonStyle(.pressDim)
 	}
 }
 
@@ -342,7 +346,7 @@ private struct StoryTile: View {
 			.frame(height: 128 * u)
 			.background(News.cardBg, in: RoundedRectangle(cornerRadius: 12 * u))
 		}
-		.buttonStyle(.plain)
+		.buttonStyle(.pressDim)
 	}
 }
 
@@ -447,7 +451,7 @@ private struct NewsSectionView: View {
 					.frame(height: 84 * u)
 					.background(News.cardBg, in: RoundedRectangle(cornerRadius: 14 * u))
 				}
-				.buttonStyle(.plain)
+				.buttonStyle(.pressDim)
 			}
 		}
 		.frame(maxWidth: .infinity, alignment: .leading)

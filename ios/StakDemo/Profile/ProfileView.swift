@@ -166,7 +166,7 @@ struct ProfileView: View {
 								.frame(height: 48 * u)
 								.contentShape(Rectangle())
 							}
-							.buttonStyle(.plain)
+							.buttonStyle(.pressDim)
 						}
 					}
 					.padding(.vertical, 4 * u)
@@ -189,7 +189,7 @@ struct ProfileView: View {
 							)
 							.contentShape(Rectangle())
 					}
-					.buttonStyle(.plain)
+					.buttonStyle(.pressDim)
 					// 171:1037 authors the auth CTAs' teal drop-shadow stack, but the button
 					// has NO fill and Figma casts shadows from the rendered alpha - the 0.36
 					// hairline at 33% renders nothing (the 2x export is pure #0A1020 under the

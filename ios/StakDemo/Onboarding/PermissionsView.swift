@@ -128,7 +128,7 @@ struct StakToggle: View {
 			}
 			.frame(width: 42 * u, height: 24 * u)
 		}
-		.buttonStyle(.plain)
+		.buttonStyle(.pressDim)
 		.accessibilityAddTraits(.isToggle)
 		.accessibilityValue(isOn ? "On" : "Off")
 	}

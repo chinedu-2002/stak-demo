@@ -70,7 +70,7 @@ struct AuthBackCircle: View {
 			}
 			.frame(width: 40 * u, height: 40 * u)
 		}
-		.buttonStyle(.plain)
+		.buttonStyle(.pressDim)
 		.accessibilityLabel("Back")
 	}
 }
@@ -129,7 +129,7 @@ struct SocialPill: View {
 			.padding(.vertical, 13 * u)
 			.background(Color.white, in: RoundedRectangle(cornerRadius: 24 * u))
 		}
-		.buttonStyle(.plain)
+		.buttonStyle(.pressDim)
 	}
 }
 
@@ -239,7 +239,7 @@ struct ShowHideToggle: View {
 				.font(StakFont.geist(11 * figmaUnit, .medium))
 				.foregroundStyle(Auth.linkTeal)
 		}
-		.buttonStyle(.plain)
+		.buttonStyle(.pressDim)
 	}
 }
 
@@ -278,7 +278,7 @@ struct AuthCta: View {
 						.strokeBorder(StakColors.ctaBorderGradient, lineWidth: 0.36 * u)
 				)
 		}
-		.buttonStyle(.plain)
+		.buttonStyle(.pressDim)
 		// Authored glow (1:873): teal drop shadows cast downward — the
 		// soft wash behind the rows under the button.
 		.background(
@@ -320,7 +320,7 @@ struct AuthSecondaryButton: View {
 				)
 				.contentShape(Rectangle())
 		}
-		.buttonStyle(.plain)
+		.buttonStyle(.pressDim)
 		.padding(.horizontal, 20 * u)
 	}
 }
@@ -342,7 +342,7 @@ struct AuthSwitchRow: View {
 					.font(StakFont.geist(12 * u, .medium))
 					.foregroundStyle(Auth.linkTeal)
 			}
-			.buttonStyle(.plain)
+			.buttonStyle(.pressDim)
 		}
 	}
 }

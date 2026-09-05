@@ -237,7 +237,7 @@ private struct DeckCardBody: View {
 					Button(action: onSave) {
 						Color.clear.frame(width: 86 * u, height: 38 * u)
 					}
-					.buttonStyle(.plain)
+					.buttonStyle(.pressDim)
 					.padding(.top, 2 * u)
 					.padding(.trailing, 6 * u)
 				}

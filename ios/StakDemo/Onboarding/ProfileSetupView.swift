@@ -73,14 +73,14 @@ struct ProfileSetupView: View {
 						}
 						.frame(width: 96 * u, height: 96 * u)
 					}
-					.buttonStyle(.plain)
+					.buttonStyle(.pressDim)
 					.accessibilityLabel(photoData == nil ? "Add a photo" : "Profile photo")
 					Button(action: { showPhotoPicker = true }) {
 						Text("Add a photo")
 							.font(StakFont.geist(12 * u, .medium))
 							.foregroundStyle(Auth.linkTeal)
 					}
-					.buttonStyle(.plain)
+					.buttonStyle(.pressDim)
 				}
 				.frame(maxWidth: .infinity)
 				.padding(.vertical, 6 * u)

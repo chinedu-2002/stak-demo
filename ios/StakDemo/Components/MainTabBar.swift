@@ -75,7 +75,7 @@ struct MainTabBar: View {
 						// Authored: only Tab - Home has a fixed width (34); the rest hug.
 						.frame(width: tab == .home ? 34 * u : nil)
 					}
-					.buttonStyle(.plain)
+					.buttonStyle(.pressDim)
 				}
 			}
 			.offset(x: 0.5 * u)

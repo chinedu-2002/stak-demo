@@ -268,7 +268,7 @@ private struct DetailCta: View {
 				.background(discCtaGradient, in: RoundedRectangle(cornerRadius: 6 * u))
 				.overlay(RoundedRectangle(cornerRadius: 6 * u).strokeBorder(StakColors.ctaBorderGradient, lineWidth: 0.36 * u))
 		}
-		.buttonStyle(.plain)
+		.buttonStyle(.pressDim)
 	}
 }
 
@@ -290,7 +290,7 @@ private struct DetailSecondary: View {
 				.frame(height: 52 * u)
 				.overlay(RoundedRectangle(cornerRadius: 6 * u).strokeBorder(Color(argb: 0x54343B4F), lineWidth: 0.36 * u))
 		}
-		.buttonStyle(.plain)
+		.buttonStyle(.pressDim)
 	}
 }
 

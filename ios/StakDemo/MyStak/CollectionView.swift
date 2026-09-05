@@ -196,7 +196,7 @@ private struct StockTile: View {
 			.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
 			.background(cardBg, in: RoundedRectangle(cornerRadius: 16 * u))
 		}
-		.buttonStyle(.plain)
+		.buttonStyle(.pressDim)
 	}
 }
 
@@ -223,6 +223,6 @@ private struct AddStockTile: View {
 					.stroke(Color(argb: 0xFF2A3346), style: StrokeStyle(lineWidth: 1.5 * u, dash: [6 * u, 5 * u]))
 			)
 		}
-		.buttonStyle(.plain)
+		.buttonStyle(.pressDim)
 	}
 }

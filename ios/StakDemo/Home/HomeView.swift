@@ -204,7 +204,7 @@ private struct TopNav: View {
 					}
 					.frame(width: 35 * u, height: 35 * u)
 				}
-				.buttonStyle(.plain)
+				.buttonStyle(.pressDim)
 				.accessibilityLabel("Profile")
 			}
 			.frame(height: 35 * u)
@@ -556,7 +556,7 @@ private struct FirstRunOverlay: View {
 						)
 					)
 			}
-			.buttonStyle(.plain)
+			.buttonStyle(.pressDim)
 			.padding(.top, 105 * u)
 		}
 		.frame(maxWidth: .infinity)

@@ -71,7 +71,7 @@ struct SettingsLinkRow: View {
 			.frame(height: 48 * u)
 			.contentShape(Rectangle())
 		}
-		.buttonStyle(.plain)
+		.buttonStyle(.pressDim)
 	}
 }
 
@@ -140,7 +140,7 @@ private struct NotificationSettingsView: View {
 							.font(StakFont.geist(13 * u, .medium))
 							.foregroundStyle(teal)
 					}
-					.buttonStyle(.plain)
+					.buttonStyle(.pressDim)
 				}
 				.frame(maxWidth: .infinity, alignment: .leading)
 				.padding(16 * u)
@@ -187,7 +187,7 @@ private struct AppearanceView: View {
 						.frame(height: 48 * u)
 						.contentShape(Rectangle())
 					}
-					.buttonStyle(.plain)
+					.buttonStyle(.pressDim)
 				}
 			}
 			.padding(.vertical, 4 * u)
@@ -236,7 +236,7 @@ private struct LinkedRow: View {
 					.font(StakFont.geist(13 * u, .medium))
 					.foregroundStyle(teal)
 			}
-			.buttonStyle(.plain)
+			.buttonStyle(.pressDim)
 		}
 		.padding(.horizontal, 14 * u)
 		.frame(height: 48 * u)
@@ -288,7 +288,7 @@ private struct FaqRow: View {
 				.frame(height: 48 * u)
 				.contentShape(Rectangle())
 			}
-			.buttonStyle(.plain)
+			.buttonStyle(.pressDim)
 			if open {
 				Text(answer)
 					.font(StakFont.geist(12 * u))
@@ -354,7 +354,7 @@ struct RiskStyleSheet: View {
 					.overlay(RoundedRectangle(cornerRadius: 12 * u).strokeBorder(selected ? Color(argb: 0x8069B3CA) : Color(argb: 0x1AFFFFFF), lineWidth: 1 * u))
 					.contentShape(Rectangle())
 				}
-				.buttonStyle(.plain)
+				.buttonStyle(.pressDim)
 			}
 		}
 		.padding(.horizontal, 20 * u)

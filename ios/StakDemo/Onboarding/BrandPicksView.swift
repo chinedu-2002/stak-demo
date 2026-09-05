@@ -147,6 +147,6 @@ private struct BrandTile: View {
 				}
 			}
 		}
-		.buttonStyle(.plain)
+		.buttonStyle(.pressDim)
 	}
 }

@@ -122,7 +122,7 @@ struct MyStakView: View {
 					.strokeBorder(StakColors.ctaBorderGradient, lineWidth: 0.36 * u)
 			)
 		}
-		.buttonStyle(.plain)
+		.buttonStyle(.pressDim)
 	}
 
 	/// Your read insight card.
@@ -187,7 +187,7 @@ struct MyStakView: View {
 			.padding(18 * u)
 			.background(teal, in: RoundedRectangle(cornerRadius: 16 * u))
 		}
-		.buttonStyle(.plain)
+		.buttonStyle(.pressDim)
 	}
 }
 
@@ -245,7 +245,7 @@ private struct CollectionChip: View {
 			.padding(12 * u)
 			.background(cardBg, in: RoundedRectangle(cornerRadius: 12 * u))
 		}
-		.buttonStyle(.plain)
+		.buttonStyle(.pressDim)
 	}
 }
 

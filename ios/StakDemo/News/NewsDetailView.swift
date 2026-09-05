@@ -100,7 +100,7 @@ struct NewsDetailView: View {
 							.resizable()
 							.frame(width: 24 * u, height: 24 * u)
 					}
-					.buttonStyle(.plain)
+					.buttonStyle(.pressDim)
 					.accessibilityLabel("Share")
 				}
 				.padding(.leading, 16 * u)
@@ -328,7 +328,7 @@ private struct HeroImage: View {
 							.frame(width: 59.92 * u, height: 53.75 * u)
 							.rotationEffect(.degrees(90))
 					}
-					.buttonStyle(.plain)
+					.buttonStyle(.pressDim)
 					// 1:1522: the polygon sits 8.64%/25% inset in its 81 box, so the rotated
 					// glyph's centre is 6.63 right of the box centre - exact-design audit 2026-09-04.
 					.offset(x: 6.13 * u, y: 12.5 * u)
@@ -382,7 +382,7 @@ private struct HeroImage: View {
 							.resizable()
 							.frame(width: 17.79 * u, height: 18.27 * u)
 					}
-					.buttonStyle(.plain)
+					.buttonStyle(.pressDim)
 					.padding(.top, 8 * u)
 					// 1:1523 sits at x 330.77 in the 360 hero: 11.44 from the right - exact-design audit 2026-09-04.
 					.padding(.trailing, 11.44 * u)
@@ -472,7 +472,7 @@ private struct AddToStakButton: View {
 					.strokeBorder(ctaBorder, lineWidth: 0.36 * u)
 			)
 		}
-		.buttonStyle(.plain)
+		.buttonStyle(.pressDim)
 	}
 }
 
@@ -810,7 +810,7 @@ private struct ReadNext: View {
 					.frame(height: 84 * u)
 					.background(News.cardBg, in: RoundedRectangle(cornerRadius: 14 * u))
 				}
-				.buttonStyle(.plain)
+				.buttonStyle(.pressDim)
 			}
 		}
 		.padding(.top, 6 * u)
@@ -889,7 +889,7 @@ private struct SaveSuccessOverlay: View {
 									.strokeBorder(ctaBorder, lineWidth: 0.36 * u)
 							)
 					}
-					.buttonStyle(.plain)
+					.buttonStyle(.pressDim)
 					Button(action: onDismiss) {
 						Text("Back")
 							.font(StakFont.sora(14 * u))
@@ -902,7 +902,7 @@ private struct SaveSuccessOverlay: View {
 							)
 							.contentShape(Rectangle())
 					}
-					.buttonStyle(.plain)
+					.buttonStyle(.pressDim)
 				}
 			}
 			.padding(.horizontal, 20 * u)

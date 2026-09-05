@@ -66,7 +66,7 @@ struct SignInView: View {
 								.font(StakFont.geist(12 * u, .medium))
 								.foregroundStyle(Auth.linkTeal)
 						}
-						.buttonStyle(.plain)
+						.buttonStyle(.pressDim)
 					}
 					.frame(maxWidth: .infinity, alignment: .leading)
 					.padding(.horizontal, 24 * u)

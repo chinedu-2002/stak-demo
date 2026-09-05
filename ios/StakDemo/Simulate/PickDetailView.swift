@@ -225,7 +225,7 @@ struct PickDetailView: View {
 									.overlay(RoundedRectangle(cornerRadius: 6 * u).strokeBorder(Sim.ctaBorder, lineWidth: 0.361 * u))
 									.tealShadow(dy: 12.285, blur: 12.285, alpha: 0.04)
 							}
-							.buttonStyle(.plain)
+							.buttonStyle(.pressDim)
 						}
 						Button(action: onBack) {
 							Text("Back")
@@ -238,7 +238,7 @@ struct PickDetailView: View {
 										.strokeBorder(Color(argb: 0x54343B4F), lineWidth: 0.36 * u)
 								)
 						}
-						.buttonStyle(.plain)
+						.buttonStyle(.pressDim)
 					}
 					.padding(.horizontal, 20 * u)
 					.padding(.top, 6 * u)

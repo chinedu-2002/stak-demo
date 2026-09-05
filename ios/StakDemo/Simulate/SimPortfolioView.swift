@@ -155,7 +155,7 @@ private struct SellPill: View {
 						.strokeBorder(Color(argb: 0x24FFFFFF), lineWidth: 1 * u)
 				)
 		}
-		.buttonStyle(.plain)
+		.buttonStyle(.pressDim)
 	}
 }
 
@@ -323,7 +323,7 @@ struct SellConfirmSheet: View {
 											)
 									)
 							}
-							.buttonStyle(.plain)
+							.buttonStyle(.pressDim)
 						}
 					}
 					// 1:4861 (exact-design audit 2026-09-04): the three runs share one baseline.
@@ -354,7 +354,7 @@ struct SellConfirmSheet: View {
 							.overlay(RoundedRectangle(cornerRadius: 6 * u).strokeBorder(Sim.ctaBorder, lineWidth: 0.361 * u))
 							.tealShadow(dy: 12.285, blur: 12.285, alpha: 0.04)
 					}
-					.buttonStyle(.plain)
+					.buttonStyle(.pressDim)
 					SimSheetSecondary(text: "Back", action: onDismiss)
 				}
 			}
@@ -382,7 +382,7 @@ private struct SimSheetSecondary: View {
 						.strokeBorder(Color(argb: 0x54343B4F), lineWidth: 0.36 * u)
 				)
 		}
-		.buttonStyle(.plain)
+		.buttonStyle(.pressDim)
 	}
 }
 
@@ -454,7 +454,7 @@ struct PositionClosedSheet: View {
 							.tealShadow(dy: 28.183, blur: 16.62, alpha: 0.03)
 							.tealShadow(dy: 49.862, blur: 19.512, alpha: 0.01)
 					}
-					.buttonStyle(.plain)
+					.buttonStyle(.pressDim)
 					SimSheetSecondary(text: "View portfolio", action: onViewPortfolio)
 				}
 			}

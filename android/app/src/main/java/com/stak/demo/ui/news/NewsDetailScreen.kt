@@ -216,7 +216,7 @@ fun NewsDetailScreen(articleId: String = NewsArticleFeed.APPLE, onBack: () -> Un
 						.size((24 * u).dp)
 						.clickable(
 							interactionSource = remember { MutableInteractionSource() },
-							indication = null,
+							indication = com.stak.demo.ui.theme.PressDim,
 						) {
 							val send = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
 								type = "text/plain"
@@ -625,7 +625,7 @@ private fun HeroImage(media: NewsMedia, category: String, saved: Boolean, player
 					.size((17.79 * u).dp, (18.27 * u).dp)
 					.clickable(
 						interactionSource = remember { MutableInteractionSource() },
-						indication = null,
+						indication = com.stak.demo.ui.theme.PressDim,
 						onClick = onBookmark,
 					),
 			)
@@ -680,7 +680,7 @@ private fun AddToStakButton(onClick: () -> Unit) {
 			.border((0.36 * u).dp, CtaBorder, RoundedCornerShape((6 * u).dp))
 			.clickable(
 				interactionSource = remember { MutableInteractionSource() },
-				indication = null,
+				indication = com.stak.demo.ui.theme.PressDim,
 				onClick = onClick,
 			),
 	) {
@@ -1023,7 +1023,7 @@ private fun ReadNext(currentId: String, onOpen: (String) -> Unit) {
 					.background(News.CardBg)
 					.clickable(
 						interactionSource = remember { MutableInteractionSource() },
-						indication = null,
+						indication = com.stak.demo.ui.theme.PressDim,
 						onClick = { onOpen(next.id) },
 					)
 					.padding((12 * u).dp),
@@ -1152,7 +1152,7 @@ private fun SaveSuccessOverlay(facts: NewsArticleFeed.StockFacts, onViewInMyStak
 						.border((0.36 * u).dp, CtaBorder, RoundedCornerShape((6 * u).dp))
 						.clickable(
 							interactionSource = remember { MutableInteractionSource() },
-							indication = null,
+							indication = com.stak.demo.ui.theme.PressDim,
 							onClick = onViewInMyStak,
 						),
 				) {
@@ -1170,7 +1170,7 @@ private fun SaveSuccessOverlay(facts: NewsArticleFeed.StockFacts, onViewInMyStak
 						.border((0.36 * u).dp, Color(0x54343B4F), RoundedCornerShape((6 * u).dp))
 						.clickable(
 							interactionSource = remember { MutableInteractionSource() },
-							indication = null,
+							indication = com.stak.demo.ui.theme.PressDim,
 							onClick = onDismiss,
 						),
 				) {
@@ -1757,7 +1757,7 @@ private fun ControlGlyph(
 			.size((size * u).dp)
 			.clickable(
 				interactionSource = remember { MutableInteractionSource() },
-				indication = null,
+				indication = com.stak.demo.ui.theme.PressDim,
 			) { onTap() },
 	)
 }
@@ -1869,7 +1869,7 @@ private fun PipPlaceholder(u: Float, modifier: Modifier = Modifier, onTap: () ->
 			.background(Color(0xFF0E1424))
 			.clickable(
 				interactionSource = remember { MutableInteractionSource() },
-				indication = null,
+				indication = com.stak.demo.ui.theme.PressDim,
 			) { onTap() },
 	) {
 		Column(
@@ -2008,7 +2008,7 @@ private fun MiniGlyph(
 			.background(Color(0x73000000), CircleShape)
 			.clickable(
 				interactionSource = remember { MutableInteractionSource() },
-				indication = null,
+				indication = com.stak.demo.ui.theme.PressDim,
 			) { onTap() },
 	) {
 		Icon(
@@ -2189,7 +2189,7 @@ private fun SheetRow(
 			.height((56 * u).dp)
 			.clickable(
 				interactionSource = remember { MutableInteractionSource() },
-				indication = null,
+				indication = com.stak.demo.ui.theme.PressDim,
 			) { onClick() }
 			.padding(horizontal = (20 * u).dp),
 	) {
@@ -2236,7 +2236,7 @@ private fun SheetHeader(title: String, u: Float, onBack: () -> Unit) {
 			.height((44 * u).dp)
 			.clickable(
 				interactionSource = remember { MutableInteractionSource() },
-				indication = null,
+				indication = com.stak.demo.ui.theme.PressDim,
 			) { onBack() }
 			.padding(horizontal = (20 * u).dp),
 	) {

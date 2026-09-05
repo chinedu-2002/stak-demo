@@ -191,7 +191,7 @@ private fun StockTile(stock: CollStock, onClick: (() -> Unit)?, modifier: Modifi
 			.clip(RoundedCornerShape((16 * u).dp))
 			.background(CardBg)
 			.then(
-				if (onClick != null) Modifier.clickable(interactionSource = interaction, indication = null, onClick = onClick) else Modifier,
+				if (onClick != null) Modifier.clickable(interactionSource = interaction, indication = com.stak.demo.ui.theme.PressDim, onClick = onClick) else Modifier,
 			)
 			.padding((14 * u).dp),
 	) {
@@ -248,7 +248,7 @@ private fun AddStockTile(onClick: () -> Unit, modifier: Modifier = Modifier) {
 			}
 			.clickable(
 				interactionSource = remember { MutableInteractionSource() },
-				indication = null,
+				indication = com.stak.demo.ui.theme.PressDim,
 				onClick = onClick,
 			)
 			.padding((14 * u).dp),

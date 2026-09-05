@@ -154,7 +154,7 @@ private fun MatrixCard(option: MatrixOption, selected: Boolean, onClick: () -> U
 			.then(if (selected) Modifier.border((0.53 * u).dp, Auth.LinkTeal, shape) else Modifier)
 			.clickable(
 				interactionSource = remember { MutableInteractionSource() },
-				indication = null,
+				indication = com.stak.demo.ui.theme.PressDim,
 				onClick = onClick,
 			)
 			.padding(horizontal = (14.74 * u).dp, vertical = (15.27 * u).dp),

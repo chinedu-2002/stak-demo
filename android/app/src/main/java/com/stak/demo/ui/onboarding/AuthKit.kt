@@ -128,7 +128,7 @@ internal fun AuthBackCircle(onClick: () -> Unit, modifier: Modifier = Modifier) 
 			.background(Auth.NavCircle, CircleShape)
 			.clickable(
 				interactionSource = remember { MutableInteractionSource() },
-				indication = null,
+				indication = com.stak.demo.ui.theme.PressDim,
 				onClick = onClick,
 			),
 		contentAlignment = Alignment.Center,
@@ -266,7 +266,7 @@ internal fun ShowHideToggle(shown: Boolean, onToggle: () -> Unit) {
 		color = Auth.LinkTeal,
 		modifier = Modifier.clickable(
 			interactionSource = remember { MutableInteractionSource() },
-			indication = null,
+			indication = com.stak.demo.ui.theme.PressDim,
 			onClick = onToggle,
 		),
 	)
@@ -359,7 +359,7 @@ internal fun AuthSwitchRow(prefix: String, link: String, onClick: () -> Unit) {
 			color = Auth.LinkTeal,
 			modifier = Modifier.clickable(
 				interactionSource = remember { MutableInteractionSource() },
-				indication = null,
+				indication = com.stak.demo.ui.theme.PressDim,
 				onClick = onClick,
 			),
 		)

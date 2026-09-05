@@ -77,7 +77,7 @@ fun MainTabBar(selected: MainTab, onSelect: (MainTab) -> Unit) {
 					// Authored: only Tab - Home has a fixed width (34); the rest hug.
 					modifier = (if (tab == MainTab.Home) Modifier.width((34 * u).dp) else Modifier).clickable(
 						interactionSource = remember { MutableInteractionSource() },
-						indication = null,
+						indication = com.stak.demo.ui.theme.PressDim,
 					) { onSelect(tab) },
 				) {
 					Image(

@@ -138,7 +138,7 @@ fun ProfileSetupScreen(onBack: () -> Unit, onProceed: () -> Unit) {
 						.clip(CircleShape)
 						.clickable(
 							interactionSource = remember { MutableInteractionSource() },
-							indication = null,
+							indication = com.stak.demo.ui.theme.PressDim,
 							onClick = { pickPhoto.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
 						),
 					contentAlignment = Alignment.Center,
@@ -165,7 +165,7 @@ fun ProfileSetupScreen(onBack: () -> Unit, onProceed: () -> Unit) {
 					color = Auth.LinkTeal,
 					modifier = Modifier.clickable(
 						interactionSource = remember { MutableInteractionSource() },
-						indication = null,
+						indication = com.stak.demo.ui.theme.PressDim,
 						onClick = { pickPhoto.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
 					),
 				)

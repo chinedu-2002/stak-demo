@@ -32,6 +32,8 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -111,7 +113,7 @@ fun NewsScreen(onOpenArticle: (String) -> Unit) {
 					.background(News.CardBg, CircleShape)
 					.clickable(
 						interactionSource = remember { MutableInteractionSource() },
-						indication = null,
+						indication = com.stak.demo.ui.theme.PressDim,
 					) {
 						searching = !searching
 						if (!searching) query = ""
@@ -122,6 +124,16 @@ fun NewsScreen(onOpenArticle: (String) -> Unit) {
 					contentDescription = "Search",
 					modifier = Modifier.size((20 * u).dp),
 				)
+			}
+		}
+		// Product audit (2026-09-05): opening search focuses the field and raises
+		// the keyboard, so the tap on the glass is enough to start typing.
+		val searchFocus = remember { androidx.compose.ui.focus.FocusRequester() }
+		val keyboard = androidx.compose.ui.platform.LocalSoftwareKeyboardController.current
+		LaunchedEffect(searching) {
+			if (searching) {
+				searchFocus.requestFocus()
+				keyboard?.show()
 			}
 		}
 		if (searching) {
@@ -143,7 +155,7 @@ fun NewsScreen(onOpenArticle: (String) -> Unit) {
 						inner()
 					}
 				},
-				modifier = Modifier
+				modifier = Modifier.focusRequester(searchFocus)
 					.fillMaxWidth()
 					.padding(horizontal = (20 * u).dp)
 					.padding(top = (12 * u).dp)
@@ -284,7 +296,7 @@ private fun BriefCard(brief: NewsBriefFeed.Brief, onRead: () -> Unit) {
 			.background(News.Teal)
 			.clickable(
 				interactionSource = remember { MutableInteractionSource() },
-				indication = null,
+				indication = com.stak.demo.ui.theme.PressDim,
 				onClick = onRead,
 			)
 			.padding(start = (18 * u).dp, end = (18 * u).dp, top = (18 * u).dp, bottom = (16 * u).dp),
@@ -387,7 +399,7 @@ private fun StoryTile(tag: String, tagWeight: FontWeight, headline: String, sour
 			.background(News.CardBg)
 			.clickable(
 				interactionSource = remember { MutableInteractionSource() },
-				indication = null,
+				indication = com.stak.demo.ui.theme.PressDim,
 				onClick = onClick,
 			)
 			.padding((14 * u).dp),
@@ -455,7 +467,7 @@ private fun NewsSection(
 					.background(News.CardBg)
 					.clickable(
 						interactionSource = remember { MutableInteractionSource() },
-						indication = null,
+						indication = com.stak.demo.ui.theme.PressDim,
 						onClick = { onOpen(row.id) },
 					)
 					.padding((12 * u).dp),

@@ -555,7 +555,7 @@ internal fun DiscoverScreen(
 							}
 							.clickable(
 								interactionSource = remember { MutableInteractionSource() },
-								indication = null,
+								indication = com.stak.demo.ui.theme.PressDim,
 								onClick = { onLearnMore(frontCard.symbol) },
 							),
 					)
@@ -611,7 +611,7 @@ internal fun DiscoverScreen(
 							.border((0.36 * u).dp, CtaBorder, RoundedCornerShape((6 * u).dp))
 							.clickable(
 								interactionSource = remember { MutableInteractionSource() },
-								indication = null,
+								indication = com.stak.demo.ui.theme.PressDim,
 							) { onPracticeBuy(buySpecFor(frontCard.symbol)) },
 					) {
 						Text(
@@ -628,7 +628,7 @@ internal fun DiscoverScreen(
 							.border((0.36 * u).dp, Color(0x54343B4F), RoundedCornerShape((6 * u).dp))
 							.clickable(
 								interactionSource = remember { MutableInteractionSource() },
-								indication = null,
+								indication = com.stak.demo.ui.theme.PressDim,
 								onClick = { onLearnMore(frontCard.symbol) },
 							),
 					) {
@@ -778,7 +778,7 @@ private fun DeckCardBody(card: DeckCard, onSave: (() -> Unit)?, u: Float, rows: 
 						.size((86 * u).dp, (38 * u).dp)
 						.clickable(
 							interactionSource = remember { MutableInteractionSource() },
-							indication = null,
+							indication = com.stak.demo.ui.theme.PressDim,
 							onClick = onSave,
 						),
 				)
@@ -988,7 +988,7 @@ private fun SheetCta(text: String, onClick: () -> Unit) {
 			.border((0.36 * u).dp, CtaBorder, RoundedCornerShape((6 * u).dp))
 			.clickable(
 				interactionSource = remember { MutableInteractionSource() },
-				indication = null,
+				indication = com.stak.demo.ui.theme.PressDim,
 				onClick = onClick,
 			),
 	) {
@@ -1013,7 +1013,7 @@ private fun SheetSecondary(text: String, onClick: () -> Unit) {
 			.border((0.36 * u).dp, Color(0x54343B4F), RoundedCornerShape((6 * u).dp))
 			.clickable(
 				interactionSource = remember { MutableInteractionSource() },
-				indication = null,
+				indication = com.stak.demo.ui.theme.PressDim,
 				onClick = onClick,
 			),
 	) {
@@ -1090,7 +1090,7 @@ private fun PracticeBuyContent(
 							)
 							.clickable(
 								interactionSource = remember { MutableInteractionSource() },
-								indication = null,
+								indication = com.stak.demo.ui.theme.PressDim,
 							) {
 								selected = i
 								// Custom re-applies whatever valid amount its field already
@@ -1332,7 +1332,7 @@ private fun EndOfDeck(seen: Int, saved: Int, bought: Int, onPracticeBuySaves: ()
 				.border((0.36 * u).dp, Color(0x54343B4F), RoundedCornerShape((6 * u).dp))
 				.clickable(
 					interactionSource = remember { MutableInteractionSource() },
-					indication = null,
+					indication = com.stak.demo.ui.theme.PressDim,
 					// B4 (1:2330 Motion): Review saves -> the My STAK tab, Instant.
 					onClick = onReviewSaves,
 				),
@@ -1358,7 +1358,7 @@ private fun EndOfDeck(seen: Int, saved: Int, bought: Int, onPracticeBuySaves: ()
 				.clip(RoundedCornerShape((14 * u).dp))
 				.clickable(
 					interactionSource = remember { MutableInteractionSource() },
-					indication = null,
+					indication = com.stak.demo.ui.theme.PressDim,
 					onClick = onSwipeAgain,
 				),
 		) {

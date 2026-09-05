@@ -213,7 +213,7 @@ fun ProfileScreen(onBack: () -> Unit, onLogOut: () -> Unit = {}, onOpenSetting: 
 							.height((48 * u).dp)
 							.clickable(
 								interactionSource = remember { MutableInteractionSource() },
-								indication = null,
+								indication = com.stak.demo.ui.theme.PressDim,
 							) { onOpenSetting(kind) }
 							.padding(horizontal = (14 * u).dp),
 					) {
@@ -245,7 +245,7 @@ fun ProfileScreen(onBack: () -> Unit, onLogOut: () -> Unit = {}, onOpenSetting: 
 					.border((0.36 * u).dp, Color(0x54343B4F), RoundedCornerShape((6 * u).dp))
 					.clickable(
 						interactionSource = remember { MutableInteractionSource() },
-						indication = null,
+						indication = com.stak.demo.ui.theme.PressDim,
 					) { onLogOut() },
 			) {
 				Text(

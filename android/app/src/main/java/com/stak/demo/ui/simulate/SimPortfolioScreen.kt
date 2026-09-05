@@ -217,7 +217,7 @@ private fun SellPill(onClick: () -> Unit) {
 			.border((1 * u).dp, Color(0x24FFFFFF), RoundedCornerShape((6 * u).dp))
 			.clickable(
 				interactionSource = remember { MutableInteractionSource() },
-				indication = null,
+				indication = com.stak.demo.ui.theme.PressDim,
 				onClick = onClick,
 			),
 	) {
@@ -273,7 +273,7 @@ private fun SimSheet(onDismiss: () -> Unit, content: @Composable () -> Unit) {
 				.background(Color(0x9E02050E))
 				.clickable(
 					interactionSource = remember { MutableInteractionSource() },
-					indication = null,
+					indication = com.stak.demo.ui.theme.PressDim,
 					onClick = onDismiss,
 				),
 		)
@@ -373,7 +373,7 @@ private fun SellConfirmContent(pick: PickSpec, onConfirm: () -> Unit, onDismiss:
 							)
 							.clickable(
 								interactionSource = remember { MutableInteractionSource() },
-								indication = null,
+								indication = com.stak.demo.ui.theme.PressDim,
 							) { mode = i }
 							.padding(vertical = (8 * u).dp),
 					) {
@@ -413,7 +413,7 @@ private fun SellConfirmContent(pick: PickSpec, onConfirm: () -> Unit, onDismiss:
 					.border((0.361 * u).dp, Sim.CtaBorder, RoundedCornerShape((6 * u).dp))
 					.clickable(
 						interactionSource = remember { MutableInteractionSource() },
-						indication = null,
+						indication = com.stak.demo.ui.theme.PressDim,
 						onClick = onConfirm,
 					),
 			) {
@@ -432,7 +432,7 @@ private fun SellConfirmContent(pick: PickSpec, onConfirm: () -> Unit, onDismiss:
 					.border((0.361 * u).dp, Color(0x54343B4F), RoundedCornerShape((6 * u).dp))
 					.clickable(
 						interactionSource = remember { MutableInteractionSource() },
-						indication = null,
+						indication = com.stak.demo.ui.theme.PressDim,
 						onClick = onDismiss,
 					),
 			) {
@@ -512,7 +512,7 @@ private fun PositionClosedContent(pick: PickSpec, onBackToSimulate: () -> Unit, 
 					.border((0.361 * u).dp, Sim.CtaBorder, RoundedCornerShape((6 * u).dp))
 					.clickable(
 						interactionSource = remember { MutableInteractionSource() },
-						indication = null,
+						indication = com.stak.demo.ui.theme.PressDim,
 						onClick = onBackToSimulate,
 					),
 			) {
@@ -531,7 +531,7 @@ private fun PositionClosedContent(pick: PickSpec, onBackToSimulate: () -> Unit, 
 					.border((0.361 * u).dp, Color(0x54343B4F), RoundedCornerShape((6 * u).dp))
 					.clickable(
 						interactionSource = remember { MutableInteractionSource() },
-						indication = null,
+						indication = com.stak.demo.ui.theme.PressDim,
 						onClick = onViewPortfolio,
 					),
 			) {

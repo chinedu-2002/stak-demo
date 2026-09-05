@@ -168,7 +168,7 @@ internal fun SimulateScreen(
 						.background(Sim.CardBg, CircleShape)
 						.clickable(
 							interactionSource = remember { MutableInteractionSource() },
-							indication = null,
+							indication = com.stak.demo.ui.theme.PressDim,
 							onClick = onOpenPortfolio,
 						),
 				) {
@@ -249,7 +249,7 @@ internal fun SimulateScreen(
 							horizontalArrangement = Arrangement.spacedBy((5 * u).dp),
 							modifier = Modifier.clickable(
 								interactionSource = remember { MutableInteractionSource() },
-								indication = null,
+								indication = com.stak.demo.ui.theme.PressDim,
 								onClick = onOpenPortfolio,
 							),
 						) {
@@ -339,7 +339,7 @@ internal fun EmptyStateCard(title: String, body: String, link: String? = null, o
 				color = Sim.Teal,
 				modifier = Modifier
 					.padding(top = (4 * u).dp)
-					.clickable(interactionSource = remember { MutableInteractionSource() }, indication = null, onClick = onLink),
+					.clickable(interactionSource = remember { MutableInteractionSource() }, indication = com.stak.demo.ui.theme.PressDim, onClick = onLink),
 			)
 		}
 	}
@@ -417,7 +417,7 @@ private fun ScoreHero(onOpenLeaderboard: () -> Unit) {
 				.background(Sim.TealTint)
 				.clickable(
 					interactionSource = remember { MutableInteractionSource() },
-					indication = null,
+					indication = com.stak.demo.ui.theme.PressDim,
 					onClick = onOpenLeaderboard,
 				)
 				.padding(horizontal = (11 * u).dp, vertical = (6 * u).dp),
@@ -450,7 +450,7 @@ private fun ScoreHero(onOpenLeaderboard: () -> Unit) {
 			listOf("1D", "1W", "1M", "3M", "YTD", "1Y").forEach { label ->
 				val select = Modifier.clickable(
 					interactionSource = remember { MutableInteractionSource() },
-					indication = null,
+					indication = com.stak.demo.ui.theme.PressDim,
 				) { range = label }
 				if (label == range) {
 					Box(
@@ -518,7 +518,7 @@ internal fun BuyPill(text: String = "Buy", onClick: () -> Unit) {
 			.border((0.36 * u).dp, Sim.CtaBorder, RoundedCornerShape((6 * u).dp))
 			.clickable(
 				interactionSource = remember { MutableInteractionSource() },
-				indication = null,
+				indication = com.stak.demo.ui.theme.PressDim,
 				onClick = onClick,
 			),
 	) {
@@ -542,7 +542,7 @@ internal fun CenterLink(text: String, centered: Boolean = true, onClick: () -> U
 			.then(if (centered) Modifier.fillMaxWidth() else Modifier)
 			.clickable(
 				interactionSource = remember { MutableInteractionSource() },
-				indication = null,
+				indication = com.stak.demo.ui.theme.PressDim,
 				onClick = onClick,
 			),
 	) {
@@ -592,7 +592,7 @@ private fun PickDuo(
 			.background(Sim.CardBg)
 			.clickable(
 				interactionSource = remember { MutableInteractionSource() },
-				indication = null,
+				indication = com.stak.demo.ui.theme.PressDim,
 				onClick = onClick,
 			)
 			.padding((14 * u).dp),
@@ -674,7 +674,7 @@ internal fun PortfolioRow(
 			.background(Sim.CardBg)
 			.clickable(
 				interactionSource = remember { MutableInteractionSource() },
-				indication = null,
+				indication = com.stak.demo.ui.theme.PressDim,
 				onClick = onClick,
 			)
 			.padding(horizontal = (14 * u).dp, vertical = (12 * u).dp),

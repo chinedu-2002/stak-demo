@@ -166,7 +166,7 @@ private fun TopNav(onProfile: () -> Unit, onBell: () -> Unit = {}, modifier: Mod
 					.size((35 * u).dp)
 					.clickable(
 						interactionSource = remember { MutableInteractionSource() },
-						indication = null,
+						indication = com.stak.demo.ui.theme.PressDim,
 					) { onBell() },
 			) {
 				Image(
@@ -191,7 +191,7 @@ private fun TopNav(onProfile: () -> Unit, onBell: () -> Unit = {}, modifier: Mod
 					.background(Home.NavCircle, CircleShape)
 					.clickable(
 						interactionSource = remember { MutableInteractionSource() },
-						indication = null,
+						indication = com.stak.demo.ui.theme.PressDim,
 						onClick = onProfile,
 					),
 			) {
@@ -246,7 +246,7 @@ private fun MarketMoodCard(onOpenNews: () -> Unit) {
 			.clip(RoundedCornerShape((8 * u).dp))
 			.clickable(
 				interactionSource = remember { MutableInteractionSource() },
-				indication = null,
+				indication = com.stak.demo.ui.theme.PressDim,
 				onClick = onOpenNews,
 			)
 			.background(Home.CardBg),
@@ -489,7 +489,7 @@ private fun WhyThisMattersCard(onOpenMyStak: () -> Unit) {
 			// reaches the card edges, only transparent padding overhangs.
 			.clickable(
 				interactionSource = remember { MutableInteractionSource() },
-				indication = null,
+				indication = com.stak.demo.ui.theme.PressDim,
 				onClick = onOpenMyStak,
 			)
 			.background(Home.CardBg, RoundedCornerShape((8 * u).dp)),
@@ -539,7 +539,7 @@ private fun DeckBanner(onOpenDeck: () -> Unit) {
 			.clip(RoundedCornerShape((8 * u).dp))
 			.clickable(
 				interactionSource = remember { MutableInteractionSource() },
-				indication = null,
+				indication = com.stak.demo.ui.theme.PressDim,
 				onClick = onOpenDeck,
 			)
 			.background(Home.Teal),
@@ -640,7 +640,7 @@ private fun FirstRunOverlay(onSeeTodaysPick: () -> Unit, modifier: Modifier = Mo
 				)
 				.clickable(
 					interactionSource = remember { MutableInteractionSource() },
-					indication = null,
+					indication = com.stak.demo.ui.theme.PressDim,
 					onClick = onSeeTodaysPick,
 				),
 		) {

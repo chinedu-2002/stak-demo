@@ -4,7 +4,6 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
@@ -32,7 +31,12 @@ internal val RANGE_SERIES: Map<String, List<Float>> = mapOf(
 	"1Y" to listOf(0.15f, 0.22f, 0.30f, 0.26f, 0.40f, 0.36f, 0.50f, 0.55f, 0.48f, 0.62f, 0.70f, 0.82f),
 )
 
-/** A range's line: `tint` 2-wide round stroke over a 22%-to-clear `tint` fill, in the caller's box. */
+/**
+ * A range's line: a `tint` 2-wide round stroke in the caller's box and
+ * nothing else - every authored "Chart line" (1:3245, 1:3936, 1:2409,
+ * 1:4664) is a bare #69B3CA 2 stroke with no fill (user, 2026-09-05: "was
+ * there a gradient?" - there was not; the old fill came from a stand-in).
+ */
 @Composable
 internal fun RangeChart(series: List<Float>, tint: Color, modifier: Modifier) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
@@ -45,13 +49,6 @@ internal fun RangeChart(series: List<Float>, tint: Color, modifier: Modifier) {
 			moveTo(points.first().x, points.first().y)
 			points.drop(1).forEach { lineTo(it.x, it.y) }
 		}
-		val fill = Path().apply {
-			addPath(line)
-			lineTo(points.last().x, h)
-			lineTo(points.first().x, h)
-			close()
-		}
-		drawPath(fill, Brush.verticalGradient(0f to tint.copy(alpha = 0.22f), 1f to Color.Transparent, startY = 0f, endY = h))
 		drawPath(line, tint, style = Stroke(width = (2 * u).dp.toPx(), cap = StrokeCap.Round, join = StrokeJoin.Round))
 	}
 }

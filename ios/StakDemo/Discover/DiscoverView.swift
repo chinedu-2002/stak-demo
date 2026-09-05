@@ -447,23 +447,29 @@ struct DiscoverView: View {
 				}
 			}
 
-			// Saved toast (frame 1:1796) — centered pill under the header.
+			// Saved toast (frame 1:1796) - the pill sits at the authored x 111
+			// (1:1965: x111 y122 w160), 4 left of the screen centre, not centred
+			// (Android band-diff vs the 2x export, 2026-09-04; mirrors android).
 			if savedToast {
 				VStack {
-					// Toast 1:1965 authors rgba(36,43,61,0.48), r18, px16 py11, gap 9
-					// and a 17 bookmark (1:1966) - exact-design audit 2026-09-04.
-					HStack(spacing: 9 * u) {
-						Image("IcSavedBookmark")
-							.resizable()
-							.frame(width: 17 * u, height: 17 * u)
-						Text("Saved to My STAK")
-							.font(StakFont.geist(12 * u, .medium))
-							.foregroundStyle(Color.white)
+					HStack(spacing: 0) {
+						// Toast 1:1965 authors rgba(36,43,61,0.48), r18, px16 py11, gap 9
+						// and a 17 bookmark (1:1966) - exact-design audit 2026-09-04.
+						HStack(spacing: 9 * u) {
+							Image("IcSavedBookmark")
+								.resizable()
+								.frame(width: 17 * u, height: 17 * u)
+							Text("Saved to My STAK")
+								.font(StakFont.geist(12 * u, .medium))
+								.foregroundStyle(Color.white)
+						}
+						.padding(.horizontal, 16 * u)
+						.frame(height: 39 * u)
+						// Authored (1:1796): translucent pill — the peek slab shows through.
+						.background(Disc.chipBg.opacity(0.48), in: RoundedRectangle(cornerRadius: 18 * u))
+						Spacer(minLength: 0)
 					}
-					.padding(.horizontal, 16 * u)
-					.frame(height: 39 * u)
-					// Authored (1:1796): translucent pill — the peek slab shows through.
-					.background(Disc.chipBg.opacity(0.48), in: RoundedRectangle(cornerRadius: 18 * u))
+					.padding(.leading, 111 * u)
 					.padding(.top, 78 * u)
 					Spacer()
 				}

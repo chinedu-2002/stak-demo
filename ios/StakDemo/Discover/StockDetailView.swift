@@ -56,7 +56,12 @@ struct StockDetailView: View {
 		self.onPracticeBuyToSimulate = onPracticeBuyToSimulate
 		self.onTab = onTab
 		// Codex audit (2026-09-04): saved follows the holdings store, like the deck card.
-		self._saved = State(initialValue: fromMyStak || MyStakHoldings.shared.tickers.contains(symbol))
+		// The Discover entry follows THIS RUN's saves, like the deck's Save chip:
+		// 1:2382/1:2579 author "Unsaved" for a stock My STAK already lists, and
+		// the chip ruling (user, 2026-09-04) applies to the page it opens. The
+		// seeded holdings made every designed card open "Saved". My STAK entry
+		// opens saved. Mirrors android.
+		self._saved = State(initialValue: fromMyStak || DeckSession.shared.saved.contains(symbol))
 	}
 
 	var body: some View {
@@ -205,17 +210,19 @@ struct StockDetailView: View {
 				DetailSavedSheet(
 					f: f,
 					// Unauthored scrim tap - keeps its instant dismiss-and-mark.
-					onDismiss: { showSuccess = false; saved = true },
+					onDismiss: { showSuccess = false; saved = true; DeckSession.shared.saved.insert(f.symbol) },
 					// Authored (92:969): View in My STAK -> Overview, the
 					// forward push; Keep exploring -> deck, dissolve 300 -
 					// the stock is marked saved before the page leaves.
 					onViewInMyStak: {
 						saved = true
+						DeckSession.shared.saved.insert(f.symbol)
 						MyStakHoldings.shared.add(f.symbol)
 						if let onViewInMyStak { onViewInMyStak() } else { showSuccess = false }
 					},
 					onKeepExploring: {
 						saved = true
+						DeckSession.shared.saved.insert(f.symbol)
 						MyStakHoldings.shared.add(f.symbol)
 						if let onKeepExploring { onKeepExploring() } else { showSuccess = false }
 					}
@@ -601,25 +608,32 @@ private struct CompareCard: View {
 					.foregroundStyle(muted)
 			} else {
 				VStack(alignment: .leading, spacing: 21 * u) {
-					ZStack(alignment: .topLeading) {
-						// AAPL column tint (1:2721): 81x170 r8 at card (94, 43.94) - 12
-						// above the table top - exact-design audit 2026-09-04.
-						RoundedRectangle(cornerRadius: 8 * u)
-							.fill(Color(argb: 0x125DA8BF))
-							.frame(width: 81 * u, height: 170 * u)
-							.offset(x: 78 * u, y: -12 * u)
-						// 1:2722: a 0.5-wide #272F40 hairline between the MSFT and GOOGL
-						// columns, card x257 y49.94, 134.5 tall - exact-design audit 2026-09-04.
-						Rectangle()
-							.fill(Color(argb: 0xFF272F40))
-							.frame(width: 0.5 * u, height: 134.5 * u)
-							.offset(x: 241 * u, y: -6 * u)
-						VStack(spacing: 12 * u) {
-							compareRow("", f.symbol, f.peerA, f.peerB, header: true)
-							ForEach(f.compareRows, id: \.label) { r in
-								compareRow(r.label, r.a, r.b, r.c, valueColor: r.green ? green : nil)
-							}
+					// The tint column and the hairline are a BACKGROUND of the
+					// 148-tall table (1:2724), never laid out: as ZStack siblings the
+					// 170-tall tint made the stack 170 and pushed the footnote, TIP
+					// and CTAs 22 down (mirrors android, 2026-09-04).
+					VStack(spacing: 12 * u) {
+						compareRow("", f.symbol, f.peerA, f.peerB, header: true)
+						ForEach(f.compareRows, id: \.label) { r in
+							compareRow(r.label, r.a, r.b, r.c, valueColor: r.green ? green : nil)
 						}
+					}
+					.background(alignment: .topLeading) {
+						ZStack(alignment: .topLeading) {
+							// AAPL column tint (1:2721): 81x170 r8 at card (94, 43.94) - 12
+							// above the table top - exact-design audit 2026-09-04.
+							RoundedRectangle(cornerRadius: 8 * u)
+								.fill(Color(argb: 0x125DA8BF))
+								.frame(width: 81 * u, height: 170 * u)
+								.offset(x: 78 * u, y: -12 * u)
+							// 1:2722: a 0.5-wide #272F40 hairline between the MSFT and GOOGL
+							// columns, card x257 y49.94, 134.5 tall - exact-design audit 2026-09-04.
+							Rectangle()
+								.fill(Color(argb: 0xFF272F40))
+								.frame(width: 0.5 * u, height: 134.5 * u)
+								.offset(x: 241 * u, y: -6 * u)
+						}
+						.frame(width: 0, height: 0, alignment: .topLeading)
 					}
 					Text("Cultural context only, not financial advice.")
 						.font(StakFont.geist(10 * u, .medium))

@@ -47,7 +47,6 @@ import com.stak.demo.ui.theme.Sora
 import com.stak.demo.ui.theme.StakColors
 import kotlin.math.roundToInt
 import kotlinx.coroutines.launch
-import com.stak.demo.ui.theme.ADVANCE_ROUNDING
 
 // The tutorial deck (1:344) is the Discover deck at 87.4% — the same
 // authored queue slabs behind a live front card built from the shared
@@ -85,7 +84,7 @@ fun SwipeTutorialScreen(onBack: () -> Unit, onContinue: () -> Unit) {
 			Spacer(modifier = Modifier.weight(1f))
 			Text(
 				text = "STEP 3 OF 6",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, letterSpacing = (0.9 * u + ADVANCE_ROUNDING.value).sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, letterSpacing = (0.9 * u).sp),
 				color = Auth.FaintText,
 			)
 		}
@@ -101,12 +100,12 @@ fun SwipeTutorialScreen(onBack: () -> Unit, onContinue: () -> Unit) {
 			Column(verticalArrangement = Arrangement.spacedBy((12 * u).dp)) {
 				Text(
 					text = "Now try a few swipes.",
-					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (24 * u).sp, lineHeight = (31 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (24 * u).sp, lineHeight = (31 * u).sp),
 					color = StakColors.TextPrimary,
 				)
 				Text(
 					text = "Swipe down for the next card. Save what you like.",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp),
 					color = Auth.SubtitleGray,
 				)
 			}
@@ -192,7 +191,7 @@ fun SwipeTutorialScreen(onBack: () -> Unit, onContinue: () -> Unit) {
 					}
 					Text(
 						text = "Swipe down",
-						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (8.73 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (8.73 * u).sp),
 						color = Auth.FaintText,
 					)
 				}

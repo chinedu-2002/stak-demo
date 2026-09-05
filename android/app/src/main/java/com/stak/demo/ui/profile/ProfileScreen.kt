@@ -33,7 +33,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.stak.demo.ui.onboarding.AuthBackCircle
-import com.stak.demo.ui.theme.ADVANCE_ROUNDING
 import com.stak.demo.ui.theme.Geist
 import com.stak.demo.ui.theme.Sora
 import com.stak.demo.ui.theme.StakColors
@@ -57,7 +56,6 @@ private val ChipInk = Color(0xFF7FD4E8)
 @Composable
 fun ProfileScreen(onBack: () -> Unit, onLogOut: () -> Unit = {}) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
-	// Every Text run carries ADVANCE_ROUNDING: M3 Text(style = TextStyle(...)) never merges LocalTextStyle, so the app-wide 0.24sp never reached these literals (171:995 runs - exact-design audit 2026-09-04).
 	Column(modifier = Modifier.fillMaxSize().background(StakColors.Bg)) {
 		Box(
 			modifier = Modifier
@@ -72,7 +70,7 @@ fun ProfileScreen(onBack: () -> Unit, onLogOut: () -> Unit = {}) {
 			)
 			Text(
 				text = "Profile",
-				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp, lineHeight = (20 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp, lineHeight = (20 * u).sp),
 				color = Color.White,
 				modifier = Modifier.align(Alignment.Center),
 			)
@@ -105,19 +103,19 @@ fun ProfileScreen(onBack: () -> Unit, onLogOut: () -> Unit = {}) {
 					} else {
 						Text(
 							text = com.stak.demo.ui.UserProfile.greetingName.take(1).uppercase(),
-							style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (22 * u).sp, lineHeight = (28 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+							style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (22 * u).sp, lineHeight = (28 * u).sp),
 							color = Color(0xFF9EADC7),
 						)
 					}
 				}
 				Text(
 					text = com.stak.demo.ui.UserProfile.greetingName,
-					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (20 * u).sp, lineHeight = (25 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (20 * u).sp, lineHeight = (25 * u).sp),
 					color = Color.White,
 				)
 				Text(
 					text = "Paper investor · joined July 2026",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
 					color = Muted,
 				)
 			}
@@ -132,7 +130,7 @@ fun ProfileScreen(onBack: () -> Unit, onLogOut: () -> Unit = {}) {
 			) {
 				Text(
 					text = "YOUR TASTE",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (11 * u).sp, lineHeight = (14 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (11 * u).sp, lineHeight = (14 * u).sp),
 					color = Muted,
 				)
 				Row(horizontalArrangement = Arrangement.spacedBy((8 * u).dp)) {
@@ -149,7 +147,7 @@ fun ProfileScreen(onBack: () -> Unit, onLogOut: () -> Unit = {}) {
 					) {
 						Text(
 							text = label,
-							style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+							style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
 							color = ChipInk,
 							maxLines = 1,
 							softWrap = false,
@@ -159,7 +157,7 @@ fun ProfileScreen(onBack: () -> Unit, onLogOut: () -> Unit = {}) {
 			}
 			Text(
 					text = "Your taste graph sharpens with every swipe.",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
 					color = Body,
 				)
 			}
@@ -181,7 +179,7 @@ fun ProfileScreen(onBack: () -> Unit, onLogOut: () -> Unit = {}) {
 				}
 				Text(
 					text = "▲ +$240.00 all time on $10,000 paper",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
 					color = Green,
 				)
 			}
@@ -207,14 +205,14 @@ fun ProfileScreen(onBack: () -> Unit, onLogOut: () -> Unit = {}) {
 					) {
 						Text(
 							text = label,
-							style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp, lineHeight = (17 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+							style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp, lineHeight = (17 * u).sp),
 							color = Color.White,
 						)
 						Spacer(modifier = Modifier.weight(1f))
 						// Chevron line height 18 as authored (171:1027 - exact-design audit 2026-09-04).
 						Text(
 							text = "›",
-							style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp, lineHeight = (18 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+							style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp, lineHeight = (18 * u).sp),
 							color = Muted,
 						)
 					}
@@ -250,7 +248,7 @@ fun ProfileScreen(onBack: () -> Unit, onLogOut: () -> Unit = {}) {
 			) {
 				Text(
 					text = "Log out",
-					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp, lineHeight = (18 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp, lineHeight = (18 * u).sp),
 					color = Muted,
 				)
 			}
@@ -264,12 +262,12 @@ private fun ProfileStat(value: String, label: String) {
 	Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy((4 * u).dp)) {
 		Text(
 			text = value,
-			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp, lineHeight = (20 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp, lineHeight = (20 * u).sp),
 			color = Bright,
 		)
 		Text(
 			text = label,
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp, lineHeight = (14 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp, lineHeight = (14 * u).sp),
 			color = Muted,
 		)
 	}

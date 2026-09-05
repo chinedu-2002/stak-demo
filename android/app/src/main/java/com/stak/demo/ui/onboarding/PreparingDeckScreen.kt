@@ -38,7 +38,6 @@ import com.stak.demo.R
 import com.stak.demo.ui.theme.Geist
 import com.stak.demo.ui.theme.Sora
 import com.stak.demo.ui.theme.StakColors
-import com.stak.demo.ui.theme.ADVANCE_ROUNDING
 import kotlinx.coroutines.delay
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.offset
@@ -80,7 +79,7 @@ fun PreparingDeckScreen(onDone: () -> Unit) {
 		)
 		Text(
 			text = "Building your first deck...",
-			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (22 * u).sp, lineHeight = (28 * u).sp, textAlign = TextAlign.Center, letterSpacing = ADVANCE_ROUNDING),
+			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (22 * u).sp, lineHeight = (28 * u).sp, textAlign = TextAlign.Center),
 			color = StakColors.TextPrimary,
 			modifier = Modifier
 				.align(Alignment.TopCenter)
@@ -97,7 +96,7 @@ fun PreparingDeckScreen(onDone: () -> Unit) {
 			Spinner()
 			Text(
 				text = "Reading your brand picks",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (15 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (15 * u).sp),
 				color = Auth.FaintText,
 			)
 		}

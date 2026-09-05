@@ -42,7 +42,6 @@ import com.stak.demo.ui.onboarding.AuthBackCircle
 import com.stak.demo.ui.theme.Geist
 import com.stak.demo.ui.theme.Sora
 import com.stak.demo.ui.theme.StakColors
-import com.stak.demo.ui.theme.ADVANCE_ROUNDING
 import androidx.compose.foundation.layout.requiredSize
 
 /**
@@ -137,7 +136,7 @@ fun PickDetailScreen(
 				Spacer(modifier = Modifier.weight(1f))
 				Text(
 					text = p.symbol,
-					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp),
 					color = Color.White,
 				)
 				Spacer(modifier = Modifier.weight(1f))
@@ -171,24 +170,24 @@ fun PickDetailScreen(
 				) {
 					Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy((9 * u).dp)) {
 						Box(contentAlignment = Alignment.Center, modifier = Modifier.size((38 * u).dp).background(Sim.ChipBg, CircleShape)) {
-							Text(p.badge, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp, lineHeight = (19 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Sim.BadgeInk)
+							Text(p.badge, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp, lineHeight = (19 * u).sp), color = Sim.BadgeInk)
 						}
 						Text(
 							p.pickedLine,
-							style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+							style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
 							color = Sim.Muted,
 						)
 					}
 					Row(verticalAlignment = Alignment.Bottom, modifier = Modifier.padding(top = (11 * u).dp).height((48 * u).dp)) {
 						Text(
 							gainWhole,
-							style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (38 * u).sp, lineHeight = (48 * u).sp, letterSpacing = ADVANCE_ROUNDING), // 1:4660 carries no tracking (exact-design audit 2026-09-04)
+							style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (38 * u).sp, lineHeight = (48 * u).sp), // 1:4660 carries no tracking (exact-design audit 2026-09-04)
 							// A losing pick's figure takes the authored red (the rows' Sim.Red).
 							color = if (p.up) Color.White else Sim.Red,
 						)
 						Text(
 							gainCents,
-							style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp, lineHeight = (20 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+							style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp, lineHeight = (20 * u).sp),
 							color = Sim.Muted,
 							modifier = Modifier.padding(start = (7 * u).dp, bottom = (6 * u).dp),
 						)
@@ -196,7 +195,7 @@ fun PickDetailScreen(
 					Text(
 						"That is ${if (p.up) "up" else "down"} ${p.gainPct} on a ${p.stakeBasis} paper stake",
 						// 1:4662 (exact-design audit 2026-09-04): Geist Light, like the hero's all-time line.
-						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Light, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Light, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
 						color = Sim.Muted,
 						modifier = Modifier.padding(top = (11 * u).dp),
 					)
@@ -221,10 +220,10 @@ fun PickDetailScreen(
 										.background(Color(0x292C9DBC))
 										.border((0.75 * u).dp, Color(0x662C9DBC), RoundedCornerShape((11.25 * u).dp)),
 								) {
-									Text(label, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Sim.Teal)
+									Text(label, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp), color = Sim.Teal)
 								}
 							} else {
-								Text(label, style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Sim.Muted)
+								Text(label, style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp), color = Sim.Muted)
 							}
 						}
 					}
@@ -259,14 +258,14 @@ fun PickDetailScreen(
 						Image(painterResource(R.drawable.ic_gist_sparkle), null, modifier = Modifier.size((16 * u).dp))
 						Text(
 							"INSIGHT",
-							style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, letterSpacing = (0.9 * u + ADVANCE_ROUNDING.value).sp),
+							style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, letterSpacing = (0.9 * u).sp),
 							color = Sim.Faint,
 						)
 					}
 					Text(
 						// The authored sentence with only the symbol swapped (losing picks too).
 						"Your stake tracks the move live. If ${p.symbol} gives back gains, the dollars follow it down.",
-						style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp, lineHeight = (17 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+						style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp, lineHeight = (17 * u).sp),
 						color = Sim.Body,
 					)
 				}
@@ -290,7 +289,7 @@ fun PickDetailScreen(
 						Text(
 							"Sell",
 							// 1:4695 (exact-design audit 2026-09-04): Sora Regular 14 on a 20.69 line - was Geist Medium.
-							style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp, lineHeight = (20.69 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+							style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp, lineHeight = (20.69 * u).sp),
 							color = Color.White,
 						)
 					}
@@ -307,7 +306,7 @@ fun PickDetailScreen(
 							onClick = onBack,
 						),
 				) {
-					Text("Back", style = TextStyle(fontFamily = Sora, fontSize = (14 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Sim.Muted)
+					Text("Back", style = TextStyle(fontFamily = Sora, fontSize = (14 * u).sp), color = Sim.Muted)
 				}
 			}
 		}
@@ -338,10 +337,10 @@ private fun StatBox(label: String, value: String, valueColor: Color, modifier: M
 			.background(Sim.CardBg)
 			.padding(horizontal = (14 * u).dp, vertical = (13 * u).dp),
 	) {
-		Text(label, style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp, lineHeight = (13 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Sim.Muted)
+		Text(label, style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp, lineHeight = (13 * u).sp), color = Sim.Muted)
 		Text(
 			value,
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp, lineHeight = (18 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp, lineHeight = (18 * u).sp),
 			color = valueColor,
 		)
 	}

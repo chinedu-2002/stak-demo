@@ -49,7 +49,6 @@ import com.stak.demo.R
 import com.stak.demo.ui.theme.Geist
 import com.stak.demo.ui.theme.Sora
 import com.stak.demo.ui.theme.StakColors
-import com.stak.demo.ui.theme.ADVANCE_ROUNDING
 
 /**
  * Onboarding · Create account — Figma node 1554:9126 ("Auth · Sign up").
@@ -87,12 +86,12 @@ fun CreateAccountScreen(onBack: () -> Unit, onCreateAccount: () -> Unit, onSignI
 				Column(verticalArrangement = Arrangement.spacedBy((12 * u).dp)) {
 					Text(
 						text = "Create your account",
-						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (26 * u).sp, lineHeight = (33 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (26 * u).sp, lineHeight = (33 * u).sp),
 						color = StakColors.TextPrimary,
 					)
 					Text(
 						text = "Enter your details below to continue",
-						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
 						color = Auth.SubtitleGray,
 					)
 				}
@@ -131,7 +130,7 @@ fun CreateAccountScreen(onBack: () -> Unit, onCreateAccount: () -> Unit, onSignI
 				AuthSwitchRow(prefix = "Already have an account?", link = "Sign in", onClick = onSignIn)
 				Text(
 					text = "By continuing you agree to the Terms and Privacy Policy.",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (10 * u).sp, textAlign = TextAlign.Center, letterSpacing = ADVANCE_ROUNDING),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (10 * u).sp, textAlign = TextAlign.Center),
 					color = Auth.FaintText,
 					modifier = Modifier.fillMaxWidth().padding(horizontal = (24 * u).dp),
 				)

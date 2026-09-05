@@ -39,7 +39,6 @@ import androidx.compose.ui.unit.sp
 import com.stak.demo.ui.theme.Geist
 import com.stak.demo.ui.theme.Sora
 import com.stak.demo.ui.theme.StakColors
-import com.stak.demo.ui.theme.ADVANCE_ROUNDING
 
 /** One 2x2 matrix option — icon in a #242b3d circle, Geist title/subtitle.
  * Icon glyphs keep their native Figma frame size (21.06 for the goal set,
@@ -86,7 +85,7 @@ internal fun MatrixQuizScreen(
 			Spacer(modifier = Modifier.weight(1f))
 			Text(
 				text = stepLabel,
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, letterSpacing = (0.9 * u + ADVANCE_ROUNDING.value).sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, letterSpacing = (0.9 * u).sp),
 				color = Auth.FaintText,
 			)
 		}
@@ -103,12 +102,12 @@ internal fun MatrixQuizScreen(
 			Column(verticalArrangement = Arrangement.spacedBy((12 * u).dp)) {
 				Text(
 					text = headline,
-					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (24 * u).sp, lineHeight = (31 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (24 * u).sp, lineHeight = (31 * u).sp),
 					color = StakColors.TextPrimary,
 				)
 				Text(
 					text = subtitle,
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
 					color = Auth.SubtitleGray,
 				)
 			}
@@ -173,13 +172,13 @@ private fun MatrixCard(option: MatrixOption, selected: Boolean, onClick: () -> U
 		Column(verticalArrangement = Arrangement.spacedBy((5 * u).dp)) {
 			Text(
 				text = option.title,
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16.85 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16.85 * u).sp),
 				color = StakColors.TextPrimary,
 				modifier = Modifier.width((142.13 * u).dp),
 			)
 			Text(
 				text = option.subtitle,
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (10 * u).sp, lineHeight = (13.69 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (10 * u).sp, lineHeight = (13.69 * u).sp),
 				color = Auth.FaintText,
 				modifier = Modifier.width((121.07 * u).dp),
 			)

@@ -45,7 +45,6 @@ import androidx.compose.ui.unit.sp
 import com.stak.demo.ui.theme.Geist
 import com.stak.demo.ui.theme.Sora
 import com.stak.demo.ui.theme.StakColors
-import com.stak.demo.ui.theme.ADVANCE_ROUNDING
 
 private const val NAME_MAX = 20
 
@@ -112,12 +111,12 @@ fun ProfileSetupScreen(onBack: () -> Unit, onProceed: () -> Unit) {
 			Column(verticalArrangement = Arrangement.spacedBy((12 * u).dp)) {
 				Text(
 					text = "Make it yours",
-					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (26 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (26 * u).sp),
 					color = StakColors.TextPrimary,
 				)
 				Text(
 					text = "Pick a name and photo. This is how you’ll show up on leaderboards.",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp),
 					color = Auth.SubtitleGray,
 					modifier = Modifier.width((276 * u).dp),
 				)
@@ -153,14 +152,14 @@ fun ProfileSetupScreen(onBack: () -> Unit, onProceed: () -> Unit) {
 					} else {
 						Text(
 							text = name.firstOrNull()?.uppercase() ?: "",
-							style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (36 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+							style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (36 * u).sp),
 							color = Color(0xFF9EADC7),
 						)
 					}
 				}
 				Text(
 					text = "Add a photo",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp),
 					color = Auth.LinkTeal,
 					modifier = Modifier.clickable(
 						interactionSource = remember { MutableInteractionSource() },
@@ -172,7 +171,7 @@ fun ProfileSetupScreen(onBack: () -> Unit, onProceed: () -> Unit) {
 
 			Text(
 				text = "DISPLAY NAME",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, letterSpacing = (1.2 * u + ADVANCE_ROUNDING.value).sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, letterSpacing = (1.2 * u).sp),
 				color = Auth.FaintText,
 			)
 
@@ -187,7 +186,7 @@ fun ProfileSetupScreen(onBack: () -> Unit, onProceed: () -> Unit) {
 				BasicTextField(
 					value = name,
 					onValueChange = { name = it.take(NAME_MAX) },
-					textStyle = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp, color = StakColors.TextPrimary, letterSpacing = ADVANCE_ROUNDING),
+					textStyle = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp, color = StakColors.TextPrimary),
 					singleLine = true,
 					// Names start capitalized on the keyboard; whatever is typed
 					// is capitalized again at save (UserProfile.capitalizeWords).
@@ -199,14 +198,14 @@ fun ProfileSetupScreen(onBack: () -> Unit, onProceed: () -> Unit) {
 				)
 				Text(
 					text = "${name.length} / $NAME_MAX",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp),
 					color = Auth.FaintText,
 				)
 			}
 
 			Text(
 				text = "You can change this anytime in Profile.",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp),
 				color = Auth.FaintText,
 			)
 		}

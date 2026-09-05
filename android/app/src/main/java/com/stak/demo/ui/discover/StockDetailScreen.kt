@@ -884,7 +884,9 @@ private fun SinceYouSavedCard() {
 			.fillMaxWidth()
 			.clip(RoundedCornerShape((16 * u).dp))
 			.background(Card)
-			.padding((16 * u).dp),
+			// 16:1012 authors p14/16/14/16 (84 tall); the old uniform 16 made the
+			// card 4 taller and pushed every module below it (StakTest, 2026-09-05).
+			.padding(horizontal = (16 * u).dp, vertical = (14 * u).dp),
 	) {
 		Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy((8 * u).dp)) {
 			Image(painterResource(R.drawable.ic_saved_bookmark), null, modifier = Modifier.size((12 * u).dp))

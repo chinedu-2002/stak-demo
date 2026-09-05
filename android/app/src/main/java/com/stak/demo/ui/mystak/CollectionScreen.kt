@@ -43,6 +43,7 @@ import com.stak.demo.R
 import com.stak.demo.ui.onboarding.AuthBackCircle
 import com.stak.demo.ui.theme.Geist
 import com.stak.demo.ui.theme.Sora
+import com.stak.demo.ui.theme.fractionalSpacedBy
 import com.stak.demo.ui.theme.StakColors
 
 private val CardBg = Color(0xFF181F30)
@@ -140,14 +141,17 @@ fun CollectionScreen(
 					color = Color(0xFFC8D2E0),
 				)
 			}
-			Column(verticalArrangement = Arrangement.spacedBy((10 * u).dp), modifier = Modifier.fillMaxWidth()) {
+			// Authored tiles are 139 tall (1:3333) and the grid gap 10: pinned, with
+			// fractional gaps, so the rows stop drifting (+2.5 by row 3 on StakTest,
+			// 2026-09-05, from per-text and per-gap px rounding).
+			Column(verticalArrangement = fractionalSpacedBy((10 * u).dp), modifier = Modifier.fillMaxWidth()) {
 				// Codex audit (2026-09-04): the dashed Add-stock tile is ALWAYS
 				// the last cell - on a new row when the held count is even or
 				// zero - so an emptied collection still offers "Add stock".
 				// null is that cell; the two-per-row layout is unchanged.
 				val cells: List<CollStock?> = held + null
 				cells.chunked(2).forEach { row ->
-					Row(horizontalArrangement = Arrangement.spacedBy((10 * u).dp), modifier = Modifier.fillMaxWidth().height(androidx.compose.foundation.layout.IntrinsicSize.Min)) {
+					Row(horizontalArrangement = Arrangement.spacedBy((10 * u).dp), modifier = Modifier.fillMaxWidth().height((139 * u).dp)) {
 						row.forEach { stock ->
 							if (stock != null) {
 								StockTile(

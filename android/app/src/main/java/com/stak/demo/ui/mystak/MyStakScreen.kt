@@ -207,7 +207,10 @@ fun MyStakScreen(onOpenCollection: (String) -> Unit, onStartSwiping: () -> Unit)
 					color = Ink,
 				)
 				Text(
-					text = "Based on your taste, 8 fresh picks are waiting in the deck.",
+					// The authored two-line shape breaks before "deck." (1:3322, 34 tall);
+					// the static Geist run is ~2% narrower than Figma's and pulled it onto
+					// line 1, shortening the card 17 (StakTest, 2026-09-05).
+					text = "Based on your taste, 8 fresh picks are waiting in the\ndeck.",
 					// 1:3322 Geist Regular 12 / 17 (was 13) - exact-design audit 2026-09-04.
 					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (17 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
 					color = Ink,

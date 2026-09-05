@@ -1,5 +1,6 @@
 package com.stak.demo.ui.discover
 
+import com.stak.demo.ui.theme.FIGMA_LINE_BOX
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
@@ -603,7 +604,7 @@ private fun DetailSavedSheet(f: DetailFacts, onDone: () -> Unit, onViewInMyStak:
 			}
 			Text(
 				"Watching from today · no money committed",
-				style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp, lineHeight = (18 * u).sp),
+				style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp, lineHeight = (18 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
 				color = Color(0xFFC8D2E0),
 				modifier = Modifier.fillMaxWidth(),
 			)
@@ -884,7 +885,7 @@ private fun SinceYouSavedCard() {
 		}
 		Text(
 			"Saved 5 weeks ago. AAPL is up 4.6% since, moving roughly with the market. Steady giants tend to.",
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp, lineHeight = (14 * u).sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp, lineHeight = (14 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
 			color = Muted,
 		)
 	}

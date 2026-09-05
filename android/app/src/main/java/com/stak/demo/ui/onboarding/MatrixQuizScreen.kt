@@ -1,5 +1,6 @@
 package com.stak.demo.ui.onboarding
 
+import com.stak.demo.ui.theme.FIGMA_LINE_BOX
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -102,12 +103,12 @@ internal fun MatrixQuizScreen(
 			Column(verticalArrangement = Arrangement.spacedBy((12 * u).dp)) {
 				Text(
 					text = headline,
-					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (24 * u).sp, lineHeight = (31 * u).sp),
+					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (24 * u).sp, lineHeight = (31 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
 					color = StakColors.TextPrimary,
 				)
 				Text(
 					text = subtitle,
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
 					color = Auth.SubtitleGray,
 				)
 			}
@@ -172,13 +173,13 @@ private fun MatrixCard(option: MatrixOption, selected: Boolean, onClick: () -> U
 		Column(verticalArrangement = Arrangement.spacedBy((5 * u).dp)) {
 			Text(
 				text = option.title,
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16.85 * u).sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16.85 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
 				color = StakColors.TextPrimary,
 				modifier = Modifier.width((142.13 * u).dp),
 			)
 			Text(
 				text = option.subtitle,
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (10 * u).sp, lineHeight = (13.69 * u).sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (10 * u).sp, lineHeight = (13.69 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
 				color = Auth.FaintText,
 				modifier = Modifier.width((121.07 * u).dp),
 			)

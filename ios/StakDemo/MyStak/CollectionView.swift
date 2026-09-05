@@ -131,8 +131,8 @@ struct CollectionView: View {
 		let u = figmaUnit
 		return VStack(spacing: 10 * u) {
 			ForEach(Array(gridRows.enumerated()), id: \.offset) { _, row in
-				// `.fixedSize(vertical: true)` = Compose IntrinsicSize.Min: tiles in a
-				// row share the tallest tile's height, so the Add card stretches to match.
+				// Authored tile rows are 139 tall (1:3333): pinned, so every row lands on
+				// the frame's grid and the Add card matches (mirrors Android, 2026-09-05).
 				HStack(spacing: 10 * u) {
 					ForEach(row) { cell in
 						switch cell {
@@ -152,7 +152,7 @@ struct CollectionView: View {
 						}
 					}
 				}
-				.fixedSize(horizontal: false, vertical: true)
+				.frame(height: 139 * u)
 			}
 		}
 		.frame(maxWidth: .infinity)

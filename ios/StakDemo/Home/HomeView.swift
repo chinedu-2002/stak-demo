@@ -497,13 +497,17 @@ private struct DeckBanner: View {
 
 /// First-run bottom treatment — scrim fading to bg over its first 98.7px
 /// (43.68% of the frame's 226px overlay) + the frosted "See Todays Pick"
-/// pill, whose bottom sits 70px above the screen edge as in the frame.
+/// pill 105px below the overlay's top edge (1:958: overlay y629, pill y734).
 private struct FirstRunOverlay: View {
 	let onSeeTodaysPick: () -> Void
 
 	var body: some View {
 		let u = figmaUnit
-		ZStack(alignment: .bottom) {
+		// The pill is anchored to the content geometry like the scrim: 105 below
+		// the overlay top (= 70 above the edge on the 844 frame); on taller
+		// screens it stays with the banner it belongs to (mirrors Android,
+		// 2026-09-05).
+		ZStack(alignment: .top) {
 			VStack(spacing: 0) {
 				LinearGradient(
 					stops: [
@@ -527,11 +531,30 @@ private struct FirstRunOverlay: View {
 					// pill) - exact-design audit 2026-09-04.
 					.offset(y: 1.44 * u)
 					.frame(width: 136 * u, height: 51 * u)
-					.background(Color(argb: 0x0FFFFFFF), in: Capsule())
-					.overlay(Capsule().strokeBorder(Color(argb: 0x66FFFFFF), lineWidth: 0.94 * u))
+					// The authored pill (1:1081) is a Figma glass stack; matched to
+					// its RENDER in the 2x export of 1:958: a cool-tinted 8% wash and
+					// a rim that glows only on the two caps (0.57 / 0.49 white) and
+					// holds 0.21 along the straight top and bottom runs (mirrors
+					// Android, 2026-09-05).
+					.background(Color(argb: 0x15C8D7FF), in: Capsule())
+					.overlay(
+						Capsule().strokeBorder(
+							LinearGradient(
+								stops: [
+									.init(color: Color.white.opacity(0.57), location: 0),
+									.init(color: Color.white.opacity(0.21), location: 0.19),
+									.init(color: Color.white.opacity(0.21), location: 0.81),
+									.init(color: Color.white.opacity(0.49), location: 1)
+								],
+								startPoint: .leading,
+								endPoint: .trailing
+							),
+							lineWidth: 0.94 * u
+						)
+					)
 			}
 			.buttonStyle(.plain)
-			.padding(.bottom, 70 * u)
+			.padding(.top, 105 * u)
 		}
 		.frame(maxWidth: .infinity)
 	}

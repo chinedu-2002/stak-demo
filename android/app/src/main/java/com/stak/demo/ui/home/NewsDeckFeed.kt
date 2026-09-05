@@ -22,14 +22,17 @@ object NewsDeckFeed {
 
 	data class Story(val title: String, val body: String)
 
+	// exact-design audit 2026-09-04 (1:1166 / 1:1170): the frame's " ...." and
+	// "...." truncation marks are typos - normalised to the three-dot ellipsis
+	// the third card (1:1174) already uses; the story copy itself is verbatim.
 	val DEMO_STORIES = listOf(
 		Story(
 			"Wall Street's fear gauge reads 32",
-			"The Fear & Greed Index is firmly in Fear territory. Money is rotating out of the ....",
+			"The Fear & Greed Index is firmly in Fear territory. Money is rotating out of the...",
 		),
 		Story(
 			"Fed meeting notes drop Wednesday",
-			"Minutes from the last Fed meeting land July 8. A market this tense moves on every word....",
+			"Minutes from the last Fed meeting land July 8. A market this tense moves on every word...",
 		),
 		Story(
 			"The OpenAI IPO is reportedly delayed",

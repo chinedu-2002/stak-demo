@@ -305,7 +305,8 @@ private fun RiskFitCard(f: DetailFacts) {
 		modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape((16 * u).dp)).background(Card)
 			.padding(horizontal = (16 * u).dp, vertical = (14 * u).dp),
 	) {
-		Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+		// 1:2427 authors a 24-tall head row - exact-design audit 2026-09-04.
+		Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().height((24 * u).dp)) {
 			Text(
 				"Risk fit",
 				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp),
@@ -507,8 +508,12 @@ private fun DetailCta(text: String, onClick: () -> Unit) {
 	}
 }
 
+/**
+ * Hairline secondary. The page CTA (1:2568) authors Sora 13; the save-success
+ * sheet's "Keep exploring" (92:1205) authors Sora 14 - exact-design audit 2026-09-04.
+ */
 @Composable
-private fun DetailSecondary(text: String, onClick: () -> Unit) {
+private fun DetailSecondary(text: String, size: Float = 13f, onClick: () -> Unit) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Box(
 		contentAlignment = Alignment.Center,
@@ -522,7 +527,7 @@ private fun DetailSecondary(text: String, onClick: () -> Unit) {
 				onClick = onClick,
 			),
 	) {
-		Text(text, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = (13 * u).sp), color = Muted)
+		Text(text, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = (size * u).sp), color = Muted)
 	}
 }
 
@@ -592,7 +597,8 @@ private fun DetailSavedSheet(f: DetailFacts, onDone: () -> Unit, onViewInMyStak:
 			)
 			Column(verticalArrangement = Arrangement.spacedBy((16 * u).dp), modifier = Modifier.fillMaxWidth()) {
 				DetailCta("View in My STAK", onClick = onViewInMyStak)
-				DetailSecondary("Keep exploring", onClick = onKeepExploring)
+				// 92:1205 authors Sora 14 - exact-design audit 2026-09-04.
+				DetailSecondary("Keep exploring", size = 14f, onClick = onKeepExploring)
 			}
 		}
 	}
@@ -613,13 +619,17 @@ private fun DetailBuyHost(spec: BuySpec, onClose: () -> Unit, onViewInMyStak: ()
 	)
 }
 
-/** Kicker label — Geist Medium 10, tracking 0.8, muted. */
+/**
+ * Kicker label — Geist 10, tracking 0.8, muted. 1:2653 "PRICE TARGET RANGE"
+ * authors Regular; the consensus / RECENT ACTIONS kickers (1:2668 / 1:2675)
+ * author Medium - exact-design audit 2026-09-04.
+ */
 @Composable
-private fun Kicker(text: String) {
+private fun Kicker(text: String, weight: FontWeight = FontWeight.Medium) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Text(
 		text,
-		style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, letterSpacing = (0.8 * u + ADVANCE_ROUNDING.value).sp),
+		style = TextStyle(fontFamily = Geist, fontWeight = weight, fontSize = (10 * u).sp, letterSpacing = (0.8 * u + ADVANCE_ROUNDING.value).sp),
 		color = Muted,
 	)
 }
@@ -637,7 +647,8 @@ private fun AnalystCard(f: DetailFacts, open: Boolean, onToggle: () -> Unit) {
 			) { onToggle() }
 			.padding(horizontal = (16 * u).dp, vertical = (14 * u).dp),
 	) {
-		Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+		// Collapsed head (1:2455) authors a 22-tall row - exact-design audit 2026-09-04.
+		Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().then(if (!open) Modifier.height((22 * u).dp) else Modifier)) {
 			Text(
 				"Analyst view",
 				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp),
@@ -655,10 +666,12 @@ private fun AnalystCard(f: DetailFacts, open: Boolean, onToggle: () -> Unit) {
 				color = Green,
 			)
 		} else {
-			Kicker("PRICE TARGET RANGE")
+			Kicker("PRICE TARGET RANGE", weight = FontWeight.Normal)
+			// 1:2656: a 14 circle at y-3 inside the 8-tall clipped track renders as
+			// a 14x8 cap - exact-design audit 2026-09-04 (was 13 wide).
 			Box(modifier = Modifier.fillMaxWidth().height((8 * u).dp)) {
 				Box(modifier = Modifier.width((180 * u).dp).height((8 * u).dp).background(Color(0x8C5DA8BF), RoundedCornerShape((4 * u).dp)))
-				Box(modifier = Modifier.offset(x = (f.targetMarkerX * u).dp).size((13 * u).dp, (8 * u).dp).background(Color(0xFFA6E4F7), RoundedCornerShape((4 * u).dp)))
+				Box(modifier = Modifier.offset(x = (f.targetMarkerX * u).dp).size((14 * u).dp, (8 * u).dp).background(Color(0xFFA6E4F7), RoundedCornerShape((4 * u).dp)))
 			}
 			Row(modifier = Modifier.fillMaxWidth()) {
 				Column(verticalArrangement = Arrangement.spacedBy((1 * u).dp)) {
@@ -682,7 +695,9 @@ private fun AnalystCard(f: DetailFacts, open: Boolean, onToggle: () -> Unit) {
 				color = Green,
 			)
 			Kicker(f.consensus)
-			Box(modifier = Modifier.fillMaxWidth().height((8 * u).dp).clip(RoundedCornerShape((4 * u).dp)).background(Color(0xFF10182B))) {
+			// 1:2669 authors the consensus track in the card's own #181F30 (the
+			// render shows only the green fill) - exact-design audit 2026-09-04.
+			Box(modifier = Modifier.fillMaxWidth().height((8 * u).dp).clip(RoundedCornerShape((4 * u).dp)).background(Card)) {
 				Box(modifier = Modifier.width((f.buyBarW * u).dp).height((8 * u).dp).background(Green, RoundedCornerShape((4 * u).dp)))
 			}
 			Row(modifier = Modifier.fillMaxWidth()) {
@@ -694,13 +709,15 @@ private fun AnalystCard(f: DetailFacts, open: Boolean, onToggle: () -> Unit) {
 			}
 			Kicker("RECENT ACTIONS")
 			f.actions.forEach { (name, action, target) ->
+				// 1:2676..1:2696 author the rows in the card's own #181F30 (flat in
+				// the render, no darker wells) - exact-design audit 2026-09-04.
 				Row(
 					verticalAlignment = Alignment.CenterVertically,
 					modifier = Modifier
 						.fillMaxWidth()
 						.height((38 * u).dp)
 						.clip(RoundedCornerShape((10 * u).dp))
-						.background(Color(0xFF10182B))
+						.background(Card)
 						.padding(horizontal = (12 * u).dp),
 				) {
 					Text(name, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp), color = Bright)
@@ -723,8 +740,10 @@ private fun AnalystCard(f: DetailFacts, open: Boolean, onToggle: () -> Unit) {
 private fun CompareCard(f: DetailFacts) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	var open by rememberSaveable { mutableStateOf(false) }
+	// Both states author a 23 gap under the title (1:2526 / 1:2719); the open
+	// table and its footnote sit 21 apart (1:2723) - exact-design audit 2026-09-04.
 	Column(
-		verticalArrangement = Arrangement.spacedBy(if (open) (21 * u).dp else (12 * u).dp),
+		verticalArrangement = Arrangement.spacedBy((23 * u).dp),
 		modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape((16 * u).dp)).background(Card)
 			.clickable(
 				interactionSource = remember { MutableInteractionSource() },
@@ -732,7 +751,8 @@ private fun CompareCard(f: DetailFacts) {
 			) { open = !open }
 			.padding(horizontal = (16 * u).dp, vertical = (14 * u).dp),
 	) {
-		Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+		// Collapsed head (1:2527) authors a 22-tall row - exact-design audit 2026-09-04.
+		Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().then(if (!open) Modifier.height((22 * u).dp) else Modifier)) {
 			Text(
 				"Compare and learn",
 				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp),
@@ -744,32 +764,44 @@ private fun CompareCard(f: DetailFacts) {
 			}
 		}
 		if (!open) {
+			// 1:2531 authors Geist Regular - exact-design audit 2026-09-04 (was Medium).
 			Text(
 				f.peersLabel,
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (11 * u).sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp),
 				color = Muted,
 			)
 		} else {
-			Box(modifier = Modifier.fillMaxWidth()) {
-				// AAPL column tint spans the table rows (frame 1:2721).
-				Box(
-					modifier = Modifier
-						.offset(x = (78 * u).dp, y = 0.dp)
-						.size((81 * u).dp, (170 * u).dp)
-						.background(Color(0x125DA8BF), RoundedCornerShape((8 * u).dp)),
-				)
-				Column(verticalArrangement = Arrangement.spacedBy((12 * u).dp), modifier = Modifier.fillMaxWidth()) {
-					CompareRow("", f.symbol, f.peerA, f.peerB, header = true)
-					f.compareRows.forEach { r ->
-						CompareRow(r.label, r.a, r.b, r.c, valueColor = if (r.green) Green else null)
+			Column(verticalArrangement = Arrangement.spacedBy((21 * u).dp), modifier = Modifier.fillMaxWidth()) {
+				Box(modifier = Modifier.fillMaxWidth()) {
+					// AAPL column tint (1:2721): 81x170 r8 at card (94, 43.94) - 12
+					// above the table top - exact-design audit 2026-09-04.
+					Box(
+						modifier = Modifier
+							.offset(x = (78 * u).dp, y = (-12 * u).dp)
+							.size((81 * u).dp, (170 * u).dp)
+							.background(Color(0x125DA8BF), RoundedCornerShape((8 * u).dp)),
+					)
+					// 1:2722: a 0.5-wide #272F40 hairline between the MSFT and GOOGL
+					// columns, card x257 y49.94, 134.5 tall - exact-design audit 2026-09-04.
+					Box(
+						modifier = Modifier
+							.offset(x = (241 * u).dp, y = (-6 * u).dp)
+							.size((0.5 * u).dp, (134.5 * u).dp)
+							.background(Color(0xFF272F40)),
+					)
+					Column(verticalArrangement = Arrangement.spacedBy((12 * u).dp), modifier = Modifier.fillMaxWidth()) {
+						CompareRow("", f.symbol, f.peerA, f.peerB, header = true)
+						f.compareRows.forEach { r ->
+							CompareRow(r.label, r.a, r.b, r.c, valueColor = if (r.green) Green else null)
+						}
 					}
 				}
+				Text(
+					"Cultural context only, not financial advice.",
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp),
+					color = Muted,
+				)
 			}
-			Text(
-				"Cultural context only, not financial advice.",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp),
-				color = Muted,
-			)
 		}
 	}
 }
@@ -905,7 +937,8 @@ private val DETAIL_FACTS = mapOf(
 			DetailStat("Profit margin", "24.3%", "Excellent", good = true, border = true),
 		),
 		upside = "↑ 6.7% upside",
-		targetLow = "$180", targetAvg = "$248", targetHigh = "$300", targetMarkerX = 167f,
+		// 1:2656 authors the marker at x173 - exact-design audit 2026-09-04 (was 167).
+		targetLow = "$180", targetAvg = "$248", targetHigh = "$300", targetMarkerX = 173f,
 		consensus = "WALL ST. CONSENSUS · 42 ANALYSTS",
 		buyCount = "● Buy 28", holdCount = "Hold 12", sellCount = "Sell 2", buyBarW = 212f,
 		actions = listOf(

@@ -375,7 +375,7 @@ private fun NewsArticlePage(
 	}
 }
 
-/** 360x208 r10 hero — phone art, Tech & Ai toast, play badge, bookmark/saved chip. */
+/** 360x208 r10 hero — phone art, Tech & AI toast, play badge, bookmark/saved chip. */
 @Composable
 // CONTRACT (user, 2026-08-25): this screen is the News info page TEMPLATE.
 // The design authors exactly ONE article (1:1495, the Apple foldable
@@ -482,7 +482,9 @@ private fun HeroImage(media: NewsMedia, category: String, saved: Boolean, player
 					contentDescription = "Play",
 					modifier = Modifier
 						.align(Alignment.Center)
-						.offset(x = (-0.5 * u).dp, y = (12.5 * u).dp)
+						// 1:1522: the polygon sits 8.64%/25% inset in its 81 box, so the rotated
+						// glyph's centre is 6.63 right of the box centre - exact-design audit 2026-09-04.
+						.offset(x = (6.13 * u).dp, y = (12.5 * u).dp)
 						.rotate(90f)
 						.size((59.92 * u).dp, (53.75 * u).dp)
 						.clickable(
@@ -528,7 +530,9 @@ private fun HeroImage(media: NewsMedia, category: String, saved: Boolean, player
 					contentDescription = "Play",
 					modifier = Modifier
 						.align(Alignment.Center)
-						.offset(x = (-0.5 * u).dp, y = (12.5 * u).dp)
+						// 1:1522: the polygon sits 8.64%/25% inset in its 81 box, so the rotated
+						// glyph's centre is 6.63 right of the box centre - exact-design audit 2026-09-04.
+						.offset(x = (6.13 * u).dp, y = (12.5 * u).dp)
 						.rotate(90f)
 						.size((59.92 * u).dp, (53.75 * u).dp)
 						.clickable(
@@ -564,7 +568,8 @@ private fun HeroImage(media: NewsMedia, category: String, saved: Boolean, player
 				modifier = Modifier
 					.align(Alignment.BottomStart)
 					.padding(start = (9 * u).dp, bottom = (10 * u).dp)
-					.clip(RoundedCornerShape((7.88 * u).dp))
+					// Authored r7.875 (1:1519) - exact-design audit 2026-09-04.
+					.clip(RoundedCornerShape((7.875 * u).dp))
 					.background(Color(0x40242B3D))
 					.padding(horizontal = (7 * u).dp, vertical = (5 * u).dp),
 			) {
@@ -587,7 +592,8 @@ private fun HeroImage(media: NewsMedia, category: String, saved: Boolean, player
 				modifier = Modifier
 					.align(Alignment.TopEnd)
 					.padding(top = (8 * u).dp, end = (7 * u).dp)
-					.clip(RoundedCornerShape((7.88 * u).dp))
+					// Authored r7.875 (1:1386) - exact-design audit 2026-09-04.
+					.clip(RoundedCornerShape((7.875 * u).dp))
 					.background(Color(0x40242B3D))
 					// Authored toast is 21 tall (1:1386): 13 text + 4/4 pads.
 					.padding(horizontal = (7 * u).dp, vertical = (4 * u).dp),
@@ -611,7 +617,8 @@ private fun HeroImage(media: NewsMedia, category: String, saved: Boolean, player
 				contentDescription = "Save",
 				modifier = Modifier
 					.align(Alignment.TopEnd)
-					.padding(top = (8 * u).dp, end = (11 * u).dp)
+					// 1:1523 sits at x 330.77 in the 360 hero: 11.44 from the right - exact-design audit 2026-09-04.
+					.padding(top = (8 * u).dp, end = (11.44 * u).dp)
 					.size((17.79 * u).dp, (18.27 * u).dp)
 					.clickable(
 						interactionSource = remember { MutableInteractionSource() },
@@ -676,7 +683,8 @@ private fun AddToStakButton(onClick: () -> Unit) {
 	) {
 		Text(
 			text = "Add to STAK",
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp, lineHeight = (21 * u).sp),
+			// Authored lh 20.69 (1:1535) - exact-design audit 2026-09-04.
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp, lineHeight = (20.69 * u).sp),
 			color = Color.White,
 		)
 		Image(
@@ -782,7 +790,8 @@ private fun StockCard(saved: Boolean, ticker: String, facts: NewsArticleFeed.Sto
 		}
 		if (saved) {
 			Box(modifier = Modifier.fillMaxWidth().height((1 * u).dp).background(News.Divider))
-			Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+			// Authored CTA row carries a 2 vertical pad (1:1420) - exact-design audit 2026-09-04.
+			Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().padding(vertical = (2 * u).dp)) {
 				Text(
 					text = "View $ticker in My STAK",
 					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp, lineHeight = (17 * u).sp),
@@ -790,11 +799,15 @@ private fun StockCard(saved: Boolean, ticker: String, facts: NewsArticleFeed.Sto
 					color = Color(0xFFAEAEAE),
 				)
 				Spacer(modifier = Modifier.weight(1f))
-				Image(
-					painter = painterResource(R.drawable.ic_daily_chevron),
-					contentDescription = null,
-					modifier = Modifier.rotate(-90f).size((6.88 * u).dp, (3.75 * u).dp),
-				)
+				// The rotated chevron occupies its authored 3.75x6.875 box (1:1422), so its
+				// visual edge meets the card's padding - exact-design audit 2026-09-04.
+				Box(contentAlignment = Alignment.Center, modifier = Modifier.size((3.75 * u).dp, (6.875 * u).dp)) {
+					Image(
+						painter = painterResource(R.drawable.ic_daily_chevron),
+						contentDescription = null,
+						modifier = Modifier.requiredSize((6.875 * u).dp, (3.75 * u).dp).rotate(-90f),
+					)
+				}
 			}
 		}
 	}

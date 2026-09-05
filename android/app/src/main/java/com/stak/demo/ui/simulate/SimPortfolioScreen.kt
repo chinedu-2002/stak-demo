@@ -38,10 +38,12 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -51,8 +53,6 @@ import com.stak.demo.ui.theme.Geist
 import com.stak.demo.ui.theme.Sora
 import com.stak.demo.ui.theme.StakColors
 import com.stak.demo.ui.theme.ADVANCE_ROUNDING
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.graphics.nativeCanvas
 
 // Codex audit (2026-09-04): SimPick and the six authored rows moved to
 // PaperPortfolio.kt - the rows are the shared portfolio's positions now.
@@ -95,7 +95,7 @@ fun SimPortfolioScreen(
 					contentAlignment = Alignment.Center,
 					modifier = Modifier.size((40 * u).dp).background(Sim.CardBg, CircleShape),
 				) {
-					Image(painterResource(R.drawable.ic_news_share), null, modifier = Modifier.size((17 * u).dp))
+					Image(painterResource(R.drawable.ic_news_share), null, modifier = Modifier.size((18 * u).dp)) // 1:4517 icon/share is 18 (exact-design audit 2026-09-04)
 				}
 			}
 			Column(
@@ -105,14 +105,17 @@ fun SimPortfolioScreen(
 					.fillMaxWidth()
 					.verticalScroll(rememberScrollState())
 					.padding(horizontal = (20 * u).dp)
-					.padding(top = (6 * u).dp, bottom = (20 * u).dp),
+					.padding(top = (6 * u).dp, bottom = (26 * u).dp), // 1:4518 pb 26 (exact-design audit 2026-09-04)
 			) {
+				// 1:4519 (exact-design audit 2026-09-04): a 158x32 r13 OUTLINE in #181f30 (1px,
+				// no fill) with the line inset 16 - was a filled r16 pill.
 				Box(
-					contentAlignment = Alignment.Center,
+					contentAlignment = Alignment.CenterStart,
 					modifier = Modifier
 						.align(Alignment.CenterHorizontally)
 						.size((158 * u).dp, (32 * u).dp)
-						.background(Sim.CardBg, RoundedCornerShape((16 * u).dp)),
+						.border((1 * u).dp, Sim.CardBg, RoundedCornerShape((13 * u).dp))
+						.padding(horizontal = (16 * u).dp),
 				) {
 					Text(
 						// Authored copy (user, 2026-09-04 (CHINEDU 07 · Simulate 423:1007): the authored look wins).
@@ -133,6 +136,8 @@ fun SimPortfolioScreen(
 					PortfolioRow(
 						badge = p.badge, ticker = p.ticker, sub = p.sub,
 						amount = p.amount, pct = p.pct, up = p.up,
+						// 1:4539 (exact-design audit 2026-09-04): this page's picked line is Geist Light.
+						subLight = true,
 						onClick = { onOpenPick(p.ticker) },
 						// B16 (1:4496 Motion): the Sell pill opens the Pick detail
 						// - the authored sell flow lives there; the in-page
@@ -140,8 +145,9 @@ fun SimPortfolioScreen(
 						trailing = { SellPill(onClick = { onOpenPick(p.ticker) }) },
 					)
 				}
+				// 1:4605 gk (exact-design audit 2026-09-04): the kicker sits 4 below the box top (13 in a 17), not centred.
 				Box(
-					contentAlignment = Alignment.CenterStart,
+					contentAlignment = Alignment.BottomStart,
 					modifier = Modifier.fillMaxWidth().height((17 * u).dp).padding(start = (2 * u).dp),
 				) {
 					Text(
@@ -155,9 +161,10 @@ fun SimPortfolioScreen(
 				}
 				Text(
 					text = "Sell a pick and the cash returns to your balance, gain or loss.",
-					style = TextStyle(fontFamily = Geist, fontSize = (11 * u).sp, lineHeight = (14 * u).sp),
+					// 1:4621 (exact-design audit 2026-09-04): centre-aligned across the full column, so a wrap stays centred.
+					style = TextStyle(fontFamily = Geist, fontSize = (11 * u).sp, lineHeight = (14 * u).sp, textAlign = TextAlign.Center),
 					color = Sim.Faint,
-					modifier = Modifier.align(Alignment.CenterHorizontally),
+					modifier = Modifier.fillMaxWidth(),
 				)
 			}
 		}
@@ -198,7 +205,7 @@ private fun FilterChip(label: String, selected: Boolean) {
 	}
 }
 
-/** 60x30 outlined Sell pill — transparent bg with the app's secondary hairline. */
+/** 60x30 outlined Sell pill (1:4543) — transparent bg under a 1px white-14% hairline, Sora 12 muted. */
 @Composable
 private fun SellPill(onClick: () -> Unit) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
@@ -206,7 +213,8 @@ private fun SellPill(onClick: () -> Unit) {
 		contentAlignment = Alignment.Center,
 		modifier = Modifier
 			.size((60 * u).dp, (30 * u).dp)
-			.border((0.36 * u).dp, Color(0x54343B4F), RoundedCornerShape((6 * u).dp))
+			// 1:4543 (exact-design audit 2026-09-04): a 1px white-14% hairline - not the sheets' 0.36 #343B4F.
+			.border((1 * u).dp, Color(0x24FFFFFF), RoundedCornerShape((6 * u).dp))
 			.clickable(
 				interactionSource = remember { MutableInteractionSource() },
 				indication = null,
@@ -215,8 +223,9 @@ private fun SellPill(onClick: () -> Unit) {
 	) {
 		Text(
 			"Sell",
-			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (15 * u).sp),
-			color = Color(0xFFDCE7F7),
+			// 1:4544 (exact-design audit 2026-09-04): Sora Regular 12 in #819abb - was Medium #DCE7F7.
+			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (15 * u).sp),
+			color = Sim.Muted,
 		)
 	}
 }
@@ -224,25 +233,30 @@ private fun SellPill(onClick: () -> Unit) {
 @Composable
 private fun RealizedRow(badge: String, ticker: String, sub: String, amount: String, up: Boolean) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
+	// 1:4607 Banked (exact-design audit 2026-09-04): the whole row renders at 72%, its
+	// badge at 55% inside that; ticker Sora SemiBold 12 #d3d3dd, sold line Geist
+	// Light 10 #5c6b85, the banked figure Geist Regular 14 - the row used to be
+	// drawn at full strength in the live rows' type.
 	Row(
 		verticalAlignment = Alignment.CenterVertically,
 		horizontalArrangement = Arrangement.spacedBy((12 * u).dp),
 		modifier = Modifier
 			.fillMaxWidth()
+			.alpha(0.72f)
 			.clip(RoundedCornerShape((12 * u).dp))
 			.background(Sim.CardBg)
 			.padding(horizontal = (14 * u).dp, vertical = (12 * u).dp),
 	) {
-		Box(contentAlignment = Alignment.Center, modifier = Modifier.size((36 * u).dp).background(Sim.ChipBg, CircleShape)) {
+		Box(contentAlignment = Alignment.Center, modifier = Modifier.size((36 * u).dp).alpha(0.55f).background(Sim.ChipBg, CircleShape)) {
 			Text(badge, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (14 * u).sp, lineHeight = (18 * u).sp), color = Sim.BadgeInk)
 		}
 		Column(verticalArrangement = Arrangement.spacedBy((2 * u).dp), modifier = Modifier.weight(1f)) {
-			Text(ticker, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (15 * u).sp), color = Color.White)
-			Text(sub, style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp, lineHeight = (13 * u).sp), color = Sim.Muted)
+			Text(ticker, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (12 * u).sp, lineHeight = (15 * u).sp), color = Sim.HeaderGray)
+			Text(sub, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Light, fontSize = (10 * u).sp, lineHeight = (13 * u).sp), color = Sim.Faint)
 		}
 		Text(
 			amount,
-			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (13 * u).sp, lineHeight = (18 * u).sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp, lineHeight = (18 * u).sp),
 			color = if (up) Sim.Green else Sim.Red,
 		)
 	}
@@ -325,69 +339,78 @@ private fun SellConfirmContent(pick: PickSpec, onConfirm: () -> Unit, onDismiss:
 			color = Color.White,
 		)
 		PickSellRow(pick)
-		Row(horizontalArrangement = Arrangement.spacedBy((6 * u).dp)) {
-			Text(
-				"You hold ${pick.shares} shares from your ${pick.stakeBasis} stake.",
-				style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp, lineHeight = (18 * u).sp),
-				color = Sim.Body,
-			)
-		}
-		Row(horizontalArrangement = Arrangement.spacedBy((6 * u).dp)) {
-			Text("Position value", style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp), color = Sim.Muted)
-			Text(
-				pick.stakeValue,
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp),
-				color = Sim.Bright,
-			)
-		}
-		Row(horizontalArrangement = Arrangement.spacedBy((8 * u).dp), modifier = Modifier.fillMaxWidth()) {
-			listOf("All", "Half", "Custom").forEachIndexed { i, label ->
-				val sel = i == mode
-				Box(
-					contentAlignment = Alignment.Center,
-					modifier = Modifier
-						.weight(1f)
-						.clip(RoundedCornerShape((10 * u).dp))
-						.background(if (sel) Color(0xFF0F2A38) else Color(0xFF0B1430))
-						.border(
-							if (sel) (0.5 * u).dp else (1 * u).dp,
-							if (sel) Color(0xFF5DA8BF) else Color(0x1FFFFFFF),
-							RoundedCornerShape((10 * u).dp),
+		Text(
+			"You hold ${pick.shares} shares from your ${pick.stakeBasis} stake.",
+			style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp, lineHeight = (18 * u).sp),
+			color = Sim.Body,
+			modifier = Modifier.fillMaxWidth(),
+		)
+		// 1:4846 Practice ticket (exact-design audit 2026-09-04): the value line, the
+		// quick amounts and the Returning line sit 12 apart inside the sheet's 14 rhythm.
+		Column(verticalArrangement = Arrangement.spacedBy((12 * u).dp), modifier = Modifier.fillMaxWidth()) {
+			Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy((6 * u).dp)) {
+				Text("Position value", style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp, lineHeight = (16 * u).sp), color = Sim.Muted)
+				Text(
+					pick.stakeValue,
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
+					color = Sim.Bright,
+				)
+			}
+			Row(horizontalArrangement = Arrangement.spacedBy((8 * u).dp), modifier = Modifier.fillMaxWidth()) {
+				listOf("All", "Half", "Custom").forEachIndexed { i, label ->
+					val sel = i == mode
+					Box(
+						contentAlignment = Alignment.Center,
+						modifier = Modifier
+							.weight(1f)
+							// 1:4853 (exact-design audit 2026-09-04): the sell chips are r6 - the buy ticket's r10 had been carried over.
+							.clip(RoundedCornerShape((6 * u).dp))
+							.background(if (sel) Color(0xFF0F2A38) else Color(0xFF0B1430))
+							.border(
+								if (sel) (0.5 * u).dp else (1 * u).dp,
+								if (sel) Color(0xFF5DA8BF) else Color(0x1FFFFFFF),
+								RoundedCornerShape((6 * u).dp),
+							)
+							.clickable(
+								interactionSource = remember { MutableInteractionSource() },
+								indication = null,
+							) { mode = i }
+							.padding(vertical = (8 * u).dp),
+					) {
+						Text(
+							label,
+							style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
+							color = if (sel) Color(0xFFA6E4F7) else Color(0xFFDCE7F7),
 						)
-						.clickable(
-							interactionSource = remember { MutableInteractionSource() },
-							indication = null,
-						) { mode = i }
-						.padding(vertical = (8 * u).dp),
-				) {
-					Text(
-						label,
-						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp),
-						color = if (sel) Color(0xFFA6E4F7) else Color(0xFFDCE7F7),
-					)
+					}
 				}
 			}
-		}
-		Row(
-			horizontalArrangement = Arrangement.spacedBy((6 * u).dp, Alignment.CenterHorizontally),
-			modifier = Modifier.fillMaxWidth(),
-		) {
-			Text("Returning", style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp), color = Sim.Muted)
-			Text(
-				pick.stakeValue,
-				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp),
-				color = Sim.Bright,
-			)
-			Text("to your cash", style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp), color = Sim.Muted)
+			// 1:4861 (exact-design audit 2026-09-04): the three runs share one baseline.
+			Row(
+				horizontalArrangement = Arrangement.spacedBy((6 * u).dp, Alignment.CenterHorizontally),
+				modifier = Modifier.fillMaxWidth(),
+			) {
+				Text("Returning", style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp, lineHeight = (16 * u).sp), color = Sim.Muted, modifier = Modifier.alignByBaseline())
+				Text(
+					pick.stakeValue,
+					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp, lineHeight = (19 * u).sp),
+					color = Sim.Bright,
+					modifier = Modifier.alignByBaseline(),
+				)
+				Text("to your cash", style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp, lineHeight = (16 * u).sp), color = Sim.Muted, modifier = Modifier.alignByBaseline())
+			}
 		}
 		Column(verticalArrangement = Arrangement.spacedBy((16 * u).dp), modifier = Modifier.fillMaxWidth()) {
-			// Dark navy confirm — #12203e per the frame.
+			// 1:4866 (exact-design audit 2026-09-04): #12203e, 51 tall, under the 0.361 CTA
+			// hairline and the 4% teal wash; the label is Sora Regular 14 (was Geist Medium, 52, no hairline).
 			Box(
 				contentAlignment = Alignment.Center,
 				modifier = Modifier
 					.fillMaxWidth()
-					.height((52 * u).dp)
+					.height((51 * u).dp)
+					.tealShadow(u, dy = 12.285f, blur = 12.285f, alpha = 0.04f)
 					.background(Sim.DarkCta, RoundedCornerShape((6 * u).dp))
+					.border((0.361 * u).dp, Sim.CtaBorder, RoundedCornerShape((6 * u).dp))
 					.clickable(
 						interactionSource = remember { MutableInteractionSource() },
 						indication = null,
@@ -396,17 +419,17 @@ private fun SellConfirmContent(pick: PickSpec, onConfirm: () -> Unit, onDismiss:
 			) {
 				Text(
 					"Confirm sell",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp),
+					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp, lineHeight = (20.69 * u).sp),
 					color = Color.White,
 				)
 			}
+			// 1:4868 (exact-design audit 2026-09-04): hairline only - the 4% white fill was never authored.
 			Box(
 				contentAlignment = Alignment.Center,
 				modifier = Modifier
 					.fillMaxWidth()
 					.height((52 * u).dp)
-					.background(Color(0x0AFFFFFF), RoundedCornerShape((6 * u).dp))
-					.border((0.36 * u).dp, Color(0x54343B4F), RoundedCornerShape((6 * u).dp))
+					.border((0.361 * u).dp, Color(0x54343B4F), RoundedCornerShape((6 * u).dp))
 					.clickable(
 						interactionSource = remember { MutableInteractionSource() },
 						indication = null,
@@ -441,37 +464,42 @@ private fun PositionClosedContent(pick: PickSpec, onBackToSimulate: () -> Unit, 
 			color = Sim.Body,
 			modifier = Modifier.fillMaxWidth(),
 		)
-		Row(horizontalArrangement = Arrangement.spacedBy((6 * u).dp), modifier = Modifier.fillMaxWidth()) {
-			Text("Proceeds", style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp), color = Sim.Muted)
-			Text(
-				pick.stakeValue,
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp),
-				color = Sim.Bright,
-			)
-		}
-		// 73:855 centres the Returned line (the Proceeds line above stays left-aligned).
-		Row(horizontalArrangement = Arrangement.spacedBy((6 * u).dp, Alignment.CenterHorizontally), modifier = Modifier.fillMaxWidth()) {
-			Text("Returned", style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp), color = Sim.Muted)
-			Text(
-				pick.stakeValue,
-				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp),
-				color = Sim.Bright,
-			)
-			Text("to your cash (${pick.gain})", style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp), color = Sim.Muted)
+		// 73:1003 Practice ticket (exact-design audit 2026-09-04): Proceeds and the Returned line sit 12 apart.
+		Column(verticalArrangement = Arrangement.spacedBy((12 * u).dp), modifier = Modifier.fillMaxWidth()) {
+			Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy((6 * u).dp)) {
+				Text("Proceeds", style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp, lineHeight = (16 * u).sp), color = Sim.Muted)
+				Text(
+					pick.stakeValue,
+					// 73:1006 (exact-design audit 2026-09-04): the proceeds figure is Sora SemiBold 12 - was Geist Medium.
+					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (12 * u).sp, lineHeight = (15 * u).sp),
+					color = Sim.Bright,
+				)
+			}
+			// 73:1018 centres the Returned line on one baseline (the Proceeds line above stays left-aligned).
+			Row(
+				horizontalArrangement = Arrangement.spacedBy((6 * u).dp, Alignment.CenterHorizontally),
+				modifier = Modifier.fillMaxWidth(),
+			) {
+				Text("Returned", style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp, lineHeight = (16 * u).sp), color = Sim.Muted, modifier = Modifier.alignByBaseline())
+				Text(
+					pick.stakeValue,
+					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp, lineHeight = (19 * u).sp),
+					color = Sim.Bright,
+					modifier = Modifier.alignByBaseline(),
+				)
+				Text("to your cash (${pick.gain})", style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp, lineHeight = (16 * u).sp), color = Sim.Muted, modifier = Modifier.alignByBaseline())
+			}
 		}
 		Column(verticalArrangement = Arrangement.spacedBy((16 * u).dp), modifier = Modifier.fillMaxWidth()) {
+			// 73:1023 (exact-design audit 2026-09-04): the authored shadow stack is the 1% (dy
+			// 49.86, blur 19.51) and 3% (dy 28.18, blur 16.62) teal layers - not the deck CTA's 9% at 12.28.
 			Box(
 				contentAlignment = Alignment.Center,
 				modifier = Modifier
 					.fillMaxWidth()
 					.height((52 * u).dp)
-					.drawBehind {
-						val r = (6 * u).dp.toPx()
-						val paint = android.graphics.Paint().apply { isAntiAlias = true }
-						paint.color = android.graphics.Color.argb(23, 82, 170, 199)
-						paint.maskFilter = android.graphics.BlurMaskFilter((12.28f * u).dp.toPx(), android.graphics.BlurMaskFilter.Blur.NORMAL)
-						drawContext.canvas.nativeCanvas.drawRoundRect(0f, (12.28f * u).dp.toPx(), size.width, (12.28f * u).dp.toPx() + size.height, r, r, paint)
-					}
+					.tealShadow(u, dy = 49.862f, blur = 19.512f, alpha = 0.01f)
+					.tealShadow(u, dy = 28.183f, blur = 16.62f, alpha = 0.03f)
 					.background(
 						androidx.compose.ui.graphics.Brush.verticalGradient(
 							0.0889f to Color(0xFFA6E4F7),
@@ -481,7 +509,7 @@ private fun PositionClosedContent(pick: PickSpec, onBackToSimulate: () -> Unit, 
 						),
 						RoundedCornerShape((6 * u).dp),
 					)
-					.border((0.36 * u).dp, Sim.CtaBorder, RoundedCornerShape((6 * u).dp))
+					.border((0.361 * u).dp, Sim.CtaBorder, RoundedCornerShape((6 * u).dp))
 					.clickable(
 						interactionSource = remember { MutableInteractionSource() },
 						indication = null,
@@ -490,17 +518,17 @@ private fun PositionClosedContent(pick: PickSpec, onBackToSimulate: () -> Unit, 
 			) {
 				Text(
 					"Back to Simulate",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp, lineHeight = (20.69 * u).sp),
 					color = Color.White,
 				)
 			}
+			// 73:1025 (exact-design audit 2026-09-04): hairline only - the 4% white fill was never authored.
 			Box(
 				contentAlignment = Alignment.Center,
 				modifier = Modifier
 					.fillMaxWidth()
 					.height((52 * u).dp)
-					.background(Color(0x0AFFFFFF), RoundedCornerShape((6 * u).dp))
-					.border((0.36 * u).dp, Color(0x54343B4F), RoundedCornerShape((6 * u).dp))
+					.border((0.361 * u).dp, Color(0x54343B4F), RoundedCornerShape((6 * u).dp))
 					.clickable(
 						interactionSource = remember { MutableInteractionSource() },
 						indication = null,

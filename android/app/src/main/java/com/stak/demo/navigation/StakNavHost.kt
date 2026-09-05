@@ -330,10 +330,13 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
 			// Prototype (sign-in frame): "Home first run" arrives as Push
 			// Right — in from the left, 300ms ease out.
 			enterTransition = {
-				if (initialState.destination.route == StakRoutes.SIGN_IN) {
-					slideInHorizontally(tween(300, easing = EaseOut)) { -it }
-				} else {
-					null
+				when (initialState.destination.route) {
+					StakRoutes.SIGN_IN -> slideInHorizontally(tween(300, easing = EaseOut)) { -it }
+					// Splash -> Home (returning user) has no authored edge; it completes the
+					// splash's authored DISSOLVE 350 (1:926 -> 1:830) instead of pairing that
+					// fade-out with the default slide-in - prototype audit 2026-09-04.
+					StakRoutes.SPLASH -> fadeIn(tween(350, easing = EaseOut))
+					else -> null
 				}
 			},
 			// A3: pushing an instant-edge page must not slide the shell away

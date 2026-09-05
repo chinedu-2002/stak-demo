@@ -300,14 +300,15 @@ private fun BriefCard(brief: NewsBriefFeed.Brief, onRead: () -> Unit) {
 		)
 		Text(
 			text = brief.body,
-			// Authored 13/lh17 wraps to 3 lines in the 314 box; Compose
-			// shapes Geist wider — 12.2 restores the authored 3-line wrap.
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12.2 * u).sp, lineHeight = (17 * u).sp),
+			// Authored Geist Regular 12 / lh17 (1:1265; the earlier 12.2 wrap
+			// tweak assumed 13) - exact-design audit 2026-09-04.
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (17 * u).sp),
 			color = News.Ink,
 		)
 		Row(
 			verticalAlignment = Alignment.CenterVertically,
-			modifier = Modifier.fillMaxWidth().height((21 * u).dp),
+			// Authored hf row is 21 tall with a 4 top pad (1:1266) - exact-design audit 2026-09-04.
+			modifier = Modifier.fillMaxWidth().height((21 * u).dp).padding(top = (4 * u).dp),
 		) {
 			Text(
 				text = brief.source,
@@ -352,6 +353,8 @@ private fun StoryGrid(onOpenArticle: (String) -> Unit, query: String = "") {
 		if (showMarket) {
 			StoryTile(
 				tag = "Markets",
+				// Authored Geist Regular (1:1280) - exact-design audit 2026-09-04.
+				tagWeight = FontWeight.Normal,
 				headline = market.headline,
 				source = "${market.source} · ${market.age}",
 				onClick = { onOpenArticle(market.id) },
@@ -361,6 +364,8 @@ private fun StoryGrid(onOpenArticle: (String) -> Unit, query: String = "") {
 		if (showYours) {
 			StoryTile(
 				tag = "Your stocks",
+				// Authored Geist Light (1:1288) - exact-design audit 2026-09-04.
+				tagWeight = FontWeight.Light,
 				headline = yours.headline,
 				source = "${yours.source} · ${yours.age}",
 				onClick = { onOpenArticle(yours.id) },
@@ -371,7 +376,7 @@ private fun StoryGrid(onOpenArticle: (String) -> Unit, query: String = "") {
 }
 
 @Composable
-private fun StoryTile(tag: String, headline: String, source: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
+private fun StoryTile(tag: String, tagWeight: FontWeight, headline: String, source: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Column(
 		verticalArrangement = Arrangement.spacedBy((8 * u).dp),
@@ -386,7 +391,7 @@ private fun StoryTile(tag: String, headline: String, source: String, onClick: ()
 			)
 			.padding((14 * u).dp),
 	) {
-		NewsTag(text = tag, letterSpacing = (0.4 * u + ADVANCE_ROUNDING.value).sp)
+		NewsTag(text = tag, letterSpacing = (0.4 * u + ADVANCE_ROUNDING.value).sp, weight = tagWeight)
 		Text(
 			text = headline,
 			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Light, fontSize = (12 * u).sp, lineHeight = (20 * u).sp),
@@ -401,9 +406,13 @@ private fun StoryTile(tag: String, headline: String, source: String, onClick: ()
 	}
 }
 
-/** #242b3d r5 chip — Geist 8 #819abb. */
+/**
+ * #242b3d r5 chip — Geist 8 #819abb. Medium for the row chips (1:1302);
+ * the tile tags are authored Regular / Light (1:1280 / 1:1288) -
+ * exact-design audit 2026-09-04.
+ */
 @Composable
-internal fun NewsTag(text: String, letterSpacing: androidx.compose.ui.unit.TextUnit = 0.sp) {
+internal fun NewsTag(text: String, letterSpacing: androidx.compose.ui.unit.TextUnit = 0.sp, weight: FontWeight = FontWeight.Medium) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Box(
 		modifier = Modifier
@@ -413,7 +422,7 @@ internal fun NewsTag(text: String, letterSpacing: androidx.compose.ui.unit.TextU
 	) {
 		Text(
 			text = text,
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (8 * u).sp, lineHeight = (10 * u).sp, letterSpacing = letterSpacing),
+			style = TextStyle(fontFamily = Geist, fontWeight = weight, fontSize = (8 * u).sp, lineHeight = (10 * u).sp, letterSpacing = letterSpacing),
 			color = News.Muted,
 		)
 	}
@@ -430,8 +439,10 @@ private fun NewsSection(
 	Column(verticalArrangement = Arrangement.spacedBy((10 * u).dp), modifier = Modifier.fillMaxWidth()) {
 		Text(
 			text = title,
-			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp, lineHeight = (22 * u).sp),
+			// Authored header: the 20-tall Sora 16 box + a 2 bottom pad (1:1293) - exact-design audit 2026-09-04.
+			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp, lineHeight = (20 * u).sp),
 			color = News.HeaderGray,
+			modifier = Modifier.padding(bottom = (2 * u).dp),
 		)
 		rows.forEach { row ->
 			Row(
@@ -473,7 +484,9 @@ private fun NewsSection(
 					)
 				}
 				Column(verticalArrangement = Arrangement.spacedBy((5 * u).dp), modifier = Modifier.weight(1f)) {
-					Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+					// Authored meta row is 16 tall (1:1298, the chip's height) whether
+					// or not the chip shows, so the card holds 84 - exact-design audit 2026-09-04.
+					Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().height((16 * u).dp)) {
 						Text(
 							text = "${row.source} · ${row.age}",
 							style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp, lineHeight = (14 * u).sp),

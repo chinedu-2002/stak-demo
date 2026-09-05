@@ -49,7 +49,7 @@ private val BARS = listOf(
  * the #181f30 taste card with four strength bars drawn at their exact
  * Figma widths - the frame arrives already filled, so there is no
  * entry animation (Codex parity audit 2026-09-04) - the Risk style
- * chip ("Growth-Oriented" ›) and the "Lets go!" / Back CTAs.
+ * chip ("Growth-Oriented" ›) and the "Let's go!" / Back CTAs.
  */
 @Composable
 fun TasteRevealScreen(onBack: () -> Unit, onLetsGo: () -> Unit) {
@@ -180,7 +180,8 @@ fun TasteRevealScreen(onBack: () -> Unit, onLetsGo: () -> Unit) {
 			verticalArrangement = Arrangement.spacedBy((10 * u).dp),
 			modifier = Modifier.fillMaxWidth().padding(top = (8 * u).dp, bottom = (26 * u).dp),
 		) {
-			AuthCta(text = "Lets go!", onClick = onLetsGo)
+			// Copy fix: 1:746 authors "Lets go!" -> "Let's go!" (exact-design audit 2026-09-04).
+			AuthCta(text = "Let's go!", onClick = onLetsGo)
 			AuthSecondaryButton(text = "Back", onClick = onBack)
 		}
 	}

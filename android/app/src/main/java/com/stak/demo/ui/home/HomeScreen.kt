@@ -208,7 +208,11 @@ private fun TopNav(onProfile: () -> Unit, modifier: Modifier = Modifier) {
 					Image(
 						painter = painterResource(R.drawable.ic_nav_person),
 						contentDescription = "Profile",
-						modifier = Modifier.size((12.99 * u).dp, (13.64 * u).dp),
+						// 118:1683/1684: the 24 icon box sits at circle centre
+						// (+0.5, -0.5) and the glyph at (+0.49, -0.18) inside it, so
+						// the glyph rests at (+0.99, -0.68), not dead centre -
+						// exact-design audit 2026-09-04.
+						modifier = Modifier.offset(x = (0.99 * u).dp, y = (-0.68 * u).dp).size((12.99 * u).dp, (13.64 * u).dp),
 					)
 				}
 			}
@@ -292,7 +296,9 @@ private fun MarketMoodCard(onOpenNews: () -> Unit) {
 		Row(
 			verticalAlignment = Alignment.CenterVertically,
 			horizontalArrangement = Arrangement.Center,
-			modifier = Modifier.fillMaxWidth().padding(top = (25 * u).dp),
+			// 118:1690 centres at 50%+0.45 (row left 34, gauge at 260 in the
+			// render); plain centring lands at 33.55 - exact-design audit 2026-09-04.
+			modifier = Modifier.fillMaxWidth().padding(top = (25 * u).dp).offset(x = (0.45 * u).dp),
 		) {
 			Column(verticalArrangement = Arrangement.spacedBy((4 * u).dp), modifier = Modifier.width((180 * u).dp)) {
 				Text(
@@ -620,10 +626,15 @@ private fun FirstRunOverlay(onSeeTodaysPick: () -> Unit, modifier: Modifier = Mo
 				),
 		) {
 			Text(
-				// Authored copy verbatim (user, 2026-09-04 (CHINEDU 02 · Home dev 118:1633): the exact frame wins, spelling included).
-				text = "See Todays Pick",
+				// user, 2026-09-04: grammar fixed, frame typo not copied.
+				text = "See Today’s Pick",
 				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp),
 				color = Color.White,
+				// 1:1083/1:1093: the label box sits at pill centre +0.5 with a
+				// 7.524/5.643 top/bottom padding split, so its cap box rests 1.44
+				// below centre (render: caps at 128-136 in the 105-156 pill) -
+				// exact-design audit 2026-09-04.
+				modifier = Modifier.offset(y = (1.44 * u).dp),
 			)
 		}
 	}

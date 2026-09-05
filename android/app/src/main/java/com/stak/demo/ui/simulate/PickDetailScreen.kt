@@ -145,7 +145,7 @@ fun PickDetailScreen(
 					contentAlignment = Alignment.Center,
 					modifier = Modifier.size((40 * u).dp).background(Sim.CardBg, CircleShape),
 				) {
-					Image(painterResource(R.drawable.ic_news_share), null, modifier = Modifier.size((17 * u).dp))
+					Image(painterResource(R.drawable.ic_news_share), null, modifier = Modifier.size((18 * u).dp)) // 1:4652 icon/share is 18 (exact-design audit 2026-09-04)
 				}
 			}
 			Column(
@@ -155,16 +155,17 @@ fun PickDetailScreen(
 					.fillMaxWidth()
 					.verticalScroll(rememberScrollState())
 					.padding(horizontal = (20 * u).dp)
-					.padding(top = (6 * u).dp, bottom = (20 * u).dp),
+					.padding(top = (6 * u).dp, bottom = (26 * u).dp), // 1:4653 pb 26 (exact-design audit 2026-09-04)
 			) {
-				// Authored hero card (1:4654): 350x307 r24 with 18 padding - avatar row,
+				// Authored hero card (1:4654): 350x307 r16 with 18 padding - avatar row,
 				// +$24 in a 48-tall box with the .00 at 16/20, subtitle, the 343x73.5 chart
 				// line bleeding 14.5 past the padding, range tabs 40 below the line.
 				Column(
 					modifier = Modifier
 						.fillMaxWidth()
 						.height((307 * u).dp)
-						.clip(RoundedCornerShape((24 * u).dp))
+						// 1:4654 (exact-design audit 2026-09-04): the hero is r16 - the r24 was never authored.
+						.clip(RoundedCornerShape((16 * u).dp))
 						.background(Sim.CardBg)
 						.padding((18 * u).dp),
 				) {
@@ -181,7 +182,7 @@ fun PickDetailScreen(
 					Row(verticalAlignment = Alignment.Bottom, modifier = Modifier.padding(top = (11 * u).dp).height((48 * u).dp)) {
 						Text(
 							gainWhole,
-							style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (38 * u).sp, lineHeight = (48 * u).sp, letterSpacing = (-0.38 * u).sp),
+							style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (38 * u).sp, lineHeight = (48 * u).sp), // 1:4660 carries no tracking (exact-design audit 2026-09-04)
 							// A losing pick's figure takes the authored red (the rows' Sim.Red).
 							color = if (p.up) Color.White else Sim.Red,
 						)
@@ -194,7 +195,8 @@ fun PickDetailScreen(
 					}
 					Text(
 						"That is ${if (p.up) "up" else "down"} ${p.gainPct} on a ${p.stakeBasis} paper stake",
-						style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
+						// 1:4662 (exact-design audit 2026-09-04): Geist Light, like the hero's all-time line.
+						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Light, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
 						color = Sim.Muted,
 						modifier = Modifier.padding(top = (11 * u).dp),
 					)
@@ -236,8 +238,9 @@ fun PickDetailScreen(
 						StatBox("vs the market", p.vsMarket, if (p.ahead) Sim.Green else Sim.Red, Modifier.weight(1f))
 					}
 					Row(horizontalArrangement = Arrangement.spacedBy((10 * u).dp)) {
-						StatBox("Price then", p.priceThen, Sim.Bright, Modifier.weight(1f))
-						StatBox("Price now", p.priceNow, Sim.Bright, Modifier.weight(1f))
+						// 1:4684 / 1:4687 (exact-design audit 2026-09-04): the prices are plain white, not #f2f6fc.
+						StatBox("Price then", p.priceThen, Color.White, Modifier.weight(1f))
+						StatBox("Price now", p.priceNow, Color.White, Modifier.weight(1f))
 					}
 				}
 				// WHY / insight card — teal-tinted like the deck tips.
@@ -245,12 +248,14 @@ fun PickDetailScreen(
 					verticalArrangement = Arrangement.spacedBy((9 * u).dp),
 					modifier = Modifier
 						.fillMaxWidth()
-						.clip(RoundedCornerShape((16 * u).dp))
+						// 1:4688 (exact-design audit 2026-09-04): the live note is r14.
+						.clip(RoundedCornerShape((14 * u).dp))
 						.background(Sim.TealTint)
 						// Live note (1:4688): 83 tall, x14, kicker row at 12, body at 37.
 						.padding(horizontal = (14 * u).dp, vertical = (12 * u).dp),
 				) {
-					Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy((7 * u).dp)) {
+					// 1:4689 (exact-design audit 2026-09-04): sparkle and kicker share the row's top edge.
+					Row(verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.spacedBy((7 * u).dp)) {
 						Image(painterResource(R.drawable.ic_gist_sparkle), null, modifier = Modifier.size((16 * u).dp))
 						Text(
 							"INSIGHT",
@@ -273,7 +278,10 @@ fun PickDetailScreen(
 						modifier = Modifier
 							.fillMaxWidth()
 							.height((51 * u).dp)
+							// 1:4694 (exact-design audit 2026-09-04): the 0.361 CTA hairline and the 4% teal wash under #12203e.
+							.tealShadow(u, dy = 12.285f, blur = 12.285f, alpha = 0.04f)
 							.background(Sim.DarkCta, RoundedCornerShape((6 * u).dp))
+							.border((0.361 * u).dp, Sim.CtaBorder, RoundedCornerShape((6 * u).dp))
 							.clickable(
 								interactionSource = remember { MutableInteractionSource() },
 								indication = null,
@@ -281,7 +289,8 @@ fun PickDetailScreen(
 					) {
 						Text(
 							"Sell",
-							style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp),
+							// 1:4695 (exact-design audit 2026-09-04): Sora Regular 14 on a 20.69 line - was Geist Medium.
+							style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp, lineHeight = (20.69 * u).sp),
 							color = Color.White,
 						)
 					}
@@ -319,18 +328,20 @@ fun PickDetailScreen(
 @Composable
 private fun StatBox(label: String, value: String, valueColor: Color, modifier: Modifier) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
+	// 1:4675 cell (exact-design audit 2026-09-04): r14, label Geist 10 #819abb, value
+	// Geist Regular 14 - was r12 / #5c6b85 / Sora SemiBold 15.
 	Column(
 		verticalArrangement = Arrangement.spacedBy((4 * u).dp),
 		modifier = modifier
 			.height((61 * u).dp)
-			.clip(RoundedCornerShape((12 * u).dp))
+			.clip(RoundedCornerShape((14 * u).dp))
 			.background(Sim.CardBg)
 			.padding(horizontal = (14 * u).dp, vertical = (13 * u).dp),
 	) {
-		Text(label, style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp, lineHeight = (13 * u).sp), color = Sim.Faint)
+		Text(label, style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp, lineHeight = (13 * u).sp), color = Sim.Muted)
 		Text(
 			value,
-			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp, lineHeight = (18 * u).sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp, lineHeight = (18 * u).sp),
 			color = valueColor,
 		)
 	}

@@ -136,7 +136,8 @@ fun MyStakScreen(onOpenCollection: (String) -> Unit, onStartSwiping: () -> Unit)
 				Text(
 					text = "Add more",
 					// Codex parity audit (2026-09-04): 1:3155 sets the CTA at 14.
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp, lineHeight = (21 * u).sp),
+					// 1:3226 line-height 20.69 (was 21) - exact-design audit 2026-09-04.
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp, lineHeight = (20.69 * u).sp),
 					color = Color.White,
 				)
 				Image(painterResource(R.drawable.ic_plus_small), null, modifier = Modifier.size((14 * u).dp))
@@ -200,23 +201,30 @@ fun MyStakScreen(onOpenCollection: (String) -> Unit, onStartSwiping: () -> Unit)
 				)
 				Text(
 					text = "Based on your taste, 8 fresh picks are waiting in the deck.",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (13 * u).sp, lineHeight = (17 * u).sp),
+					// 1:3322 Geist Regular 12 / 17 (was 13) - exact-design audit 2026-09-04.
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (17 * u).sp),
 					color = Ink,
 				)
-				Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy((4 * u).dp)) {
+				// 1:3323 "b": pt 4 over the 17/18 natural runs (was a 22 line-height strip) - exact-design audit 2026-09-04.
+				Row(
+					verticalAlignment = Alignment.CenterVertically,
+					horizontalArrangement = Arrangement.spacedBy((4 * u).dp),
+					modifier = Modifier.padding(top = (4 * u).dp),
+				) {
 					Text(
 						text = "Start swiping",
-						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp, lineHeight = (22 * u).sp),
+						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp, lineHeight = (17 * u).sp),
 						color = Color(0xB80A1020),
 					)
 					Text(
 						text = "›",
-						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp, lineHeight = (22 * u).sp),
+						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp, lineHeight = (18 * u).sp),
 						color = Ink,
 					)
 				}
 			}
-			Spacer(modifier = Modifier.height(0.dp))
+			// 1:3156: the Sections column ends at the Discover CTA and the 86 bottom
+			// padding IS the tab bar, so no trailing gap - exact-design audit 2026-09-04.
 		}
 	}
 }
@@ -311,7 +319,8 @@ private fun PortfolioSummary() {
 			)
 			Text(
 				text = "+4.9%",
-				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (44 * u).sp, lineHeight = (55 * u).sp, letterSpacing = (-0.44 * u).sp),
+				// 1:3239 tracking -0.44 carries ADVANCE_ROUNDING like every tracked run - exact-design audit 2026-09-04.
+				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (44 * u).sp, lineHeight = (55 * u).sp, letterSpacing = (-0.44 * u + ADVANCE_ROUNDING.value).sp),
 				color = Color.White,
 			)
 			Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy((10 * u).dp)) {
@@ -408,18 +417,19 @@ private fun AllocationCard() {
 			SectorBar("Tech & AI", "42% · 6 stocks", Teal, (132 * u).dp)
 			SectorBar("Finance", "21% · 3 stocks", Color(0xFF7AB3F0), (66 * u).dp)
 			SectorBar("Green Energy", "20% · 3 stocks", Green, (63 * u).dp)
-			SectorBar("Real Estate", "12% · 2 stocks", Color(0xFF9E8CE5), (38 * u).dp)
+			// 1:3306 legend dot is #9E8CE6 while the 1:3310 bar is #9E8CE5 - exact-design audit 2026-09-04.
+			SectorBar("Real Estate", "12% · 2 stocks", Color(0xFF9E8CE5), (38 * u).dp, dot = Color(0xFF9E8CE6))
 			SectorBar("Other", "5% · 1 stock", Faint, (16 * u).dp)
 		}
 	}
 }
 
 @Composable
-private fun SectorBar(name: String, share: String, color: Color, fill: Dp) {
+private fun SectorBar(name: String, share: String, color: Color, fill: Dp, dot: Color = color) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Column(verticalArrangement = Arrangement.spacedBy((6 * u).dp), modifier = Modifier.fillMaxWidth()) {
 		Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-			Box(modifier = Modifier.size((9 * u).dp).background(color, CircleShape))
+			Box(modifier = Modifier.size((9 * u).dp).background(dot, CircleShape))
 			Spacer(modifier = Modifier.width((8 * u).dp))
 			Text(name, style = TextStyle(fontFamily = Geist, fontSize = (13 * u).sp, lineHeight = (17 * u).sp), color = Color.White)
 			Spacer(modifier = Modifier.weight(1f))

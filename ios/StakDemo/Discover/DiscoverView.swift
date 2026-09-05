@@ -483,6 +483,10 @@ struct DiscoverView: View {
 
 		}
 		.background(StakColors.bg.ignoresSafeArea())
+		// Only a CHANGE of the key restarts a finished deck - never the re-entry
+		// itself, so a deck the user comes back to from My STAK / Simulate keeps
+		// its end state (prototype walk 2026-09-05; Android mirrors this with a
+		// remembered initial key).
 		.onChange(of: resetKey) { if seen >= deckSize { restart() } }
 	}
 }

@@ -68,7 +68,8 @@ internal fun MatrixQuizScreen(
 	subtitle: String,
 	options: List<MatrixOption>,
 	onBack: () -> Unit,
-	onContinue: () -> Unit,
+	/** Continue reports the chosen card's index. */
+	onContinue: (Int) -> Unit,
 	// The frames arrive with one card already selected (04 Goal 1554:8828,
 	// 05 Risk 1554:8913); the caller names it (Codex parity audit
 	// 2026-09-04). -1 = start unselected.
@@ -133,7 +134,7 @@ internal fun MatrixQuizScreen(
 			verticalArrangement = Arrangement.spacedBy((10 * u).dp),
 			modifier = Modifier.fillMaxWidth().padding(top = (8 * u).dp, bottom = (26 * u).dp),
 		) {
-			AuthCta(text = "Continue", onClick = { if (selected >= 0) onContinue() })
+			AuthCta(text = "Continue", enabled = selected >= 0, onClick = { if (selected >= 0) onContinue(selected) })
 			AuthSecondaryButton(text = "Back", onClick = onBack)
 		}
 	}

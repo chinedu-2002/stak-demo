@@ -20,6 +20,13 @@ object UserProfile {
 	 * production. Authored demo default until then.
 	 */
 	var riskStyle by mutableStateOf("Growth-Oriented")
+	// The onboarding answers (product audit, 2026-09-05): they shape the taste
+	// reveal, the risk style and the Profile chips instead of going nowhere.
+	var brandPicks by mutableStateOf(setOf<String>())
+	/** 04 Goal card index, -1 until answered (TasteModel.GOAL_*). */
+	var goal by mutableStateOf(-1)
+	/** 05 Risk card index, -1 until answered (TasteModel.RISK_*). */
+	var risk by mutableStateOf(-1)
 
 	/** The name as the app addresses the user - always capitalized. */
 	val greetingName: String

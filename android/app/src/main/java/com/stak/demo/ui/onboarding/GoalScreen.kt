@@ -21,8 +21,8 @@ fun GoalScreen(onBack: () -> Unit, onContinue: () -> Unit) {
 			MatrixOption("Just exploring", "Curious, no plan yet", R.drawable.ic_goal_explore, iconDy = 9f),
 		),
 		onBack = onBack,
-		onContinue = onContinue,
-		// 1554:8828 arrives with "Find my first stocks" selected.
-		initialSelection = 2,
+		// Product audit (2026-09-05): nothing pre-selected; the answer shapes
+		// the taste reveal and the Profile chips.
+		onContinue = { choice -> com.stak.demo.ui.UserProfile.goal = choice; onContinue() },
 	)
 }

@@ -32,15 +32,7 @@ import com.stak.demo.ui.theme.Sora
 import com.stak.demo.ui.theme.StakColors
 
 /** One taste bar — label, strength word (its own gray), fill fraction of the track. */
-private data class TasteBar(val label: String, val strength: String, val strengthColor: Color, val fraction: Float)
 
-/** Figma fills 286/248/165/70 over the 310px track. */
-private val BARS = listOf(
-	TasteBar("Tech curious", "Strong", Color(0xFF69B3CA), 286f / 310f),
-	TasteBar("Growth seeking", "Strong", Color(0xFF69B3CA), 248f / 310f),
-	TasteBar("Consumer brands", "Medium", Color(0xFF819ABB), 165f / 310f),
-	TasteBar("Income & dividends", "Light", Color(0xFF5C6B85), 70f / 310f),
-)
 
 /**
  * Onboarding · 07 Taste reveal — Figma node 1554:9051 ("STEP 6 OF 6").
@@ -104,7 +96,10 @@ fun TasteRevealScreen(onBack: () -> Unit, onLetsGo: () -> Unit) {
 					.background(Auth.InputBg, RoundedCornerShape((16 * u).dp))
 					.padding((16 * u).dp),
 			) {
-				BARS.forEach { bar ->
+				// Product audit (2026-09-05): the bars come from the user's picks and
+				// answers, not fixed copy.
+				val profile = com.stak.demo.ui.UserProfile
+				TasteModel.bars(profile.brandPicks, profile.goal, profile.risk).forEach { bar ->
 					Column(verticalArrangement = Arrangement.spacedBy((6 * u).dp)) {
 						Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
 							Text(
@@ -156,7 +151,7 @@ fun TasteRevealScreen(onBack: () -> Unit, onLetsGo: () -> Unit) {
 						color = StakColors.Muted,
 					)
 					Text(
-						text = "Growth-Oriented",
+						text = com.stak.demo.ui.UserProfile.riskStyle,
 						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp),
 						color = StakColors.TextPrimary,
 					)

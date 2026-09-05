@@ -4,8 +4,9 @@ import SwiftUI
 let rangeLabels = ["1D", "1W", "1M", "3M", "YTD", "1Y"]
 
 /// A chart at a range. "3M" shows the authored export (`authored`); every
-/// other range draws the shared demo series in the same box - `tint` 2-wide
-/// round stroke over a 22%-to-clear `tint` fill. The series are demo
+/// other range draws the shared demo series in the same box - a `tint`
+/// 2-wide round stroke and nothing else: every authored "Chart line" is a
+/// bare #69B3CA 2 stroke with no fill (user, 2026-09-05). The series are demo
 /// stand-ins until the backend serves price history. Shared by Simulate,
 /// My STAK, Stock Detail and Pick Detail (user, 2026-09-05: "be able to
 /// click on the timeline"). Mirrors android ui/components/RangeChart.kt.
@@ -32,11 +33,7 @@ struct RangeLineChart: View {
 			if let points = RangeLineChart.series[range], range != "3M" {
 				GeometryReader { geo in
 					let line = RangeLineChart.linePath(points, in: geo.size)
-					ZStack {
-						RangeLineChart.fillPath(line, in: geo.size)
-							.fill(LinearGradient(colors: [tint.opacity(0.22), Color.clear], startPoint: .top, endPoint: .bottom))
-						line.stroke(tint, style: StrokeStyle(lineWidth: 2 * u, lineCap: .round, lineJoin: .round))
-					}
+					line.stroke(tint, style: StrokeStyle(lineWidth: 2 * u, lineCap: .round, lineJoin: .round))
 				}
 			} else {
 				Image(authored)
@@ -55,15 +52,6 @@ struct RangeLineChart: View {
 			let point = CGPoint(x: size.width * CGFloat(i) / steps, y: size.height * (1 - fraction))
 			if i == 0 { path.move(to: point) } else { path.addLine(to: point) }
 		}
-		return path
-	}
-
-	/// The polyline closed down to the box's bottom edge for the gradient.
-	private static func fillPath(_ line: Path, in size: CGSize) -> Path {
-		var path = line
-		path.addLine(to: CGPoint(x: size.width, y: size.height))
-		path.addLine(to: CGPoint(x: 0, y: size.height))
-		path.closeSubpath()
 		return path
 	}
 }

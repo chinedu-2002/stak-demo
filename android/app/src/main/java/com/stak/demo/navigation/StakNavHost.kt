@@ -256,8 +256,9 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
 			ProfileSetupScreen(
 				onBack = { navController.popBackStack() },
 				onProceed = {
-					// Account created - remembered across launches.
-					com.stak.demo.ui.Session.signIn()
+					// Account created - a NEW account, empty until the user saves
+					// and buys (product audit, 2026-09-05); remembered across launches.
+					com.stak.demo.ui.Session.signIn(demo = false)
 					navController.navigate(StakRoutes.MAIN) {
 						popUpTo(0) { inclusive = true }
 					}
@@ -312,8 +313,9 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
 					}
 				},
 				onSignIn = {
-					// Signed in - remembered across launches.
-					com.stak.demo.ui.Session.signIn()
+					// Signed in = the demo account with its authored history
+					// (product audit, 2026-09-05); remembered across launches.
+					com.stak.demo.ui.Session.signIn(demo = true)
 					navController.navigate(StakRoutes.MAIN) {
 						popUpTo(0) { inclusive = true }
 					}
@@ -737,6 +739,7 @@ private fun MainShell(
 							onOpenLeaderboard = onOpenLeaderboard,
 							// B14 (1:3964 Motion): All saved staks -> My STAK tab.
 							onOpenMyStak = { switchTab(MainTab.MySTAK) },
+							onOpenDiscover = { switchTab(MainTab.Discover) },
 						)
 						MainTab.MySTAK -> MyStakScreen(
 							onOpenCollection = onOpenCollection,

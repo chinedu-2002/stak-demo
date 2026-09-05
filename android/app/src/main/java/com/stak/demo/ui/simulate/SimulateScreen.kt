@@ -124,6 +124,8 @@ internal fun SimulateScreen(
 	onPracticeBuy: ((BuySpec) -> Unit)? = null,
 	// B14 (1:3964 Motion): "All saved staks ›" hops to the My STAK tab.
 	onOpenMyStak: () -> Unit = {},
+	/** The empty state's "Go to Discover" (a new account has nothing saved yet). */
+	onOpenDiscover: () -> Unit = {},
 ) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	// The in-page ticket: null = closed, else the tapped row's spec.
@@ -184,15 +186,22 @@ internal fun SimulateScreen(
 			) {
 				ScoreHero(onOpenLeaderboard = onOpenLeaderboard)
 				SectionHeader("Saved staks")
-				// Codex audit (2026-09-04): a saved stak that has been bought says
-				// so - the authored "not in portfolio yet" only while it is not.
-				// 1:3947 slist (exact-design audit 2026-09-04): the saved rows sit 10 apart, not the column's 18.
-				Column(verticalArrangement = Arrangement.spacedBy((10 * u).dp)) {
-					SavedStakRow("P", "PLTR", savedStakSub("PLTR", "Saved Jun 30 · not in portfolio yet"), spec = PLTR_BUY, onBuy = practiceBuy)
-					SavedStakRow("C", "COST", savedStakSub("COST", "Saved Jul 2 · not in portfolio yet"), spec = COST_BUY, onBuy = practiceBuy)
+				val savedRows = savedStakRows()
+				if (savedRows.isEmpty()) {
+					// Product audit (2026-09-05): a new account has saved nothing yet.
+					EmptyStateCard(
+						title = "Nothing saved yet",
+						body = "Save stocks from the Discover deck and practice buy them here.",
+						link = "Go to Discover",
+						onLink = onOpenDiscover,
+					)
+				} else {
+					Column(verticalArrangement = Arrangement.spacedBy((10 * u).dp)) {
+						savedRows.forEach { row -> SavedStakRow(row.spec.badge, row.spec.symbol, row.sub, spec = row.spec, onBuy = practiceBuy) }
+					}
+					CenterLink("All saved staks", onClick = onOpenMyStak)
 				}
-				CenterLink("All saved staks", onClick = onOpenMyStak)
-				InsightCard()
+				if (PaperPortfolio.pickCount > 0) InsightCard()
 				// Review 2026-09-04: best / worst come from the live ledger (max /
 				// min gain dollars); the seeded rows still render the authored
 				// NVDA +24.0% / +$24 on $100 and MSFT -3.0% / -$3 on $100. Fewer
@@ -211,6 +220,10 @@ internal fun SimulateScreen(
 				// Codex audit (2026-09-04): the first three held positions, from
 				// the shared PaperPortfolio - a fresh buy lands at the top.
 				// 1:4009 plist (exact-design audit 2026-09-04): the three rows sit 10 apart, not the column's 18.
+				if (PaperPortfolio.pickCount == 0) {
+					// Product audit (2026-09-05): a new account has no picks yet.
+					EmptyStateCard(title = "No picks yet", body = "Your first practice buy lands here with its live gain.")
+				} else {
 				Column(verticalArrangement = Arrangement.spacedBy((10 * u).dp)) {
 					PaperPortfolio.positions.take(3).forEach { pos ->
 						val p = pos.row
@@ -218,10 +231,11 @@ internal fun SimulateScreen(
 					}
 				}
 				// Authored copy (user, 2026-09-04 (CHINEDU 07 · Simulate 423:1007): the authored look wins); the ledger still drives the rows above.
-				CenterLink("See all 12 picks", onClick = onOpenPortfolio)
+				CenterLink("See all ${PaperPortfolio.pickCountLabel} picks", onClick = onOpenPortfolio)
+				}
 				// 1:4040 Points breakdown (exact-design audit 2026-09-04): the section header
 				// and the Allocation card are 15 apart, not the column's 18.
-				Column(verticalArrangement = Arrangement.spacedBy((15 * u).dp)) {
+				if (PaperPortfolio.pickCount > 0) Column(verticalArrangement = Arrangement.spacedBy((15 * u).dp)) {
 					Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
 						Text(
 							text = "Portfolio breakdown",
@@ -275,6 +289,62 @@ private fun SectionHeader(title: String) {
 private fun savedStakSub(symbol: String, authored: String): String =
 	PaperPortfolio.pickSpec(symbol)?.let { "In portfolio · ${it.shares} shares" } ?: authored
 
+/** A "Saved staks" row: the stock's buy ticket and its sub line. */
+private data class SavedStak(val spec: BuySpec, val sub: String)
+
+/**
+ * The demo account shows its two authored saves (PLTR / COST); a new
+ * account lists what IT saved - the saved stocks that have a buy ticket,
+ * newest-agnostic, two at a time (product audit, 2026-09-05).
+ */
+private fun savedStakRows(): List<SavedStak> {
+	if (PaperPortfolio.demo) {
+		return listOf(
+			SavedStak(PLTR_BUY, savedStakSub("PLTR", "Saved Jun 30 · not in portfolio yet")),
+			SavedStak(COST_BUY, savedStakSub("COST", "Saved Jul 2 · not in portfolio yet")),
+		)
+	}
+	val tickets = listOf(com.stak.demo.ui.discover.NVDA_BUY, com.stak.demo.ui.discover.AAPL_BUY, com.stak.demo.ui.discover.GOOGL_BUY, PLTR_BUY, COST_BUY)
+	return tickets.filter { it.symbol in com.stak.demo.ui.MyStakHoldings.tickers }
+		.take(2)
+		.map { SavedStak(it, savedStakSub(it.symbol, "Saved · not in portfolio yet")) }
+}
+
+/** The card an empty section shows a new account (CardBg r14, Sora title, Geist body, optional teal link). */
+@Composable
+internal fun EmptyStateCard(title: String, body: String, link: String? = null, onLink: () -> Unit = {}) {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
+	Column(
+		verticalArrangement = Arrangement.spacedBy((6 * u).dp),
+		modifier = Modifier
+			.fillMaxWidth()
+			.clip(RoundedCornerShape((14 * u).dp))
+			.background(Sim.CardBg)
+			.padding((16 * u).dp),
+	) {
+		Text(
+			text = title,
+			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp, lineHeight = (19 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
+			color = Color.White,
+		)
+		Text(
+			text = body,
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (13 * u).sp, lineHeight = (19 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
+			color = Sim.Muted,
+		)
+		if (link != null) {
+			Text(
+				text = "$link ›",
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp, lineHeight = (17 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
+				color = Sim.Teal,
+				modifier = Modifier
+					.padding(top = (4 * u).dp)
+					.clickable(interactionSource = remember { MutableInteractionSource() }, indication = null, onClick = onLink),
+			)
+		}
+	}
+}
+
 /** Portfolio value hero — $10,240.00, cash, weekly change, chart + pills. */
 @Composable
 private fun ScoreHero(onOpenLeaderboard: () -> Unit) {
@@ -317,7 +387,7 @@ private fun ScoreHero(onOpenLeaderboard: () -> Unit) {
 			)
 		}
 		Text(
-			text = "+${PaperPortfolio.usd(PaperPortfolio.allTimeGain)} all time on $" + String.format(java.util.Locale.US, "%,.0f", PaperPortfolio.PAPER_START) + " paper · 12 picks",
+			text = "${PaperPortfolio.signedUsd(PaperPortfolio.allTimeGain)} all time on $" + String.format(java.util.Locale.US, "%,.0f", PaperPortfolio.PAPER_START) + " paper · ${PaperPortfolio.pickCountLabel} picks",
 			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Light, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
 			color = Sim.Muted,
 			modifier = Modifier.padding(horizontal = (20 * u).dp),
@@ -335,9 +405,9 @@ private fun ScoreHero(onOpenLeaderboard: () -> Unit) {
 			)
 		}
 		Text(
-			text = "▲ ${PaperPortfolio.WEEK_GAIN} (${PaperPortfolio.WEEK_PCT}) this week",
+			text = "${if (PaperPortfolio.weekUp) "▲" else "▼"} ${PaperPortfolio.weekGainText} (${PaperPortfolio.weekPctText}) this week",
 			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
-			color = Sim.Green,
+			color = if (PaperPortfolio.weekUp) Sim.Green else Sim.Red,
 			modifier = Modifier.padding(horizontal = (20 * u).dp),
 		)
 		Box(
@@ -353,7 +423,7 @@ private fun ScoreHero(onOpenLeaderboard: () -> Unit) {
 				.padding(horizontal = (11 * u).dp, vertical = (6 * u).dp),
 		) {
 			Text(
-				text = "#${PaperPortfolio.WEEK_RANK} this week",
+				text = PaperPortfolio.weekRank?.let { "#$it this week" } ?: "Unranked this week",
 				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
 				color = Sim.Teal,
 			)
@@ -699,7 +769,7 @@ private fun BoardCard(onOpenLeaderboard: () -> Unit) {
 		// Codex audit (2026-09-04): You reads the shared week figures (the
 		// hero's +1.9% / #47) instead of its own contradicting +4.2%.
 		// Authored board figures (1:4111 +4.2%; user, 2026-09-04 (CHINEDU 07 · Simulate 423:1007): the authored look wins).
-		BoardRow("47", "You", "+4.2%", you = true)
+		BoardRow(PaperPortfolio.weekRank?.toString() ?: "—", "You", if (PaperPortfolio.demo) "+4.2%" else PaperPortfolio.weekPctText, you = true)
 		// 1:4112 (exact-design audit 2026-09-04): the frame lays this link at the card's
 		// left edge (x16, hug width), not centred like the column links.
 		CenterLink("Full leaderboard", centered = false, onClick = onOpenLeaderboard)

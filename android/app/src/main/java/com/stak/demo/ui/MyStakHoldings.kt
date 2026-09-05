@@ -22,18 +22,23 @@ import androidx.compose.runtime.setValue
  * Mirrors ios/StakDemo/MyStakHoldings.swift.
  */
 object MyStakHoldings {
-	var tickers by mutableStateOf(
-		setOf(
-			"NVDA", "AAPL", "MSFT", "GOOGL", "AMD", // AI & Tech
-			"JPM", "V", "GS", // Finance
-			"ENPH", "NEE", "FSLR", // Green Energy
-			"PLD", "O", // Real Estate
-			"LLY", "UNH", "JNJ", "PFE", // Healthcare
-			"COST", "NKE", // Consumer
-			"TSLA", "SNOW", // Overview Best/Worst - no collection lists them
-		),
+	/** The authored demo account's holdings (the frames' 5/3/3/2/4/2 counts). */
+	private val SEED = setOf(
+		"NVDA", "AAPL", "MSFT", "GOOGL", "AMD", // AI & Tech
+		"JPM", "V", "GS", // Finance
+		"ENPH", "NEE", "FSLR", // Green Energy
+		"PLD", "O", // Real Estate
+		"LLY", "UNH", "JNJ", "PFE", // Healthcare
+		"COST", "NKE", // Consumer
+		"TSLA", "SNOW", // Overview Best/Worst - no collection lists them
 	)
+	var tickers by mutableStateOf(SEED)
 		private set
+
+	/** Product audit (2026-09-05): a NEW account holds nothing until the user saves; the demo account keeps the seed. */
+	fun reset(demo: Boolean) {
+		tickers = if (demo) SEED else emptySet()
+	}
 
 	/** How many stocks the user holds - the Overview's "Across N stocks". */
 	val count: Int get() = tickers.size

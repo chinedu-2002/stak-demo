@@ -73,7 +73,21 @@ internal object PaperPortfolio {
 	const val WEEK_PCT = "+1.9%"
 
 	/** Authored "+$240.00 all time" (1:3898). */
-	val allTimeGain = 240.0
+	/** All-time gain = today's value over the paper start (the demo's authored $240 falls out of its $10,240). */
+	val allTimeGain: Double get() = portfolioValue - PAPER_START
+
+	/** The authored demo account, or a fresh one (product audit, 2026-09-05). */
+	var demo by mutableStateOf(true)
+		private set
+
+	/** The leaderboard rank - the demo's authored #47; a new account is unranked until it has moves. */
+	val weekRank: Int? get() = if (demo) WEEK_RANK else null
+	val weekUp: Boolean get() = if (demo) true else allTimeGain >= 0
+	val weekGainText: String get() = if (demo) WEEK_GAIN else signedWhole(allTimeGain)
+	val weekPctText: String get() = if (demo) WEEK_PCT else signedPct(allTimeGain / PAPER_START * 100)
+
+	/** "12 picks" is authored for the demo (its rows list six); a new account counts its own. */
+	val pickCountLabel: Int get() = if (demo) 12 + (positions.size - SEED_ROWS.size) else positions.size
 
 	// The authored hero (1:3924): $10,240.00 of which $8,800.00 is cash.
 	private const val AUTHORED_VALUE = 10240.0
@@ -81,6 +95,9 @@ internal object PaperPortfolio {
 
 	var cash by mutableDoubleStateOf(SEED_CASH)
 		private set
+
+	private var baseValue = AUTHORED_VALUE
+	private var baseCash = SEED_CASH
 
 	var positions by mutableStateOf(
 		SEED_ROWS.map { row -> Position(PICK_SPECS.first { it.symbol == row.ticker }, row) },
@@ -97,7 +114,34 @@ internal object PaperPortfolio {
 
 	// The seeded rows' stake - the authored figure counts picks the frame
 	// never lists, so value is tracked as the authored number plus moves.
-	private val seedHoldings: Double = positions.sumOf { it.stake }
+	private var baseHoldings: Double = positions.sumOf { it.stake }
+
+	/** Seeds the authored demo history or clears everything to $10,000 of untouched paper cash. */
+	fun reset(demo: Boolean) {
+		this.demo = demo
+		if (demo) {
+			cash = SEED_CASH
+			positions = SEED_ROWS.map { row -> Position(PICK_SPECS.first { it.symbol == row.ticker }, row) }
+			realized = listOf(
+				Realized("S", "SHOP", "Sold May 30 · profit banked", "+$12.00", true),
+				Realized("C", "COIN", "Sold Jun 15 · loss realized", "-$8.00", false),
+			)
+			baseValue = AUTHORED_VALUE
+			baseCash = SEED_CASH
+		} else {
+			cash = PAPER_START
+			positions = emptyList()
+			realized = emptyList()
+			baseValue = PAPER_START
+			baseCash = PAPER_START
+		}
+		baseHoldings = positions.sumOf { it.stake }
+	}
+
+	fun signedWhole(amount: Double): String = (if (amount < 0) "-$" else "+$") + String.format(Locale.US, "%,.0f", kotlin.math.abs(amount))
+	fun signedUsd(amount: Double): String = (if (amount < 0) "-" else "+") + usd(kotlin.math.abs(amount))
+	fun signedPct(pct: Double): String = String.format(Locale.US, "%+.1f%%", pct)
+	fun wholeUsd(amount: Double): String = "$" + String.format(Locale.US, "%,.0f", amount)
 
 	/**
 	 * The authored $10,240.00 plus every move since: a buy swaps cash for
@@ -105,7 +149,7 @@ internal object PaperPortfolio {
 	 * holds until prices move - the demo serves no live prices.
 	 */
 	val portfolioValue: Double
-		get() = AUTHORED_VALUE + (cash - SEED_CASH) + (positions.sumOf { it.stake } - seedHoldings)
+		get() = baseValue + (cash - baseCash) + (positions.sumOf { it.stake } - baseHoldings)
 
 	val pickCount: Int get() = positions.size
 

@@ -166,22 +166,26 @@ fun MyStakScreen(onOpenCollection: (String) -> Unit, onStartSwiping: () -> Unit)
 						color = Color.White,
 					)
 				}
+				// Product audit (2026-09-05): a new account has no read yet.
+				val empty = com.stak.demo.ui.MyStakHoldings.count == 0
 				Text(
-					text = "You lean into growth and tech.",
+					text = if (empty) "Your read starts with your first save." else "You lean into growth and tech.",
 					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp, lineHeight = (19 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
 					color = Color.White,
 				)
 				// Authored insight copy - user, 2026-09-04 (CHINEDU 06 · My STAK 1:3155): the authored look wins over a store-derived count.
 				Text(
-					text = "Six of your fourteen picks are tech or AI names. Your STAK skews high-growth, with a small hedge in real estate.",
+					text = if (empty) "Save stocks from the Discover deck and STAK will read your taste from them." else "Six of your fourteen picks are tech or AI names. Your STAK skews high-growth, with a small hedge in real estate.",
 					// Codex parity audit (2026-09-04): 1:3155 sets the body at 13.
 					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (13 * u).sp, lineHeight = (19 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
 					color = Body,
 				)
 			}
 			PortfolioSummary()
-			SectionHeader("Breakdown")
-			AllocationCard()
+			if (com.stak.demo.ui.MyStakHoldings.count > 0) {
+				SectionHeader("Breakdown")
+				AllocationCard()
+			}
 			// Discover banner.
 			Column(
 				verticalArrangement = Arrangement.spacedBy((9 * u).dp),
@@ -317,6 +321,8 @@ private fun PortfolioSummary() {
 	// timeline"); "3M" is the authored default (1:3155) and keeps the
 	// authored chart image, the other ranges draw the shared demo series.
 	var range by rememberSaveable { mutableStateOf("3M") }
+	// Product audit (2026-09-05): a new account has no performance yet.
+	val empty = com.stak.demo.ui.MyStakHoldings.count == 0
 	Column(
 		verticalArrangement = Arrangement.spacedBy((14 * u).dp),
 		modifier = Modifier
@@ -332,7 +338,7 @@ private fun PortfolioSummary() {
 				color = Muted,
 			)
 			Text(
-				text = "+4.9%",
+				text = if (empty) "—" else "+4.9%",
 				// 1:3239 tracking -0.44 - exact-design audit 2026-09-04.
 				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (44 * u).sp, lineHeight = (55 * u).sp, letterSpacing = (-0.44 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
 				color = Color.White,
@@ -340,9 +346,9 @@ private fun PortfolioSummary() {
 			Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy((10 * u).dp)) {
 				Text(
 					// Authored summary copy; the store's count is not what the frame shows - user, 2026-09-04 (CHINEDU 06 · My STAK 1:3155): the authored look wins.
-					text = "Across 14 stocks",
+					text = if (empty) "No stocks yet" else if (com.stak.demo.ui.Session.demoAccount) "Across 14 stocks" else "Across ${com.stak.demo.ui.MyStakHoldings.count} stocks",
 					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp, lineHeight = (18 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
-					color = Green,
+					color = if (empty) Muted else Green,
 				)
 				Text(
 					text = ".",
@@ -396,7 +402,7 @@ private fun PortfolioSummary() {
 			}
 		}
 		Box(modifier = Modifier.fillMaxWidth().height((1 * u).dp).background(Track))
-		Row(horizontalArrangement = Arrangement.spacedBy((151 * u).dp, Alignment.CenterHorizontally), modifier = Modifier.fillMaxWidth()) {
+		if (!empty) Row(horizontalArrangement = Arrangement.spacedBy((151 * u).dp, Alignment.CenterHorizontally), modifier = Modifier.fillMaxWidth()) {
 			Column(verticalArrangement = Arrangement.spacedBy((3 * u).dp)) {
 				Text("Best this week", style = TextStyle(fontFamily = Geist, fontSize = (11 * u).sp, lineHeight = (14 * u).sp, lineHeightStyle = FIGMA_LINE_BOX), color = Faint)
 				Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy((6 * u).dp)) {

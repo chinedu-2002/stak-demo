@@ -170,16 +170,19 @@ fun ProfileScreen(onBack: () -> Unit, onLogOut: () -> Unit = {}) {
 					.padding((14 * u).dp),
 			) {
 				Row(modifier = Modifier.fillMaxWidth().height((40 * u).dp).padding(horizontal = 0.dp)) {
-					ProfileStat("$10,240", "Portfolio")
+					// Live from the shared paper portfolio (product audit, 2026-09-05).
+					val pp = com.stak.demo.ui.simulate.PaperPortfolio
+					ProfileStat(pp.wholeUsd(pp.portfolioValue), "Portfolio")
 					Spacer(modifier = Modifier.weight(1f))
-					ProfileStat("$8,800.00", "Cash")
+					ProfileStat(pp.usd(pp.cash), "Cash")
 					Spacer(modifier = Modifier.weight(1f))
-					ProfileStat("12", "Picks")
+					ProfileStat(pp.pickCountLabel.toString(), "Picks")
 				}
+				val gain = com.stak.demo.ui.simulate.PaperPortfolio.allTimeGain
 				Text(
-					text = "▲ +$240.00 all time on $10,000 paper",
+					text = "${if (gain >= 0) "▲" else "▼"} ${com.stak.demo.ui.simulate.PaperPortfolio.signedUsd(gain)} all time on $10,000 paper",
 					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
-					color = Green,
+					color = if (gain >= 0) Green else Color(0xFFE5484D),
 				)
 			}
 			// Settings card.

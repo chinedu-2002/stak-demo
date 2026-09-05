@@ -225,7 +225,7 @@ fun PickDetailScreen(
 						RANGE_LABELS.forEach { label ->
 							val select = Modifier.clickable(
 								interactionSource = remember { MutableInteractionSource() },
-								indication = null,
+								indication = com.stak.demo.ui.theme.PressDim,
 							) { range = label }
 							if (label == range) {
 								Box(
@@ -300,7 +300,7 @@ fun PickDetailScreen(
 							.border((0.361 * u).dp, Sim.CtaBorder, RoundedCornerShape((6 * u).dp))
 							.clickable(
 								interactionSource = remember { MutableInteractionSource() },
-								indication = null,
+								indication = com.stak.demo.ui.theme.PressDim,
 							) { showSell = true },
 					) {
 						Text(
@@ -319,7 +319,7 @@ fun PickDetailScreen(
 						.border((0.36 * u).dp, Color(0x54343B4F), RoundedCornerShape((6 * u).dp))
 						.clickable(
 							interactionSource = remember { MutableInteractionSource() },
-							indication = null,
+							indication = com.stak.demo.ui.theme.PressDim,
 							onClick = onBack,
 						),
 				) {

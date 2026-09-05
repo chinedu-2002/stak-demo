@@ -177,7 +177,7 @@ internal fun StakToggle(checked: Boolean, onToggle: () -> Unit) {
 			.background(track, RoundedCornerShape((12 * u).dp))
 			.clickable(
 				interactionSource = remember { MutableInteractionSource() },
-				indication = null,
+				indication = com.stak.demo.ui.theme.PressDim,
 				onClick = onToggle,
 			),
 	) {

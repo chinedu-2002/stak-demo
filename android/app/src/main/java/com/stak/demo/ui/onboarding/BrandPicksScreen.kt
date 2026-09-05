@@ -184,7 +184,7 @@ private fun BrandTile(
 			)
 			.clickable(
 				interactionSource = remember { MutableInteractionSource() },
-				indication = null,
+				indication = com.stak.demo.ui.theme.PressDim,
 				onClick = onClick,
 			)
 			.padding(top = (13 * u).dp, bottom = (11 * u).dp, start = (4 * u).dp, end = (4 * u).dp),

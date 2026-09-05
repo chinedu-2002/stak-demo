@@ -112,7 +112,7 @@ fun SignInScreen(
 					color = Auth.LinkTeal,
 					modifier = Modifier.clickable(
 						interactionSource = remember { MutableInteractionSource() },
-						indication = null,
+						indication = com.stak.demo.ui.theme.PressDim,
 					) { onForgot() },
 				)
 			}

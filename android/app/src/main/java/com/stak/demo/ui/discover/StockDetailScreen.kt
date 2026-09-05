@@ -184,7 +184,7 @@ fun StockDetailScreen(
 					RANGE_LABELS.forEach { label ->
 						val select = Modifier.clickable(
 							interactionSource = remember { MutableInteractionSource() },
-							indication = null,
+							indication = com.stak.demo.ui.theme.PressDim,
 						) { range = label }
 						if (label == range) {
 							Box(
@@ -529,7 +529,7 @@ private fun DetailCta(text: String, onClick: () -> Unit) {
 			.border((0.36 * u).dp, com.stak.demo.ui.theme.StakColors.CtaBorderBrush, RoundedCornerShape((6 * u).dp))
 			.clickable(
 				interactionSource = remember { MutableInteractionSource() },
-				indication = null,
+				indication = com.stak.demo.ui.theme.PressDim,
 				onClick = onClick,
 			),
 	) {
@@ -552,7 +552,7 @@ private fun DetailSecondary(text: String, size: Float = 13f, onClick: () -> Unit
 			.border((0.36 * u).dp, Color(0x54343B4F), RoundedCornerShape((6 * u).dp))
 			.clickable(
 				interactionSource = remember { MutableInteractionSource() },
-				indication = null,
+				indication = com.stak.demo.ui.theme.PressDim,
 				onClick = onClick,
 			),
 	) {
@@ -572,7 +572,7 @@ private fun DetailSavedSheet(f: DetailFacts, onDone: () -> Unit, onViewInMyStak:
 				.background(Color(0x8C0C1320))
 				.clickable(
 					interactionSource = remember { MutableInteractionSource() },
-					indication = null,
+					indication = com.stak.demo.ui.theme.PressDim,
 					onClick = onDone,
 				),
 		)
@@ -672,7 +672,7 @@ private fun AnalystCard(f: DetailFacts, open: Boolean, onToggle: () -> Unit) {
 		modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape((16 * u).dp)).background(Card)
 			.clickable(
 				interactionSource = remember { MutableInteractionSource() },
-				indication = null,
+				indication = com.stak.demo.ui.theme.PressDim,
 			) { onToggle() }
 			.padding(horizontal = (16 * u).dp, vertical = (14 * u).dp),
 	) {
@@ -776,7 +776,7 @@ private fun CompareCard(f: DetailFacts) {
 		modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape((16 * u).dp)).background(Card)
 			.clickable(
 				interactionSource = remember { MutableInteractionSource() },
-				indication = null,
+				indication = com.stak.demo.ui.theme.PressDim,
 			) { open = !open }
 			.padding(horizontal = (16 * u).dp, vertical = (14 * u).dp),
 	) {

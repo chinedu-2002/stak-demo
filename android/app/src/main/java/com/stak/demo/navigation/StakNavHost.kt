@@ -669,6 +669,9 @@ private fun MainShell(
 		tabPushStyle = style
 		tab = target
 	}
+	// Product audit (2026-09-05): system back on a non-Home tab goes Home first
+	// (Instagram's convention); only Home's back leaves the app.
+	androidx.activity.compose.BackHandler(enabled = tab != MainTab.Home) { switchTab(MainTab.Home) }
 	LaunchedEffect(pendingTab.value) {
 		pendingTab.value?.let { switchTab(it); pendingTab.value = null }
 	}

@@ -147,7 +147,7 @@ fun TasteRevealScreen(onBack: () -> Unit, onLetsGo: () -> Unit) {
 					.background(Auth.InputBg, RoundedCornerShape((14 * u).dp))
 					.clickable(
 						interactionSource = remember { MutableInteractionSource() },
-						indication = null,
+						indication = com.stak.demo.ui.theme.PressDim,
 					) { showRisk = true }
 					.padding(start = (16 * u).dp, end = (14 * u).dp, top = (13 * u).dp, bottom = (13 * u).dp),
 			) {
@@ -225,7 +225,7 @@ internal fun RiskStyleSheet(onDismiss: () -> Unit) {
 						.fillMaxWidth()
 						.background(StakColors.Bg, RoundedCornerShape((12 * u).dp))
 						.border((1 * u).dp, if (selected) Color(0x8069B3CA) else Color(0x1AFFFFFF), RoundedCornerShape((12 * u).dp))
-						.clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) {
+						.clickable(interactionSource = remember { MutableInteractionSource() }, indication = com.stak.demo.ui.theme.PressDim) {
 							com.stak.demo.ui.UserProfile.risk = index
 							com.stak.demo.ui.UserProfile.riskStyle = TasteModel.riskStyle(index)
 							com.stak.demo.ui.Session.saveProfile()

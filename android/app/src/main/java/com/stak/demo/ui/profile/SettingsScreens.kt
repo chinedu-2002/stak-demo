@@ -92,7 +92,7 @@ fun SettingsLinkRow(label: String, value: String? = null, onClick: () -> Unit) {
 		modifier = Modifier
 			.fillMaxWidth()
 			.height((48 * u).dp)
-			.clickable(interactionSource = remember { MutableInteractionSource() }, indication = null, onClick = onClick)
+			.clickable(interactionSource = remember { MutableInteractionSource() }, indication = com.stak.demo.ui.theme.PressDim, onClick = onClick)
 			.padding(horizontal = (14 * u).dp),
 	) {
 		Text(label, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp), color = Color.White)
@@ -146,7 +146,7 @@ private fun NotificationSettingsScreen(onBack: () -> Unit) {
 					"Open phone settings ›",
 					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp),
 					color = Teal,
-					modifier = Modifier.clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) {
+					modifier = Modifier.clickable(interactionSource = remember { MutableInteractionSource() }, indication = com.stak.demo.ui.theme.PressDim) {
 						val intent = Intent(android.provider.Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(android.provider.Settings.EXTRA_APP_PACKAGE, context.packageName)
 						runCatching { context.startActivity(intent) }
 					},
@@ -171,7 +171,7 @@ private fun AppearanceScreen(onBack: () -> Unit) {
 					modifier = Modifier
 						.fillMaxWidth()
 						.height((48 * u).dp)
-						.clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) { UserProfile.appearance = key; Session.saveProfile() }
+						.clickable(interactionSource = remember { MutableInteractionSource() }, indication = com.stak.demo.ui.theme.PressDim) { UserProfile.appearance = key; Session.saveProfile() }
 						.padding(horizontal = (14 * u).dp),
 				) {
 					Text(label, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp), color = Color.White)
@@ -207,7 +207,7 @@ private fun LinkedRow(name: String, linked: Boolean, onToggle: () -> Unit) {
 			if (linked) "Unlink" else "Link",
 			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp),
 			color = Teal,
-			modifier = Modifier.clickable(interactionSource = remember { MutableInteractionSource() }, indication = null, onClick = onToggle),
+			modifier = Modifier.clickable(interactionSource = remember { MutableInteractionSource() }, indication = com.stak.demo.ui.theme.PressDim, onClick = onToggle),
 		)
 	}
 }
@@ -241,7 +241,7 @@ private fun FaqRow(question: String, answer: String) {
 			modifier = Modifier
 				.fillMaxWidth()
 				.height((48 * u).dp)
-				.clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) { open = !open }
+				.clickable(interactionSource = remember { MutableInteractionSource() }, indication = com.stak.demo.ui.theme.PressDim) { open = !open }
 				.padding(horizontal = (14 * u).dp),
 		) {
 			Text(question, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp), color = Color.White)

@@ -136,7 +136,7 @@ fun MyStakScreen(onOpenCollection: (String) -> Unit, onStartSwiping: () -> Unit)
 					.border((0.36 * u).dp, StakColors.CtaBorderBrush, RoundedCornerShape((6 * u).dp))
 					.clickable(
 						interactionSource = remember { MutableInteractionSource() },
-						indication = null,
+						indication = com.stak.demo.ui.theme.PressDim,
 						onClick = onStartSwiping,
 					),
 			) {
@@ -195,7 +195,7 @@ fun MyStakScreen(onOpenCollection: (String) -> Unit, onStartSwiping: () -> Unit)
 					.background(Teal)
 					.clickable(
 						interactionSource = remember { MutableInteractionSource() },
-						indication = null,
+						indication = com.stak.demo.ui.theme.PressDim,
 						onClick = onStartSwiping,
 					)
 					.padding((18 * u).dp),
@@ -273,7 +273,7 @@ private fun CollectionChip(
 			.background(CardBg)
 			.clickable(
 				interactionSource = remember { MutableInteractionSource() },
-				indication = null,
+				indication = com.stak.demo.ui.theme.PressDim,
 				onClick = onClick,
 			)
 			.padding((12 * u).dp),
@@ -382,7 +382,7 @@ private fun PortfolioSummary() {
 			RANGE_LABELS.forEach { label ->
 				val select = Modifier.clickable(
 					interactionSource = remember { MutableInteractionSource() },
-					indication = null,
+					indication = com.stak.demo.ui.theme.PressDim,
 				) { range = label }
 				if (label == range) {
 					Box(

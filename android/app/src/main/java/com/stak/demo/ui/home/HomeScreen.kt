@@ -596,7 +596,7 @@ private fun DeckBanner(onOpenDeck: () -> Unit) {
 /**
  * First-run bottom treatment — scrim fading to bg over its first 98.7px
  * (43.68% of the frame's 226px overlay) + the frosted "See Todays Pick"
- * pill, whose bottom sits 70px above the screen edge as in the frame.
+ * pill 105px below the overlay's top edge (1:958: overlay y629, pill y734).
  */
 @Composable
 private fun FirstRunOverlay(onSeeTodaysPick: () -> Unit, modifier: Modifier = Modifier) {
@@ -611,15 +611,33 @@ private fun FirstRunOverlay(onSeeTodaysPick: () -> Unit, modifier: Modifier = Mo
 			)
 			Box(modifier = Modifier.fillMaxWidth().weight(1f).background(StakColors.Bg))
 		}
+		// Anchored to the content geometry like the scrim above it: the
+		// overlay starts 41 above the deck banner, the pill 105 below that. On
+		// the 844 frame this equals "70 above the screen edge"; on a taller
+		// screen the pill stays with the banner it belongs to instead of
+		// drifting down with the bottom edge (StakTest, 2026-09-05: it sat 5.8
+		// low against the 2x export of 1:958).
 		Box(
 			contentAlignment = Alignment.Center,
 			modifier = Modifier
-				.align(Alignment.BottomCenter)
-				.padding(bottom = (70 * u).dp)
+				.align(Alignment.TopCenter)
+				.padding(top = (105 * u).dp)
 				.size((136 * u).dp, (51 * u).dp)
 				.clip(RoundedCornerShape(50))
-				.background(Color(0x0FFFFFFF))
-				.border((0.94 * u).dp, Color(0x66FFFFFF), RoundedCornerShape(50))
+				// The authored pill (1:1081) is a Figma glass stack - a 1% white
+				// fill over backdrop blurs plus three blurred gradient strokes
+				// (LINEAR_DODGE/MULTIPLY, 0.94 inside). Matched to its RENDER in
+				// the 2x export of 1:958 (2026-09-05): fill = bg + (11,12,15), a
+				// cool-tinted 8% wash; the rim glows only on the two caps (left
+				// 0.57, right 0.49 white, the cap is 19% of the width) and holds
+				// 0.21 along the straight top and bottom runs - a flat 40% rim read
+				// 122 everywhere vs the frame's 77-154.
+				.background(Color(0x15C8D7FF))
+				.border(
+					(0.94 * u).dp,
+					Brush.horizontalGradient(0f to Color(0x91FFFFFF), 0.19f to Color(0x36FFFFFF), 0.81f to Color(0x36FFFFFF), 1f to Color(0x7DFFFFFF)),
+					RoundedCornerShape(50),
+				)
 				.clickable(
 					interactionSource = remember { MutableInteractionSource() },
 					indication = null,

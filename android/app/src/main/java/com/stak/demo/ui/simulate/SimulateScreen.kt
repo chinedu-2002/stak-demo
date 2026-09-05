@@ -33,6 +33,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -40,6 +41,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -54,6 +56,7 @@ import com.stak.demo.ui.theme.Geist
 import com.stak.demo.ui.theme.Sora
 import com.stak.demo.ui.theme.StakColors
 import com.stak.demo.ui.theme.ADVANCE_ROUNDING
+import kotlin.math.roundToInt
 
 internal object Sim {
 	val CardBg = Color(0xFF181F30)
@@ -134,17 +137,19 @@ internal fun SimulateScreen(
 					.background(StakColors.Bg)
 					.statusBarsPadding()
 					.padding(horizontal = (20 * u).dp)
-					.padding(top = (8 * u).dp, bottom = (8 * u).dp),
+					// 1:3914 (exact-design audit 2026-09-04): the 52-tall header sits 8 below the
+					// status bar with no bottom inset - the 18 above the hero is the Main column's own.
+					.padding(top = (8 * u).dp),
 			) {
 				Column(verticalArrangement = Arrangement.spacedBy((3 * u).dp)) {
 					Text(
 						text = "Simulate",
-						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (26 * u).sp),
+						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (26 * u).sp, lineHeight = (33 * u).sp),
 						color = Color.White,
 					)
 					Text(
 						text = "Pick from your saves. Paper money does the talking.",
-						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp),
+						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
 						color = Sim.Muted,
 					)
 				}
@@ -179,8 +184,11 @@ internal fun SimulateScreen(
 				SectionHeader("Saved staks")
 				// Codex audit (2026-09-04): a saved stak that has been bought says
 				// so - the authored "not in portfolio yet" only while it is not.
-				SavedStakRow("P", "PLTR", savedStakSub("PLTR", "Saved Jun 30 · not in portfolio yet"), spec = PLTR_BUY, onBuy = practiceBuy)
-				SavedStakRow("C", "COST", savedStakSub("COST", "Saved Jul 2 · not in portfolio yet"), spec = COST_BUY, onBuy = practiceBuy)
+				// 1:3947 slist (exact-design audit 2026-09-04): the saved rows sit 10 apart, not the column's 18.
+				Column(verticalArrangement = Arrangement.spacedBy((10 * u).dp)) {
+					SavedStakRow("P", "PLTR", savedStakSub("PLTR", "Saved Jun 30 · not in portfolio yet"), spec = PLTR_BUY, onBuy = practiceBuy)
+					SavedStakRow("C", "COST", savedStakSub("COST", "Saved Jul 2 · not in portfolio yet"), spec = COST_BUY, onBuy = practiceBuy)
+				}
 				CenterLink("All saved staks", onClick = onOpenMyStak)
 				InsightCard()
 				// Review 2026-09-04: best / worst come from the live ledger (max /
@@ -200,41 +208,47 @@ internal fun SimulateScreen(
 				SectionHeader("Your portfolio")
 				// Codex audit (2026-09-04): the first three held positions, from
 				// the shared PaperPortfolio - a fresh buy lands at the top.
-				PaperPortfolio.positions.take(3).forEach { pos ->
-					val p = pos.row
-					PortfolioRow(p.badge, p.ticker, p.sub, p.amount, p.pct, p.up, onClick = { onOpenPick(p.ticker) })
+				// 1:4009 plist (exact-design audit 2026-09-04): the three rows sit 10 apart, not the column's 18.
+				Column(verticalArrangement = Arrangement.spacedBy((10 * u).dp)) {
+					PaperPortfolio.positions.take(3).forEach { pos ->
+						val p = pos.row
+						PortfolioRow(p.badge, p.ticker, p.sub, p.amount, p.pct, p.up, onClick = { onOpenPick(p.ticker) })
+					}
 				}
 				// Authored copy (user, 2026-09-04 (CHINEDU 07 · Simulate 423:1007): the authored look wins); the ledger still drives the rows above.
 				CenterLink("See all 12 picks", onClick = onOpenPortfolio)
-				Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-					Text(
-						text = "Portfolio breakdown",
-						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp),
-						color = Sim.HeaderGray,
-					)
-					Spacer(modifier = Modifier.weight(1f))
-					Row(
-						verticalAlignment = Alignment.CenterVertically,
-						horizontalArrangement = Arrangement.spacedBy((5 * u).dp),
-						modifier = Modifier.clickable(
-							interactionSource = remember { MutableInteractionSource() },
-							indication = null,
-							onClick = onOpenPortfolio,
-						),
-					) {
+				// 1:4040 Points breakdown (exact-design audit 2026-09-04): the section header
+				// and the Allocation card are 15 apart, not the column's 18.
+				Column(verticalArrangement = Arrangement.spacedBy((15 * u).dp)) {
+					Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
 						Text(
-							text = "Portfolio",
-							style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp),
-							color = Color.White,
+							text = "Portfolio breakdown",
+							// 1:4042: Sora SemiBold 16 on a 1.34 line (21.44).
+							style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp, lineHeight = (21.44 * u).sp),
+							color = Sim.HeaderGray,
 						)
-						Text(
-							text = "›",
-							style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp),
-							color = Sim.Muted,
-						)
+						Spacer(modifier = Modifier.weight(1f))
+						Row(
+							verticalAlignment = Alignment.CenterVertically,
+							horizontalArrangement = Arrangement.spacedBy((5 * u).dp),
+							modifier = Modifier.clickable(
+								interactionSource = remember { MutableInteractionSource() },
+								indication = null,
+								onClick = onOpenPortfolio,
+							),
+						) {
+							Text(
+								text = "Portfolio",
+								// 1:4044 (exact-design audit 2026-09-04): Geist 14 on a 1.34 line, teal at 80% - was white.
+								style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp, lineHeight = (18.76 * u).sp),
+								color = Color(0xCC69B3CA),
+							)
+							// 1:4045 (exact-design audit 2026-09-04): the exported 4.909x9 chevron asset, not a "›" glyph.
+							Image(painterResource(R.drawable.ic_sim_chevron), null, modifier = Modifier.size((4.909 * u).dp, (9 * u).dp))
+						}
 					}
+					SimAllocationCard()
 				}
-				SimAllocationCard()
 				BoardCard(onOpenLeaderboard = onOpenLeaderboard)
 			}
 		}
@@ -325,7 +339,8 @@ private fun ScoreHero(onOpenLeaderboard: () -> Unit) {
 			Text(
 				text = valueText.substringBefore('.'),
 				// Authored box (1:3924) is 55 tall — pin it so the stack sums.
-				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (44 * u).sp, lineHeight = (55 * u).sp, letterSpacing = (-0.44 * u).sp),
+				// 1:3924 (exact-design audit 2026-09-04): the figure carries no tracking - the -0.44 was never authored.
+				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (44 * u).sp, lineHeight = (55 * u).sp),
 				color = Color.White,
 			)
 			Text(
@@ -456,6 +471,8 @@ internal fun BuyPill(text: String = "Buy", onClick: () -> Unit) {
 		contentAlignment = Alignment.Center,
 		modifier = Modifier
 			.size((60 * u).dp, (30 * u).dp)
+			// 1:3954 (exact-design audit 2026-09-04): the authored drop shadow - #52AAC7 at 4%, dy 12.285, blur 12.285.
+			.tealShadow(u, dy = 12.285f, blur = 12.285f, alpha = 0.04f)
 			.background(
 				androidx.compose.ui.graphics.Brush.verticalGradient(
 					0.0889f to Color(0xFFA6E4F7),
@@ -476,22 +493,28 @@ internal fun BuyPill(text: String = "Buy", onClick: () -> Unit) {
 	}
 }
 
+/**
+ * The authored teal link (1:3964 / 1:4037 / 1:4112 - exact-design audit
+ * 2026-09-04): Geist Medium 13 + "›" 14, both #69b3ca (were white / muted
+ * Regular). Centred across the column unless the host lays it at its own
+ * left edge (the board card's "Full leaderboard").
+ */
 @Composable
-internal fun CenterLink(text: String, onClick: () -> Unit = {}) {
+internal fun CenterLink(text: String, centered: Boolean = true, onClick: () -> Unit = {}) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Row(
 		verticalAlignment = Alignment.CenterVertically,
 		horizontalArrangement = Arrangement.spacedBy((6 * u).dp, Alignment.CenterHorizontally),
 		modifier = Modifier
-			.fillMaxWidth()
+			.then(if (centered) Modifier.fillMaxWidth() else Modifier)
 			.clickable(
 				interactionSource = remember { MutableInteractionSource() },
 				indication = null,
 				onClick = onClick,
 			),
 	) {
-		Text(text, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (13 * u).sp), color = Color.White)
-		Text("›", style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp), color = Sim.Muted)
+		Text(text, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp, lineHeight = (17 * u).sp), color = Sim.Teal)
+		Text("›", style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp, lineHeight = (18 * u).sp), color = Sim.Teal)
 	}
 }
 
@@ -548,17 +571,17 @@ private fun PickDuo(
 				color = Sim.Faint,
 			)
 			Spacer(modifier = Modifier.weight(1f))
-			Text(pct, style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp), color = pctColor)
+			Text(pct, style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp, lineHeight = (16 * u).sp), color = pctColor)
 		}
+		// 1:3977 / 1:3982 (exact-design audit 2026-09-04): the badge row carries only the
+		// ticker; the "+$24 on $100" line is the card's own third row, 7 below it.
 		Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy((9 * u).dp)) {
 			Box(contentAlignment = Alignment.Center, modifier = Modifier.size((34 * u).dp).background(Sim.ChipBg, CircleShape)) {
 				Text(badge, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (14 * u).sp), color = Sim.BadgeInk)
 			}
-			Column(verticalArrangement = Arrangement.spacedBy((2 * u).dp)) {
-				Text(ticker, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp), color = Color.White)
-				Text(sub, style = TextStyle(fontFamily = Geist, fontSize = (11 * u).sp), color = Sim.Faint)
-			}
+			Text(ticker, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (15 * u).sp), color = Color.White)
 		}
+		Text(sub, style = TextStyle(fontFamily = Geist, fontSize = (11 * u).sp, lineHeight = (14 * u).sp), color = Sim.Faint)
 	}
 }
 
@@ -583,7 +606,8 @@ private fun HowItWorksCard() {
 			"2" to "Your shares move with the real price, up or down.",
 			"3" to "Sell anytime and the cash returns to your balance.",
 		).forEach { (n, rule) ->
-			Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy((10 * u).dp)) {
+			// 1:3995 (exact-design audit 2026-09-04): pill and line share the row's top edge.
+			Row(verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.spacedBy((10 * u).dp)) {
 				Box(contentAlignment = Alignment.Center, modifier = Modifier.size((20 * u).dp).background(Sim.TealTint, RoundedCornerShape((10 * u).dp))) {
 					Text(n, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (11 * u).sp), color = Sim.Teal)
 				}
@@ -604,6 +628,8 @@ internal fun PortfolioRow(
 	amount: String, pct: String, up: Boolean,
 	onClick: () -> Unit = {},
 	trailing: (@Composable () -> Unit)? = null,
+	// 1:4539 (exact-design audit 2026-09-04): the Portfolio page's picked line is Geist Light; Simulate home's (1:4015) is Regular.
+	subLight: Boolean = false,
 ) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Row(
@@ -625,12 +651,13 @@ internal fun PortfolioRow(
 		}
 		Column(verticalArrangement = Arrangement.spacedBy((3 * u).dp), modifier = Modifier.weight(1f)) {
 			Text(ticker, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (15 * u).sp), color = Color.White)
-			Text(sub, style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp, lineHeight = (13 * u).sp), color = Sim.Muted)
+			Text(sub, style = TextStyle(fontFamily = Geist, fontWeight = if (subLight) FontWeight.Light else FontWeight.Normal, fontSize = (10 * u).sp, lineHeight = (13 * u).sp), color = Sim.Muted)
 		}
 		Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy((2 * u).dp)) {
 			Text(
 				amount,
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
+				// 1:4017 (exact-design audit 2026-09-04): the P&L is Geist Regular, not Medium.
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
 				color = if (up) Sim.Green else Sim.Red,
 			)
 			Text(pct, style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp, lineHeight = (13 * u).sp), color = Sim.Faint)
@@ -710,7 +737,9 @@ private fun BoardCard(onOpenLeaderboard: () -> Unit) {
 		// hero's +1.9% / #47) instead of its own contradicting +4.2%.
 		// Authored board figures (1:4111 +4.2%; user, 2026-09-04 (CHINEDU 07 · Simulate 423:1007): the authored look wins).
 		BoardRow("47", "You", "+4.2%", you = true)
-		CenterLink("Full leaderboard", onClick = onOpenLeaderboard)
+		// 1:4112 (exact-design audit 2026-09-04): the frame lays this link at the card's
+		// left edge (x16, hug width), not centred like the column links.
+		CenterLink("Full leaderboard", centered = false, onClick = onOpenLeaderboard)
 	}
 }
 
@@ -730,6 +759,8 @@ private fun BoardRow(rank: String, name: String, pct: String, you: Boolean) {
 			rank,
 			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (12 * u).sp),
 			color = if (you) Sim.Teal else Sim.Faint,
+			// 1:4101 (exact-design audit 2026-09-04): the rank sits in a 22-wide box so the names line up.
+			modifier = Modifier.width((22 * u).dp),
 		)
 		Text(
 			name,
@@ -743,4 +774,19 @@ private fun BoardRow(rank: String, name: String, pct: String, you: Boolean) {
 			color = if (you) Sim.Teal else Sim.HeaderGray,
 		)
 	}
+}
+
+/**
+ * The authored teal drop shadow under the CTAs (#52AAC7) - `dy` / `blur`
+ * in artboard units, `alpha` 0..1 - drawn behind the r6 box the way the
+ * Discover deck CTA does it (exact-design audit 2026-09-04). Chain it
+ * before `background` so the wash sits under the fill.
+ */
+internal fun Modifier.tealShadow(u: Float, dy: Float, blur: Float, alpha: Float, radius: Float = 6f): Modifier = drawBehind {
+	val r = (radius * u).dp.toPx()
+	val paint = android.graphics.Paint().apply { isAntiAlias = true }
+	paint.color = android.graphics.Color.argb((alpha * 255f).roundToInt(), 82, 170, 199)
+	paint.maskFilter = android.graphics.BlurMaskFilter((blur * u).dp.toPx(), android.graphics.BlurMaskFilter.Blur.NORMAL)
+	val top = (dy * u).dp.toPx()
+	drawContext.canvas.nativeCanvas.drawRoundRect(0f, top, size.width, top + size.height, r, r, paint)
 }

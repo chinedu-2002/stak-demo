@@ -20,9 +20,11 @@ object NewsBriefFeed {
 	data class Brief(val title: String, val body: String, val source: String)
 
 	val DEMO_BRIEFS = listOf(
+		// Authored page-1 copy (1:1264/1:1265), "all time high" hyphenated -
+		// exact-design audit 2026-09-04.
 		Brief(
 			"Dow closes at a record as chips slide",
-			"Wall Street split into the long weekend. The Dow hit an all time high while a memory chip rout pulled the Nasdaq down, and a soft jobs report eased the pressure on the...",
+			"Wall Street split into the long weekend. The Dow hit an all-time high while a memory chip rout pulled the Nasdaq down, and a soft jobs report eased the pressure on the...",
 			"Bloomberg · 10h",
 		),
 		// STRICT stock news (user, 2026-08-25): the old Fed-rates demo

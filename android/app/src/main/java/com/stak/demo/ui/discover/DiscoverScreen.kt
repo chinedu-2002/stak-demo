@@ -300,18 +300,22 @@ internal fun DiscoverScreen(
 	Box(modifier = Modifier.fillMaxSize().background(StakColors.Bg)) {
 		Column(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
 			// Header — Discover + progress ring, kicker below.
+			// 1:2330 authors the whole header 10 lower than 1:1627 (ring y64 vs
+			// 54) with an 8 kicker gap (y116) - exact-design audit 2026-09-04.
+			val atEnd = seen >= DECK_SIZE
 			Column(
-				verticalArrangement = Arrangement.spacedBy((5 * u).dp),
-				modifier = Modifier.fillMaxWidth().padding(horizontal = (20 * u).dp).padding(top = (10 * u).dp),
+				verticalArrangement = Arrangement.spacedBy(((if (atEnd) 8 else 5) * u).dp),
+				modifier = Modifier.fillMaxWidth().padding(horizontal = (20 * u).dp).padding(top = ((if (atEnd) 20 else 10) * u).dp),
 			) {
 				// 1:1627 centres the 33-tall title in the 44-tall ring row (measured exact);
-				// the end-of-deck frame (1:2330) authors the title 7 higher against the ring.
+				// the end-of-deck frame (1:2330) authors the title 7.5 higher against the ring
+				// (y62 vs ring y64) in #F2F6FC (1:2354) - exact-design audit 2026-09-04.
 				Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
 					Text(
 						text = "Discover",
 						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (26 * u).sp, lineHeight = (33 * u).sp),
-						color = Color.White,
-						modifier = Modifier.offset(y = if (seen >= DECK_SIZE) (-7 * u).dp else 0.dp),
+						color = if (atEnd) Disc.BrightInk else Color.White,
+						modifier = Modifier.offset(y = if (atEnd) (-7.5 * u).dp else 0.dp),
 					)
 					Spacer(modifier = Modifier.weight(1f))
 					// "1/12" over the twelve-card run (user, 2026-09-04: the authored deck look wins).
@@ -325,11 +329,15 @@ internal fun DiscoverScreen(
 						)
 					}
 				}
+				// 1:1656 authors the kicker #5C6B85 / tracking 0.9, inset 2 (Context
+				// row px-2); 1:2362 authors it #819ABB / tracking 0.8, flush at x20 -
+				// exact-design audit 2026-09-04.
 				Text(
 					text = "TODAY · AI & CHIPS",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, lineHeight = (13 * u).sp, letterSpacing = (0.9 * u).sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, lineHeight = (13 * u).sp, letterSpacing = ((if (atEnd) 0.8 else 0.9) * u).sp),
 					// Measured: this tracked caps run needs no advance-rounding compensation (it ran 4 wide with it).
-					color = Disc.Muted,
+					color = if (atEnd) Disc.Muted else Disc.Faint,
+					modifier = Modifier.padding(start = ((if (atEnd) 0 else 2) * u).dp),
 				)
 			}
 			Spacer(modifier = Modifier.height((27 * u).dp))
@@ -560,7 +568,8 @@ internal fun DiscoverScreen(
 					) {
 						Text(
 							text = "Practice buy",
-							style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp, lineHeight = (21 * u).sp),
+							// 1:1784 authors lh 20.69 - exact-design audit 2026-09-04.
+							style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp, lineHeight = (20.69 * u).sp),
 							color = Color.White,
 						)
 					}
@@ -588,20 +597,22 @@ internal fun DiscoverScreen(
 		}
 		// Saved toast (frame 1:1796) — centered pill under the header.
 		if (savedToast) {
+			// Toast 1:1965 authors rgba(36,43,61,0.48), r18, px16 py11, gap 9 and
+			// a 17 bookmark (1:1966) - exact-design audit 2026-09-04.
 			Row(
 				verticalAlignment = Alignment.CenterVertically,
-				horizontalArrangement = Arrangement.spacedBy((13.5 * u).dp),
+				horizontalArrangement = Arrangement.spacedBy((9 * u).dp),
 				modifier = Modifier
 					.align(Alignment.TopCenter)
 					.statusBarsPadding()
 					.padding(top = (78 * u).dp)
-					.clip(RoundedCornerShape((19.5 * u).dp))
+					.clip(RoundedCornerShape((18 * u).dp))
 					// Authored (1:1796): translucent pill - the peek slab shows through.
-					.background(Disc.ChipBg.copy(alpha = 0.5f))
-					.padding(start = (14 * u).dp, end = (12 * u).dp)
+					.background(Disc.ChipBg.copy(alpha = 0.48f))
+					.padding(horizontal = (16 * u).dp)
 					.height((39 * u).dp),
 			) {
-				Image(painterResource(R.drawable.ic_saved_bookmark), null, modifier = Modifier.size((14 * u).dp))
+				Image(painterResource(R.drawable.ic_saved_bookmark), null, modifier = Modifier.size((17 * u).dp))
 				Text(
 					text = "Saved to My STAK",
 					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp),
@@ -794,16 +805,20 @@ private fun SaveChip(u: Float, modifier: Modifier = Modifier) {
 	}
 }
 
-/** 16x8 down-chevron stroke (Muted). */
+/**
+ * 16x8 down-chevron: the authored export (1:1777) is a 2-wide #5C6B85
+ * round stroke M2 1 L8 7 L14 1 - exact-design audit 2026-09-04.
+ */
 @Composable
 private fun GestureChevron(u: Float) {
 	Canvas(modifier = Modifier.size((16 * u).dp, (8 * u).dp)) {
+		val px = size.width / 16f
 		val p = Path().apply {
-			moveTo(0f, 0f)
-			lineTo(size.width / 2f, size.height)
-			lineTo(size.width, 0f)
+			moveTo(2f * px, 1f * px)
+			lineTo(8f * px, 7f * px)
+			lineTo(14f * px, 1f * px)
 		}
-		drawPath(p, StakColors.Muted, style = Stroke(width = (1.6 * u).dp.toPx(), cap = StrokeCap.Round, join = StrokeJoin.Round))
+		drawPath(p, Disc.Faint, style = Stroke(width = 2f * px, cap = StrokeCap.Round, join = StrokeJoin.Round))
 	}
 }
 
@@ -928,8 +943,8 @@ private fun SheetSecondary(text: String, onClick: () -> Unit) {
 		modifier = Modifier
 			.fillMaxWidth()
 			.height((52 * u).dp)
-			// Authored (1:1970): faint 4% white fill under the hairline.
-			.background(Color(0x0AFFFFFF), RoundedCornerShape((6 * u).dp))
+			// 1:2197 authors NO fill - the render's lighter band under Confirm is
+			// the CTA's own glow (exact-design audit 2026-09-04); hairline only.
 			.border((0.36 * u).dp, Color(0x54343B4F), RoundedCornerShape((6 * u).dp))
 			.clickable(
 				interactionSource = remember { MutableInteractionSource() },
@@ -1117,10 +1132,11 @@ private fun OrderFilledContent(onPrimary: () -> Unit, onSecondary: () -> Unit, s
 			color = Color.White,
 		)
 		NvdaStockRow(spec)
-		// Authored status line (85:1407): 18-tall, left-aligned, 14 below the stock row.
+		// Authored status line (85:1407): Geist 12 / lh 18, left-aligned, 14 below
+		// the stock row - exact-design audit 2026-09-04 (was 14).
 		Text(
 			text = "Filled instantly · paper order",
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp, lineHeight = (18 * u).sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (18 * u).sp),
 			color = Disc.Body,
 			modifier = Modifier.fillMaxWidth(),
 		)

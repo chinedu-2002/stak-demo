@@ -118,7 +118,9 @@ private fun Spinner() {
 		val stroke = (2.94 * u).dp.toPx()
 		drawArc(
 			color = Auth.FaintText,
-			startAngle = 0f,
+			// The authored ring (1:683) opens at the top-left quadrant: the arc
+			// runs from 12 o'clock clockwise to 9 (exact-design audit 2026-09-04).
+			startAngle = 270f,
 			sweepAngle = 270f,
 			useCenter = false,
 			topLeft = Offset(stroke / 2f, stroke / 2f),

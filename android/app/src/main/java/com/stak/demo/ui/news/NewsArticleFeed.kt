@@ -96,7 +96,9 @@ object NewsArticleFeed {
 	private val ARTICLES = listOf(
 		Article(
 			id = APPLE,
-			category = "Tech & Ai",
+			// Authored toast reads "Tech & Ai" (1:1521); the initialism is fixed -
+			// exact-design audit 2026-09-04.
+			category = "Tech & AI",
 			headline = "Apple climbs 5% on foldable iPhone push",
 			subtitle = "A bigger foldable order and the widest iPhone lineup in years sent Apple toward a record, and to within touching distance of Nvidia’s crown.",
 			ticker = "AAPL",
@@ -106,7 +108,7 @@ object NewsArticleFeed {
 				"Apple had one of its best days in months on Thursday, climbing almost 5 percent after word got out that the company is planning its widest iPhone lineup in years. Nikkei Asia reported that Apple has asked suppliers to prepare at least five new models, and to lift output of its first foldable to around 10 million units, well above the seven to eight million it had penciled in.",
 				"That last number is the tell. Companies do not quietly double down on a product they expect to flop, and the foldable, which the rumor mill has taken to calling the iPhone Ultra, is now expected to land between late 2026 and the first half of 2027. Traders read the order size as confidence and bought accordingly. Apple gained about 182 billion dollars in market value on the day, nearly enough on its own to paper over a sell-off tearing through chip stocks.",
 				"The rally leaves Apple roughly 4 percent shy of retaking the title of most valuable company in the world from Nvidia, a crown the two have passed back and forth all year. It also lets the stock shake off a rough June, when a rare mid-cycle price increase on Macs and iPads, blamed on climbing memory costs, sent shares lower and rattled investors who had grown used to Apple holding the line.",
-				"The real verdict comes on July 30, when Apple reports fiscal third quarter results. Wall Street is penciling in revenue of around 108 billion dollars, but the number everyone will hunt for is any early read on how the new lineup, and its price tags, are actually selling.",
+				"The real verdict comes on July 30, when Apple reports fiscal third-quarter results. Wall Street is penciling in revenue of around 108 billion dollars, but the number everyone will hunt for is any early read on how the new lineup, and its price tags, are actually selling.",
 			),
 			media = NewsMedia.demo(),
 			shareText = "Apple climbs 5% on foldable iPhone push - read it on STAK: https://stak.app/news/apple-foldable-iphone-push",
@@ -153,7 +155,7 @@ object NewsArticleFeed {
 		// demo article was macro, not stock news - replaced with the
 		// Alphabet story its brief now carries.
 		demo(
-			"googl-ad-quarter", "Tech & Ai",
+			"googl-ad-quarter", "Tech & AI",
 			"Alphabet jumps after a blowout ad quarter",
 			"An advertising beat on every line quieted the market's biggest question about the company.",
 			listOf(
@@ -206,7 +208,7 @@ object NewsArticleFeed {
 			media = NewsMedia.Video(url = "https://video.twimg.com/amplify_video/1699284608536248320/vid/avc1/640x360/Eeh_WcbfPbwwZC8h.mp4?tag=16", posterUrl = "https://pbs.twimg.com/amplify_video_thumb/1699284608536248320/img/FYIKCy2RrRRIaOEG.jpg", sourceLink = "https://x.com/BloombergTV/status/1699393999142879621"),
 		),
 		demo(
-			"tech-earnings-week", "Tech & Ai",
+			"tech-earnings-week", "Tech & AI",
 			"Tech earnings week: what to watch",
 			"Five of the largest names report in four days - AI spending guidance is the number that moves everything.",
 			listOf(
@@ -232,7 +234,7 @@ object NewsArticleFeed {
 		// story was macro, not stock news - the Markets tile now serves
 		// the day's top stock story.
 		demo(
-			MARKET_TILE, "Tech & Ai",
+			MARKET_TILE, "Tech & AI",
 			"Amazon climbs on cloud margin beat",
 			"A cloud profit surprise eased the market's doubt about how much of the AI buildout turns into earnings.",
 			listOf(
@@ -254,7 +256,7 @@ object NewsArticleFeed {
 			media = NewsMedia.Video(url = "https://pdl-iphone-cnbc-com.akamaized.net/7000402916/0a2a7740-0215-11f1-8ce3-3d87008d7586/1770242470-43852144172-hd_L.mp4", posterUrl = "https://image.cnbcfm.com/api/v1/image/108261644-17702424741770242470-43852144172-1080pnbcnews.jpg?v=1770242473", sourceLink = "https://www.cnbc.com/video/2026/02/04/aws-in-focus-for-amazon-earnings.html"),
 		),
 		demo(
-			"nvda-lags-rally", "Tech & Ai",
+			"nvda-lags-rally", "Tech & AI",
 			"Nvidia lags the chip rally it kicked off",
 			"The stock that started the AI trade is sitting out its latest leg, and the reasons say a lot about where the rally goes next.",
 			listOf(
@@ -276,7 +278,7 @@ object NewsArticleFeed {
 			media = NewsMedia.Video(url = "https://pdl-iphone-cnbc-com.akamaized.net/7000396229/a2927310-c652-11f0-afc8-d79487fce04e/1763671856-42633094871-hd_L.mp4", posterUrl = "https://image.cnbcfm.com/api/v1/image/108229488-17636718631763671856-42633094871-1080pnbcnews.jpg?v=1763671862&w=1280&h=720", sourceLink = "https://www.cnbc.com/video/2025/11/20/dan-ives-nvidia-put-up-a-masterpiece-quarter-and-threw-ai-bubble-out-the-window.html"),
 		),
 		demo(
-			"tsla-drops-deliveries", "Tech & Ai",
+			"tsla-drops-deliveries", "Tech & AI",
 			"Tesla drops 7% even after beating deliveries",
 			"A delivery beat was not enough - the margin behind each car is now the number that moves the stock.",
 			listOf(
@@ -301,7 +303,7 @@ object NewsArticleFeed {
 		// row was macro, not stock news - replaced with a stock story.
 		// The authored row image is reused as the served-thumb stand-in.
 		demo(
-			"amd-yearly-high", "Tech & Ai",
+			"amd-yearly-high", "Tech & AI",
 			"AMD rides the AI rotation to a yearly high",
 			"The clearest winner of the week's rotation out of the AI trade's most crowded names.",
 			listOf(
@@ -323,7 +325,7 @@ object NewsArticleFeed {
 			media = NewsMedia.Video(url = "https://pdl-iphone-cnbc-com.akamaized.net/7000412105/899c3ab0-494e-11f1-8d98-6dd8be25c276/1778073695-45746068381-hd_L.mp4", posterUrl = "https://image.cnbcfm.com/api/v1/image/108302924-1778073838912-1778073695-45746068381-hd.jpg?v=1778073840&w=1280&h=720", sourceLink = "https://www.cnbc.com/video/2026/05/06/amd-ceo-lisa-su-agents-are-driving-tremendous-demand-in-the-ai-cycle.html"),
 		),
 		demo(
-			"memory-chips-soar", "Tech & Ai",
+			"memory-chips-soar", "Tech & AI",
 			"Memory chips soar as the AI trade rotates",
 			"The unglamorous end of the chip business is suddenly the hottest trade in the AI boom.",
 			listOf(

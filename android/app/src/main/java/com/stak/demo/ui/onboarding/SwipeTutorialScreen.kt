@@ -3,7 +3,6 @@ package com.stak.demo.ui.onboarding
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.EaseOut
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
@@ -31,10 +30,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.StrokeJoin
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
@@ -214,19 +209,17 @@ fun SwipeTutorialScreen(onBack: () -> Unit, onContinue: () -> Unit) {
 	}
 }
 
-/** 13.97x6.98 down-chevron stroke (artboard-scaled), StakColors.Muted. */
+/**
+ * The authored 13.97x6.98 down-chevron (1:487 / 1:489): the exported
+ * vector - stroke #5C6B85 at 1.75, round caps, the glyph inset inside
+ * its frame. Was a hand-drawn corner-to-corner #819ABB 1.6 stroke
+ * (exact-design audit 2026-09-04).
+ */
 @Composable
 private fun ChevronDown(u: Float) {
-	Canvas(modifier = Modifier.size((13.97 * u).dp, (6.98 * u).dp)) {
-		val p = Path().apply {
-			moveTo(0f, 0f)
-			lineTo(size.width / 2f, size.height)
-			lineTo(size.width, 0f)
-		}
-		drawPath(
-			p,
-			StakColors.Muted,
-			style = Stroke(width = (1.6 * u).dp.toPx(), cap = StrokeCap.Round, join = StrokeJoin.Round),
-		)
-	}
+	Image(
+		painter = painterResource(R.drawable.ic_swipe_chevron),
+		contentDescription = null,
+		modifier = Modifier.size((13.97 * u).dp, (6.98 * u).dp),
+	)
 }

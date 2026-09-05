@@ -33,7 +33,6 @@ import com.stak.demo.ui.onboarding.AuthBackCircle
 import com.stak.demo.ui.theme.Geist
 import com.stak.demo.ui.theme.Sora
 import com.stak.demo.ui.theme.StakColors
-import com.stak.demo.ui.theme.ADVANCE_ROUNDING
 
 private data class Rank(
 	val rank: String, val initial: String, val name: String,
@@ -73,7 +72,7 @@ fun LeaderboardScreen(onBack: () -> Unit) {
 			Spacer(modifier = Modifier.weight(1f))
 			Text(
 				text = "Leaderboard",
-				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp, lineHeight = (20 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp, lineHeight = (20 * u).sp),
 				color = Color.White,
 			)
 			Spacer(modifier = Modifier.weight(1f))
@@ -101,11 +100,11 @@ fun LeaderboardScreen(onBack: () -> Unit) {
 			Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().padding(horizontal = (2 * u).dp)) {
 				Text(
 					text = "RANKED BY RETURN",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, lineHeight = (13 * u).sp, letterSpacing = (0.9 * u + ADVANCE_ROUNDING.value).sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, lineHeight = (13 * u).sp, letterSpacing = (0.9 * u).sp),
 					color = Sim.Faint,
 				)
 				Spacer(modifier = Modifier.weight(1f))
-				Text("Trailing 7 days", style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp, lineHeight = (13 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Sim.Faint)
+				Text("Trailing 7 days", style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp, lineHeight = (13 * u).sp), color = Sim.Faint)
 			}
 			// You — highlighted with the ▲ spots delta.
 			Row(
@@ -122,26 +121,26 @@ fun LeaderboardScreen(onBack: () -> Unit) {
 				// week figures and pick count - the same #47 / +1.9% the
 				// Simulate hero and board card show.
 				Box(modifier = Modifier.width((28 * u).dp)) {
-					Text(PaperPortfolio.WEEK_RANK.toString(), style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp, lineHeight = (20 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Sim.Teal)
+					Text(PaperPortfolio.WEEK_RANK.toString(), style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp, lineHeight = (20 * u).sp), color = Sim.Teal)
 				}
 				Box(contentAlignment = Alignment.Center, modifier = Modifier.size((36 * u).dp).background(Sim.ChipBg, CircleShape)) {
-					Text("E", style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (14 * u).sp, lineHeight = (18 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Sim.BadgeInk) // 1:4158 is 14 (exact-design audit 2026-09-04)
+					Text("E", style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (14 * u).sp, lineHeight = (18 * u).sp), color = Sim.BadgeInk) // 1:4158 is 14 (exact-design audit 2026-09-04)
 				}
 				Column(verticalArrangement = Arrangement.spacedBy((2 * u).dp), modifier = Modifier.weight(1f)) {
-					Text("You", style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (15 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Color.White) // 1:4160 Sora Medium (exact-design audit 2026-09-04)
-					Text("12 picks this week", style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp, lineHeight = (13 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Sim.Muted)
+					Text("You", style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (15 * u).sp), color = Color.White) // 1:4160 Sora Medium (exact-design audit 2026-09-04)
+					Text("12 picks this week", style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp, lineHeight = (13 * u).sp), color = Sim.Muted)
 				}
 				Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy((2 * u).dp)) {
 					// Authored You row (user, 2026-09-04 (CHINEDU 07 · Simulate 423:1007): the authored look wins).
-					Text("+4.2%", style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (13 * u).sp, lineHeight = (16 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Sim.Teal)
-					Text("▲ 12 spots", style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp, lineHeight = (13 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Sim.Green)
+					Text("+4.2%", style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (13 * u).sp, lineHeight = (16 * u).sp), color = Sim.Teal)
+					Text("▲ 12 spots", style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp, lineHeight = (13 * u).sp), color = Sim.Green)
 				}
 			}
 			TOP.forEach { LeaderRow(it) }
 			Text(
 				text = "· · ·",
 				// 1:4205 (exact-design audit 2026-09-04): Geist Medium 13 - was Regular 12.
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp, lineHeight = (17 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp, lineHeight = (17 * u).sp),
 				color = Sim.Faint,
 				modifier = Modifier.align(Alignment.CenterHorizontally),
 			)
@@ -149,7 +148,7 @@ fun LeaderboardScreen(onBack: () -> Unit) {
 			Text(
 				text = "Percentage return, not dollar size, so everyone competes on the same scale. This week ranks the trailing 7 days.",
 				// 1:4124 centres the explainer.
-				style = TextStyle(fontFamily = Geist, fontSize = (11 * u).sp, lineHeight = (16 * u).sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center, letterSpacing = ADVANCE_ROUNDING),
+				style = TextStyle(fontFamily = Geist, fontSize = (11 * u).sp, lineHeight = (16 * u).sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center),
 				color = Sim.Faint,
 				modifier = Modifier.fillMaxWidth(),
 			)
@@ -169,7 +168,7 @@ private fun PeriodChip(label: String, selected: Boolean) {
 	) {
 		Text(
 			text = label,
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
 			color = if (selected) Sim.Teal else Sim.Muted,
 		)
 	}
@@ -188,15 +187,15 @@ private fun LeaderRow(r: Rank) {
 			.padding(horizontal = (14 * u).dp, vertical = (11 * u).dp),
 	) {
 		Box(modifier = Modifier.width((24 * u).dp)) {
-			Text(r.rank, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (12 * u).sp, lineHeight = (15 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Sim.Faint)
+			Text(r.rank, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (12 * u).sp, lineHeight = (15 * u).sp), color = Sim.Faint)
 		}
 		Box(contentAlignment = Alignment.Center, modifier = Modifier.size((32 * u).dp).background(Sim.ChipBg, CircleShape)) {
-			Text(r.initial, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (13 * u).sp, lineHeight = (16 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Sim.BadgeInk)
+			Text(r.initial, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (13 * u).sp, lineHeight = (16 * u).sp), color = Sim.BadgeInk)
 		}
 		Column(verticalArrangement = Arrangement.spacedBy((2 * u).dp), modifier = Modifier.weight(1f)) {
-			Text(r.name, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (15 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Color.White) // 1:4170 Sora Medium, not Geist (exact-design audit 2026-09-04)
-			Text(r.picks, style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp, lineHeight = (13 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Sim.Faint) // 1:4171 #5c6b85 (exact-design audit 2026-09-04)
+			Text(r.name, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (15 * u).sp), color = Color.White) // 1:4170 Sora Medium, not Geist (exact-design audit 2026-09-04)
+			Text(r.picks, style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp, lineHeight = (13 * u).sp), color = Sim.Faint) // 1:4171 #5c6b85 (exact-design audit 2026-09-04)
 		}
-		Text(r.pct, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (12 * u).sp, lineHeight = (15 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Sim.HeaderGray)
+		Text(r.pct, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (12 * u).sp, lineHeight = (15 * u).sp), color = Sim.HeaderGray)
 	}
 }

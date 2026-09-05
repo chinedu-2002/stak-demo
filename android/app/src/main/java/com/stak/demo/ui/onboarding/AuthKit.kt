@@ -39,7 +39,6 @@ import androidx.compose.ui.unit.sp
 import com.stak.demo.R
 import com.stak.demo.ui.theme.Geist
 import com.stak.demo.ui.theme.StakColors
-import com.stak.demo.ui.theme.ADVANCE_ROUNDING
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -153,7 +152,7 @@ internal fun SocialPill(text: String, iconRes: Int, onClick: () -> Unit) {
 		Image(painter = painterResource(iconRes), contentDescription = null, modifier = Modifier.size((18 * u).dp))
 		Text(
 			text = text,
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp),
 			color = Auth.DarkOnWhite,
 		)
 	}
@@ -167,7 +166,7 @@ internal fun AuthOrDivider() {
 		Box(modifier = Modifier.weight(1f).height((1 * u).dp).background(Auth.DividerLine))
 		Text(
 			text = "or",
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp),
 			color = Auth.FaintText,
 		)
 		Box(modifier = Modifier.weight(1f).height((1 * u).dp).background(Auth.DividerLine))
@@ -185,7 +184,7 @@ internal fun AuthInput(
 	trailing: (@Composable () -> Unit)? = null,
 ) {
 	val u = figmaUnit()
-	val textStyle = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (13 * u).sp, color = StakColors.TextPrimary, letterSpacing = ADVANCE_ROUNDING)
+	val textStyle = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (13 * u).sp, color = StakColors.TextPrimary)
 	Row(
 		verticalAlignment = Alignment.CenterVertically,
 		modifier = Modifier
@@ -220,7 +219,7 @@ internal fun ShowHideToggle(shown: Boolean, onToggle: () -> Unit) {
 	val u = figmaUnit()
 	Text(
 		text = if (shown) "Hide" else "Show",
-		style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (11 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+		style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (11 * u).sp),
 		color = Auth.LinkTeal,
 		modifier = Modifier.clickable(
 			interactionSource = remember { MutableInteractionSource() },
@@ -269,7 +268,7 @@ internal fun AuthCta(text: String, onClick: () -> Unit) {
 	) {
 		Text(
 			text = text,
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp),
 			color = StakColors.TextPrimary,
 		)
 	}
@@ -290,7 +289,7 @@ internal fun AuthSecondaryButton(text: String, onClick: () -> Unit) {
 	) {
 		Text(
 			text = text,
-			style = TextStyle(fontFamily = com.stak.demo.ui.theme.Sora, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+			style = TextStyle(fontFamily = com.stak.demo.ui.theme.Sora, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp),
 			color = StakColors.Muted,
 		)
 	}
@@ -303,12 +302,12 @@ internal fun AuthSwitchRow(prefix: String, link: String, onClick: () -> Unit) {
 	Row(horizontalArrangement = Arrangement.spacedBy((5 * u).dp), verticalAlignment = Alignment.CenterVertically) {
 		Text(
 			text = prefix,
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp),
 			color = StakColors.Muted,
 		)
 		Text(
 			text = link,
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp),
 			color = Auth.LinkTeal,
 			modifier = Modifier.clickable(
 				interactionSource = remember { MutableInteractionSource() },

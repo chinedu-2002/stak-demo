@@ -52,7 +52,6 @@ import com.stak.demo.ui.onboarding.AuthBackCircle
 import com.stak.demo.ui.theme.Geist
 import com.stak.demo.ui.theme.Sora
 import com.stak.demo.ui.theme.StakColors
-import com.stak.demo.ui.theme.ADVANCE_ROUNDING
 
 // Codex audit (2026-09-04): SimPick and the six authored rows moved to
 // PaperPortfolio.kt - the rows are the shared portfolio's positions now.
@@ -87,7 +86,7 @@ fun SimPortfolioScreen(
 				Spacer(modifier = Modifier.weight(1f))
 				Text(
 					text = "Your portfolio",
-					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp, lineHeight = (20 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp, lineHeight = (20 * u).sp),
 					color = Color.White,
 				)
 				Spacer(modifier = Modifier.weight(1f))
@@ -120,7 +119,7 @@ fun SimPortfolioScreen(
 					Text(
 						// Authored copy (user, 2026-09-04 (CHINEDU 07 · Simulate 423:1007): the authored look wins).
 						"12 picks · +$240.00 all time",
-						style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp, lineHeight = (13 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+						style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp, lineHeight = (13 * u).sp),
 						color = Sim.Muted,
 					)
 				}
@@ -152,7 +151,7 @@ fun SimPortfolioScreen(
 				) {
 					Text(
 						text = "SOLD · REALIZED",
-						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, lineHeight = (13 * u).sp, letterSpacing = (0.9 * u + ADVANCE_ROUNDING.value).sp),
+						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, lineHeight = (13 * u).sp, letterSpacing = (0.9 * u).sp),
 						color = Sim.Faint,
 					)
 				}
@@ -162,7 +161,7 @@ fun SimPortfolioScreen(
 				Text(
 					text = "Sell a pick and the cash returns to your balance, gain or loss.",
 					// 1:4621 (exact-design audit 2026-09-04): centre-aligned across the full column, so a wrap stays centred.
-					style = TextStyle(fontFamily = Geist, fontSize = (11 * u).sp, lineHeight = (14 * u).sp, textAlign = TextAlign.Center, letterSpacing = ADVANCE_ROUNDING),
+					style = TextStyle(fontFamily = Geist, fontSize = (11 * u).sp, lineHeight = (14 * u).sp, textAlign = TextAlign.Center),
 					color = Sim.Faint,
 					modifier = Modifier.fillMaxWidth(),
 				)
@@ -199,7 +198,7 @@ private fun FilterChip(label: String, selected: Boolean) {
 	) {
 		Text(
 			text = label,
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
 			color = if (selected) Sim.Teal else Sim.Muted,
 		)
 	}
@@ -224,7 +223,7 @@ private fun SellPill(onClick: () -> Unit) {
 		Text(
 			"Sell",
 			// 1:4544 (exact-design audit 2026-09-04): Sora Regular 12 in #819abb - was Medium #DCE7F7.
-			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (15 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (15 * u).sp),
 			color = Sim.Muted,
 		)
 	}
@@ -248,15 +247,15 @@ private fun RealizedRow(badge: String, ticker: String, sub: String, amount: Stri
 			.padding(horizontal = (14 * u).dp, vertical = (12 * u).dp),
 	) {
 		Box(contentAlignment = Alignment.Center, modifier = Modifier.size((36 * u).dp).alpha(0.55f).background(Sim.ChipBg, CircleShape)) {
-			Text(badge, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (14 * u).sp, lineHeight = (18 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Sim.BadgeInk)
+			Text(badge, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (14 * u).sp, lineHeight = (18 * u).sp), color = Sim.BadgeInk)
 		}
 		Column(verticalArrangement = Arrangement.spacedBy((2 * u).dp), modifier = Modifier.weight(1f)) {
-			Text(ticker, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (12 * u).sp, lineHeight = (15 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Sim.HeaderGray)
-			Text(sub, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Light, fontSize = (10 * u).sp, lineHeight = (13 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Sim.Faint)
+			Text(ticker, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (12 * u).sp, lineHeight = (15 * u).sp), color = Sim.HeaderGray)
+			Text(sub, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Light, fontSize = (10 * u).sp, lineHeight = (13 * u).sp), color = Sim.Faint)
 		}
 		Text(
 			amount,
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp, lineHeight = (18 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp, lineHeight = (18 * u).sp),
 			color = if (up) Sim.Green else Sim.Red,
 		)
 	}
@@ -313,15 +312,15 @@ private fun PickSellRow(pick: PickSpec) {
 			.padding(horizontal = (14 * u).dp, vertical = (12 * u).dp),
 	) {
 		Box(contentAlignment = Alignment.Center, modifier = Modifier.size((38 * u).dp).background(Sim.ChipBg, CircleShape)) {
-			Text(pick.badge, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Sim.BadgeInk)
+			Text(pick.badge, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp), color = Sim.BadgeInk)
 		}
 		Column(verticalArrangement = Arrangement.spacedBy((2 * u).dp), modifier = Modifier.weight(1f)) {
-			Text(pick.company, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Color.White)
-			Text("${pick.priceNow} today", style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Sim.Muted)
+			Text(pick.company, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp), color = Color.White)
+			Text("${pick.priceNow} today", style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp), color = Sim.Muted)
 		}
 		Text(
 			pick.dayChange,
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp),
 			color = if (pick.dayChange.startsWith("▼")) Sim.Red else Sim.Green,
 		)
 	}
@@ -335,13 +334,13 @@ private fun SellConfirmContent(pick: PickSpec, onConfirm: () -> Unit, onDismiss:
 	Column(verticalArrangement = Arrangement.spacedBy((14 * u).dp), modifier = Modifier.fillMaxWidth()) {
 		Text(
 			"Sell ${pick.symbol}?",
-			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (18 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (18 * u).sp),
 			color = Color.White,
 		)
 		PickSellRow(pick)
 		Text(
 			"You hold ${pick.shares} shares from your ${pick.stakeBasis} stake.",
-			style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp, lineHeight = (18 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+			style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp, lineHeight = (18 * u).sp),
 			color = Sim.Body,
 			modifier = Modifier.fillMaxWidth(),
 		)
@@ -349,10 +348,10 @@ private fun SellConfirmContent(pick: PickSpec, onConfirm: () -> Unit, onDismiss:
 		// quick amounts and the Returning line sit 12 apart inside the sheet's 14 rhythm.
 		Column(verticalArrangement = Arrangement.spacedBy((12 * u).dp), modifier = Modifier.fillMaxWidth()) {
 			Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy((6 * u).dp)) {
-				Text("Position value", style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Sim.Muted)
+				Text("Position value", style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp, lineHeight = (16 * u).sp), color = Sim.Muted)
 				Text(
 					pick.stakeValue,
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
 					color = Sim.Bright,
 				)
 			}
@@ -379,7 +378,7 @@ private fun SellConfirmContent(pick: PickSpec, onConfirm: () -> Unit, onDismiss:
 					) {
 						Text(
 							label,
-							style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+							style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
 							color = if (sel) Color(0xFFA6E4F7) else Color(0xFFDCE7F7),
 						)
 					}
@@ -390,14 +389,14 @@ private fun SellConfirmContent(pick: PickSpec, onConfirm: () -> Unit, onDismiss:
 				horizontalArrangement = Arrangement.spacedBy((6 * u).dp, Alignment.CenterHorizontally),
 				modifier = Modifier.fillMaxWidth(),
 			) {
-				Text("Returning", style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Sim.Muted, modifier = Modifier.alignByBaseline())
+				Text("Returning", style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp, lineHeight = (16 * u).sp), color = Sim.Muted, modifier = Modifier.alignByBaseline())
 				Text(
 					pick.stakeValue,
-					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp, lineHeight = (19 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp, lineHeight = (19 * u).sp),
 					color = Sim.Bright,
 					modifier = Modifier.alignByBaseline(),
 				)
-				Text("to your cash", style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Sim.Muted, modifier = Modifier.alignByBaseline())
+				Text("to your cash", style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp, lineHeight = (16 * u).sp), color = Sim.Muted, modifier = Modifier.alignByBaseline())
 			}
 		}
 		Column(verticalArrangement = Arrangement.spacedBy((16 * u).dp), modifier = Modifier.fillMaxWidth()) {
@@ -419,7 +418,7 @@ private fun SellConfirmContent(pick: PickSpec, onConfirm: () -> Unit, onDismiss:
 			) {
 				Text(
 					"Confirm sell",
-					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp, lineHeight = (20.69 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp, lineHeight = (20.69 * u).sp),
 					color = Color.White,
 				)
 			}
@@ -436,7 +435,7 @@ private fun SellConfirmContent(pick: PickSpec, onConfirm: () -> Unit, onDismiss:
 						onClick = onDismiss,
 					),
 			) {
-				Text("Back", style = TextStyle(fontFamily = Sora, fontSize = (14 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Sim.Muted)
+				Text("Back", style = TextStyle(fontFamily = Sora, fontSize = (14 * u).sp), color = Sim.Muted)
 			}
 		}
 	}
@@ -454,24 +453,24 @@ private fun PositionClosedContent(pick: PickSpec, onBackToSimulate: () -> Unit, 
 		Image(painterResource(R.drawable.ic_sheet_check), null, modifier = Modifier.size((47 * u).dp))
 		Text(
 			"Position closed",
-			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (18 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (18 * u).sp),
 			color = Color.White,
 		)
 		PickSellRow(pick)
 		Text(
 			"Sold ${pick.shares} shares from your ${pick.stakeBasis} stake.",
-			style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp, lineHeight = (18 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+			style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp, lineHeight = (18 * u).sp),
 			color = Sim.Body,
 			modifier = Modifier.fillMaxWidth(),
 		)
 		// 73:1003 Practice ticket (exact-design audit 2026-09-04): Proceeds and the Returned line sit 12 apart.
 		Column(verticalArrangement = Arrangement.spacedBy((12 * u).dp), modifier = Modifier.fillMaxWidth()) {
 			Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy((6 * u).dp)) {
-				Text("Proceeds", style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Sim.Muted)
+				Text("Proceeds", style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp, lineHeight = (16 * u).sp), color = Sim.Muted)
 				Text(
 					pick.stakeValue,
 					// 73:1006 (exact-design audit 2026-09-04): the proceeds figure is Sora SemiBold 12 - was Geist Medium.
-					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (12 * u).sp, lineHeight = (15 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (12 * u).sp, lineHeight = (15 * u).sp),
 					color = Sim.Bright,
 				)
 			}
@@ -480,14 +479,14 @@ private fun PositionClosedContent(pick: PickSpec, onBackToSimulate: () -> Unit, 
 				horizontalArrangement = Arrangement.spacedBy((6 * u).dp, Alignment.CenterHorizontally),
 				modifier = Modifier.fillMaxWidth(),
 			) {
-				Text("Returned", style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Sim.Muted, modifier = Modifier.alignByBaseline())
+				Text("Returned", style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp, lineHeight = (16 * u).sp), color = Sim.Muted, modifier = Modifier.alignByBaseline())
 				Text(
 					pick.stakeValue,
-					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp, lineHeight = (19 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp, lineHeight = (19 * u).sp),
 					color = Sim.Bright,
 					modifier = Modifier.alignByBaseline(),
 				)
-				Text("to your cash (${pick.gain})", style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Sim.Muted, modifier = Modifier.alignByBaseline())
+				Text("to your cash (${pick.gain})", style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp, lineHeight = (16 * u).sp), color = Sim.Muted, modifier = Modifier.alignByBaseline())
 			}
 		}
 		Column(verticalArrangement = Arrangement.spacedBy((16 * u).dp), modifier = Modifier.fillMaxWidth()) {
@@ -518,7 +517,7 @@ private fun PositionClosedContent(pick: PickSpec, onBackToSimulate: () -> Unit, 
 			) {
 				Text(
 					"Back to Simulate",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp, lineHeight = (20.69 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp, lineHeight = (20.69 * u).sp),
 					color = Color.White,
 				)
 			}
@@ -535,7 +534,7 @@ private fun PositionClosedContent(pick: PickSpec, onBackToSimulate: () -> Unit, 
 						onClick = onViewPortfolio,
 					),
 			) {
-				Text("View portfolio", style = TextStyle(fontFamily = Sora, fontSize = (14 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Sim.Muted)
+				Text("View portfolio", style = TextStyle(fontFamily = Sora, fontSize = (14 * u).sp), color = Sim.Muted)
 			}
 		}
 	}

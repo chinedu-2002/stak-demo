@@ -44,7 +44,6 @@ import com.stak.demo.ui.onboarding.AuthBackCircle
 import com.stak.demo.ui.theme.Geist
 import com.stak.demo.ui.theme.Sora
 import com.stak.demo.ui.theme.StakColors
-import com.stak.demo.ui.theme.ADVANCE_ROUNDING
 
 private val CardBg = Color(0xFF181F30)
 private val Muted = Color(0xFF819ABB)
@@ -89,7 +88,7 @@ fun CollectionScreen(
 			Spacer(modifier = Modifier.weight(1f))
 			Text(
 				text = c.name,
-				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp),
 				color = Color.White,
 			)
 			Spacer(modifier = Modifier.weight(1f))
@@ -129,23 +128,23 @@ fun CollectionScreen(
 				}
 				Text(
 					text = c.name,
-					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (26 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (26 * u).sp),
 					color = Color.White,
 				)
 				Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy((7 * u).dp)) {
-					Text(heldCountLabel(held.size), style = TextStyle(fontFamily = Geist, fontSize = (13 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Muted)
-					Text("·", style = TextStyle(fontFamily = Geist, fontSize = (13 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Faint)
+					Text(heldCountLabel(held.size), style = TextStyle(fontFamily = Geist, fontSize = (13 * u).sp), color = Muted)
+					Text("·", style = TextStyle(fontFamily = Geist, fontSize = (13 * u).sp), color = Faint)
 					// The weekly move is not in the shared demo data - the
 					// authored 1:3333 literal stays for every collection.
 					Text(
 						"+2.4% this week",
-						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp),
 						color = Green,
 					)
 				}
 				Text(
 					text = c.blurb,
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (13 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (13 * u).sp),
 					color = Color(0xFFC8D2E0),
 				)
 			}
@@ -204,28 +203,28 @@ private fun StockTile(stock: CollStock, onClick: (() -> Unit)?, modifier: Modifi
 			Box(contentAlignment = Alignment.Center, modifier = Modifier.size((36 * u).dp).background(Color(0xFF242B3D), CircleShape)) {
 				Text(
 					stock.badge,
-					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (14 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (14 * u).sp),
 					color = BadgeInk,
 				)
 			}
 			Spacer(modifier = Modifier.weight(1f))
 			Text(
 				stock.change,
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp),
 				color = if (stock.up) Green else RedDown,
 			)
 		}
 		Column(verticalArrangement = Arrangement.spacedBy((2 * u).dp)) {
 			Text(
 				stock.ticker,
-				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp),
 				color = Color.White,
 			)
-			Text(stock.company, style = TextStyle(fontFamily = Geist, fontSize = (11 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Muted)
+			Text(stock.company, style = TextStyle(fontFamily = Geist, fontSize = (11 * u).sp), color = Muted)
 		}
 		Text(
 			stock.price,
-			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Medium, fontSize = (15 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Medium, fontSize = (15 * u).sp),
 			color = Color.White,
 		)
 	}
@@ -261,7 +260,7 @@ private fun AddStockTile(onClick: () -> Unit, modifier: Modifier = Modifier) {
 		Image(painterResource(R.drawable.ic_plus_circle), null, modifier = Modifier.size((24 * u).dp))
 		Text(
 			"Add stock",
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp),
 			color = Muted,
 		)
 	}

@@ -9,45 +9,36 @@ import androidx.compose.ui.text.font.FontWeight
 import com.stak.demo.R
 
 /**
- * Sora (variable, weights instantiated per style) is the UI face across the app.
- * Squarish Sans CT is the display face for the STAK wordmark and big numerals.
+ * Sora is the UI face across the app; Squarish Sans CT is the display face
+ * for the STAK wordmark and big numerals.
+ *
+ * STATIC instances, one file per weight - the same files iOS bundles and
+ * Figma renders. The variable fonts were dropped on 2026-09-04: Android
+ * shapes a FontVariation instance with the DEFAULT instance's advances
+ * (HVAR ignored), so every SemiBold/Medium run came out 1.5-2.6% narrower
+ * than the frame (Sora 26 SemiBold "Discover" 400-vs-600 advance gap 1.5%,
+ * Geist 14 Medium "Practice buy" 2.6% - measured on StakTest vs the 2x
+ * export of 1:1627) while Regular runs matched. The old ADVANCE_ROUNDING
+ * tracking was a workaround for exactly this and is gone.
  */
-@OptIn(ExperimentalTextApi::class)
-private fun sora(weight: FontWeight) = Font(
-	R.font.sora_variable,
-	weight = weight,
-	style = FontStyle.Normal,
-	variationSettings = FontVariation.Settings(FontVariation.weight(weight.weight)),
-)
-
-@OptIn(ExperimentalTextApi::class)
 val Sora = FontFamily(
-	sora(FontWeight.Light),
-	sora(FontWeight.Normal),
-	sora(FontWeight.Medium),
-	sora(FontWeight.SemiBold),
-	sora(FontWeight.Bold),
+	Font(R.font.sora_light, FontWeight.Light),
+	Font(R.font.sora_regular, FontWeight.Normal),
+	Font(R.font.sora_medium, FontWeight.Medium),
+	Font(R.font.sora_semibold, FontWeight.SemiBold),
+	Font(R.font.sora_bold, FontWeight.Bold),
 )
 
 val Squarish = FontFamily(Font(R.font.squarish_sans_ct))
 val SquarishSC = FontFamily(Font(R.font.squarish_sans_ct_sc))
 
-@OptIn(ExperimentalTextApi::class)
-private fun geist(weight: FontWeight) = Font(
-	R.font.geist_variable,
-	weight = weight,
-	style = FontStyle.Normal,
-	variationSettings = FontVariation.Settings(FontVariation.weight(weight.weight)),
-)
-
-/** Geist — the in-app data/UI face used by the splash subtitle and stat chips. */
-@OptIn(ExperimentalTextApi::class)
+/** Geist — the in-app data/UI face used by the splash subtitle and stat chips (static instances, see Sora). */
 val Geist = FontFamily(
-	geist(FontWeight.Light),
-	geist(FontWeight.Normal),
-	geist(FontWeight.Medium),
-	geist(FontWeight.SemiBold),
-	geist(FontWeight.Bold),
+	Font(R.font.geist_light, FontWeight.Light),
+	Font(R.font.geist_regular, FontWeight.Normal),
+	Font(R.font.geist_medium, FontWeight.Medium),
+	Font(R.font.geist_semibold, FontWeight.SemiBold),
+	Font(R.font.geist_bold, FontWeight.Bold),
 )
 
 @OptIn(ExperimentalTextApi::class)

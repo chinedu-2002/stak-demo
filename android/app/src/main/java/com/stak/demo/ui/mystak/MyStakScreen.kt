@@ -41,7 +41,6 @@ import com.stak.demo.R
 import com.stak.demo.ui.theme.Geist
 import com.stak.demo.ui.theme.Sora
 import com.stak.demo.ui.theme.StakColors
-import com.stak.demo.ui.theme.ADVANCE_ROUNDING
 
 private val CardBg = Color(0xFF181F30)
 private val Muted = Color(0xFF819ABB)
@@ -83,12 +82,12 @@ fun MyStakScreen(onOpenCollection: (String) -> Unit, onStartSwiping: () -> Unit)
 		) {
 			Text(
 				text = "My STAK",
-				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (26 * u).sp, lineHeight = (33 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (26 * u).sp, lineHeight = (33 * u).sp),
 				color = Color.White,
 			)
 			Text(
 				text = "Your saved stocks, live.",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (13 * u).sp, lineHeight = (17 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (13 * u).sp, lineHeight = (17 * u).sp),
 				color = Muted,
 			)
 		}
@@ -137,7 +136,7 @@ fun MyStakScreen(onOpenCollection: (String) -> Unit, onStartSwiping: () -> Unit)
 					text = "Add more",
 					// Codex parity audit (2026-09-04): 1:3155 sets the CTA at 14.
 					// 1:3226 line-height 20.69 (was 21) - exact-design audit 2026-09-04.
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp, lineHeight = (20.69 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp, lineHeight = (20.69 * u).sp),
 					color = Color.White,
 				)
 				Image(painterResource(R.drawable.ic_plus_small), null, modifier = Modifier.size((14 * u).dp))
@@ -155,20 +154,20 @@ fun MyStakScreen(onOpenCollection: (String) -> Unit, onStartSwiping: () -> Unit)
 					Image(painterResource(R.drawable.ic_gist_sparkle), null, modifier = Modifier.size((24 * u).dp))
 					Text(
 						text = "Your read",
-						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (14 * u).sp, lineHeight = (18 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (14 * u).sp, lineHeight = (18 * u).sp),
 						color = Color.White,
 					)
 				}
 				Text(
 					text = "You lean into growth and tech.",
-					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp, lineHeight = (19 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp, lineHeight = (19 * u).sp),
 					color = Color.White,
 				)
 				// Authored insight copy - user, 2026-09-04 (CHINEDU 06 · My STAK 1:3155): the authored look wins over a store-derived count.
 				Text(
 					text = "Six of your fourteen picks are tech or AI names. Your STAK skews high-growth, with a small hedge in real estate.",
 					// Codex parity audit (2026-09-04): 1:3155 sets the body at 13.
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (13 * u).sp, lineHeight = (19 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (13 * u).sp, lineHeight = (19 * u).sp),
 					color = Body,
 				)
 			}
@@ -191,18 +190,18 @@ fun MyStakScreen(onOpenCollection: (String) -> Unit, onStartSwiping: () -> Unit)
 			) {
 				Text(
 					text = "DISCOVER",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, lineHeight = (13 * u).sp, letterSpacing = (0.6 * u + ADVANCE_ROUNDING.value).sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, lineHeight = (13 * u).sp, letterSpacing = (0.6 * u).sp),
 					color = Ink,
 				)
 				Text(
 					text = "More like your STAK",
-					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (18 * u).sp, lineHeight = (23 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (18 * u).sp, lineHeight = (23 * u).sp),
 					color = Ink,
 				)
 				Text(
 					text = "Based on your taste, 8 fresh picks are waiting in the deck.",
 					// 1:3322 Geist Regular 12 / 17 (was 13) - exact-design audit 2026-09-04.
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (17 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (17 * u).sp),
 					color = Ink,
 				)
 				// 1:3323 "b": pt 4 over the 17/18 natural runs (was a 22 line-height strip) - exact-design audit 2026-09-04.
@@ -213,12 +212,12 @@ fun MyStakScreen(onOpenCollection: (String) -> Unit, onStartSwiping: () -> Unit)
 				) {
 					Text(
 						text = "Start swiping",
-						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp, lineHeight = (17 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp, lineHeight = (17 * u).sp),
 						color = Color(0xB80A1020),
 					)
 					Text(
 						text = "›",
-						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp, lineHeight = (18 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp, lineHeight = (18 * u).sp),
 						color = Ink,
 					)
 				}
@@ -234,7 +233,7 @@ private fun SectionHeader(title: String) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Text(
 		text = title,
-		style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp, lineHeight = (20 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+		style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp, lineHeight = (20 * u).sp),
 		color = HeaderGray,
 		modifier = Modifier.fillMaxWidth(),
 	)
@@ -277,7 +276,7 @@ private fun CollectionChip(
 		Column(verticalArrangement = Arrangement.spacedBy((2 * u).dp), modifier = Modifier.weight(1f)) {
 			Text(
 				text = name,
-				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (13 * u).sp, lineHeight = (16 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (13 * u).sp, lineHeight = (16 * u).sp),
 				color = Color.White,
 				maxLines = 1,
 				softWrap = false,
@@ -287,13 +286,13 @@ private fun CollectionChip(
 			)
 			Text(
 				text = count,
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp, lineHeight = (14 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp, lineHeight = (14 * u).sp),
 				color = Muted,
 			)
 		}
 		Text(
 			text = "›",
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (16 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (16 * u).sp),
 			color = Faint,
 		)
 	}
@@ -314,30 +313,30 @@ private fun PortfolioSummary() {
 		Column(verticalArrangement = Arrangement.spacedBy((8 * u).dp), modifier = Modifier.padding(start = (20 * u).dp)) {
 			Text(
 				text = "Performance this week",
-				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (15 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (15 * u).sp),
 				color = Muted,
 			)
 			Text(
 				text = "+4.9%",
-				// 1:3239 tracking -0.44 carries ADVANCE_ROUNDING like every tracked run - exact-design audit 2026-09-04.
-				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (44 * u).sp, lineHeight = (55 * u).sp, letterSpacing = (-0.44 * u + ADVANCE_ROUNDING.value).sp),
+				// 1:3239 tracking -0.44 - exact-design audit 2026-09-04.
+				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (44 * u).sp, lineHeight = (55 * u).sp, letterSpacing = (-0.44 * u).sp),
 				color = Color.White,
 			)
 			Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy((10 * u).dp)) {
 				Text(
 					// Authored summary copy; the store's count is not what the frame shows - user, 2026-09-04 (CHINEDU 06 · My STAK 1:3155): the authored look wins.
 					text = "Across 14 stocks",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp, lineHeight = (18 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp, lineHeight = (18 * u).sp),
 					color = Green,
 				)
 				Text(
 					text = ".",
-					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp, lineHeight = (18 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp, lineHeight = (18 * u).sp),
 					color = Muted,
 				)
 				Text(
 					text = "3M",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp, lineHeight = (18 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp, lineHeight = (18 * u).sp),
 					color = Muted,
 				)
 			}
@@ -363,27 +362,27 @@ private fun PortfolioSummary() {
 							.background(Color(0x292C9DBC))
 							.border((0.75 * u).dp, Color(0x662C9DBC), RoundedCornerShape((11.25 * u).dp)),
 					) {
-						Text(label, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Teal)
+						Text(label, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp), color = Teal)
 					}
 				} else {
-					Text(label, style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Muted)
+					Text(label, style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp), color = Muted)
 				}
 			}
 		}
 		Box(modifier = Modifier.fillMaxWidth().height((1 * u).dp).background(Track))
 		Row(horizontalArrangement = Arrangement.spacedBy((151 * u).dp, Alignment.CenterHorizontally), modifier = Modifier.fillMaxWidth()) {
 			Column(verticalArrangement = Arrangement.spacedBy((3 * u).dp)) {
-				Text("Best this week", style = TextStyle(fontFamily = Geist, fontSize = (11 * u).sp, lineHeight = (14 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Faint)
+				Text("Best this week", style = TextStyle(fontFamily = Geist, fontSize = (11 * u).sp, lineHeight = (14 * u).sp), color = Faint)
 				Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy((6 * u).dp)) {
-					Text("TSLA", style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (13 * u).sp, lineHeight = (16 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Color.White)
-					Text("+3.4%", style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Green)
+					Text("TSLA", style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (13 * u).sp, lineHeight = (16 * u).sp), color = Color.White)
+					Text("+3.4%", style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp), color = Green)
 				}
 			}
 			Column(verticalArrangement = Arrangement.spacedBy((3 * u).dp)) {
-				Text("Worst", style = TextStyle(fontFamily = Geist, fontSize = (11 * u).sp, lineHeight = (14 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Faint)
+				Text("Worst", style = TextStyle(fontFamily = Geist, fontSize = (11 * u).sp, lineHeight = (14 * u).sp), color = Faint)
 				Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy((6 * u).dp)) {
-					Text("SNOW", style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (13 * u).sp, lineHeight = (16 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Color.White)
-					Text("-0.5%", style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Red)
+					Text("SNOW", style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (13 * u).sp, lineHeight = (16 * u).sp), color = Color.White)
+					Text("-0.5%", style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp), color = Red)
 				}
 			}
 		}
@@ -409,7 +408,7 @@ private fun AllocationCard() {
 	) {
 		Text(
 			text = "Allocation",
-			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp, lineHeight = (19 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp, lineHeight = (19 * u).sp),
 			color = Color.White,
 		)
 		Image(painterResource(R.drawable.ms_donut), null, modifier = Modifier.size((150 * u).dp))
@@ -431,9 +430,9 @@ private fun SectorBar(name: String, share: String, color: Color, fill: Dp, dot: 
 		Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
 			Box(modifier = Modifier.size((9 * u).dp).background(dot, CircleShape))
 			Spacer(modifier = Modifier.width((8 * u).dp))
-			Text(name, style = TextStyle(fontFamily = Geist, fontSize = (13 * u).sp, lineHeight = (17 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Color.White)
+			Text(name, style = TextStyle(fontFamily = Geist, fontSize = (13 * u).sp, lineHeight = (17 * u).sp), color = Color.White)
 			Spacer(modifier = Modifier.weight(1f))
-			Text(share, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, letterSpacing = ADVANCE_ROUNDING), color = Muted)
+			Text(share, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp), color = Muted)
 		}
 		Box(modifier = Modifier.fillMaxWidth().height((7 * u).dp).clip(RoundedCornerShape((4 * u).dp)).background(Track)) {
 			Box(modifier = Modifier.width(fill).height((7 * u).dp).background(color, RoundedCornerShape((4 * u).dp)))

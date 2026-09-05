@@ -26,6 +26,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -48,6 +51,20 @@ import com.stak.demo.ui.theme.StakColors
 fun PermissionsScreen(onBack: () -> Unit, onContinue: () -> Unit) {
 	val u = figmaUnit()
 	var notifications by rememberSaveable { mutableStateOf(true) }
+	// Product audit (2026-09-05): "Allow and continue" really asks the OS
+	// (Android 13+ POST_NOTIFICATIONS); the grant is what the toggle meant.
+	val context = LocalContext.current
+	val askNotifications = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+		notifications = granted
+		com.stak.demo.ui.UserProfile.notificationsOn = granted
+		onContinue()
+	}
+	fun allowAndContinue() {
+		val needsAsk = notifications && android.os.Build.VERSION.SDK_INT >= 33 &&
+			androidx.core.content.ContextCompat.checkSelfPermission(context, android.Manifest.permission.POST_NOTIFICATIONS) != android.content.pm.PackageManager.PERMISSION_GRANTED
+		com.stak.demo.ui.UserProfile.notificationsOn = notifications
+		if (needsAsk) askNotifications.launch(android.Manifest.permission.POST_NOTIFICATIONS) else onContinue()
+	}
 	var accountSecurity by rememberSaveable { mutableStateOf(true) }
 
 	Artboard(modifier = Modifier.background(StakColors.Bg)) {
@@ -102,8 +119,8 @@ fun PermissionsScreen(onBack: () -> Unit, onContinue: () -> Unit) {
 			verticalArrangement = Arrangement.spacedBy((10 * u).dp),
 			modifier = Modifier.fillMaxWidth().padding(top = (8 * u).dp, bottom = (26 * u).dp),
 		) {
-			AuthCta(text = "Allow and continue", onClick = onContinue)
-			AuthSecondaryButton(text = "Not now", onClick = onContinue)
+			AuthCta(text = "Allow and continue", onClick = { allowAndContinue() })
+			AuthSecondaryButton(text = "Not now", onClick = { com.stak.demo.ui.UserProfile.notificationsOn = false; onContinue() })
 		}
 	}
 }

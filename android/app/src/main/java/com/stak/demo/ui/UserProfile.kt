@@ -27,6 +27,8 @@ object UserProfile {
 	var goal by mutableStateOf(-1)
 	/** 05 Risk card index, -1 until answered (TasteModel.RISK_*). */
 	var risk by mutableStateOf(-1)
+	/** 08 Permissions: the user's answer, and the OS grant when it was asked (product audit, 2026-09-05). */
+	var notificationsOn by mutableStateOf(true)
 
 	/** The name as the app addresses the user - always capitalized. */
 	val greetingName: String

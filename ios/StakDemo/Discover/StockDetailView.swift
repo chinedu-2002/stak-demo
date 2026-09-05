@@ -904,7 +904,7 @@ private let detailFacts: [String: DetailFacts] = [
 		title: "GOOGL · Alphabet Inc",
 		price: "$178.90",
 		change: "▲ 0.8% today",
-		tip: "Ad money moves with the economy, so some quarters just drift.",
+		tip: "Ad money tracks the economy. Some quarters drift.",
 		riskPillX: 150,
 		riskCopy: "Moderate volatility. Sits mid-range for your profile.",
 		stats: [
@@ -950,7 +950,7 @@ private let detailFacts: [String: DetailFacts] = [
 		title: "MSFT · Microsoft Corp",
 		price: "$438.20",
 		change: "▼ 0.4% today",
-		tip: "Subscriptions renew every month, so the swings stay small.",
+		tip: "Subscriptions renew monthly. Swings stay small.",
 		riskPillX: 88,
 		riskCopy: "Low volatility. Fits the steady side of your profile.",
 		stats: [
@@ -990,7 +990,7 @@ private let detailFacts: [String: DetailFacts] = [
 		title: "AMD · Advanced Micro Devices",
 		price: "$164.30",
 		change: "▲ 2.1% today",
-		tip: "Chip rallies run in rotations. Expect sharp days both ways.",
+		tip: "Chip rallies rotate. Expect sharp days both ways.",
 		riskPillX: 238,
 		riskCopy: "High volatility. Fits the bolder side of your profile.",
 		stats: [
@@ -1030,7 +1030,7 @@ private let detailFacts: [String: DetailFacts] = [
 		title: "JPM · JPMorgan Chase",
 		price: "$245.60",
 		change: "▲ 0.6% today",
-		tip: "Banks earn on the spread, so rates set the pace, not hype.",
+		tip: "Banks earn on the spread. Rates set the pace.",
 		riskPillX: 150,
 		riskCopy: "Moderate volatility. Sits mid-range for your profile.",
 		stats: [
@@ -1070,7 +1070,7 @@ private let detailFacts: [String: DetailFacts] = [
 		title: "V · Visa Inc",
 		price: "$352.10",
 		change: "▲ 0.3% today",
-		tip: "Visa takes a toll on every swipe. Fees like that rarely swing.",
+		tip: "Visa takes a toll on every swipe. Fees rarely swing.",
 		riskPillX: 88,
 		riskCopy: "Low volatility. Fits the steady side of your profile.",
 		stats: [
@@ -1110,7 +1110,7 @@ private let detailFacts: [String: DetailFacts] = [
 		title: "GS · Goldman Sachs Group",
 		price: "$612.40",
 		change: "▼ 0.5% today",
-		tip: "Deal fees come in waves. Expect quiet stretches and big quarters.",
+		tip: "Deal fees come in waves. Expect lumpy quarters.",
 		riskPillX: 150,
 		riskCopy: "Moderate volatility. Sits mid-range for your profile.",
 		stats: [
@@ -1150,7 +1150,7 @@ private let detailFacts: [String: DetailFacts] = [
 		title: "ENPH · Enphase Energy",
 		price: "$78.40",
 		change: "▲ 1.9% today",
-		tip: "Solar rides policy and rates. Expect sharp moves either way.",
+		tip: "Solar rides policy and rates. Expect sharp moves.",
 		riskPillX: 238,
 		riskCopy: "High volatility. Fits the bolder side of your profile.",
 		stats: [
@@ -1190,7 +1190,7 @@ private let detailFacts: [String: DetailFacts] = [
 		title: "NEE · NextEra Energy",
 		price: "$84.20",
 		change: "▲ 0.4% today",
-		tip: "Power bills get paid in every market. Utilities move slowly.",
+		tip: "Power bills get paid in every market. Slow mover.",
 		riskPillX: 88,
 		riskCopy: "Low volatility. Fits the steady side of your profile.",
 		stats: [
@@ -1230,7 +1230,7 @@ private let detailFacts: [String: DetailFacts] = [
 		title: "FSLR · First Solar Inc",
 		price: "$228.90",
 		change: "▼ 1.1% today",
-		tip: "Policy headlines move solar makers. Size the stake for surprises.",
+		tip: "Policy headlines move solar. Size the stake small.",
 		riskPillX: 238,
 		riskCopy: "High volatility. Fits the bolder side of your profile.",
 		stats: [
@@ -1270,7 +1270,7 @@ private let detailFacts: [String: DetailFacts] = [
 		title: "PLD · Prologis Inc",
 		price: "$118.30",
 		change: "▲ 0.2% today",
-		tip: "Rent checks arrive every month. Warehouse landlords move gently.",
+		tip: "Rent arrives monthly. Landlords move gently.",
 		riskPillX: 150,
 		riskCopy: "Moderate volatility. Sits mid-range for your profile.",
 		stats: [
@@ -1310,7 +1310,7 @@ private let detailFacts: [String: DetailFacts] = [
 		title: "O · Realty Income Corp",
 		price: "$59.10",
 		change: "▼ 0.3% today",
-		tip: "Built for the monthly dividend, not for big price moves.",
+		tip: "Built for the monthly dividend, not big price moves.",
 		riskPillX: 88,
 		riskCopy: "Low volatility. Fits the steady side of your profile.",
 		stats: [
@@ -1350,7 +1350,7 @@ private let detailFacts: [String: DetailFacts] = [
 		title: "LLY · Eli Lilly and Co",
 		price: "$792.50",
 		change: "▲ 1.4% today",
-		tip: "Blockbuster drugs grow fast, and the price already expects it.",
+		tip: "Blockbuster drugs grow fast. The price expects it.",
 		riskPillX: 150,
 		riskCopy: "Moderate volatility. Sits mid-range for your profile.",
 		stats: [
@@ -1390,7 +1390,7 @@ private let detailFacts: [String: DetailFacts] = [
 		title: "UNH · UnitedHealth Group",
 		price: "$318.70",
 		change: "▼ 0.8% today",
-		tip: "Insurers earn a thin slice of a huge pie. Cost surprises bite.",
+		tip: "A thin slice of a huge pie. Cost surprises bite.",
 		riskPillX: 150,
 		riskCopy: "Moderate volatility. Sits mid-range for your profile.",
 		stats: [
@@ -1430,7 +1430,7 @@ private let detailFacts: [String: DetailFacts] = [
 		title: "JNJ · Johnson & Johnson",
 		price: "$162.40",
 		change: "▲ 0.5% today",
-		tip: "From Band-Aids to cancer drugs, a spread that wide stays calm.",
+		tip: "Band-Aids to cancer drugs. The spread stays calm.",
 		riskPillX: 88,
 		riskCopy: "Low volatility. Fits the steady side of your profile.",
 		stats: [
@@ -1470,7 +1470,7 @@ private let detailFacts: [String: DetailFacts] = [
 		title: "PFE · Pfizer Inc",
 		price: "$25.30",
 		change: "▼ 0.2% today",
-		tip: "A fat dividend and a slow grind. Patience is the whole trade.",
+		tip: "Fat dividend, slow grind. Patience is the trade.",
 		riskPillX: 88,
 		riskCopy: "Low volatility. Fits the steady side of your profile.",
 		stats: [
@@ -1510,7 +1510,7 @@ private let detailFacts: [String: DetailFacts] = [
 		title: "COST · Costco Wholesale Corp",
 		price: "$947.20",
 		change: "▲ 0.7% today",
-		tip: "Members pay yearly and shop weekly. Boring, and that is the point.",
+		tip: "Pay yearly, shop weekly. Boring on purpose.",
 		riskPillX: 88,
 		riskCopy: "Low volatility. Fits the steady side of your profile.",
 		stats: [
@@ -1550,7 +1550,7 @@ private let detailFacts: [String: DetailFacts] = [
 		title: "NKE · Nike Inc",
 		price: "$72.80",
 		change: "▼ 1.3% today",
-		tip: "Brand turnarounds take seasons, not weeks. Give it time.",
+		tip: "Brand turnarounds take seasons, not weeks.",
 		riskPillX: 150,
 		riskCopy: "Moderate volatility. Sits mid-range for your profile.",
 		stats: [

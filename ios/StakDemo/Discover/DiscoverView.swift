@@ -155,7 +155,9 @@ private let deck: [DeckCard] = [
 		art: "DiscCardGOOGL", ticker: "GOOGL · Alphabet Inc",
 		headline: "Search pays for everything, and nine billion-user products ride behind it.",
 		price: "$178.90", change: "▲ 0.8% today",
-		tip: "Ad money moves with the economy, so some quarters just drift.",
+		// One authored line (1:2061, 265 wide): the peek-card/tutorial copy
+		// "Ad money moves with the economy, so some quarters just drift." runs 315u.
+		tip: "Ad money tracks the economy. Some quarters drift.",
 		cardTop: Color(argb: 0xFF263D5D), artBg: Color(argb: 0xFF2F486E)
 	)
 ]

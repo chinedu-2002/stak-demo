@@ -257,8 +257,6 @@ struct AuthCta: View {
 				)
 		}
 		.buttonStyle(.plain)
-		.disabled(!enabled)
-		.opacity(enabled ? 1 : 0.5)
 		// Authored glow (1:873): teal drop shadows cast downward — the
 		// soft wash behind the rows under the button.
 		.background(
@@ -275,6 +273,9 @@ struct AuthCta: View {
 			.allowsHitTesting(false)
 		)
 		.padding(.horizontal, 20 * u)
+		// The whole button - glow, fill and label - dims while gated.
+		.disabled(!enabled)
+		.opacity(enabled ? 1 : 0.5)
 	}
 }
 

@@ -93,7 +93,8 @@ struct ProfileView: View {
 						Text("YOUR TASTE")
 							.font(StakFont.geist(11 * u, .medium))
 							.foregroundStyle(StakColors.muted)
-						HStack(spacing: 8 * u) {
+						// A new account's chips hug their labels and may not fit one row - they wrap.
+						FlowLayout(spacing: 8 * u) {
 							// The demo account keeps the authored chips at their pinned widths; a new
 							// account's chips come from its onboarding answers and hug their labels
 							// (product audit, 2026-09-05).

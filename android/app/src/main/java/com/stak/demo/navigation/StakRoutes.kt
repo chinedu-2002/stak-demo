@@ -29,6 +29,13 @@ object StakRoutes {
 	const val MYSTAK_STOCK = "mystak/stock/{symbol}"
 	fun myStakStock(symbol: String) = "mystak/stock/$symbol"
 	const val PROFILE = "profile"
+	/** The Home bell's inbox (product audit, 2026-09-05). */
+	const val NOTIFICATIONS = "notifications"
+	/** The Profile hub's settings pages - `kind` is a SettingsKind. */
+	const val SETTINGS = "settings/{kind}"
+	fun settings(kind: String) = "settings/$kind"
+	/** Sign in's "Forgot password?" */
+	const val FORGOT_PASSWORD = "auth/forgot-password"
 	const val SIM_PORTFOLIO = "simulate/portfolio"
 	/** Pick detail - `symbol` is the tapped pick's ticker; NVDA is the authored frame (1:4631). Codex parity audit (2026-09-04). */
 	const val SIM_PICK = "simulate/pick/{symbol}"

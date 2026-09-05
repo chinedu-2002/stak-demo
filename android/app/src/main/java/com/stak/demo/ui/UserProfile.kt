@@ -29,6 +29,13 @@ object UserProfile {
 	var risk by mutableStateOf(-1)
 	/** 08 Permissions: the user's answer, and the OS grant when it was asked (product audit, 2026-09-05). */
 	var notificationsOn by mutableStateOf(true)
+	// The settings pages behind the Profile hub (product audit, 2026-09-05).
+	var priceAlerts by mutableStateOf(true)
+	var dailyDeck by mutableStateOf(true)
+	var marketNews by mutableStateOf(false)
+	var appearance by mutableStateOf("dark")
+	var linkedGoogle by mutableStateOf(false)
+	var linkedApple by mutableStateOf(false)
 
 	/** The name as the app addresses the user - always capitalized. */
 	val greetingName: String

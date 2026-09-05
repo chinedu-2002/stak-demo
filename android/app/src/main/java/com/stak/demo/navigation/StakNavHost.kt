@@ -299,6 +299,8 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
 			},
 		) {
 			SignInScreen(
+				// Product audit (2026-09-05): the link opens the reset flow.
+				onForgot = { navController.navigate(StakRoutes.FORGOT_PASSWORD) },
 				onBack = {
 					// B21 aftermath: after Log out, sign in is the whole
 					// stack — a bare pop would blank the NavHost, so the
@@ -326,6 +328,9 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
 					}
 				},
 			)
+		}
+		composable(StakRoutes.FORGOT_PASSWORD) {
+			com.stak.demo.ui.onboarding.ForgotPasswordScreen(onBack = { navController.popBackStack() })
 		}
 		composable(
 			StakRoutes.MAIN,
@@ -366,6 +371,8 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
 				onOpenStock = { symbol -> navController.navigate(StakRoutes.stockDetail(symbol)) },
 				onOpenCollection = { id -> navController.navigate(StakRoutes.collection(id)) },
 				onOpenProfile = { navController.navigate(StakRoutes.PROFILE) },
+				// Product audit (2026-09-05): the bell opens the inbox.
+				onOpenNotifications = { navController.navigate(StakRoutes.NOTIFICATIONS) },
 				onOpenSimPortfolio = { navController.navigate(StakRoutes.SIM_PORTFOLIO) },
 				onOpenSimPick = { symbol -> navController.navigate(StakRoutes.simPick(symbol)) },
 				onOpenLeaderboard = { navController.navigate(StakRoutes.LEADERBOARD) },
@@ -537,6 +544,8 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
 		) {
 			ProfileScreen(
 				onBack = { navController.popBackStack() },
+				// Product audit (2026-09-05): the rows open their settings pages.
+				onOpenSetting = { kind -> navController.navigate(StakRoutes.settings(kind)) },
 				onLogOut = {
 					com.stak.demo.ui.Session.signOut()
 					// B21: the session ends and the whole stack clears.
@@ -544,6 +553,18 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
 						popUpTo(0) { inclusive = true }
 					}
 				},
+			)
+		}
+		composable(StakRoutes.NOTIFICATIONS) {
+			com.stak.demo.ui.inbox.NotificationsScreen(
+				onBack = { navController.popBackStack() },
+				onOpenSettings = { navController.navigate(StakRoutes.settings(com.stak.demo.ui.profile.SettingsKind.NOTIFICATIONS)) },
+			)
+		}
+		composable(StakRoutes.SETTINGS) { entry ->
+			com.stak.demo.ui.profile.SettingsScreen(
+				kind = entry.arguments?.getString("kind") ?: com.stak.demo.ui.profile.SettingsKind.HELP,
+				onBack = { navController.popBackStack() },
 			)
 		}
 		composable(
@@ -629,6 +650,7 @@ private fun MainShell(
 	onOpenStock: (String) -> Unit,
 	onOpenCollection: (String) -> Unit,
 	onOpenProfile: () -> Unit,
+	onOpenNotifications: () -> Unit,
 	onOpenSimPortfolio: () -> Unit,
 	// Codex parity audit (2026-09-04): the tapped pick's ticker.
 	onOpenSimPick: (String) -> Unit,
@@ -718,6 +740,7 @@ private fun MainShell(
 							// Profile push (1:1003, BACK) returns to first run.
 							onSeeTodaysPick = { homeFirstRun = false; switchTab(MainTab.Discover) },
 							onProfile = onOpenProfile,
+							onBell = onOpenNotifications,
 							onOpenNews = { homeFirstRun = false; switchTab(MainTab.News) },
 							onOpenMyStak = { homeFirstRun = false; switchTab(MainTab.MySTAK) },
 							onOpenDeck = { homeFirstRun = false; switchTab(MainTab.Discover) },

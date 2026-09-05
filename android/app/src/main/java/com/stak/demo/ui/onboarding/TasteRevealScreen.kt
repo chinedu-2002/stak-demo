@@ -21,6 +21,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.getValue
+import androidx.compose.foundation.border
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -46,6 +51,8 @@ import com.stak.demo.ui.theme.StakColors
 @Composable
 fun TasteRevealScreen(onBack: () -> Unit, onLetsGo: () -> Unit) {
 	val u = figmaUnit()
+	// Product audit (2026-09-05): the Risk style row opens a picker sheet.
+	var showRisk by rememberSaveable { mutableStateOf(false) }
 
 	Artboard(modifier = Modifier.background(StakColors.Bg)) {
 		Row(
@@ -141,7 +148,7 @@ fun TasteRevealScreen(onBack: () -> Unit, onLetsGo: () -> Unit) {
 					.clickable(
 						interactionSource = remember { MutableInteractionSource() },
 						indication = null,
-					) { /* risk detail not designed yet */ }
+					) { showRisk = true }
 					.padding(start = (16 * u).dp, end = (14 * u).dp, top = (13 * u).dp, bottom = (13 * u).dp),
 			) {
 				Column(verticalArrangement = Arrangement.spacedBy((2 * u).dp), modifier = Modifier.weight(1f)) {
@@ -178,6 +185,61 @@ fun TasteRevealScreen(onBack: () -> Unit, onLetsGo: () -> Unit) {
 			// Copy fix: 1:746 authors "Lets go!" -> "Let's go!" (exact-design audit 2026-09-04).
 			AuthCta(text = "Let's go!", onClick = onLetsGo)
 			AuthSecondaryButton(text = "Back", onClick = onBack)
+			if (showRisk) RiskStyleSheet(onDismiss = { showRisk = false })
+		}
+	}
+}
+
+/**
+ * The risk style picker behind the reveal's "Risk style ›" row (product
+ * audit, 2026-09-05): the four 05 Risk answers, current one checked; a
+ * tap re-answers the quiz and the reveal follows. Mirrors ios RiskStyleSheet.
+ */
+@OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
+@Composable
+internal fun RiskStyleSheet(onDismiss: () -> Unit) {
+	val u = figmaUnit()
+	androidx.compose.material3.ModalBottomSheet(
+		onDismissRequest = onDismiss,
+		containerColor = Auth.InputBg,
+		scrimColor = Color(0x80000000),
+		dragHandle = null,
+		shape = RoundedCornerShape(topStart = (16 * u).dp, topEnd = (16 * u).dp),
+	) {
+		Column(
+			verticalArrangement = Arrangement.spacedBy((8 * u).dp),
+			modifier = Modifier.fillMaxWidth().padding(horizontal = (20 * u).dp).padding(top = (18 * u).dp, bottom = (30 * u).dp),
+		) {
+			Text("Risk style", style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (17 * u).sp), color = StakColors.TextPrimary)
+			Text("How you’d react to a 10% overnight drop. Change it any time.", style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp), color = Auth.SubtitleGray, modifier = Modifier.padding(bottom = (6 * u).dp))
+			listOf(
+				TasteModel.RISK_BUY_MORE to ("Buy more after checking why" to "Comfortable with dips if the story holds"),
+				TasteModel.RISK_HOLD to ("Hold and watch it closely" to "I can handle short-term drops"),
+				TasteModel.RISK_STEP_AWAY to ("Step away for now" to "Big drops make me uncomfortable"),
+				TasteModel.RISK_SELL_SOME to ("Sell some, reduce risk" to "I’d rather protect part of my money"),
+			).forEach { (index, copy) ->
+				val selected = com.stak.demo.ui.UserProfile.riskStyle == TasteModel.riskStyle(index) && (com.stak.demo.ui.UserProfile.risk == index || com.stak.demo.ui.UserProfile.risk < 0)
+				Row(
+					verticalAlignment = Alignment.CenterVertically,
+					modifier = Modifier
+						.fillMaxWidth()
+						.background(StakColors.Bg, RoundedCornerShape((12 * u).dp))
+						.border((1 * u).dp, if (selected) Color(0x8069B3CA) else Color(0x1AFFFFFF), RoundedCornerShape((12 * u).dp))
+						.clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) {
+							com.stak.demo.ui.UserProfile.risk = index
+							com.stak.demo.ui.UserProfile.riskStyle = TasteModel.riskStyle(index)
+							com.stak.demo.ui.Session.saveProfile()
+							onDismiss()
+						}
+						.padding(horizontal = (14 * u).dp, vertical = (12 * u).dp),
+				) {
+					Column(verticalArrangement = Arrangement.spacedBy((2 * u).dp), modifier = Modifier.weight(1f)) {
+						Text(TasteModel.riskStyle(index) + " · " + copy.first, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp), color = StakColors.TextPrimary)
+						Text(copy.second, style = TextStyle(fontFamily = Geist, fontSize = (11 * u).sp), color = Auth.SubtitleGray)
+					}
+					if (selected) Text("✓", style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp), color = Auth.LinkTeal)
+				}
+			}
 		}
 	}
 }

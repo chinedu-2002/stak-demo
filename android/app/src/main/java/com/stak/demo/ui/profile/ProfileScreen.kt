@@ -54,7 +54,7 @@ private val ChipInk = Color(0xFF7FD4E8)
  */
 @OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
 @Composable
-fun ProfileScreen(onBack: () -> Unit, onLogOut: () -> Unit = {}) {
+fun ProfileScreen(onBack: () -> Unit, onLogOut: () -> Unit = {}, onOpenSetting: (String) -> Unit = {}) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Column(modifier = Modifier.fillMaxSize().background(StakColors.Bg)) {
 		Box(
@@ -205,7 +205,7 @@ fun ProfileScreen(onBack: () -> Unit, onLogOut: () -> Unit = {}) {
 					.background(CardBg)
 					.padding(vertical = (4 * u).dp),
 			) {
-				listOf("Notifications", "Appearance", "Linked accounts", "Help & support").forEach { label ->
+				listOf("Notifications" to SettingsKind.NOTIFICATIONS, "Appearance" to SettingsKind.APPEARANCE, "Linked accounts" to SettingsKind.LINKED, "Help & support" to SettingsKind.HELP).forEach { (label, kind) ->
 					Row(
 						verticalAlignment = Alignment.CenterVertically,
 						modifier = Modifier
@@ -214,7 +214,7 @@ fun ProfileScreen(onBack: () -> Unit, onLogOut: () -> Unit = {}) {
 							.clickable(
 								interactionSource = remember { MutableInteractionSource() },
 								indication = null,
-							) { /* Settings screens land in a later phase. */ }
+							) { onOpenSetting(kind) }
 							.padding(horizontal = (14 * u).dp),
 					) {
 						Text(

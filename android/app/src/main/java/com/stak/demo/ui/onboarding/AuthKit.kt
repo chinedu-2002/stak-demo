@@ -23,6 +23,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.nativeCanvas
@@ -57,6 +59,8 @@ internal object Auth {
 	val InputBg = Color(0xFF181F30)
 	val DividerLine = Color(0xFF2A3346)
 	val FaintText = Color(0xFF5C6B85)
+	/** Inline validation red (the app's negative tone). */
+	val ErrorRed = Color(0xFFE5484D)
 	val LinkTeal = Color(0xFF69B3CA)
 	val DarkOnWhite = Color(0xFF0E162B)
 }
@@ -183,14 +187,18 @@ internal fun AuthInput(
 	keyboardType: KeyboardType = KeyboardType.Text,
 	hidden: Boolean = false,
 	trailing: (@Composable () -> Unit)? = null,
+	/** Inline validation (product audit, 2026-09-05): a red hairline and a caption under the field. */
+	error: String? = null,
 ) {
 	val u = figmaUnit()
 	val textStyle = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (13 * u).sp, color = StakColors.TextPrimary)
+	Column(verticalArrangement = Arrangement.spacedBy((6 * u).dp)) {
 	Row(
 		verticalAlignment = Alignment.CenterVertically,
 		modifier = Modifier
 			.fillMaxWidth()
 			.background(Auth.InputBg, RoundedCornerShape((14 * u).dp))
+			.then(if (error != null) Modifier.border((1 * u).dp, Auth.ErrorRed, RoundedCornerShape((14 * u).dp)) else Modifier)
 			.padding((16 * u).dp),
 	) {
 		Box(modifier = Modifier.weight(1f)) {
@@ -205,12 +213,46 @@ internal fun AuthInput(
 				cursorBrush = SolidColor(StakColors.Accent),
 				visualTransformation = if (hidden) PasswordVisualTransformation() else VisualTransformation.None,
 				keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
-				modifier = Modifier.fillMaxWidth(),
+				// The placeholder is the field's accessible name (screen readers and UI tests).
+				modifier = Modifier.fillMaxWidth().semantics { contentDescription = placeholder },
 			)
 		}
 		if (trailing != null) {
 			trailing()
 		}
+	}
+	if (error != null) {
+		Text(
+			text = error,
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp),
+			color = Auth.ErrorRed,
+			modifier = Modifier.padding(start = (4 * u).dp),
+		)
+	}
+	}
+}
+
+/** The sign-up / sign-in field rules (product audit, 2026-09-05). Mirrors ios AuthRules. */
+internal object AuthRules {
+	private val EMAIL = Regex("[^@\\s]+@[^@\\s]+\\.[^@\\s]{2,}")
+	const val PASSWORD_MIN = 8
+
+	fun emailError(email: String): String? = when {
+		email.isBlank() -> "Enter your email address"
+		!EMAIL.matches(email.trim()) -> "That doesn’t look like an email address"
+		else -> null
+	}
+
+	fun passwordError(password: String): String? = when {
+		password.isEmpty() -> "Enter your password"
+		password.length < PASSWORD_MIN -> "Use at least $PASSWORD_MIN characters"
+		else -> null
+	}
+
+	fun confirmError(password: String, confirm: String): String? = when {
+		confirm.isEmpty() -> "Confirm your password"
+		confirm != password -> "Passwords don’t match"
+		else -> null
 	}
 }
 

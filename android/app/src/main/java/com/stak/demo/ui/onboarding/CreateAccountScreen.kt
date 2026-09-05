@@ -66,6 +66,13 @@ fun CreateAccountScreen(onBack: () -> Unit, onCreateAccount: () -> Unit, onSignI
 	var password by rememberSaveable { mutableStateOf("") }
 	var confirm by rememberSaveable { mutableStateOf("") }
 	var showPassword by rememberSaveable { mutableStateOf(false) }
+	// Product audit (2026-09-05): the form validates on the tap - the CTA waits
+	// for all three fields, then the rules speak inline under the field.
+	var attempted by rememberSaveable { mutableStateOf(false) }
+	val emailError = AuthRules.emailError(email)
+	val passwordError = AuthRules.passwordError(password)
+	val confirmError = AuthRules.confirmError(password, confirm)
+	val filled = email.isNotBlank() && password.isNotEmpty() && confirm.isNotEmpty()
 
 	Box(modifier = Modifier.fillMaxSize().background(StakColors.Bg)) {
 		AuthWatermark()
@@ -103,7 +110,7 @@ fun CreateAccountScreen(onBack: () -> Unit, onCreateAccount: () -> Unit, onSignI
 
 				AuthOrDivider()
 
-				AuthInput(value = email, onValueChange = { email = it }, placeholder = "Email address", keyboardType = KeyboardType.Email)
+				AuthInput(value = email, onValueChange = { email = it }, placeholder = "Email address", keyboardType = KeyboardType.Email, error = if (attempted) emailError else null)
 				AuthInput(
 					value = password,
 					onValueChange = { password = it },
@@ -111,6 +118,7 @@ fun CreateAccountScreen(onBack: () -> Unit, onCreateAccount: () -> Unit, onSignI
 					keyboardType = KeyboardType.Password,
 					hidden = !showPassword,
 					trailing = { ShowHideToggle(shown = showPassword, onToggle = { showPassword = !showPassword }) },
+					error = if (attempted) passwordError else null,
 				)
 				AuthInput(
 					value = confirm,
@@ -118,6 +126,7 @@ fun CreateAccountScreen(onBack: () -> Unit, onCreateAccount: () -> Unit, onSignI
 					placeholder = "Confirm Password",
 					keyboardType = KeyboardType.Password,
 					hidden = !showPassword,
+					error = if (attempted) confirmError else null,
 				)
 			}
 
@@ -127,7 +136,10 @@ fun CreateAccountScreen(onBack: () -> Unit, onCreateAccount: () -> Unit, onSignI
 				verticalArrangement = Arrangement.spacedBy((12 * u).dp),
 				modifier = Modifier.fillMaxWidth().padding(top = (8 * u).dp, bottom = (26 * u).dp),
 			) {
-				AuthCta(text = "Create account", onClick = onCreateAccount)
+				AuthCta(text = "Create account", enabled = filled, onClick = {
+					attempted = true
+					if (emailError == null && passwordError == null && confirmError == null) onCreateAccount()
+				})
 				AuthSwitchRow(prefix = "Already have an account?", link = "Sign in", onClick = onSignIn)
 				Text(
 					text = "By continuing you agree to the Terms and Privacy Policy.",

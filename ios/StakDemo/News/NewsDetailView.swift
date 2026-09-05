@@ -804,6 +804,8 @@ private struct ReadNext: View {
 						.frame(maxWidth: .infinity, alignment: .leading)
 					}
 					.padding(12 * u)
+					// Authored Read-next cards are 84 tall (1:1495) - pinned (mirrors Android, 2026-09-05).
+					.frame(height: 84 * u)
 					.background(News.cardBg, in: RoundedRectangle(cornerRadius: 14 * u))
 				}
 				.buttonStyle(.plain)

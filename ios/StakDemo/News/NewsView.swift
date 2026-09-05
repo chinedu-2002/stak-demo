@@ -442,6 +442,9 @@ private struct NewsSectionView: View {
 						}
 					}
 					.padding(12 * u)
+					// Authored News cards are 84 tall (1:1228) - pinned so the section
+					// stacks land on the frame's grid (mirrors the Android News fix, 2026-09-05).
+					.frame(height: 84 * u)
 					.background(News.cardBg, in: RoundedRectangle(cornerRadius: 14 * u))
 				}
 				.buttonStyle(.plain)

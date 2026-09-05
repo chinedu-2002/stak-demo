@@ -1,6 +1,7 @@
 package com.stak.demo.ui.news
 
 import com.stak.demo.ui.theme.FIGMA_LINE_BOX
+import com.stak.demo.ui.theme.fractionalSpacedBy
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.fadeIn
@@ -314,7 +315,9 @@ private fun NewsArticlePage(
 		) {
 			HeroImage(media = article.media, category = article.category, saved = saved, player = hero, onBookmark = onSave)
 			Column(
-				verticalArrangement = Arrangement.spacedBy((15 * u).dp),
+				// Fractional gaps: seventeen 15u gaps rounded to 42 px each drifted
+				// the tail 2.8u below the frame (StakTest, 2026-09-05).
+				verticalArrangement = fractionalSpacedBy((15 * u).dp),
 				modifier = Modifier
 					.fillMaxWidth()
 					.padding(horizontal = (20 * u).dp)

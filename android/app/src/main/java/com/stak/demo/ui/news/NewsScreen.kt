@@ -1,6 +1,7 @@
 package com.stak.demo.ui.news
 
 import com.stak.demo.ui.theme.FIGMA_LINE_BOX
+import com.stak.demo.ui.theme.fractionalSpacedBy
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -152,7 +153,7 @@ fun NewsScreen(onOpenArticle: (String) -> Unit) {
 			)
 		}
 		Column(
-			verticalArrangement = Arrangement.spacedBy((22 * u).dp),
+			verticalArrangement = fractionalSpacedBy((22 * u).dp),
 			modifier = Modifier
 				.weight(1f)
 				.fillMaxWidth()
@@ -436,7 +437,7 @@ private fun NewsSection(
 	onOpen: (String) -> Unit,
 ) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
-	Column(verticalArrangement = Arrangement.spacedBy((10 * u).dp), modifier = Modifier.fillMaxWidth()) {
+	Column(verticalArrangement = fractionalSpacedBy((10 * u).dp), modifier = Modifier.fillMaxWidth()) {
 		Text(
 			text = title,
 			// Authored header: the 20-tall Sora 16 box + a 2 bottom pad (1:1293) - exact-design audit 2026-09-04.

@@ -154,6 +154,14 @@ struct AuthInput<Trailing: View>: View {
 	var keyboard: UIKeyboardType = .default
 	var hidden = false
 	var trailing: Trailing
+	/// Inline validation (product audit, 2026-09-05): a red hairline and a caption under the field.
+	var error: String? = nil
+
+	func error(_ message: String?) -> AuthInput {
+		var copy = self
+		copy.error = message
+		return copy
+	}
 
 	init(
 		_ placeholder: String,
@@ -189,6 +197,20 @@ struct AuthInput<Trailing: View>: View {
 		}
 		.padding(16 * u)
 		.background(Auth.inputBg, in: RoundedRectangle(cornerRadius: 14 * u))
+		.overlay(
+			RoundedRectangle(cornerRadius: 14 * u)
+				.strokeBorder(Auth.errorRed, lineWidth: error == nil ? 0 : 1 * u)
+		)
+		.overlay(alignment: .bottomLeading) {
+			if let error {
+				Text(error)
+					.font(StakFont.geist(11 * u))
+					.foregroundStyle(Auth.errorRed)
+					.padding(.leading, 4 * u)
+					.offset(y: 6 * u + 14 * u)
+			}
+		}
+		.padding(.bottom, error == nil ? 0 : 6 * u + 14 * u)
 	}
 
 	private var prompt: Text {
@@ -322,5 +344,34 @@ struct AuthSwitchRow: View {
 			}
 			.buttonStyle(.plain)
 		}
+	}
+}
+
+extension Auth {
+	/// Inline validation red (the app's negative tone).
+	static let errorRed = Color(argb: 0xFFE5484D)
+}
+
+/// The sign-up / sign-in field rules (product audit, 2026-09-05). Mirrors android AuthRules.
+enum AuthRules {
+	static let passwordMin = 8
+
+	static func emailError(_ email: String) -> String? {
+		let trimmed = email.trimmingCharacters(in: .whitespaces)
+		if trimmed.isEmpty { return "Enter your email address" }
+		let ok = trimmed.range(of: "^[^@\\s]+@[^@\\s]+\\.[^@\\s]{2,}$", options: .regularExpression) != nil
+		return ok ? nil : "That doesn’t look like an email address"
+	}
+
+	static func passwordError(_ password: String) -> String? {
+		if password.isEmpty { return "Enter your password" }
+		if password.count < passwordMin { return "Use at least \(passwordMin) characters" }
+		return nil
+	}
+
+	static func confirmError(_ password: String, _ confirm: String) -> String? {
+		if confirm.isEmpty { return "Confirm your password" }
+		if confirm != password { return "Passwords don’t match" }
+		return nil
 	}
 }

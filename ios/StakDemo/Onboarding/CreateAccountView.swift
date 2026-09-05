@@ -15,6 +15,13 @@ struct CreateAccountView: View {
 	@State private var password = ""
 	@State private var confirm = ""
 	@State private var showPassword = false
+	// Product audit (2026-09-05): the form validates on the tap - the CTA waits for
+	// all three fields, then the rules speak inline under the field.
+	@State private var attempted = false
+	private var emailError: String? { AuthRules.emailError(email) }
+	private var passwordError: String? { AuthRules.passwordError(password) }
+	private var confirmError: String? { AuthRules.confirmError(password, confirm) }
+	private var filled: Bool { !email.trimmingCharacters(in: .whitespaces).isEmpty && !password.isEmpty && !confirm.isEmpty }
 
 	var body: some View {
 		let u = figmaUnit
@@ -50,10 +57,13 @@ struct CreateAccountView: View {
 						AuthOrDivider()
 
 						AuthInput("Email address", text: $email, keyboard: .emailAddress)
+							.error(attempted ? emailError : nil)
 						AuthInput("Password", text: $password, hidden: !showPassword) {
 							ShowHideToggle(shown: $showPassword)
 						}
+						.error(attempted ? passwordError : nil)
 						AuthInput("Confirm Password", text: $confirm, hidden: !showPassword)
+							.error(attempted ? confirmError : nil)
 					}
 					.frame(maxWidth: .infinity, alignment: .leading)
 					.padding(.horizontal, 24 * u)
@@ -62,7 +72,10 @@ struct CreateAccountView: View {
 
 				// CTA block — sharp-cornered gradient button, switch link, fine print.
 				VStack(spacing: 12 * u) {
-					AuthCta(text: "Create account", action: onCreateAccount)
+					AuthCta(text: "Create account", enabled: filled, action: {
+						attempted = true
+						if emailError == nil && passwordError == nil && confirmError == nil { onCreateAccount() }
+					})
 					AuthSwitchRow(prefix: "Already have an account?", link: "Sign in", action: onSignIn)
 					Text("By continuing you agree to the Terms and Privacy Policy.")
 						.font(StakFont.geist(10 * u))

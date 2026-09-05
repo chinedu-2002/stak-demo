@@ -13,6 +13,12 @@ struct SignInView: View {
 	@State private var email = ""
 	@State private var password = ""
 	@State private var showPassword = false
+	// Product audit (2026-09-05): validates on the tap - the CTA waits for both
+	// fields, then the email rule speaks inline under the field.
+	@State private var attempted = false
+	private var emailError: String? { AuthRules.emailError(email) }
+	private var passwordError: String? { password.isEmpty ? "Enter your password" : nil }
+	private var filled: Bool { !email.trimmingCharacters(in: .whitespaces).isEmpty && !password.isEmpty }
 
 	var body: some View {
 		let u = figmaUnit
@@ -48,9 +54,11 @@ struct SignInView: View {
 						AuthOrDivider()
 
 						AuthInput("Email address", text: $email, keyboard: .emailAddress)
+							.error(attempted ? emailError : nil)
 						AuthInput("Password", text: $password, hidden: !showPassword) {
 							ShowHideToggle(shown: $showPassword)
 						}
+						.error(attempted ? passwordError : nil)
 						Button(action: { /* recovery flow not designed yet */ }) {
 							Text("Forgot password?")
 								.font(StakFont.geist(12 * u, .medium))
@@ -64,7 +72,10 @@ struct SignInView: View {
 				}
 
 				VStack(spacing: 12 * u) {
-					AuthCta(text: "Sign in", action: onSignIn)
+					AuthCta(text: "Sign in", enabled: filled, action: {
+						attempted = true
+						if emailError == nil && passwordError == nil { onSignIn() }
+					})
 					AuthSwitchRow(prefix: "New to STAK?", link: "Create account", action: onCreateAccount)
 				}
 				.padding(.top, 8 * u)

@@ -55,11 +55,11 @@ struct MatrixQuizView: View {
 					VStack(alignment: .leading, spacing: 12 * u) {
 						Text(headline)
 							.font(StakFont.sora(24 * u, .semiBold))
-							.lineSpacing((31 - 24) * u)
+							.stakLineHeight(31 * u, size: 24 * u, face: .sora)
 							.foregroundStyle(StakColors.textPrimary)
 						Text(subtitle)
 							.font(StakFont.geist(12 * u))
-							.lineSpacing((16 - 12) * u)
+							.stakLineHeight(16 * u, size: 12 * u, face: .geist)
 							.foregroundStyle(Auth.subtitleGray)
 					}
 
@@ -119,12 +119,12 @@ private struct MatrixCard: View {
 				VStack(alignment: .leading, spacing: 5 * u) {
 					Text(option.title)
 						.font(StakFont.geist(12 * u, .medium))
-						.lineSpacing((16.85 - 12) * u)
+						.stakLineHeight(16.85 * u, size: 12 * u, face: .geist)
 						.foregroundStyle(StakColors.textPrimary)
 						.frame(width: 142.13 * u, alignment: .leading)
 					Text(option.subtitle)
 						.font(StakFont.geist(10 * u))
-						.lineSpacing((13.69 - 10) * u)
+						.stakLineHeight(13.69 * u, size: 10 * u, face: .geist)
 						.foregroundStyle(Auth.faintText)
 						.frame(width: 121.07 * u, alignment: .leading)
 				}

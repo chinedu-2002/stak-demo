@@ -450,7 +450,7 @@ private struct InsightCard: View {
 			}
 			Text("Three chip stocks drove 70% of your gains this month. Your taste has a type.")
 				.font(StakFont.geist(12 * u))
-				.lineSpacing((20 - 12) * u)
+				.stakLineHeight(20 * u, size: 12 * u, face: .geist)
 				.foregroundStyle(Sim.body)
 		}
 		.padding(.horizontal, 16 * u)
@@ -535,7 +535,7 @@ private struct HowItWorksCard: View {
 					.frame(width: 20 * u, height: 20 * u)
 					Text(rule)
 						.font(StakFont.geist(12 * u))
-						.lineSpacing((18 - 12) * u)
+						.stakLineHeight(18 * u, size: 12 * u, face: .geist)
 						.foregroundStyle(Sim.body)
 				}
 			}

@@ -120,7 +120,7 @@ struct LeaderboardView: View {
 					ForEach(near, id: \.rank) { LeaderRow(r: $0) }
 					Text("Percentage return, not dollar size, so everyone competes on the same scale. This week ranks the trailing 7 days.")
 						.font(StakFont.geist(11 * u))
-						.lineSpacing((16 - 11) * u)
+						.stakLineHeight(16 * u, size: 11 * u, face: .geist)
 						.foregroundStyle(Sim.faint)
 						// 1:4124 centres the explainer across the full column width.
 						.multilineTextAlignment(.center)

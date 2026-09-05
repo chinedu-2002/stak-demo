@@ -109,7 +109,7 @@ struct ProfileView: View {
 						}
 						Text("Your taste graph sharpens with every swipe.")
 							.font(StakFont.geist(12 * u))
-							.lineSpacing((16 - 12) * u)
+							.stakLineHeight(16 * u, size: 12 * u, face: .geist)
 							.foregroundStyle(bodyInk)
 					}
 					.frame(maxWidth: .infinity, alignment: .leading)

@@ -143,7 +143,7 @@ struct MyStakView: View {
 			// My STAK 1:3155): the authored look wins.
 			Text("Six of your fourteen picks are tech or AI names. Your STAK skews high-growth, with a small hedge in real estate.")
 				.font(StakFont.geist(13 * u))
-				.lineSpacing((19 - 13) * u)
+				.stakLineHeight(19 * u, size: 13 * u, face: .geist)
 				.foregroundStyle(bodyColor)
 		}
 		.frame(maxWidth: .infinity, alignment: .leading)
@@ -166,7 +166,7 @@ struct MyStakView: View {
 				// 1:3322 Geist Regular 12 / 17 (was 13) - exact-design audit 2026-09-04.
 				Text("Based on your taste, 8 fresh picks are waiting in the deck.")
 					.font(StakFont.geist(12 * u))
-					.lineSpacing((17 - 12) * u)
+					.stakLineHeight(17 * u, size: 12 * u, face: .geist)
 					.foregroundStyle(ink)
 				// 1:3323 "b": pt 4 over the natural runs (was a 22u strip) - exact-design audit 2026-09-04.
 				HStack(spacing: 4 * u) {

@@ -16,14 +16,14 @@ struct IntroView: View {
 				VStack(alignment: .leading, spacing: 12 * u) {
 					Text("Find stocks you actually understand.")
 						.font(StakFont.sora(26 * u, .semiBold))
-						.lineSpacing((31 - 26) * u)
+						.stakLineHeight(31 * u, size: 26 * u, face: .sora)
 						.foregroundStyle(StakColors.textPrimary)
 					Text("STAK turns brands you already know into simple, clear stock ideas, so you can invest with confidence.")
 						// Wrap-true 14x0.95: the rendered Geist shapes ~5% wider
 						// than authored, and the authored break is
 						// "...into simple, clear / stock ideas...".
 						.font(StakFont.geist(14 * u))
-						.lineSpacing((21 - 14) * u)
+						.stakLineHeight(21 * u, size: 14 * u, face: .geist)
 					// RENDER-measured: the authored break is after "simple," -
 					// the 342u (authored column) width pin forces the authored wrap (mirrors android).
 					.frame(width: 342 * u, alignment: .leading)

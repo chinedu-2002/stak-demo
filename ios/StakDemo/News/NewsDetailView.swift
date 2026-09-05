@@ -183,12 +183,12 @@ private struct NewsArticlePage: View {
 					Text(article.headline)
 						// RENDER-measured 20sp (the metadata's 24 lied); lh32 box stands.
 						.font(StakFont.sora(20 * u, .semiBold))
-						.lineSpacing((32 - 20) * u)
+						.stakLineHeight(32 * u, size: 20 * u, face: .sora)
 						.foregroundStyle(StakColors.textPrimary)
 					Text(article.subtitle)
 						// 14.3 keeps the authored line-1 break after "lineup".
 						.font(StakFont.geist(14.3 * u))
-						.lineSpacing((22 - 14.3) * u)
+						.stakLineHeight(22 * u, size: 14.3 * u, face: .geist)
 						.foregroundStyle(News.muted)
 						// 1:1495: 26 of ink gap under the headline (the column's 15 + 5).
 						.padding(.top, 5 * u)
@@ -606,7 +606,7 @@ private struct GistBullet: View {
 				.frame(width: 16 * u, height: 16 * u)
 			Text(text)
 				.font(StakFont.geist(13 * u))
-				.lineSpacing((19 - 13) * u)
+				.stakLineHeight(19 * u, size: 13 * u, face: .geist)
 				.foregroundStyle(News.body)
 				.frame(maxWidth: .infinity, alignment: .leading)
 		}
@@ -622,7 +622,7 @@ private struct Paragraph: View {
 		let u = figmaUnit
 		Text(text)
 			.font(StakFont.geist(size * u))
-			.lineSpacing((line - size) * u)
+			.stakLineHeight(line * u, size: size * u, face: .geist)
 			.foregroundStyle(News.body)
 			.frame(maxWidth: .infinity, alignment: .leading)
 	}
@@ -639,7 +639,7 @@ private struct PullQuote: View {
 				.frame(width: 3 * u)
 			Text(text)
 				.font(StakFont.sora(16 * u, .semiBold))
-				.lineSpacing((26 - 16) * u)
+				.stakLineHeight(26 * u, size: 16 * u, face: .sora)
 				.foregroundStyle(Color(argb: 0xFFD3D3DD))
 				.frame(maxWidth: .infinity, alignment: .leading)
 		}
@@ -667,7 +667,7 @@ private struct NewToThisCard: View {
 			}
 			Text(body_)
 				.font(StakFont.geist(13 * u))
-				.lineSpacing((20 - 13) * u)
+				.stakLineHeight(20 * u, size: 13 * u, face: .geist)
 				.foregroundStyle(News.body)
 		}
 		.frame(maxWidth: .infinity, alignment: .leading)
@@ -796,7 +796,7 @@ private struct ReadNext: View {
 								.foregroundStyle(News.muted)
 							Text(next.headline)
 								.font(StakFont.sora(14 * u))
-								.lineSpacing((19 - 14) * u)
+								.stakLineHeight(19 * u, size: 14 * u, face: .sora)
 								.foregroundStyle(StakColors.textPrimary)
 						}
 						.frame(maxWidth: .infinity, alignment: .leading)
@@ -867,7 +867,7 @@ private struct SaveSuccessOverlay: View {
 				.background(Color(argb: 0x1A69B3CA), in: RoundedRectangle(cornerRadius: 6 * u))
 				Text("Watching from today · no money committed")
 					.font(StakFont.geist(12 * u))
-					.lineSpacing((18 - 12) * u)
+					.stakLineHeight(18 * u, size: 12 * u, face: .geist)
 					.foregroundStyle(News.body)
 					.frame(maxWidth: .infinity, alignment: .leading)
 				VStack(spacing: 16 * u) {

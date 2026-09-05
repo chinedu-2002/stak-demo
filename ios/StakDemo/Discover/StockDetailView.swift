@@ -677,7 +677,7 @@ private struct SinceYouSavedCard: View {
 			}
 			Text("Saved 5 weeks ago. AAPL is up 4.6% since, moving roughly with the market. Steady giants tend to.")
 				.font(StakFont.geist(11 * u))
-				.lineSpacing((14 - 11) * u)
+				.stakLineHeight(14 * u, size: 11 * u, face: .geist)
 				.foregroundStyle(muted)
 		}
 		.padding(16 * u)
@@ -739,7 +739,7 @@ private struct DetailSavedSheet: View {
 				.background(Color(argb: 0x1A69B3CA), in: RoundedRectangle(cornerRadius: 6 * u))
 				Text("Watching from today · no money committed")
 					.font(StakFont.geist(12 * u))
-					.lineSpacing((18 - 12) * u)
+					.stakLineHeight(18 * u, size: 12 * u, face: .geist)
 					.foregroundStyle(Color(argb: 0xFFC8D2E0))
 					.frame(maxWidth: .infinity, alignment: .leading)
 				VStack(spacing: 16 * u) {

@@ -86,7 +86,7 @@ struct SimPortfolioView: View {
 						}
 						Text("Sell a pick and the cash returns to your balance, gain or loss.")
 							.font(StakFont.geist(11 * u))
-							.lineSpacing((14 - 11) * u)
+							.stakLineHeight(14 * u, size: 11 * u, face: .geist)
 							.foregroundStyle(Sim.faint)
 							// 1:4621 (exact-design audit 2026-09-04): centre-aligned, so a wrap stays centred.
 							.multilineTextAlignment(.center)
@@ -288,7 +288,7 @@ struct SellConfirmSheet: View {
 				// Review (2026-09-04): the pick's own cost basis ("$100" authored).
 				Text("You hold \(pick.shares) shares from your \(pick.stakeBasis) stake.")
 					.font(StakFont.geist(12 * u))
-					.lineSpacing((18 - 12) * u)
+					.stakLineHeight(18 * u, size: 12 * u, face: .geist)
 					.foregroundStyle(Sim.body)
 				// 1:4846 Practice ticket (exact-design audit 2026-09-04): the value line, the
 				// quick amounts and the Returning line sit 12 apart inside the sheet's 14 rhythm.
@@ -407,7 +407,7 @@ struct PositionClosedSheet: View {
 				PickSellRow(pick: pick)
 				Text("Sold \(pick.shares) shares from your \(pick.stakeBasis) stake.")
 					.font(StakFont.geist(12 * u))
-					.lineSpacing((18 - 12) * u)
+					.stakLineHeight(18 * u, size: 12 * u, face: .geist)
 					.foregroundStyle(Sim.body)
 					.frame(maxWidth: .infinity, alignment: .leading)
 				// 73:1003 Practice ticket (exact-design audit 2026-09-04): Proceeds and the Returned line sit 12 apart.

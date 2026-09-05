@@ -209,7 +209,7 @@ private struct TopNav: View {
 			Text("\(greeting), \(profile.greetingName)")
 				.onReceive(clock) { _ in greeting = Greeting.now() }
 				.font(StakFont.sora(16 * u, .semiBold))
-				.lineSpacing((20 - 16) * u)
+				.stakLineHeight(20 * u, size: 16 * u, face: .sora)
 				.foregroundStyle(Color.white)
 		}
 		.padding(.top, 22 * u)
@@ -256,7 +256,7 @@ private struct MarketMoodCard: View {
 				VStack(alignment: .leading, spacing: 4 * u) {
 					Text("Market Mood")
 						.font(StakFont.sora(20 * u, .medium))
-						.lineSpacing((25 - 20) * u)
+						.stakLineHeight(25 * u, size: 20 * u, face: .sora)
 						.foregroundStyle(Color.white)
 					// Backend-served with the mood score in production (the words
 					// change with the market); authored demo copy this phase.
@@ -472,7 +472,7 @@ private struct DeckBanner: View {
 				HStack(spacing: 3 * u) {
 					Text("Go to Deck")
 						.font(StakFont.geist(11.49 * u, .medium))
-						.lineSpacing((15 - 11.49) * u)
+						.stakLineHeight(15 * u, size: 11.49 * u, face: .geist)
 						.foregroundStyle(Color.white)
 					Image("IcArrowRightSmall")
 						.resizable()

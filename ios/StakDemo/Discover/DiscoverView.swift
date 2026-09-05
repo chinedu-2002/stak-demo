@@ -239,7 +239,7 @@ struct DiscoverView: View {
 					HStack {
 						Text("Discover")
 							.font(StakFont.sora(26 * u, .semiBold))
-							.lineSpacing((33 - 26) * u)
+							.stakLineHeight(33 * u, size: 26 * u, face: .sora)
 							.foregroundStyle(atEnd ? Disc.brightInk : Color.white)
 							.offset(y: atEnd ? -7.5 * u : 0)
 						Spacer()
@@ -580,20 +580,20 @@ private struct DeckCardBody: View {
 				VStack(alignment: .leading, spacing: 8 * u) {
 					Text(card.ticker)
 						.font(StakFont.geist(10 * u))
-						.lineSpacing((13 - 10) * u)
+						.stakLineHeight(13 * u, size: 10 * u, face: .geist)
 						.foregroundStyle(Disc.muted)
 					Text(card.headline)
 						.font(StakFont.geist(16 * u))
-						.lineSpacing((23 - 16) * u)
+						.stakLineHeight(23 * u, size: 16 * u, face: .geist)
 						.foregroundStyle(Color.white)
 					HStack(alignment: .bottom, spacing: 9 * u) {
 						Text(card.price)
 							.font(StakFont.sora(20 * u, .semiBold))
-							.lineSpacing((25 - 20) * u)
+							.stakLineHeight(25 * u, size: 20 * u, face: .sora)
 							.foregroundStyle(Color.white)
 						Text(card.change)
 							.font(StakFont.geist(11 * u, .medium))
-							.lineSpacing((14 - 11) * u)
+							.stakLineHeight(14 * u, size: 11 * u, face: .geist)
 							.foregroundStyle(Disc.green)
 							.padding(.bottom, 2 * u)
 					}
@@ -605,7 +605,7 @@ private struct DeckCardBody: View {
 						.foregroundStyle(Disc.teal)
 					Text(card.tip)
 						.font(StakFont.geist(11 * u))
-						.lineSpacing((15 - 11) * u)
+						.stakLineHeight(15 * u, size: 11 * u, face: .geist)
 						.foregroundStyle(Disc.body)
 						.frame(maxWidth: .infinity, alignment: .leading)
 				}
@@ -913,7 +913,7 @@ struct PracticeBuySheet: View {
 				// the cash block 1.5 lower than the 14 column gap alone gives.
 				Text("Your paper stake starts at today’s price and tracks the real move live, in either direction.")
 					.font(StakFont.geist(12 * u))
-					.lineSpacing((18 - 12) * u)
+					.stakLineHeight(18 * u, size: 12 * u, face: .geist)
 					.foregroundStyle(Disc.body)
 					.padding(.top, 1 * u)
 				VStack(alignment: .leading, spacing: 12 * u) {
@@ -1020,7 +1020,7 @@ struct OrderFilledSheet: View {
 				// the stock row - exact-design audit 2026-09-04 (was 14).
 				Text("Filled instantly · paper order")
 					.font(StakFont.geist(12 * u))
-					.lineSpacing((18 - 12) * u)
+					.stakLineHeight(18 * u, size: 12 * u, face: .geist)
 					.foregroundStyle(Disc.body)
 					.frame(maxWidth: .infinity, alignment: .leading)
 				HStack(spacing: 6 * u) {

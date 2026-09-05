@@ -61,12 +61,12 @@ struct BrandPicksView: View {
 					VStack(alignment: .leading, spacing: 12 * u) {
 						Text("Which brands do you know or use?")
 							.font(StakFont.sora(24 * u, .semiBold))
-							.lineSpacing((31 - 24) * u)
+							.stakLineHeight(31 * u, size: 24 * u, face: .sora)
 							.foregroundStyle(StakColors.textPrimary)
 						Text("Pick a few. STAK uses this to learn what feels familiar to you.")
 							// Authored box (1:255): 303 wide -> the designed two-line wrap.
 							.font(StakFont.geist(12 * u))
-							.lineSpacing((16 - 12) * u)
+							.stakLineHeight(16 * u, size: 12 * u, face: .geist)
 							.foregroundStyle(Auth.subtitleGray)
 							.frame(width: 303 * u, alignment: .leading)
 					}

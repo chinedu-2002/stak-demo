@@ -82,7 +82,7 @@ struct SwipeTutorialView: View {
 				VStack(alignment: .leading, spacing: 12 * u) {
 					Text("Now try a few swipes.")
 						.font(StakFont.sora(24 * u, .semiBold))
-						.lineSpacing((31 - 24) * u)
+						.stakLineHeight(31 * u, size: 24 * u, face: .sora)
 						.foregroundStyle(StakColors.textPrimary)
 					Text("Swipe down for the next card. Save what you like.")
 						.font(StakFont.geist(12 * u))
@@ -252,7 +252,7 @@ private struct DeckCardBody: View {
 						.foregroundStyle(Disc.muted)
 					Text(card.headline)
 						.font(StakFont.geist(16 * u))
-						.lineSpacing((23 - 16) * u)
+						.stakLineHeight(23 * u, size: 16 * u, face: .geist)
 						.foregroundStyle(Color.white)
 						.padding(.top, 0.85 * u)
 					HStack(alignment: .bottom, spacing: 9 * u) {
@@ -273,7 +273,7 @@ private struct DeckCardBody: View {
 						.foregroundStyle(Disc.teal)
 					Text(card.tip)
 						.font(StakFont.geist(11 * u))
-						.lineSpacing((15 - 11) * u)
+						.stakLineHeight(15 * u, size: 11 * u, face: .geist)
 						.foregroundStyle(Disc.body)
 						.frame(maxWidth: .infinity, alignment: .leading)
 				}
@@ -312,8 +312,8 @@ private struct SaveChip: View {
 		}
 		.padding(.horizontal, 13 * u)
 		.padding(.vertical, 7 * u)
-		// 1:402 / 1:441 / 1:469 author the chip at rgba(255,255,255,0.09); was 0.15 (exact-design audit 2026-09-04).
-		.background(Color(argb: 0x17FFFFFF), in: RoundedRectangle(cornerRadius: 16 * u))
+		// parity with Discover's render-measured chip (2026-09-04)
+		.background(Color(argb: 0x26FFFFFF), in: RoundedRectangle(cornerRadius: 16 * u))
 	}
 }
 

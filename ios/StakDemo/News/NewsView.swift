@@ -230,13 +230,13 @@ private struct BriefCard: View {
 					.foregroundStyle(News.ink)
 				Text(brief.title)
 					.font(StakFont.sora(19 * u, .semiBold))
-					.lineSpacing((25 - 19) * u)
+					.stakLineHeight(25 * u, size: 19 * u, face: .sora)
 					.foregroundStyle(News.ink)
 				Text(brief.body)
 					// Authored Geist Regular 12 / lh17 (1:1265; the earlier 12.2 wrap
 					// tweak assumed 13) - exact-design audit 2026-09-04.
 					.font(StakFont.geist(12 * u))
-					.lineSpacing((17 - 12) * u)
+					.stakLineHeight(17 * u, size: 12 * u, face: .geist)
 					.foregroundStyle(News.ink)
 				HStack {
 					Text(brief.source)
@@ -330,7 +330,7 @@ private struct StoryTile: View {
 				Text(headline)
 					// Authored (1:1277): Sora Light 12 in the 20 line box.
 					.font(StakFont.sora(12 * u, .light))
-					.lineSpacing((20 - 12) * u)
+					.stakLineHeight(20 * u, size: 12 * u, face: .sora)
 					.foregroundStyle(StakColors.textPrimary)
 				Spacer(minLength: 0)
 				Text(source)
@@ -436,7 +436,7 @@ private struct NewsSectionView: View {
 							Text(row.headline)
 								// Authored (1:1295): Sora Light 12 in the 19 line box.
 								.font(StakFont.sora(12 * u, .light))
-								.lineSpacing((19 - 12) * u)
+								.stakLineHeight(19 * u, size: 12 * u, face: .sora)
 								.foregroundStyle(StakColors.textPrimary)
 								.frame(maxWidth: .infinity, alignment: .leading)
 						}

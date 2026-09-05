@@ -220,7 +220,7 @@ struct PickDetailView: View {
 							// Same authored sentence for a losing pick - only the symbol swaps.
 							Text("Your stake tracks the move live. If \(pick.symbol) gives back gains, the dollars follow it down.")
 								.font(StakFont.geist(12 * u))
-								.lineSpacing((17 - 12) * u)
+								.stakLineHeight(17 * u, size: 12 * u, face: .geist)
 								.foregroundStyle(Sim.body)
 						}
 						// Live note (1:4688): 83 tall, x14, kicker row at 12, body at 37.

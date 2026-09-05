@@ -49,7 +49,7 @@ struct TasteRevealView: View {
 					VStack(alignment: .leading, spacing: 12 * u) {
 						Text("Here’s what you’re into.")
 							.font(StakFont.sora(26 * u, .semiBold))
-							.lineSpacing((33 - 26) * u)
+							.stakLineHeight(33 * u, size: 26 * u, face: .sora)
 							.foregroundStyle(StakColors.textPrimary)
 						Text("Built from your picks. It gets smarter with every swipe.")
 							.font(StakFont.geist(12 * u))

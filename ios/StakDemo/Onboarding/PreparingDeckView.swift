@@ -24,7 +24,7 @@ struct PreparingDeckView: View {
 				.offset(y: 135 * u)
 			Text("Building your first deck...")
 				.font(StakFont.sora(22 * u, .semiBold))
-				.lineSpacing((28 - 22) * u)
+				.stakLineHeight(28 * u, size: 22 * u, face: .sora)
 				.multilineTextAlignment(.center)
 				.foregroundStyle(StakColors.textPrimary)
 				.frame(maxWidth: .infinity)
@@ -33,7 +33,7 @@ struct PreparingDeckView: View {
 				Spinner()
 				Text("Reading your brand picks")
 					.font(StakFont.geist(12 * u))
-					.lineSpacing((15 - 12) * u)
+					.stakLineHeight(15 * u, size: 12 * u, face: .geist)
 					.foregroundStyle(Auth.faintText)
 			}
 			.offset(y: 650 * u)

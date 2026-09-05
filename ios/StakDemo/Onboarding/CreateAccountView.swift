@@ -35,11 +35,11 @@ struct CreateAccountView: View {
 						VStack(alignment: .leading, spacing: 12 * u) {
 							Text("Create your account")
 								.font(StakFont.sora(26 * u, .semiBold))
-								.lineSpacing((33 - 26) * u)
+								.stakLineHeight(33 * u, size: 26 * u, face: .sora)
 								.foregroundStyle(StakColors.textPrimary)
 							Text("Enter your details below to continue")
 								.font(StakFont.geist(12 * u))
-								.lineSpacing((16 - 12) * u)
+								.stakLineHeight(16 * u, size: 12 * u, face: .geist)
 								.foregroundStyle(Auth.subtitleGray)
 						}
 						Spacer().frame(height: 4 * u)

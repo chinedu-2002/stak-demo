@@ -27,6 +27,14 @@ internal data class StakCollection(
 	val blurb: String,
 	val imageRes: Int? = null,
 	val iconRes: Int? = null,
+	/**
+	 * The collection page's 60 hero (1:3357 authors AI & Tech's glass art at
+	 * 60). Every collection draws its own art at that size - the four
+	 * category icons are the 4x exports of their 1:3155 cat-icon frames
+	 * (user, 2026-09-05: the AI & Tech hero is the look; the 36 chip icon
+	 * centred in the frame was not).
+	 */
+	val heroRes: Int,
 	val stocks: List<CollStock>,
 )
 
@@ -38,6 +46,7 @@ internal val COLLECTIONS = listOf(
 		countLabel = "5 stocks",
 		blurb = "Your highest-conviction growth and AI names.",
 		imageRes = R.drawable.ms_coll_aitech,
+		heroRes = R.drawable.ms_coll_aitech,
 		stocks = listOf(
 			CollStock("N", "▲ 2.4%", true, "NVDA", "NVIDIA", "$122.10"),
 			CollStock("A", "▲ 1.2%", true, "AAPL", "Apple", "$229.35"),
@@ -52,6 +61,7 @@ internal val COLLECTIONS = listOf(
 		countLabel = "3 stocks",
 		blurb = "The banks and payment rails that move money.",
 		imageRes = R.drawable.ms_coll_finance,
+		heroRes = R.drawable.ms_coll_finance,
 		stocks = listOf(
 			CollStock("J", "▲ 0.6%", true, "JPM", "JPMorgan", "$245.60"),
 			CollStock("V", "▲ 0.3%", true, "V", "Visa", "$352.10"),
@@ -64,6 +74,7 @@ internal val COLLECTIONS = listOf(
 		countLabel = "3 stocks",
 		blurb = "Solar, the grid and the utilities going clean.",
 		iconRes = R.drawable.ic_cat_green,
+		heroRes = R.drawable.ms_coll_green,
 		stocks = listOf(
 			CollStock("E", "▲ 1.9%", true, "ENPH", "Enphase", "$78.40"),
 			CollStock("N", "▲ 0.4%", true, "NEE", "NextEra", "$84.20"),
@@ -76,6 +87,7 @@ internal val COLLECTIONS = listOf(
 		countLabel = "2 stocks",
 		blurb = "Your small hedge: warehouses and rent checks.",
 		iconRes = R.drawable.ic_cat_realestate,
+		heroRes = R.drawable.ms_coll_realestate,
 		stocks = listOf(
 			CollStock("P", "▲ 0.2%", true, "PLD", "Prologis", "$118.30"),
 			CollStock("O", "▼ 0.3%", false, "O", "Realty Income", "$59.10"),
@@ -87,6 +99,7 @@ internal val COLLECTIONS = listOf(
 		countLabel = "4 stocks",
 		blurb = "Drugmakers and insurers with steady demand.",
 		iconRes = R.drawable.ic_cat_health,
+		heroRes = R.drawable.ms_coll_health,
 		stocks = listOf(
 			CollStock("L", "▲ 1.4%", true, "LLY", "Eli Lilly", "$792.50"),
 			CollStock("U", "▼ 0.8%", false, "UNH", "UnitedHealth", "$318.70"),
@@ -100,6 +113,7 @@ internal val COLLECTIONS = listOf(
 		countLabel = "2 stocks",
 		blurb = "Brands people keep buying, in any market.",
 		iconRes = R.drawable.ic_cat_consumer,
+		heroRes = R.drawable.ms_coll_consumer,
 		stocks = listOf(
 			CollStock("C", "▲ 0.7%", true, "COST", "Costco", "$947.20"),
 			CollStock("N", "▼ 1.3%", false, "NKE", "Nike", "$72.80"),

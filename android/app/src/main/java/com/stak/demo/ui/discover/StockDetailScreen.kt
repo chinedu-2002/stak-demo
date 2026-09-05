@@ -56,6 +56,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.stak.demo.R
 import com.stak.demo.ui.components.MainTab
+import com.stak.demo.ui.components.RANGE_LABELS
+import com.stak.demo.ui.components.RANGE_SERIES
+import com.stak.demo.ui.components.RangeChart
 import com.stak.demo.ui.components.MainTabBar
 import com.stak.demo.ui.onboarding.AuthBackCircle
 import com.stak.demo.ui.theme.Geist
@@ -109,6 +112,8 @@ fun StockDetailScreen(
 	var saved by rememberSaveable { mutableStateOf(fromMyStak || f.symbol in DeckSession.saved) }
 	var showSuccess by rememberSaveable { mutableStateOf(false) }
 	var showBuy by rememberSaveable { mutableStateOf(false) }
+	// The range pills select (user, 2026-09-05); "3M" keeps the authored sd_chart_line (1:2382).
+	var range by rememberSaveable { mutableStateOf("3M") }
 	// B9/B13: hoisted Analyst state - the open state carries the tab bar
 	// (Discover entry) and the buy-success "Done" folds the section.
 	var analystOpen by rememberSaveable { mutableStateOf(false) }
@@ -155,27 +160,38 @@ fun StockDetailScreen(
 						color = if (f.change.startsWith("▼")) Red else Green,
 					)
 				}
-				Image(
-					painter = painterResource(R.drawable.sd_chart_line),
-					contentDescription = null,
-					contentScale = ContentScale.Fit,
-					modifier = Modifier.align(Alignment.CenterHorizontally).size((345 * u).dp, (76 * u).dp),
-				)
+				val chartModifier = Modifier.align(Alignment.CenterHorizontally).size((345 * u).dp, (76 * u).dp)
+				val series = RANGE_SERIES[range]
+				if (series == null) {
+					Image(
+						painter = painterResource(R.drawable.sd_chart_line),
+						contentDescription = null,
+						contentScale = ContentScale.Fit,
+						modifier = chartModifier,
+					)
+				} else {
+					RangeChart(series = series, tint = Teal, modifier = chartModifier)
+				}
 				Spacer(modifier = Modifier.height((40 * u).dp))
 				Row(
 					verticalAlignment = Alignment.CenterVertically,
 					horizontalArrangement = Arrangement.spacedBy((37 * u).dp),
 					modifier = Modifier.align(Alignment.CenterHorizontally),
 				) {
-					listOf("1D", "1W", "1M", "3M", "YTD", "1Y").forEach { label ->
-						if (label == "3M") {
+					RANGE_LABELS.forEach { label ->
+						val select = Modifier.clickable(
+							interactionSource = remember { MutableInteractionSource() },
+							indication = null,
+						) { range = label }
+						if (label == range) {
 							Box(
 								contentAlignment = Alignment.Center,
 								modifier = Modifier
 									.size((39 * u).dp, (22.5 * u).dp)
 									.clip(RoundedCornerShape((11.25 * u).dp))
 									.background(Color(0x292C9DBC))
-									.border((0.75 * u).dp, Color(0x662C9DBC), RoundedCornerShape((11.25 * u).dp)),
+									.border((0.75 * u).dp, Color(0x662C9DBC), RoundedCornerShape((11.25 * u).dp))
+									.then(select),
 							) {
 								Text(
 									label,
@@ -184,7 +200,7 @@ fun StockDetailScreen(
 								)
 							}
 						} else {
-							Text(label, style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp), color = Muted)
+							Text(label, style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp), color = Muted, modifier = select)
 						}
 					}
 				}

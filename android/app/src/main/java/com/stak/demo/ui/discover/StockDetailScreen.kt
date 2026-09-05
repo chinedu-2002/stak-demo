@@ -250,23 +250,18 @@ fun StockDetailScreen(
 						// holdings store, so the collection page and every count follow.
 						DetailSecondary("Unsave") { com.stak.demo.ui.MyStakHoldings.remove(f.symbol); onBack() }
 					} else if (saved) {
-						Box(
-							contentAlignment = Alignment.Center,
-							modifier = Modifier
-								.fillMaxWidth()
-								.height((52 * u).dp)
-								.border((0.36 * u).dp, com.stak.demo.ui.theme.StakColors.CtaBorderBrush, RoundedCornerShape((6 * u).dp)),
-						) {
-							Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy((6 * u).dp)) {
-								Image(painterResource(R.drawable.ic_saved_bookmark), null, modifier = Modifier.size((12 * u).dp))
-								Text(
-									"Saved to My STAK",
-									style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp),
-									color = Color.White,
-								)
-							}
+						// A saved stock reads the same from every entry: the authored
+						// saved block (16:1012) - Practice buy + Unsave. The "Saved to
+						// My STAK" outline button was never in a frame (user, 2026-09-05:
+						// "something is off when I saved my stock"). Unsave here drops
+						// the stock from this run's saves and the holdings store and
+						// stays on the page with the Save CTA back.
+						DetailCta("Practice buy") { if (onPracticeBuy != null) onPracticeBuy() else showBuy = true }
+						DetailSecondary("Unsave") {
+							saved = false
+							DeckSession.saved = DeckSession.saved - f.symbol
+							com.stak.demo.ui.MyStakHoldings.remove(f.symbol)
 						}
-						DetailSecondary("Practice buy") { if (onPracticeBuy != null) onPracticeBuy() else showBuy = true }
 					} else {
 						DetailCta("Save") { showSuccess = true }
 						DetailSecondary("Practice buy") { if (onPracticeBuy != null) onPracticeBuy() else showBuy = true }

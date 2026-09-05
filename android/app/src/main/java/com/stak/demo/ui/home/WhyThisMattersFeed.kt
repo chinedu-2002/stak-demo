@@ -21,6 +21,9 @@ object WhyThisMattersFeed {
 	// user, 2026-09-04: grammar fixed, frame typo not copied.
 	const val DEMO_BODY = "Your STAK collections house 80% of stocks from affected industries."
 
+	/** A new account with nothing saved yet (product audit, 2026-09-05). */
+	const val EMPTY_BODY = "Save a few stocks and STAK will show how today's news hits them."
+
 	/** The current summary - the served personalized copy once the backend exists. */
-	fun body(): String = DEMO_BODY
+	fun body(): String = if (com.stak.demo.ui.MyStakHoldings.count == 0) EMPTY_BODY else DEMO_BODY
 }

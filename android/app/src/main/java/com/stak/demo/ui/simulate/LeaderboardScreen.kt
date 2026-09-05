@@ -125,14 +125,14 @@ fun LeaderboardScreen(onBack: () -> Unit) {
 				// week figures and pick count - the same #47 / +1.9% the
 				// Simulate hero and board card show.
 				Box(modifier = Modifier.width((28 * u).dp)) {
-					Text(PaperPortfolio.WEEK_RANK.toString(), style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp, lineHeight = (20 * u).sp, lineHeightStyle = FIGMA_LINE_BOX), color = Sim.Teal)
+					Text(PaperPortfolio.weekRank?.toString() ?: "—", style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp, lineHeight = (20 * u).sp, lineHeightStyle = FIGMA_LINE_BOX), color = Sim.Teal)
 				}
 				Box(contentAlignment = Alignment.Center, modifier = Modifier.size((36 * u).dp).background(Sim.ChipBg, CircleShape)) {
 					Text("E", style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (14 * u).sp, lineHeight = (18 * u).sp, lineHeightStyle = FIGMA_LINE_BOX), color = Sim.BadgeInk) // 1:4158 is 14 (exact-design audit 2026-09-04)
 				}
 				Column(verticalArrangement = Arrangement.spacedBy((2 * u).dp), modifier = Modifier.weight(1f)) {
 					Text("You", style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (15 * u).sp, lineHeightStyle = FIGMA_LINE_BOX), color = Color.White) // 1:4160 Sora Medium (exact-design audit 2026-09-04)
-					Text("12 picks this week", style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp, lineHeight = (13 * u).sp, lineHeightStyle = FIGMA_LINE_BOX), color = Sim.Muted)
+					Text("${PaperPortfolio.pickCountLabel} picks this week", style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp, lineHeight = (13 * u).sp, lineHeightStyle = FIGMA_LINE_BOX), color = Sim.Muted)
 				}
 				Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy((2 * u).dp)) {
 					// Authored You row (user, 2026-09-04 (CHINEDU 07 · Simulate 423:1007): the authored look wins).

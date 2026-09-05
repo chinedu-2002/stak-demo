@@ -19,6 +19,7 @@ object Session {
 	private const val KEY_NAME = "display_name"
 	private const val KEY_PHOTO = "photo_uri"
 	private const val KEY_RISK = "risk_style"
+	private const val KEY_DEMO = "demo_account"
 
 	private var prefs: SharedPreferences? = null
 
@@ -29,6 +30,15 @@ object Session {
 	var resumedSignedIn = false
 		private set
 
+	/**
+	 * Which account this is (product audit, 2026-09-05). Sign in = the DEMO
+	 * account with the authored history (19 saved stocks, $10,240, #47);
+	 * Create account = a NEW account that starts empty and earns its numbers.
+	 * Persisted with the sign-in so a relaunch restores the same account.
+	 */
+	var demoAccount by mutableStateOf(true)
+		private set
+
 	/** Load once per process; restores the profile the user set before. */
 	fun init(context: Context) {
 		if (prefs != null) return
@@ -36,15 +46,26 @@ object Session {
 		prefs = p
 		signedIn = p.getBoolean(KEY_SIGNED_IN, false)
 		resumedSignedIn = signedIn
+		demoAccount = p.getBoolean(KEY_DEMO, true)
 		UserProfile.displayName = p.getString(KEY_NAME, "") ?: ""
 		UserProfile.photoUri = p.getString(KEY_PHOTO, null)
 		UserProfile.riskStyle = p.getString(KEY_RISK, UserProfile.riskStyle) ?: UserProfile.riskStyle
+		applyAccount()
 	}
 
 	/** Sign-in CTA or account creation (09 Proceed) - remembered across launches. */
-	fun signIn() {
+	/** `demo` = the authored demo account (Sign in); false = a fresh account (Create account). */
+	fun signIn(demo: Boolean) {
 		signedIn = true
+		demoAccount = demo
 		persist()
+		applyAccount()
+	}
+
+	/** Seeds (demo) or clears (new account) every user-data singleton for the current account. */
+	fun applyAccount() {
+		MyStakHoldings.reset(demo = demoAccount)
+		com.stak.demo.ui.simulate.PaperPortfolio.reset(demo = demoAccount)
 	}
 
 	/** Profile edits after sign-in (name/photo) stay with the session. */
@@ -54,15 +75,18 @@ object Session {
 	fun signOut() {
 		signedIn = false
 		resumedSignedIn = false
+		demoAccount = true
 		UserProfile.displayName = ""
 		UserProfile.photoUri = null
 		UserProfile.riskStyle = "Growth-Oriented"
 		prefs?.edit()?.clear()?.apply()
+		applyAccount()
 	}
 
 	private fun persist() {
 		prefs?.edit()
 			?.putBoolean(KEY_SIGNED_IN, signedIn)
+			?.putBoolean(KEY_DEMO, demoAccount)
 			?.putString(KEY_NAME, UserProfile.displayName)
 			?.putString(KEY_PHOTO, UserProfile.photoUri)
 			?.putString(KEY_RISK, UserProfile.riskStyle)

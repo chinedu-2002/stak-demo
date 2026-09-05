@@ -922,13 +922,12 @@ struct PracticeBuySheet: View {
 					.font(StakFont.sora(18 * u, .semiBold))
 					.foregroundStyle(Color.white)
 				SheetStockRow(spec: spec)
-				// Ink-measured against 1:1970 / 1:4232: the paragraph sits 1 lower and
-				// the cash block 1.5 lower than the 14 column gap alone gives.
+				// The authored 14 column gap alone (1:1970 / 1:4232): the old +1 / +1.5
+				// ink nudges predate the full line boxes (mirrors Android, 2026-09-05).
 				Text("Your paper stake starts at today’s price and tracks the real move live, in either direction.")
 					.font(StakFont.geist(12 * u))
 					.stakLineHeight(18 * u, size: 12 * u, face: .geist)
 					.foregroundStyle(Disc.body)
-					.padding(.top, 1 * u)
 				VStack(alignment: .leading, spacing: 12 * u) {
 					HStack(spacing: 6 * u) {
 						Text("Cash available")
@@ -983,7 +982,6 @@ struct PracticeBuySheet: View {
 						.onChange(of: customText) { applyCustom() }
 					}
 				}
-				.padding(.top, 1.5 * u)
 				// Authored: chips → shares line is a 24 gap (14 + 10).
 				HStack(alignment: .bottom, spacing: 6 * u) {
 					Text("You get")

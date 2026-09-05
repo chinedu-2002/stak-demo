@@ -83,8 +83,12 @@ struct StockDetailView: View {
 					Spacer()
 					ZStack {
 						Circle().fill(card)
+						// 1:2382 authors the share glyph white; the News asset is #AEAEAE
+						// (mirrors Android, 2026-09-05).
 						Image("IcNewsShare")
+							.renderingMode(.template)
 							.resizable()
+							.foregroundStyle(Color.white)
 							.frame(width: 17 * u, height: 17 * u)
 					}
 					.frame(width: 40 * u, height: 40 * u)

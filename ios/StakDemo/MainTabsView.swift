@@ -195,6 +195,7 @@ struct MainTabsView: View {
 							onOpenLeaderboard: { pushInstant(.leaderboard) },
 							// Authored (1:3964): All saved staks -> the My STAK tab.
 							onOpenMyStak: { switchTab(.myStak) },
+							onOpenDiscover: { switchTab(.discover) },
 							onPracticeBuy: { simulateBuy = $0 }
 						)
 					}

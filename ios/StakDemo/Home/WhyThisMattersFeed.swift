@@ -21,5 +21,8 @@ enum WhyThisMattersFeed {
 	static let demoBody = "Your STAK collections house 80% of stocks from affected industries."
 
 	/// The current summary - the served personalized copy once the backend exists.
-	static func body() -> String { demoBody }
+	/// A new account with nothing saved yet (product audit, 2026-09-05).
+	static let emptyBody = "Save a few stocks and STAK will show how today's news hits them."
+
+	static func body() -> String { MyStakHoldings.shared.count == 0 ? emptyBody : demoBody }
 }

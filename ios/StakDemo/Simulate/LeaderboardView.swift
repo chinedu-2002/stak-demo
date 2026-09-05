@@ -76,7 +76,7 @@ struct LeaderboardView: View {
 					// You — highlighted with the ▲ spots delta. Teal-tint bg
 					// only, no border (1:4124).
 					HStack(spacing: 11 * u) {
-						Text("\(PaperPortfolio.weekRank)")
+						Text(portfolio.rank.map(String.init) ?? "—")
 							.font(StakFont.sora(16 * u, .semiBold))
 							.foregroundStyle(Sim.teal)
 							.frame(width: 28 * u, alignment: .leading)
@@ -91,17 +91,17 @@ struct LeaderboardView: View {
 							Text("You")
 								.font(StakFont.sora(12 * u, .medium)) // 1:4160 Sora Medium (exact-design audit 2026-09-04)
 								.foregroundStyle(Color.white)
-							Text("12 picks this week")
+							Text("\(portfolio.pickCountLabel) picks this week")
 								.font(StakFont.geist(10 * u))
 								.foregroundStyle(Sim.muted)
 						}
 						.frame(maxWidth: .infinity, alignment: .leading)
 						VStack(alignment: .trailing, spacing: 2 * u) {
 							// Authored You row (user, 2026-09-04 (CHINEDU 07 · Simulate 423:1007): the authored look wins).
-							Text("+4.2%")
+							Text(portfolio.demo ? "+4.2%" : portfolio.weekPctText)
 								.font(StakFont.sora(13 * u, .semiBold))
 								.foregroundStyle(Sim.teal)
-							Text("▲ 12 spots")
+							Text(portfolio.demo ? "▲ 12 spots" : "new this week")
 								.font(StakFont.geist(10 * u))
 								.foregroundStyle(Sim.green)
 						}

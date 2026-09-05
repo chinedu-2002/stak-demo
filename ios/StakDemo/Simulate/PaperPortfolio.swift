@@ -24,8 +24,50 @@ final class PaperPortfolio: ObservableObject {
 
 	/// Authored (1:3898): "$10,000 paper", "+$240.00 all time", "Cash available $8,800.00".
 	static let paperStart = 10000.0
-	let allTimeGain = 240.0
+	/// All-time gain = today's value over the paper start (the demo's authored $240 falls out of its $10,240).
+	var allTimeGain: Double { portfolioValue - PaperPortfolio.paperStart }
 	@Published var cash: Double = 8800
+
+	/// The authored demo account, or a fresh one (product audit, 2026-09-05; mirrors Android).
+	@Published private(set) var demo = true
+	private var baseValue = 10240.0
+	private var baseCash = 8800.0
+
+	/// The leaderboard rank - the demo's authored #47; a new account is unranked until it has moves.
+	var rank: Int? { demo ? PaperPortfolio.weekRank : nil }
+	var weekUp: Bool { demo ? true : allTimeGain >= 0 }
+	var weekGainText: String { demo ? PaperPortfolio.weekGain : PaperPortfolio.signedWhole(allTimeGain) }
+	var weekPctText: String { demo ? PaperPortfolio.weekPct : PaperPortfolio.signedPct(allTimeGain / PaperPortfolio.paperStart * 100) }
+	/// "12 picks" is authored for the demo (its rows list six); a new account counts its own.
+	var pickCountLabel: Int { demo ? 12 + (positions.count - PaperPortfolio.authoredRows.count) : positions.count }
+
+	/// Seeds the authored demo history or clears everything to $10,000 of untouched paper cash.
+	func reset(demo: Bool) {
+		self.demo = demo
+		newStake = 0
+		if demo {
+			cash = 8800
+			positions = PaperPortfolio.authoredRows.compactMap { row in
+				PickSpecs.all.first { $0.symbol == row.ticker }.map { Position(spec: $0, row: row) }
+			}
+			realized = [
+				Realized(badge: "S", ticker: "SHOP", sub: "Sold May 30 · profit banked", amount: "+$12.00", up: true),
+				Realized(badge: "C", ticker: "COIN", sub: "Sold Jun 15 · loss realized", amount: "-$8.00", up: false)
+			]
+			baseValue = 10240
+			baseCash = 8800
+		} else {
+			cash = PaperPortfolio.paperStart
+			positions = []
+			realized = []
+			baseValue = PaperPortfolio.paperStart
+			baseCash = PaperPortfolio.paperStart
+		}
+	}
+
+	static func signedWhole(_ value: Double) -> String { (value < 0 ? "-$" : "+$") + wholeDollars(abs(value)).replacingOccurrences(of: "$", with: "") }
+	static func signedMoney(_ value: Double) -> String { (value < 0 ? "-" : "+") + money(abs(value)) }
+	static func signedPct(_ pct: Double) -> String { String(format: "%+.1f%%", pct) }
 
 	/// Audit item 6 - one week, quoted everywhere: the hero's "▲ +$186
 	/// (+1.9%) this week" / "#47 this week" (1:3898), the board's You row
@@ -83,7 +125,7 @@ final class PaperPortfolio: ObservableObject {
 	private var newStake = 0.0
 
 	/// The authored $10,240.00 (1:3898) plus whatever cash moved since.
-	var portfolioValue: Double { 10240 + (cash - 8800) + newStake }
+	var portfolioValue: Double { baseValue + (cash - baseCash) + newStake }
 	var pickCount: Int { positions.count }
 
 	func holds(_ symbol: String) -> Bool {
@@ -179,7 +221,7 @@ final class PaperPortfolio: ObservableObject {
 		(gain < 0 ? "-" : "+") + wholeDollars(abs(gain).rounded())
 	}
 
-	private static func wholeDollars(_ value: Double) -> String {
+	static func wholeDollars(_ value: Double) -> String {
 		"$" + (wholeFormatter.string(from: NSNumber(value: value)) ?? String(format: "%.0f", value))
 	}
 

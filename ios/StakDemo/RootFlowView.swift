@@ -128,8 +128,9 @@ struct RootFlowView: View {
 				// Right; the "Create account" link dissolves back.
 				onBack: { pop(.pushLeft) },
 				onSignIn: {
-					// Signed in - remembered across launches.
-					Session.shared.signIn()
+					// Signed in = the demo account with its authored history
+					// (product audit, 2026-09-05); remembered across launches.
+					Session.shared.signIn(demo: true)
 					anim = .pushRight
 					withAnimation(FlowAnim.pushRight.animation) { phase = .main }
 				},
@@ -190,8 +191,9 @@ struct RootFlowView: View {
 				onBack: { pop() },
 				// Prototype: "Proceed to home" → Home first run, Push Right.
 				onProceed: {
-					// Account created - remembered across launches.
-					Session.shared.signIn()
+					// Account created = a NEW account, empty until the user saves
+					// and buys (product audit, 2026-09-05); remembered across launches.
+					Session.shared.signIn(demo: false)
 					anim = .pushRight
 					withAnimation(FlowAnim.pushRight.animation) { phase = .main }
 				}

@@ -119,18 +119,19 @@ struct ProfileView: View {
 					// Paper stats card.
 					VStack(alignment: .leading, spacing: 10 * u) {
 						HStack {
-							ProfileStat(value: "$10,240", label: "Portfolio")
+							// Live from the shared paper portfolio (product audit, 2026-09-05).
+							ProfileStat(value: PaperPortfolio.wholeDollars(portfolio.portfolioValue), label: "Portfolio")
 							Spacer()
-							ProfileStat(value: "$8,800.00", label: "Cash")
+							ProfileStat(value: PaperPortfolio.money(portfolio.cash), label: "Cash")
 							Spacer()
-							ProfileStat(value: "12", label: "Picks")
+							ProfileStat(value: String(portfolio.pickCountLabel), label: "Picks")
 						}
 						.frame(maxWidth: .infinity)
 						// Stat columns sit at the top of the 40u row (171:1013 items-start), not centred - exact-design audit 2026-09-04.
 						.frame(height: 40 * u, alignment: .top)
-						Text("▲ +$240.00 all time on $10,000 paper")
+						Text("\(portfolio.allTimeGain >= 0 ? "▲" : "▼") \(PaperPortfolio.signedMoney(portfolio.allTimeGain)) all time on $10,000 paper")
 							.font(StakFont.geist(12 * u, .medium))
-							.foregroundStyle(StakColors.positive)
+							.foregroundStyle(portfolio.allTimeGain >= 0 ? StakColors.positive : Color(argb: 0xFFE5484D))
 					}
 					.frame(maxWidth: .infinity, alignment: .leading)
 					.padding(14 * u)

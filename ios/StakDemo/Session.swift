@@ -15,11 +15,16 @@ final class Session: ObservableObject {
 	/// Legacy: earlier builds kept the photo bytes here; read once and moved
 	/// to the photo file (see loadPhoto).
 	private static let keyPhoto = "stak.photoData"
+	private static let keyDemo = "stak.demoAccount"
 
 	@Published private(set) var signedIn: Bool
 
 	/// True when this launch started already signed in - the returning-user path.
 	private(set) var resumedSignedIn: Bool
+	/// Which account this is (product audit, 2026-09-05; mirrors Android): Sign in = the
+	/// DEMO account with the authored history, Create account = a NEW account that starts
+	/// empty and earns its numbers. Persisted with the sign-in.
+	@Published private(set) var demoAccount: Bool
 
 	private init() {
 		let d = UserDefaults.standard
@@ -29,15 +34,26 @@ final class Session: ObservableObject {
 		let wasSignedIn = d.bool(forKey: Self.keySignedIn)
 		signedIn = wasSignedIn
 		resumedSignedIn = wasSignedIn
+		demoAccount = d.object(forKey: Self.keyDemo) as? Bool ?? true
 		UserProfile.shared.displayName = d.string(forKey: Self.keyName) ?? ""
 		if let risk = d.string(forKey: Self.keyRisk) { UserProfile.shared.riskStyle = risk }
 		UserProfile.shared.photoData = Self.loadPhoto()
+		applyAccount()
+	}
+
+	/// Seeds (demo) or clears (new account) every user-data singleton for the current account.
+	func applyAccount() {
+		MyStakHoldings.shared.reset(demo: demoAccount)
+		PaperPortfolio.shared.reset(demo: demoAccount)
 	}
 
 	/// Sign-in CTA or account creation (09 Proceed) - remembered across launches.
-	func signIn() {
+	/// `demo` = the authored demo account (Sign in); false = a fresh account (Create account).
+	func signIn(demo: Bool) {
 		signedIn = true
+		demoAccount = demo
 		persist()
+		applyAccount()
 	}
 
 	/// Profile edits after sign-in stay with the session.
@@ -47,6 +63,7 @@ final class Session: ObservableObject {
 	func signOut() {
 		signedIn = false
 		resumedSignedIn = false
+		demoAccount = true
 		UserProfile.shared.displayName = ""
 		UserProfile.shared.photoData = nil
 		UserProfile.shared.riskStyle = "Growth-Oriented"
@@ -55,12 +72,15 @@ final class Session: ObservableObject {
 		d.removeObject(forKey: Self.keyName)
 		d.removeObject(forKey: Self.keyRisk)
 		d.removeObject(forKey: Self.keyPhoto)
+		d.removeObject(forKey: Self.keyDemo)
 		Self.savePhoto(nil)
+		applyAccount()
 	}
 
 	private func persist() {
 		let d = UserDefaults.standard
 		d.set(signedIn, forKey: Self.keySignedIn)
+		d.set(demoAccount, forKey: Self.keyDemo)
 		d.set(UserProfile.shared.displayName, forKey: Self.keyName)
 		d.set(UserProfile.shared.riskStyle, forKey: Self.keyRisk)
 		Self.savePhoto(UserProfile.shared.photoData)

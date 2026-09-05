@@ -16,22 +16,22 @@ import SwiftUI
 final class MyStakHoldings: ObservableObject {
 	static let shared = MyStakHoldings()
 
-	@Published private(set) var tickers: Set<String> = [
-		// AI & Tech
+	/// The authored demo account's holdings (the frames' 5/3/3/2/4/2 counts).
+	static let seed: Set<String> = [
 		"NVDA", "AAPL", "MSFT", "GOOGL", "AMD",
-		// Finance
 		"JPM", "V", "GS",
-		// Green Energy
 		"ENPH", "NEE", "FSLR",
-		// Real Estate
 		"PLD", "O",
-		// Healthcare
 		"LLY", "UNH", "JNJ", "PFE",
-		// Consumer
 		"COST", "NKE",
-		// Overview Best / Worst - no collection lists them
 		"TSLA", "SNOW"
 	]
+	@Published private(set) var tickers: Set<String> = MyStakHoldings.seed
+
+	/// Product audit (2026-09-05): a NEW account holds nothing until the user saves; the demo keeps the seed.
+	func reset(demo: Bool) {
+		tickers = demo ? MyStakHoldings.seed : []
+	}
 
 	/// Every held ticker - the Overview's "Across N stocks".
 	var count: Int { tickers.count }

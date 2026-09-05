@@ -62,8 +62,10 @@ struct MyStakView: View {
 					addMoreCta
 					yourReadCard
 					PortfolioSummary()
-					SectionHeader(title: "Breakdown")
-					AllocationCard()
+					if holdings.count > 0 {
+						SectionHeader(title: "Breakdown")
+						AllocationCard()
+					}
 					discoverBanner
 					// 1:3156: the Sections column ends at the Discover CTA and the 86 bottom
 					// padding IS the tab bar, so no trailing gap - exact-design audit 2026-09-04.
@@ -135,13 +137,14 @@ struct MyStakView: View {
 					.font(StakFont.sora(14 * u, .semiBold))
 					.foregroundStyle(StakColors.textPrimary)
 			}
-			Text("You lean into growth and tech.")
+			// Product audit (2026-09-05): a new account has no read yet.
+			Text(holdings.count == 0 ? "Your read starts with your first save." : "You lean into growth and tech.")
 				.font(StakFont.sora(15 * u, .semiBold))
 				.foregroundStyle(StakColors.textPrimary)
 			// Figma 1:3155 sets the body at 13 (Codex parity audit, 2026-09-04).
 			// Authored copy, not the store's counts - user, 2026-09-04 (CHINEDU 06 ·
 			// My STAK 1:3155): the authored look wins.
-			Text("Six of your fourteen picks are tech or AI names. Your STAK skews high-growth, with a small hedge in real estate.")
+			Text(holdings.count == 0 ? "Save stocks from the Discover deck and STAK will read your taste from them." : "Six of your fourteen picks are tech or AI names. Your STAK skews high-growth, with a small hedge in real estate.")
 				.font(StakFont.geist(13 * u))
 				.stakLineHeight(19 * u, size: 13 * u, face: .geist)
 				.foregroundStyle(bodyColor)
@@ -260,13 +263,13 @@ private struct PortfolioSummary: View {
 				Text("Performance this week")
 					.font(StakFont.sora(12 * u))
 					.foregroundStyle(muted)
-				Text("+4.9%")
+				Text(holdings.count == 0 ? "—" : "+4.9%")
 					.font(StakFont.sora(44 * u, .semiBold))
 					.tracking(-0.44 * u)
 					.foregroundStyle(StakColors.textPrimary)
 				HStack(spacing: 10 * u) {
 					// Authored summary copy; the store's count is not what the frame shows - user, 2026-09-04 (CHINEDU 06 · My STAK 1:3155).
-					Text("Across 14 stocks")
+					Text(holdings.count == 0 ? "No stocks yet" : (Session.shared.demoAccount ? "Across 14 stocks" : "Across \(holdings.count) stocks"))
 						.font(StakFont.geist(14 * u, .medium))
 						.foregroundStyle(green)
 					Text(".")
@@ -290,7 +293,7 @@ private struct PortfolioSummary: View {
 				.frame(maxWidth: .infinity)
 				.frame(height: 1 * u)
 
-			HStack(spacing: 151 * u) {
+			if holdings.count > 0 { HStack(spacing: 151 * u) {
 				VStack(alignment: .leading, spacing: 3 * u) {
 					Text("Best this week")
 						.font(StakFont.geist(11 * u))
@@ -317,7 +320,7 @@ private struct PortfolioSummary: View {
 							.foregroundStyle(red)
 					}
 				}
-			}
+			} }
 			.frame(maxWidth: .infinity)
 		}
 		.frame(maxWidth: .infinity)

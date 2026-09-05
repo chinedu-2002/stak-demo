@@ -24,7 +24,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import com.stak.demo.ui.components.RANGE_LABELS
+import com.stak.demo.ui.components.RANGE_SERIES
+import com.stak.demo.ui.components.RangeChart
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -303,6 +310,10 @@ private fun CollectionChip(
 @Composable
 private fun PortfolioSummary() {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
+	// The range pills select (user, 2026-09-05: "be able to click on the
+	// timeline"); "3M" is the authored default (1:3155) and keeps the
+	// authored chart image, the other ranges draw the shared demo series.
+	var range by rememberSaveable { mutableStateOf("3M") }
 	Column(
 		verticalArrangement = Arrangement.spacedBy((14 * u).dp),
 		modifier = Modifier
@@ -342,31 +353,42 @@ private fun PortfolioSummary() {
 				)
 			}
 		}
-		Image(
-			painter = painterResource(R.drawable.ms_chart_line),
-			contentDescription = null,
-			contentScale = ContentScale.Fit,
-			modifier = Modifier.align(Alignment.CenterHorizontally).size((343 * u).dp, (73.56 * u).dp),
-		)
+		val chartModifier = Modifier.align(Alignment.CenterHorizontally).size((343 * u).dp, (73.56 * u).dp)
+		val series = RANGE_SERIES[range]
+		if (series == null) {
+			Image(
+				painter = painterResource(R.drawable.ms_chart_line),
+				contentDescription = null,
+				contentScale = ContentScale.Fit,
+				modifier = chartModifier,
+			)
+		} else {
+			RangeChart(series = series, tint = Teal, modifier = chartModifier)
+		}
 		Row(
 			verticalAlignment = Alignment.CenterVertically,
 			horizontalArrangement = Arrangement.spacedBy((37 * u).dp),
 			modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = (26 * u).dp),
 		) {
-			listOf("1D", "1W", "1M", "3M", "YTD", "1Y").forEach { label ->
-				if (label == "3M") {
+			RANGE_LABELS.forEach { label ->
+				val select = Modifier.clickable(
+					interactionSource = remember { MutableInteractionSource() },
+					indication = null,
+				) { range = label }
+				if (label == range) {
 					Box(
 						contentAlignment = Alignment.Center,
 						modifier = Modifier
 							.size((39 * u).dp, (22.5 * u).dp)
 							.clip(RoundedCornerShape((11.25 * u).dp))
 							.background(Color(0x292C9DBC))
-							.border((0.75 * u).dp, Color(0x662C9DBC), RoundedCornerShape((11.25 * u).dp)),
+							.border((0.75 * u).dp, Color(0x662C9DBC), RoundedCornerShape((11.25 * u).dp))
+							.then(select),
 					) {
 						Text(label, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp), color = Teal)
 					}
 				} else {
-					Text(label, style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp), color = Muted)
+					Text(label, style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp), color = Muted, modifier = select)
 				}
 			}
 		}

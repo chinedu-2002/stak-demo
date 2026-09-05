@@ -1,0 +1,57 @@
+package com.stak.demo.ui.components
+
+import androidx.compose.foundation.Canvas
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.unit.dp
+
+/** The six range labels every chart offers; "3M" is the authored default and keeps each frame's exported line. */
+internal val RANGE_LABELS = listOf("1D", "1W", "1M", "3M", "YTD", "1Y")
+
+/**
+ * Demo stand-ins until the backend serves price history - each range's line
+ * as fractions of the chart height from the bottom (0 = bottom), spread
+ * evenly across the width. "3M" is absent on purpose: that range shows the
+ * authored export (sim_chart_line 1:3935, ms_chart_line 1:3155, sd_chart_line
+ * 1:2382). Shared by Simulate, My STAK, Stock Detail and Pick Detail (user,
+ * 2026-09-05: "be able to click on the timeline"). Mirrors
+ * ios/StakDemo/Theme/RangeChart.swift.
+ */
+internal val RANGE_SERIES: Map<String, List<Float>> = mapOf(
+	"1D" to listOf(0.45f, 0.50f, 0.42f, 0.55f, 0.60f, 0.52f, 0.58f, 0.66f, 0.62f, 0.70f),
+	"1W" to listOf(0.30f, 0.38f, 0.35f, 0.50f, 0.46f, 0.60f, 0.72f),
+	"1M" to listOf(0.25f, 0.30f, 0.28f, 0.42f, 0.38f, 0.52f, 0.48f, 0.60f, 0.55f, 0.68f, 0.75f),
+	"YTD" to listOf(0.20f, 0.35f, 0.30f, 0.45f, 0.40f, 0.55f, 0.50f, 0.62f, 0.70f, 0.66f, 0.80f),
+	"1Y" to listOf(0.15f, 0.22f, 0.30f, 0.26f, 0.40f, 0.36f, 0.50f, 0.55f, 0.48f, 0.62f, 0.70f, 0.82f),
+)
+
+/** A range's line: `tint` 2-wide round stroke over a 22%-to-clear `tint` fill, in the caller's box. */
+@Composable
+internal fun RangeChart(series: List<Float>, tint: Color, modifier: Modifier) {
+	val u = com.stak.demo.ui.onboarding.figmaUnit()
+	Canvas(modifier = modifier) {
+		val w = size.width
+		val h = size.height
+		val last = series.lastIndex
+		val points = series.mapIndexed { i, f -> Offset(if (last == 0) 0f else w * i / last, h * (1f - f)) }
+		val line = Path().apply {
+			moveTo(points.first().x, points.first().y)
+			points.drop(1).forEach { lineTo(it.x, it.y) }
+		}
+		val fill = Path().apply {
+			addPath(line)
+			lineTo(points.last().x, h)
+			lineTo(points.first().x, h)
+			close()
+		}
+		drawPath(fill, Brush.verticalGradient(0f to tint.copy(alpha = 0.22f), 1f to Color.Transparent, startY = 0f, endY = h))
+		drawPath(line, tint, style = Stroke(width = (2 * u).dp.toPx(), cap = StrokeCap.Round, join = StrokeJoin.Round))
+	}
+}

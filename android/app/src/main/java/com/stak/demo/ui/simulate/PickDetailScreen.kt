@@ -39,6 +39,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.stak.demo.R
+import com.stak.demo.ui.components.RANGE_LABELS
+import com.stak.demo.ui.components.RANGE_SERIES
+import com.stak.demo.ui.components.RangeChart
 import com.stak.demo.ui.onboarding.AuthBackCircle
 import com.stak.demo.ui.theme.Geist
 import com.stak.demo.ui.theme.Sora
@@ -114,6 +117,8 @@ fun PickDetailScreen(
 	onViewPortfolio: (() -> Unit)? = null,
 ) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
+	// The range pills select (user, 2026-09-05); "3M" keeps the authored sim_chart_line (1:4631).
+	var range by rememberSaveable { mutableStateOf("3M") }
 	// Pinned for the page's life: once Confirm sell removes the position,
 	// the Position-closed sheet must still show THIS pick, not the fallback.
 	val p = remember(symbol) { pickSpec(symbol) }
@@ -200,31 +205,42 @@ fun PickDetailScreen(
 						color = Sim.Muted,
 						modifier = Modifier.padding(top = (11 * u).dp),
 					)
-					Image(
-						painter = painterResource(R.drawable.sim_chart_line),
-						contentDescription = null,
-						contentScale = ContentScale.Fit,
-						modifier = Modifier.padding(top = (11 * u).dp).requiredSize((343 * u).dp, (73.5 * u).dp),
-					)
+					val chartModifier = Modifier.padding(top = (11 * u).dp).requiredSize((343 * u).dp, (73.5 * u).dp)
+					val series = RANGE_SERIES[range]
+					if (series == null) {
+						Image(
+							painter = painterResource(R.drawable.sim_chart_line),
+							contentDescription = null,
+							contentScale = ContentScale.Fit,
+							modifier = chartModifier,
+						)
+					} else {
+						RangeChart(series = series, tint = Sim.Teal, modifier = chartModifier)
+					}
 					Row(
 						verticalAlignment = Alignment.CenterVertically,
 						horizontalArrangement = Arrangement.spacedBy((37 * u).dp),
 						modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = (40 * u).dp),
 					) {
-						listOf("1D", "1W", "1M", "3M", "YTD", "1Y").forEach { label ->
-							if (label == "3M") {
+						RANGE_LABELS.forEach { label ->
+							val select = Modifier.clickable(
+								interactionSource = remember { MutableInteractionSource() },
+								indication = null,
+							) { range = label }
+							if (label == range) {
 								Box(
 									contentAlignment = Alignment.Center,
 									modifier = Modifier
 										.size((39 * u).dp, (22.5 * u).dp)
 										.clip(RoundedCornerShape((11.25 * u).dp))
 										.background(Color(0x292C9DBC))
-										.border((0.75 * u).dp, Color(0x662C9DBC), RoundedCornerShape((11.25 * u).dp)),
+										.border((0.75 * u).dp, Color(0x662C9DBC), RoundedCornerShape((11.25 * u).dp))
+										.then(select),
 								) {
 									Text(label, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp), color = Sim.Teal)
 								}
 							} else {
-								Text(label, style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp), color = Sim.Muted)
+								Text(label, style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp), color = Sim.Muted, modifier = select)
 							}
 						}
 					}

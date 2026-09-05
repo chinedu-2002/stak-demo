@@ -110,22 +110,14 @@ fun CollectionScreen(
 				.padding(top = (16 * u).dp, bottom = (26 * u).dp),
 		) {
 			Column(verticalArrangement = Arrangement.spacedBy((10 * u).dp)) {
-				if (c.imageRes != null) {
-					Image(
-						painter = painterResource(c.imageRes),
-						contentDescription = null,
-						contentScale = ContentScale.Crop,
-						modifier = Modifier.size((60 * u).dp),
-					)
-				} else if (c.iconRes != null) {
-					// Codex parity audit (2026-09-04): a collection without
-					// glass art centres its chip icon (1:3155) at the chip's own
-					// 36 inside the authored 60 hero frame, so title/meta/blurb
-					// keep their positions. Mirrors ios CollectionView.
-					Box(contentAlignment = Alignment.Center, modifier = Modifier.size((60 * u).dp)) {
-						Image(painterResource(c.iconRes), null, modifier = Modifier.size((36 * u).dp))
-					}
-				}
+				// Every collection's hero is its own 60 art, the AI & Tech treatment
+				// (1:3357) - user, 2026-09-05. Mirrors ios CollectionView.
+				Image(
+					painter = painterResource(c.heroRes),
+					contentDescription = null,
+					contentScale = ContentScale.Crop,
+					modifier = Modifier.size((60 * u).dp),
+				)
 				Text(
 					text = c.name,
 					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (26 * u).sp),

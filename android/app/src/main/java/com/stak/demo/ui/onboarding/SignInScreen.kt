@@ -51,6 +51,12 @@ fun SignInScreen(
 	var email by rememberSaveable { mutableStateOf("") }
 	var password by rememberSaveable { mutableStateOf("") }
 	var showPassword by rememberSaveable { mutableStateOf(false) }
+	// Product audit (2026-09-05): validates on the tap - the CTA waits for both
+	// fields, then the email rule speaks inline under the field.
+	var attempted by rememberSaveable { mutableStateOf(false) }
+	val emailError = AuthRules.emailError(email)
+	val passwordError = if (password.isEmpty()) "Enter your password" else null
+	val filled = email.isNotBlank() && password.isNotEmpty()
 
 	Box(modifier = Modifier.fillMaxSize().background(StakColors.Bg)) {
 		AuthWatermark()
@@ -88,7 +94,7 @@ fun SignInScreen(
 
 				AuthOrDivider()
 
-				AuthInput(value = email, onValueChange = { email = it }, placeholder = "Email address", keyboardType = KeyboardType.Email)
+				AuthInput(value = email, onValueChange = { email = it }, placeholder = "Email address", keyboardType = KeyboardType.Email, error = if (attempted) emailError else null)
 				AuthInput(
 					value = password,
 					onValueChange = { password = it },
@@ -96,6 +102,7 @@ fun SignInScreen(
 					keyboardType = KeyboardType.Password,
 					hidden = !showPassword,
 					trailing = { ShowHideToggle(shown = showPassword, onToggle = { showPassword = !showPassword }) },
+					error = if (attempted) passwordError else null,
 				)
 				Text(
 					text = "Forgot password?",
@@ -113,7 +120,10 @@ fun SignInScreen(
 				verticalArrangement = Arrangement.spacedBy((12 * u).dp),
 				modifier = Modifier.fillMaxWidth().padding(top = (8 * u).dp, bottom = (26 * u).dp),
 			) {
-				AuthCta(text = "Sign in", onClick = onSignIn)
+				AuthCta(text = "Sign in", enabled = filled, onClick = {
+					attempted = true
+					if (emailError == null && passwordError == null) onSignIn()
+				})
 				AuthSwitchRow(prefix = "New to STAK?", link = "Create account", onClick = onCreateAccount)
 			}
 		}

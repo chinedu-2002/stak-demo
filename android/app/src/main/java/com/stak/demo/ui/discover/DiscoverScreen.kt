@@ -67,6 +67,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -680,6 +681,15 @@ internal fun FrontDeckCard(
  * uniform 87.4% scale of the Discover card (1:1627) — values are
  * render-fitted against the 2x frame export. Discover uses the defaults.
  */
+/** Signed vertical inset: like padding(top) but a negative value pulls the
+ *  content up and shrinks the measured height by the same amount (Compose's
+ *  padding rejects negatives). Used for the render-fitted deck row tweaks. */
+internal fun Modifier.topInset(dp: Dp): Modifier = layout { measurable, constraints ->
+	val dy = dp.roundToPx()
+	val placeable = measurable.measure(constraints)
+	layout(placeable.width, (placeable.height + dy).coerceAtLeast(0)) { placeable.placeRelative(0, dy) }
+}
+
 internal class DeckRowTweaks(
 	val overlay: Float = 0f,
 	val headline: Float = 0f,
@@ -734,7 +744,7 @@ private fun DeckCardBody(card: DeckCard, onSave: (() -> Unit)?, u: Float, rows: 
 		}
 		Column(
 			verticalArrangement = Arrangement.spacedBy((19 * u).dp),
-			modifier = Modifier.fillMaxWidth().padding(horizontal = (18 * u).dp).padding(bottom = (16 * u).dp).padding(top = (rows.overlay * u).dp),
+			modifier = Modifier.fillMaxWidth().padding(horizontal = (18 * u).dp).padding(bottom = (16 * u).dp).topInset((rows.overlay * u).dp),
 		) {
 			Column(verticalArrangement = Arrangement.spacedBy((8 * u).dp)) {
 				Text(
@@ -746,12 +756,12 @@ private fun DeckCardBody(card: DeckCard, onSave: (() -> Unit)?, u: Float, rows: 
 					text = card.headline,
 					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (16 * u).sp, lineHeight = (23 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
 					color = Color.White,
-					modifier = Modifier.padding(top = (rows.headline * u).dp),
+					modifier = Modifier.topInset((rows.headline * u).dp),
 				)
 				Row(
 					verticalAlignment = Alignment.Bottom,
 					horizontalArrangement = Arrangement.spacedBy((9 * u).dp),
-					modifier = Modifier.padding(top = (rows.price * u).dp),
+					modifier = Modifier.topInset((rows.price * u).dp),
 				) {
 					Text(
 						text = card.price,
@@ -770,7 +780,7 @@ private fun DeckCardBody(card: DeckCard, onSave: (() -> Unit)?, u: Float, rows: 
 				verticalAlignment = Alignment.CenterVertically,
 				horizontalArrangement = Arrangement.spacedBy((8 * u).dp),
 				modifier = Modifier
-					.padding(top = (rows.tip * u).dp)
+					.topInset((rows.tip * u).dp)
 					.fillMaxWidth()
 					.clip(RoundedCornerShape((10 * u).dp))
 					.background(Disc.TipBg)

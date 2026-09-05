@@ -164,7 +164,10 @@ fun SwipeTutorialScreen(onBack: () -> Unit, onContinue: () -> Unit) {
 						// This frame's card authors looser text gaps than a
 						// uniform 87.4% scale of the Discover card (1:1627) —
 						// render-fitted against the 2x export of 1:344.
-						rows = DeckRowTweaks(overlay = 0.85f, headline = 0.85f, price = 1.65f, tip = 0.4f),
+						// Re-fitted 2026-09-05 on StakTest vs the 2x export of 1:344 after
+						// FIGMA_LINE_BOX: the old (0.85, 0.85, 1.65, 0.4) left every card row
+						// 2.2-3.2 low (ticker +2.2, headline +2.5, price +2.9, tip +2.5).
+						rows = DeckRowTweaks(overlay = -1.35f, headline = 0.55f, price = 0.95f, tip = 0.1f),
 						modifier = Modifier
 							.align(Alignment.TopCenter)
 							.offset(y = (47.5 * u).dp)

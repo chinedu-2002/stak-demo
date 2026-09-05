@@ -20,7 +20,10 @@ enum Disc {
 	static let divider = Color(argb: 0xFF2A3346)
 	static let badgeInk = Color(argb: 0xFF9EADC7)
 	static let brightInk = Color(argb: 0xFFF2F6FC)
-	static let saveChipBg = Color(argb: 0x26FFFFFF)
+	/// #FFFFFF @ 9% - the Save pill on BOTH Discover frames (DE-STAK 1:2048,
+	/// CHINEDU 1:1759); the earlier 15% no longer reads anywhere (user crop,
+	/// 2026-09-04).
+	static let saveChipBg = Color(argb: 0x17FFFFFF)
 	static let amountBg = Color(argb: 0xFF0B1430)
 	static let amountBorder = Color(argb: 0x1FFFFFFF)
 	static let amountInk = Color(argb: 0xFFDCE7F7)
@@ -638,7 +641,9 @@ private struct SaveChip: View {
 			Text("Save")
 				.font(StakFont.geist(12 * u, .medium))
 				.foregroundStyle(Color.white)
-			Image("IcHeroBookmark")
+			// The pill's own glyph (1:2050): 12 box, 8x10 bookmark, #AEAEAE stroke 1 -
+			// not the hero's dark #0A1020 export (user crop, 2026-09-04).
+			Image("IcSaveBookmark")
 				.resizable()
 				.frame(width: 12 * u, height: 12 * u)
 		}

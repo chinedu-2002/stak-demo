@@ -306,14 +306,14 @@ private struct SaveChip: View {
 			Text("Save")
 				.font(StakFont.geist(12 * u, .medium))
 				.foregroundStyle(Color.white)
-			Image("IcHeroBookmark")
+			Image("IcSaveBookmark")
 				.resizable()
 				.frame(width: 12 * u, height: 12 * u)
 		}
 		.padding(.horizontal, 13 * u)
 		.padding(.vertical, 7 * u)
 		// parity with Discover's render-measured chip (2026-09-04)
-		.background(Color(argb: 0x26FFFFFF), in: RoundedRectangle(cornerRadius: 16 * u))
+		.background(Disc.saveChipBg, in: RoundedRectangle(cornerRadius: 16 * u))
 	}
 }
 

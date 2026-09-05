@@ -25,6 +25,11 @@ struct StakCollection: Identifiable {
 	let blurb: String
 	var image: String? = nil
 	var icon: String? = nil
+	/// The collection page's 60 hero (1:3357 authors AI & Tech's glass art at
+	/// 60). Every collection draws its own art at that size - the four
+	/// category icons are the 4x exports of their 1:3155 cat-icon frames
+	/// (user, 2026-09-05). Declared before `stocks`: memberwise-init order.
+	let hero: String
 	let stocks: [CollStock]
 
 	/// Codex audit (2026-09-04): the stocks of this collection the user
@@ -54,6 +59,7 @@ enum StakCollections {
 			id: "aitech", name: "AI & Tech", count: "5 stocks",
 			blurb: "Your highest-conviction growth and AI names.",
 			image: "MsCollAITech",
+			hero: "MsCollAITech",
 			stocks: [
 				CollStock(badge: "N", change: "▲ 2.4%", up: true, ticker: "NVDA", company: "NVIDIA", price: "$122.10"),
 				CollStock(badge: "A", change: "▲ 1.2%", up: true, ticker: "AAPL", company: "Apple", price: "$229.35"),
@@ -66,6 +72,7 @@ enum StakCollections {
 			id: "finance", name: "Finance", count: "3 stocks",
 			blurb: "The banks and payment rails that move money.",
 			image: "MsCollFinance",
+			hero: "MsCollFinance",
 			stocks: [
 				CollStock(badge: "J", change: "▲ 0.6%", up: true, ticker: "JPM", company: "JPMorgan", price: "$245.60"),
 				CollStock(badge: "V", change: "▲ 0.3%", up: true, ticker: "V", company: "Visa", price: "$352.10"),
@@ -76,6 +83,7 @@ enum StakCollections {
 			id: "green", name: "Green Energy", count: "3 stocks",
 			blurb: "Solar, the grid and the utilities going clean.",
 			icon: "IcCatGreen",
+			hero: "MsCollGreen",
 			stocks: [
 				CollStock(badge: "E", change: "▲ 1.9%", up: true, ticker: "ENPH", company: "Enphase", price: "$78.40"),
 				CollStock(badge: "N", change: "▲ 0.4%", up: true, ticker: "NEE", company: "NextEra", price: "$84.20"),
@@ -86,6 +94,7 @@ enum StakCollections {
 			id: "realestate", name: "Real Estate", count: "2 stocks",
 			blurb: "Your small hedge: warehouses and rent checks.",
 			icon: "IcCatRealEstate",
+			hero: "MsCollRealEstate",
 			stocks: [
 				CollStock(badge: "P", change: "▲ 0.2%", up: true, ticker: "PLD", company: "Prologis", price: "$118.30"),
 				CollStock(badge: "O", change: "▼ 0.3%", up: false, ticker: "O", company: "Realty Income", price: "$59.10")
@@ -95,6 +104,7 @@ enum StakCollections {
 			id: "health", name: "Healthcare", count: "4 stocks",
 			blurb: "Drugmakers and insurers with steady demand.",
 			icon: "IcCatHealth",
+			hero: "MsCollHealth",
 			stocks: [
 				CollStock(badge: "L", change: "▲ 1.4%", up: true, ticker: "LLY", company: "Eli Lilly", price: "$792.50"),
 				CollStock(badge: "U", change: "▼ 0.8%", up: false, ticker: "UNH", company: "UnitedHealth", price: "$318.70"),
@@ -106,6 +116,7 @@ enum StakCollections {
 			id: "consumer", name: "Consumer", count: "2 stocks",
 			blurb: "Brands people keep buying, in any market.",
 			icon: "IcCatConsumer",
+			hero: "MsCollConsumer",
 			stocks: [
 				CollStock(badge: "C", change: "▲ 0.7%", up: true, ticker: "COST", company: "Costco", price: "$947.20"),
 				CollStock(badge: "N", change: "▼ 1.3%", up: false, ticker: "NKE", company: "Nike", price: "$72.80")

@@ -97,24 +97,13 @@ struct CollectionView: View {
 	private var hero: some View {
 		let u = figmaUnit
 		return VStack(alignment: .leading, spacing: 10 * u) {
-			// The authored 60u art frame. A collection with a category icon
-			// instead of glass art centres the chip's own 36u icon in that
-			// same frame, so title / meta / blurb keep their authored
-			// positions (Codex parity audit, 2026-09-04).
-			ZStack {
-				if let image = collection.image {
-					Image(image)
-						.resizable()
-						.scaledToFill()
-						.frame(width: 60 * u, height: 60 * u)
-						.clipped()
-				} else if let icon = collection.icon {
-					Image(icon)
-						.resizable()
-						.frame(width: 36 * u, height: 36 * u)
-				}
-			}
-			.frame(width: 60 * u, height: 60 * u)
+			// Every collection's hero is its own 60u art, the AI & Tech treatment
+			// (1:3357) - user, 2026-09-05. Mirrors android CollectionScreen.
+			Image(collection.hero)
+				.resizable()
+				.scaledToFill()
+				.frame(width: 60 * u, height: 60 * u)
+				.clipped()
 			Text(collection.name)
 				.font(StakFont.sora(26 * u, .semiBold))
 				.foregroundStyle(StakColors.textPrimary)

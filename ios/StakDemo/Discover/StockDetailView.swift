@@ -38,6 +38,8 @@ struct StockDetailView: View {
 	/// Hoisted from AnalystCard - drives the 1:2579 tab bar and the fold
 	/// back to 16:1012 when the buy receipt's Done fires.
 	@State private var analystOpen = false
+	/// The range pills select (user, 2026-09-05); "3M" keeps the authored SdChartLine (1:2382).
+	@State private var range = "3M"
 
 	init(
 		onBack: @escaping () -> Void,
@@ -108,30 +110,9 @@ struct StockDetailView: View {
 						.padding(.top, 10 * u)
 						.padding(.bottom, 6 * u)
 
-						Image("SdChartLine")
-							.resizable()
-							.scaledToFit()
-							.frame(width: 345 * u, height: 76 * u)
+						RangeLineChart(range: range, tint: teal, authored: "SdChartLine", width: 345 * u, height: 76 * u)
 						Spacer().frame(height: 40 * u)
-						HStack(spacing: 37 * u) {
-							ForEach(["1D", "1W", "1M", "3M", "YTD", "1Y"], id: \.self) { label in
-								if label == "3M" {
-									Text(label)
-										.font(StakFont.geist(12 * u, .medium))
-										.foregroundStyle(teal)
-										.frame(width: 39 * u, height: 22.5 * u)
-										.background(Color(argb: 0x292C9DBC), in: RoundedRectangle(cornerRadius: 11.25 * u))
-										.overlay(
-											RoundedRectangle(cornerRadius: 11.25 * u)
-												.strokeBorder(Color(argb: 0x662C9DBC), lineWidth: 0.75 * u)
-										)
-								} else {
-									Text(label)
-										.font(StakFont.geist(12 * u))
-										.foregroundStyle(muted)
-								}
-							}
-						}
+						RangePills(selected: $range, tint: teal, muted: muted)
 
 						VStack(spacing: 14 * u) {
 							if fromMyStak {

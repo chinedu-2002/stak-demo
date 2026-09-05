@@ -83,6 +83,8 @@ struct PickDetailView: View {
 	/// the Sell tap so the receipt (73:855) keeps showing the sold pick
 	/// after PaperPortfolio drops it.
 	@State private var selling: PickSpec? = nil
+	/// The range pills select (user, 2026-09-05); "3M" keeps the authored SimChartLine (1:4631).
+	@State private var range = "3M"
 	@ObservedObject private var portfolio = PaperPortfolio.shared
 
 	/// Codex audit (2026-09-04): the ledger's live spec (a bought pick, or
@@ -157,31 +159,10 @@ struct PickDetailView: View {
 								.frame(maxWidth: .infinity)
 								.frame(height: 73.5 * u)
 								.overlay(
-									Image("SimChartLine")
-										.resizable()
-										.scaledToFit()
-										.frame(width: 343 * u, height: 73.5 * u)
+									RangeLineChart(range: range, tint: Sim.teal, authored: "SimChartLine", width: 343 * u, height: 73.5 * u)
 								)
 								.padding(.top, 11 * u)
-							HStack(spacing: 37 * u) {
-								ForEach(["1D", "1W", "1M", "3M", "YTD", "1Y"], id: \.self) { label in
-									if label == "3M" {
-										Text(label)
-											.font(StakFont.geist(12 * u, .medium))
-											.foregroundStyle(Sim.teal)
-											.frame(width: 39 * u, height: 22.5 * u)
-											.background(Color(argb: 0x292C9DBC), in: RoundedRectangle(cornerRadius: 11.25 * u))
-											.overlay(
-												RoundedRectangle(cornerRadius: 11.25 * u)
-													.strokeBorder(Color(argb: 0x662C9DBC), lineWidth: 0.75 * u)
-											)
-									} else {
-										Text(label)
-											.font(StakFont.geist(12 * u))
-											.foregroundStyle(Sim.muted)
-									}
-								}
-							}
+							RangePills(selected: $range, tint: Sim.teal, muted: Sim.muted)
 							.frame(maxWidth: .infinity)
 							.padding(.top, 40 * u)
 						}

@@ -255,7 +255,7 @@ private struct ScoreHero: View {
 
 			// Authored: ranks→chart gap is exactly the column's 11 (1:3935);
 			// the chart bleeds outside the 20u text padding.
-			SimRangeChart(range: range)
+			RangeLineChart(range: range, tint: Sim.teal, authored: "SimChartLine", width: 343 * u, height: 73.56 * u)
 				.frame(maxWidth: .infinity)
 			HStack(spacing: 37 * u) {
 				ForEach(["1D", "1W", "1M", "3M", "YTD", "1Y"], id: \.self) { label in
@@ -286,67 +286,6 @@ private struct ScoreHero: View {
 		}
 		.padding(.vertical, 20 * u)
 		.background(Sim.cardBg, in: RoundedRectangle(cornerRadius: 18 * u))
-	}
-}
-
-/// The hero chart at a range (343x73.56, 1:3935). Codex audit
-/// (2026-09-04): "3M" keeps the authored SimChartLine; every other range
-/// draws its series in the same box - stroke Sim.teal 2 wide, round
-/// caps/joins, a teal-to-clear fill beneath. The series are demo
-/// stand-ins until the backend serves price history. Mirrors android
-/// ui/simulate/SimulateScreen.kt.
-struct SimRangeChart: View {
-	let range: String
-
-	/// Height fraction from the bottom (0 = bottom) per point, spread
-	/// evenly across the width.
-	static let series: [String: [CGFloat]] = [
-		"1D": [0.45, 0.50, 0.42, 0.55, 0.60, 0.52, 0.58, 0.66, 0.62, 0.70],
-		"1W": [0.30, 0.38, 0.35, 0.50, 0.46, 0.60, 0.72],
-		"1M": [0.25, 0.30, 0.28, 0.42, 0.38, 0.52, 0.48, 0.60, 0.55, 0.68, 0.75],
-		"YTD": [0.20, 0.35, 0.30, 0.45, 0.40, 0.55, 0.50, 0.62, 0.70, 0.66, 0.80],
-		"1Y": [0.15, 0.22, 0.30, 0.26, 0.40, 0.36, 0.50, 0.55, 0.48, 0.62, 0.70, 0.82]
-	]
-
-	var body: some View {
-		let u = figmaUnit
-		Group {
-			if let points = SimRangeChart.series[range], range != "3M" {
-				GeometryReader { geo in
-					let line = SimRangeChart.linePath(points, in: geo.size)
-					ZStack {
-						SimRangeChart.fillPath(line, in: geo.size)
-							.fill(LinearGradient(colors: [Sim.teal.opacity(0.22), Color.clear], startPoint: .top, endPoint: .bottom))
-						line.stroke(Sim.teal, style: StrokeStyle(lineWidth: 2 * u, lineCap: .round, lineJoin: .round))
-					}
-				}
-			} else {
-				Image("SimChartLine")
-					.resizable()
-					.scaledToFit()
-			}
-		}
-		.frame(width: 343 * u, height: 73.56 * u)
-	}
-
-	/// The series as a polyline across the box.
-	private static func linePath(_ points: [CGFloat], in size: CGSize) -> Path {
-		var path = Path()
-		let steps = CGFloat(max(points.count - 1, 1))
-		for (i, fraction) in points.enumerated() {
-			let point = CGPoint(x: size.width * CGFloat(i) / steps, y: size.height * (1 - fraction))
-			if i == 0 { path.move(to: point) } else { path.addLine(to: point) }
-		}
-		return path
-	}
-
-	/// The polyline closed down to the box's bottom edge for the gradient.
-	private static func fillPath(_ line: Path, in size: CGSize) -> Path {
-		var path = line
-		path.addLine(to: CGPoint(x: size.width, y: size.height))
-		path.addLine(to: CGPoint(x: 0, y: size.height))
-		path.closeSubpath()
-		return path
 	}
 }
 

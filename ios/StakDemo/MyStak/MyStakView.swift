@@ -247,6 +247,11 @@ private struct CollectionChip: View {
 
 /// Performance this week — +4.9%, chart, range pills, best/worst.
 private struct PortfolioSummary: View {
+	/// The range pills select (user, 2026-09-05: "be able to click on the
+	/// timeline"); "3M" is the authored default (1:3155) and keeps the
+	/// authored chart image. Mirrors android.
+	@State private var range = "3M"
+
 	var body: some View {
 		let u = figmaUnit
 		VStack(spacing: 14 * u) {
@@ -274,31 +279,10 @@ private struct PortfolioSummary: View {
 			.frame(maxWidth: .infinity, alignment: .leading)
 			.padding(.leading, 20 * u)
 
-			Image("MsChartLine")
-				.resizable()
-				.scaledToFit()
-				.frame(width: 343 * u, height: 73.56 * u)
+			RangeLineChart(range: range, tint: teal, authored: "MsChartLine", width: 343 * u, height: 73.56 * u)
 
-			HStack(spacing: 37 * u) {
-				ForEach(["1D", "1W", "1M", "3M", "YTD", "1Y"], id: \.self) { label in
-					if label == "3M" {
-						Text(label)
-							.font(StakFont.geist(12 * u, .medium))
-							.foregroundStyle(teal)
-							.frame(width: 39 * u, height: 22.5 * u)
-							.background(Color(argb: 0x292C9DBC), in: RoundedRectangle(cornerRadius: 11.25 * u))
-							.overlay(
-								RoundedRectangle(cornerRadius: 11.25 * u)
-									.strokeBorder(Color(argb: 0x662C9DBC), lineWidth: 0.75 * u)
-							)
-					} else {
-						Text(label)
-							.font(StakFont.geist(12 * u))
-							.foregroundStyle(muted)
-					}
-				}
-			}
-			.padding(.top, 26 * u)
+			RangePills(selected: $range, tint: teal, muted: muted)
+				.padding(.top, 26 * u)
 
 			Rectangle()
 				.fill(track)

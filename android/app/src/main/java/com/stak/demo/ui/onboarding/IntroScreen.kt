@@ -46,18 +46,22 @@ fun IntroScreen(onGetStarted: () -> Unit) {
 				.padding(horizontal = (24 * u).dp)
 				.padding(top = (24 * u).dp),
 		) {
-			Column(verticalArrangement = Arrangement.spacedBy((12 * u).dp)) {
+			// Authored gap 12 (title box 68+62 -> subtitle 142). Sora 26 at line
+			// height 31 is BELOW the face's natural 32.8, and Compose does not let
+			// a line box shrink under natural, so the two-line title measures 1.8
+			// taller than the frame's 62; the gap absorbs it (StakTest vs the 2x
+			// export of 1:179, 2026-09-05: subtitle sat +1.8 under the title).
+			Column(verticalArrangement = Arrangement.spacedBy((10.2 * u).dp)) {
 				Text(
 					text = "Find stocks you actually understand.",
 					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (26 * u).sp, lineHeight = (31 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
 					color = StakColors.TextPrimary,
 				)
 				Text(
-					text = "STAK turns brands you already know into simple, clear stock ideas, so you can invest with confidence.",
-					// RENDER-measured (2x ref): the authored break is after
-					// "simple," (frame line1 ink 922, line2 991). At the authored 14 the
-					// build pulls "clear" up - the 342u (authored column) width pin forces the
-					// authored wrap (the earlier comment had the break backwards).
+					// The authored two-line shape breaks after "simple," (1:179). With the
+					// static Geist face the run is ~0.7% narrower than Figma's, so "clear"
+					// slipped onto line 1 - the break is explicit (2026-09-05).
+					text = "STAK turns brands you already know into simple,\nclear stock ideas, so you can invest with confidence.",
 					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp, lineHeight = (21 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
 					color = Auth.SubtitleGray,
 					modifier = Modifier.width((342 * u).dp),
@@ -66,10 +70,11 @@ fun IntroScreen(onGetStarted: () -> Unit) {
 			// Hero — flattened Figma group (render bounds 342x488 at 1x),
 			// scaled to the artboard unit so proportions hold on wide devices.
 			Box(
-				// The hero art render sits at authored y235 (template-matched
-				// against 1:179). 33.15 = re-measured on StakTest vs the 2x export
-				// after FIGMA_LINE_BOX gave the title/subtitle their full boxes
-				// (the old 38.25 left the art 5.1 low, 2026-09-05).
+				// The hero art render sits at authored y235 (Hero frame y200 +
+				// 34.95; the flattened group's first vector tops out at 235.5 in
+				// 1:179). The old 33.15 was measured while the title block ran 1.8
+				// tall - that excess now lives in the title/subtitle gap above, so
+				// the pad is the authored one again (StakTest, 2026-09-05).
 				modifier = Modifier.weight(1f).fillMaxWidth(),
 				contentAlignment = Alignment.TopCenter,
 			) {
@@ -77,7 +82,7 @@ fun IntroScreen(onGetStarted: () -> Unit) {
 					painter = painterResource(R.drawable.intro_hero_box),
 					contentDescription = null,
 					contentScale = ContentScale.Fit,
-					modifier = Modifier.padding(top = (33.15 * u).dp).size((342 * u).dp, (488 * u).dp),
+					modifier = Modifier.padding(top = (34.95 * u).dp).size((342 * u).dp, (488 * u).dp),
 				)
 			}
 		}

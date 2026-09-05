@@ -243,8 +243,10 @@ private struct DeckCardBody: View {
 				}
 			}
 			// This frame's card authors looser text gaps than a uniform 87.4%
-			// scale of the Discover card (1:1627) — the extra row paddings are
-			// render-fitted against the 2x export of 1:344 (Android ca6e3de).
+			// scale of the Discover card (1:1627) — the row insets are render-fitted
+			// against the 2x export of 1:344. Re-fitted 2026-09-05 with the Android
+			// build: the old (0.85, 0.85, 1.65, 0.4) left every row 2.2-3.2 low, so
+			// the body now starts 1.35 ABOVE the template gap (negative padding).
 			VStack(alignment: .leading, spacing: 19 * u) {
 				VStack(alignment: .leading, spacing: 8 * u) {
 					Text(card.ticker)
@@ -254,7 +256,7 @@ private struct DeckCardBody: View {
 						.font(StakFont.geist(16 * u))
 						.stakLineHeight(23 * u, size: 16 * u, face: .geist)
 						.foregroundStyle(Color.white)
-						.padding(.top, 0.85 * u)
+						.padding(.top, 0.55 * u)
 					HStack(alignment: .bottom, spacing: 9 * u) {
 						Text(card.price)
 							.font(StakFont.sora(20 * u, .semiBold))
@@ -264,7 +266,7 @@ private struct DeckCardBody: View {
 							.foregroundStyle(Disc.green)
 							.padding(.bottom, 2 * u)
 					}
-					.padding(.top, 1.65 * u)
+					.padding(.top, 0.95 * u)
 				}
 				HStack(spacing: 8 * u) {
 					Text("TIP")
@@ -280,12 +282,12 @@ private struct DeckCardBody: View {
 				.padding(.horizontal, 12 * u)
 				.padding(.vertical, 9 * u)
 				.background(Disc.tealTint, in: RoundedRectangle(cornerRadius: 10 * u))
-				.padding(.top, 0.4 * u)
+				.padding(.top, 0.1 * u)
 			}
 			.frame(maxWidth: .infinity, alignment: .leading)
 			.padding(.horizontal, 18 * u)
 			.padding(.bottom, 16 * u)
-			.padding(.top, 0.85 * u)
+			.padding(.top, -1.35 * u)
 		}
 		.padding(.top, 4 * u)
 		.padding(.bottom, 4 * u)

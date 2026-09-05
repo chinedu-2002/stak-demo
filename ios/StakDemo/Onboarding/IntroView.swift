@@ -13,34 +13,39 @@ struct IntroView: View {
 		let u = figmaUnit
 		Artboard {
 			VStack(alignment: .leading, spacing: 16 * u) {
-				VStack(alignment: .leading, spacing: 12 * u) {
+				// Authored gap 12 (title box 68+62 -> subtitle 142). Sora 26 at line
+				// height 31 is below the face's natural 32.76 and stakLineHeight cannot
+				// shrink a line under natural, so the two-line title runs
+				// 2 x 32.76 - 62 = 3.52 tall; the gap absorbs it (derived from the
+				// recorded face metric - re-measure on a Mac; mirrors the Android
+				// fix of 2026-09-05 where Compose's excess measured 1.8).
+				VStack(alignment: .leading, spacing: 8.48 * u) {
 					Text("Find stocks you actually understand.")
 						.font(StakFont.sora(26 * u, .semiBold))
 						.stakLineHeight(31 * u, size: 26 * u, face: .sora)
 						.foregroundStyle(StakColors.textPrimary)
-					Text("STAK turns brands you already know into simple, clear stock ideas, so you can invest with confidence.")
-						// Wrap-true 14x0.95: the rendered Geist shapes ~5% wider
-						// than authored, and the authored break is
-						// "...into simple, clear / stock ideas...".
+					// The authored two-line shape breaks after "simple," (1:179); the
+					// break is explicit so a face-width drift can never pull "clear" up
+					// (mirrors Android, 2026-09-05).
+					Text("STAK turns brands you already know into simple,\nclear stock ideas, so you can invest with confidence.")
 						.font(StakFont.geist(14 * u))
 						.stakLineHeight(21 * u, size: 14 * u, face: .geist)
-					// RENDER-measured: the authored break is after "simple," -
-					// the 342u (authored column) width pin forces the authored wrap (mirrors android).
-					.frame(width: 342 * u, alignment: .leading)
+						.frame(width: 342 * u, alignment: .leading)
 						.foregroundStyle(Auth.subtitleGray)
 				}
 				.frame(maxWidth: .infinity, alignment: .leading)
 
 				// Hero — flattened Figma group (render bounds 342x488 at 1x),
 				// scaled to the artboard unit so proportions hold on wide devices.
-				// The hero art render sits at authored y235 (template-matched; 33.15 re-measured 2026-09-05 with the full line boxes, mirrors android
-				// against 1:179); this slot tops out at 200, so offset 35 —
-				// plus 3.25 measured on-device so text and art shift as one.
+				// The hero art render sits at authored y235 (Hero frame y200 + 34.95;
+				// the flattened group's first vector tops out at 235.5 in 1:179).
+				// The title's natural-height excess is absorbed by the gap above, so
+				// this is the authored pad (mirrors Android, 2026-09-05).
 				Image("IntroHeroBox")
 					.resizable()
 					.scaledToFit()
 					.frame(width: 342 * u, height: 488 * u)
-					.padding(.top, 33.15 * u)
+					.padding(.top, 34.95 * u)
 					.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
 			}
 			.padding(.horizontal, 24 * u)

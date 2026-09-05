@@ -225,7 +225,9 @@ internal val DECK = listOf(
 	DeckCard(
 		R.drawable.disc_card_googl, "GOOGL · Alphabet Inc",
 		"Search pays for everything, and nine billion-user products ride behind it.",
-		"$178.90", "▲ 0.8% today", "Ad money moves with the economy, so some quarters just drift.",
+		// One authored line (1:2061, 265 wide): the peek-card/tutorial copy
+		// "Ad money moves with the economy, so some quarters just drift." runs 315u.
+		"$178.90", "▲ 0.8% today", "Ad money tracks the economy. Some quarters drift.",
 		Color(0xFF263D5D), Color(0xFF2F486E),
 	),
 )
@@ -776,7 +778,11 @@ private fun DeckCardBody(card: DeckCard, onSave: (() -> Unit)?, u: Float, rows: 
 				)
 				Text(
 					text = card.tip,
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp, lineHeight = (15 * u).sp, letterSpacing = ADVANCE_ROUNDING),
+					// Measured exception (user screenshot, 2026-09-04): the authored
+					// well (1:2061) is ONE line, 265 wide - the AAPL tip fits it by
+					// 11u and the advance-rounding compensation added 12u, so it
+					// wrapped ("...often / do."). The tip run takes no tracking.
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp, lineHeight = (15 * u).sp),
 					color = Disc.Body,
 					modifier = Modifier.weight(1f),
 				)

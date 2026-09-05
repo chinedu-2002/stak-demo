@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.offset
@@ -48,13 +49,16 @@ fun MainTabBar(selected: MainTab, onSelect: (MainTab) -> Unit) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	// ONE stable bar on every tab (user, 2026-08-23): only the active tab
 	// changes; the Discover frame's 75/30 variant is a recorded standing
-	// deviation. The authored 86 bar INCLUDES the home-indicator zone -
-	// the tab row sits at its authored top inset and the system gesture
-	// area overlays the bar's lower band, exactly like the frame.
+	// deviation. The authored 86 bar is the visible band; Android's system
+	// gesture pill gets its OWN band below it (navigation-bar inset, same
+	// #060c1d) instead of overlaying the labels - the pill sat right under
+	// "Home" (user, 2026-09-04: "there should be space"). The iPhone frame
+	// keeps its indicator inside the 86 as authored.
 	Box(
 		modifier = Modifier
 			.fillMaxWidth()
 			.background(Color(0xFF060C1D))
+			.navigationBarsPadding()
 			.height((86 * u).dp),
 	) {
 		Row(

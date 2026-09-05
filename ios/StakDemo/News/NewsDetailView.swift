@@ -1039,16 +1039,33 @@ private struct NativePlayerView: UIViewControllerRepresentable {
 
 		func playerViewController(_ playerViewController: AVPlayerViewController, willBeginFullScreenPresentationWithAnimationCoordinator coordinator: UIViewControllerTransitionCoordinator) {
 			onFullScreenChange(true)
+			// Netflix-style fullscreen (user, 2026-09-05; mirrors Android): the
+			// scene turns to landscape and the clip sits letterboxed at its own
+			// aspect ratio - the inline hero's crop-fill is for the 350x208 box.
+			OrientationLock.shared.allowLandscape(true)
+			playerViewController.videoGravity = .resizeAspect
 			coordinator.animate(alongsideTransition: nil) { [weak self] context in
-				if context.isCancelled { self?.onFullScreenChange(false) }
+				if context.isCancelled {
+					self?.onFullScreenChange(false)
+					OrientationLock.shared.allowLandscape(false)
+					playerViewController.videoGravity = .resizeAspectFill
+				}
 			}
 		}
 
 		func playerViewController(_ playerViewController: AVPlayerViewController, willEndFullScreenPresentationWithAnimationCoordinator coordinator: UIViewControllerTransitionCoordinator) {
+			// Portrait FIRST, so the article underneath never shows in landscape
+			// (its 390-wide artboard scaling is portrait-only).
+			OrientationLock.shared.allowLandscape(false)
 			// Reported once the dismissal has actually completed, so a pending
 			// end-of-clip tears the player down onto a hero that is back inline.
 			coordinator.animate(alongsideTransition: nil) { [weak self] context in
-				if !context.isCancelled { self?.onFullScreenChange(false) }
+				if context.isCancelled {
+					OrientationLock.shared.allowLandscape(true)
+				} else {
+					self?.onFullScreenChange(false)
+					playerViewController.videoGravity = .resizeAspectFill
+				}
 			}
 		}
 
@@ -1064,6 +1081,9 @@ private struct NativePlayerView: UIViewControllerRepresentable {
 		context.coordinator.onFullScreenChange = onFullScreenChange
 		vc.delegate = context.coordinator
 		vc.player = player
+		// The clip fills the 350x208 hero at its own aspect ratio, cropped like
+		// the frame's hero image (fullscreen switches to letterboxed fit).
+		vc.videoGravity = .resizeAspectFill
 		// System PiP exactly like the reference: the clip floats in its own
 		// window while the article stays scrollable underneath, and
 		// backgrounding the app mid-clip pops it out automatically.

@@ -108,6 +108,9 @@ struct LeaderboardView: View {
 					}
 					.padding(.horizontal, 16 * u)
 					.padding(.vertical, 14 * u)
+					// Authored You card is 64 tall (1:4124) - pinned so the list lands on the
+					// frame's row grid (mirrors the Android leaderboard fix, 2026-09-05).
+					.frame(height: 64 * u)
 					// 1:4155 (exact-design audit 2026-09-04): the You card is r14.
 					.background(Sim.tealTint, in: RoundedRectangle(cornerRadius: 14 * u))
 
@@ -183,6 +186,9 @@ private struct LeaderRow: View {
 		}
 		.padding(.horizontal, 14 * u)
 		.padding(.vertical, 11 * u)
+		// Authored rows are 54 tall with a 16 gap (1:4124) - pinned so nine rows land
+		// on the frame's grid (mirrors the Android leaderboard fix, 2026-09-05).
+		.frame(height: 54 * u)
 		.background(Sim.cardBg, in: RoundedRectangle(cornerRadius: 12 * u))
 	}
 }

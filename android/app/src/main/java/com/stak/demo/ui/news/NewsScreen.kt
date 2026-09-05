@@ -92,13 +92,13 @@ fun NewsScreen(onOpenArticle: (String) -> Unit) {
 			Column(verticalArrangement = Arrangement.spacedBy((4 * u).dp)) {
 				Text(
 					text = "News",
-					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (26 * u).sp, lineHeight = (33 * u).sp),
+					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (26 * u).sp, lineHeight = (33 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 					color = Color.White,
 				)
 				// Authored date line (user, 2026-09-04 (CHINEDU 03 · News 1:1228): the authored look wins).
 				Text(
 					text = "Saturday, July 4",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (13 * u).sp, lineHeight = (17 * u).sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (13 * u).sp, lineHeight = (17 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 					color = News.Muted,
 				)
 			}
@@ -128,14 +128,14 @@ fun NewsScreen(onOpenArticle: (String) -> Unit) {
 				value = query,
 				onValueChange = { query = it },
 				singleLine = true,
-				textStyle = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (13 * u).sp, color = Color.White),
+				textStyle = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (13 * u).sp, color = Color.White, letterSpacing = ADVANCE_ROUNDING),
 				cursorBrush = SolidColor(News.Teal),
 				decorationBox = { inner ->
 					Box(contentAlignment = Alignment.CenterStart) {
 						if (query.isEmpty()) {
 							Text(
 								text = "Search news",
-								style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (13 * u).sp),
+								style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (13 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 								color = News.Faint,
 							)
 						}
@@ -213,12 +213,12 @@ private fun MoodMiniRow() {
 		Column(verticalArrangement = Arrangement.spacedBy((2 * u).dp)) {
 			Text(
 				text = "Market Mood",
-				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (13 * u).sp, lineHeight = (16 * u).sp),
+				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (13 * u).sp, lineHeight = (16 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 				color = Color.White,
 			)
 			Text(
 				text = "Low volatility",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp, lineHeight = (14 * u).sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp, lineHeight = (14 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 				color = News.Teal,
 			)
 		}
@@ -295,14 +295,14 @@ private fun BriefCard(brief: NewsBriefFeed.Brief, onRead: () -> Unit) {
 		)
 		Text(
 			text = brief.title,
-			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (19 * u).sp, lineHeight = (25 * u).sp),
+			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (19 * u).sp, lineHeight = (25 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 			color = News.Ink,
 		)
 		Text(
 			text = brief.body,
 			// Authored Geist Regular 12 / lh17 (1:1265; the earlier 12.2 wrap
 			// tweak assumed 13) - exact-design audit 2026-09-04.
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (17 * u).sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (17 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 			color = News.Ink,
 		)
 		Row(
@@ -312,19 +312,19 @@ private fun BriefCard(brief: NewsBriefFeed.Brief, onRead: () -> Unit) {
 		) {
 			Text(
 				text = brief.source,
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp, lineHeight = (14 * u).sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp, lineHeight = (14 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 				color = News.Ink.copy(alpha = 0.6f),
 			)
 			Spacer(modifier = Modifier.weight(1f))
 			Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy((4 * u).dp)) {
 				Text(
 					text = "Read",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 					color = News.Ink,
 				)
 				Text(
 					text = "\u203a",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 					color = News.Ink,
 				)
 			}
@@ -394,13 +394,13 @@ private fun StoryTile(tag: String, tagWeight: FontWeight, headline: String, sour
 		NewsTag(text = tag, letterSpacing = (0.4 * u + ADVANCE_ROUNDING.value).sp, weight = tagWeight)
 		Text(
 			text = headline,
-			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Light, fontSize = (12 * u).sp, lineHeight = (20 * u).sp),
+			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Light, fontSize = (12 * u).sp, lineHeight = (20 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 			color = Color.White,
 		)
 		Spacer(modifier = Modifier.weight(1f))
 		Text(
 			text = source,
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (10 * u).sp, lineHeight = (13 * u).sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (10 * u).sp, lineHeight = (13 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 			color = News.Muted,
 		)
 	}
@@ -412,7 +412,7 @@ private fun StoryTile(tag: String, tagWeight: FontWeight, headline: String, sour
  * exact-design audit 2026-09-04.
  */
 @Composable
-internal fun NewsTag(text: String, letterSpacing: androidx.compose.ui.unit.TextUnit = 0.sp, weight: FontWeight = FontWeight.Medium) {
+internal fun NewsTag(text: String, letterSpacing: androidx.compose.ui.unit.TextUnit = ADVANCE_ROUNDING, weight: FontWeight = FontWeight.Medium) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Box(
 		modifier = Modifier
@@ -440,7 +440,7 @@ private fun NewsSection(
 		Text(
 			text = title,
 			// Authored header: the 20-tall Sora 16 box + a 2 bottom pad (1:1293) - exact-design audit 2026-09-04.
-			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp, lineHeight = (20 * u).sp),
+			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp, lineHeight = (20 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 			color = News.HeaderGray,
 			modifier = Modifier.padding(bottom = (2 * u).dp),
 		)
@@ -489,7 +489,7 @@ private fun NewsSection(
 					Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().height((16 * u).dp)) {
 						Text(
 							text = "${row.source} · ${row.age}",
-							style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp, lineHeight = (14 * u).sp),
+							style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp, lineHeight = (14 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 							color = News.Muted,
 						)
 						Spacer(modifier = Modifier.weight(1f))
@@ -498,7 +498,7 @@ private fun NewsSection(
 					}
 					Text(
 						text = row.headline,
-						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Light, fontSize = (12 * u).sp, lineHeight = (19 * u).sp),
+						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Light, fontSize = (12 * u).sp, lineHeight = (19 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 						color = Color.White,
 					)
 				}

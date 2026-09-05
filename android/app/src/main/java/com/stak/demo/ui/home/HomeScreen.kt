@@ -63,6 +63,7 @@ import com.stak.demo.R
 import com.stak.demo.ui.theme.Geist
 import com.stak.demo.ui.theme.Sora
 import com.stak.demo.ui.theme.StakColors
+import com.stak.demo.ui.theme.ADVANCE_ROUNDING
 
 /** Palette of the CHINEDU "02 · Home" frames. */
 private object Home {
@@ -228,7 +229,7 @@ private fun TopNav(onProfile: () -> Unit, modifier: Modifier = Modifier) {
 		}
 		Text(
 			text = "$greeting, ${com.stak.demo.ui.UserProfile.greetingName}",
-			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp, lineHeight = (20 * u).sp),
+			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp, lineHeight = (20 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 			color = Color.White,
 		)
 	}
@@ -303,7 +304,7 @@ private fun MarketMoodCard(onOpenNews: () -> Unit) {
 			Column(verticalArrangement = Arrangement.spacedBy((4 * u).dp), modifier = Modifier.width((180 * u).dp)) {
 				Text(
 					text = "Market Mood",
-					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Medium, fontSize = (20 * u).sp, lineHeight = (25 * u).sp),
+					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Medium, fontSize = (20 * u).sp, lineHeight = (25 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 					color = Color.White,
 				)
 				Text(
@@ -313,7 +314,7 @@ private fun MarketMoodCard(onOpenNews: () -> Unit) {
 						withStyle(SpanStyle(color = Home.Teal)) { append(MarketMoodFeed.statusLead) }
 						append(MarketMoodFeed.statusRest)
 					},
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 					color = Color.White,
 				)
 			}
@@ -463,13 +464,13 @@ private fun BoxScope.NewsDeckCard(
 	) {
 		Text(
 			text = title,
-			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Medium, fontSize = (16 * u).sp),
+			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Medium, fontSize = (16 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 			color = Home.CardInk,
 			modifier = Modifier.width((202.9 * u).dp),
 		)
 		Text(
 			text = body,
-			style = TextStyle(fontFamily = Geist, fontWeight = bodyWeight, fontSize = bodySize),
+			style = TextStyle(fontFamily = Geist, fontWeight = bodyWeight, fontSize = bodySize, letterSpacing = ADVANCE_ROUNDING),
 			color = Home.CardInk,
 			modifier = Modifier.width((189.31 * u).dp),
 		)
@@ -512,14 +513,14 @@ private fun WhyThisMattersCard(onOpenMyStak: () -> Unit) {
 			Text(
 				text = "Why this matters to you",
 				// Authored (1:1040): Sora Regular 14 / lh15.
-				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp, lineHeight = (15 * u).sp),
+				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp, lineHeight = (15 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 				color = Color.White,
 			)
 			Text(
 				// Backend-served summary of why today's news matters to THIS
 				// user (holdings + risk profile); authored demo copy this phase.
 				text = WhyThisMattersFeed.body(),
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Light, fontSize = (12 * u).sp, lineHeight = (15 * u).sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Light, fontSize = (12 * u).sp, lineHeight = (15 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 				color = Color.White,
 				modifier = Modifier.width((198 * u).dp),
 			)
@@ -564,7 +565,7 @@ private fun DeckBanner(onOpenDeck: () -> Unit) {
 		) {
 			Text(
 				text = "Take your first deck to build your taste",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Light, fontSize = (12 * u).sp, lineHeight = (15 * u).sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Light, fontSize = (12 * u).sp, lineHeight = (15 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 				color = Color.Black,
 			)
 			// No clickable of its own: the authored connection is on the whole
@@ -578,7 +579,7 @@ private fun DeckBanner(onOpenDeck: () -> Unit) {
 				Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy((3 * u).dp)) {
 					Text(
 						text = "Go to Deck",
-						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (11.49 * u).sp, lineHeight = (15 * u).sp),
+						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (11.49 * u).sp, lineHeight = (15 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 						color = Color.White,
 					)
 					Image(
@@ -628,7 +629,7 @@ private fun FirstRunOverlay(onSeeTodaysPick: () -> Unit, modifier: Modifier = Mo
 			Text(
 				// user, 2026-09-04: grammar fixed, frame typo not copied.
 				text = "See Today’s Pick",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 				color = Color.White,
 				// 1:1083/1:1093: the label box sits at pill centre +0.5 with a
 				// 7.524/5.643 top/bottom padding split, so its cap box rests 1.44

@@ -325,14 +325,14 @@ private fun NewsArticlePage(
 					text = article.headline,
 					// RENDER-measured: the frame draws the headline ~800 device px
 					// wide (≈20sp), not the metadata's 24 — lh32 box stands.
-					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (20 * u).sp, lineHeight = (32 * u).sp),
+					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (20 * u).sp, lineHeight = (32 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 					color = Color.White,
 				)
 				Text(
 					text = article.subtitle,
 					// 14.3: at 14 Compose pulls "in" up to line 1; the frame
 					// breaks after "lineup" (authored 3-line shape, lh22).
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (14.3 * u).sp, lineHeight = (22 * u).sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (14.3 * u).sp, lineHeight = (22 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 					color = News.Muted,
 					// 1:1495: 26 of ink gap under the headline (the column's 15 + 5).
 					modifier = Modifier.padding(top = (5 * u).dp),
@@ -575,7 +575,7 @@ private fun HeroImage(media: NewsMedia, category: String, saved: Boolean, player
 			) {
 				Text(
 					text = category,
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, lineHeight = (13 * u).sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, lineHeight = (13 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 					color = Color.White,
 				)
 			}
@@ -605,7 +605,7 @@ private fun HeroImage(media: NewsMedia, category: String, saved: Boolean, player
 				)
 				Text(
 					text = "Saved to My STAK",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 					color = Color.White,
 				)
 			}
@@ -645,19 +645,19 @@ private fun Byline(source: String, meta: String) {
 		) {
 			Text(
 				text = source.take(1),
-				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (10 * u).sp, lineHeight = (13 * u).sp),
+				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (10 * u).sp, lineHeight = (13 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 				color = Color(0xFF9EADC7),
 			)
 		}
 		Row(horizontalArrangement = Arrangement.spacedBy((5 * u).dp), verticalAlignment = Alignment.CenterVertically) {
 			Text(
 				text = source,
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 				color = Color.White,
 			)
 			Text(
 				text = meta,
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 				color = News.Faint,
 			)
 		}
@@ -684,7 +684,7 @@ private fun AddToStakButton(onClick: () -> Unit) {
 		Text(
 			text = "Add to STAK",
 			// Authored lh 20.69 (1:1535) - exact-design audit 2026-09-04.
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp, lineHeight = (20.69 * u).sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp, lineHeight = (20.69 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 			color = Color.White,
 		)
 		Image(
@@ -725,7 +725,7 @@ private fun StockCard(saved: Boolean, ticker: String, facts: NewsArticleFeed.Sto
 			) {
 				Text(
 					text = facts.name.take(1),
-					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (18 * u).sp, lineHeight = (23 * u).sp),
+					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (18 * u).sp, lineHeight = (23 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 					color = Color(0xFF9EADC7),
 				)
 			}
@@ -733,12 +733,12 @@ private fun StockCard(saved: Boolean, ticker: String, facts: NewsArticleFeed.Sto
 			Column(verticalArrangement = Arrangement.spacedBy((3 * u).dp)) {
 				Text(
 					text = facts.name,
-					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp, lineHeight = (19 * u).sp),
+					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp, lineHeight = (19 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 					color = Color.White,
 				)
 				Text(
 					text = ticker,
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 					color = News.Muted,
 				)
 			}
@@ -767,12 +767,12 @@ private fun StockCard(saved: Boolean, ticker: String, facts: NewsArticleFeed.Sto
 			Column(verticalArrangement = Arrangement.spacedBy((3 * u).dp)) {
 				Text(
 					text = facts.price,
-					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (26 * u).sp, lineHeight = (33 * u).sp),
+					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (26 * u).sp, lineHeight = (33 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 					color = Color.White,
 				)
 				Text(
 					text = facts.change,
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp, lineHeight = (17 * u).sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp, lineHeight = (17 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 					// The app's authored up/down pair (green here, the
 					// My STAK / Simulate red for down moves).
 					color = if (facts.up) News.Green else Color(0xFFFF5A6A),
@@ -794,7 +794,7 @@ private fun StockCard(saved: Boolean, ticker: String, facts: NewsArticleFeed.Sto
 			Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().padding(vertical = (2 * u).dp)) {
 				Text(
 					text = "View $ticker in My STAK",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp, lineHeight = (17 * u).sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp, lineHeight = (17 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 					// 1:1359: the link reads #AEAEAE, not teal (Codex parity audit 2026-09-04).
 					color = Color(0xFFAEAEAE),
 				)
@@ -829,7 +829,7 @@ private fun GistCard(bullets: List<String>) {
 			Image(painterResource(R.drawable.ic_gist_sparkle), null, modifier = Modifier.size((18 * u).dp))
 			Text(
 				text = "The gist",
-				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (14 * u).sp, lineHeight = (18 * u).sp),
+				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (14 * u).sp, lineHeight = (18 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 				color = Color.White,
 			)
 		}
@@ -844,7 +844,7 @@ private fun GistBullet(text: String) {
 		Image(painterResource(R.drawable.ic_gist_check), null, modifier = Modifier.size((16 * u).dp))
 		Text(
 			text = text,
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (13 * u).sp, lineHeight = (19 * u).sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (13 * u).sp, lineHeight = (19 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 			color = News.Body,
 			modifier = Modifier.weight(1f),
 		)
@@ -856,7 +856,7 @@ private fun Paragraph(text: String, size: androidx.compose.ui.unit.TextUnit = 14
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Text(
 		text = text,
-		style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = size * u, lineHeight = line * u),
+		style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = size * u, lineHeight = line * u, letterSpacing = ADVANCE_ROUNDING),
 		color = News.Body,
 	)
 }
@@ -876,7 +876,7 @@ private fun PullQuote(text: String) {
 		)
 		Text(
 			text = text,
-			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp, lineHeight = (26 * u).sp),
+			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp, lineHeight = (26 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 			color = Color(0xFFD3D3DD),
 			modifier = Modifier.weight(1f),
 		)
@@ -898,13 +898,13 @@ private fun NewToThisCard(body: String) {
 			Image(painterResource(R.drawable.ic_gist_help), null, modifier = Modifier.size((18 * u).dp))
 			Text(
 				text = "New to this?",
-				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (13 * u).sp, lineHeight = (18 * u).sp),
+				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (13 * u).sp, lineHeight = (18 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 				color = News.Teal,
 			)
 		}
 		Text(
 			text = body,
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (13 * u).sp, lineHeight = (20 * u).sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (13 * u).sp, lineHeight = (20 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 			color = News.Body,
 		)
 	}
@@ -919,7 +919,7 @@ private fun SourceRow() {
 	) {
 		Text(
 			text = "Source",
-			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = (13 * u).sp),
+			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = (13 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 			color = Color.White,
 		)
 		Spacer(modifier = Modifier.weight(1f))
@@ -942,7 +942,7 @@ private fun KeyStatsCard(facts: NewsArticleFeed.StockFacts) {
 			Image(painterResource(R.drawable.ic_gist_info), null, modifier = Modifier.size((18 * u).dp))
 			Text(
 				text = "Key stats",
-				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (14 * u).sp, lineHeight = (18 * u).sp),
+				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (14 * u).sp, lineHeight = (18 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 				color = Color.White,
 			)
 		}
@@ -967,12 +967,12 @@ private fun StatCell(label: String, value: String, modifier: Modifier = Modifier
 	Column(verticalArrangement = Arrangement.spacedBy((3 * u).dp), modifier = modifier) {
 		Text(
 			text = label,
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp, lineHeight = (14 * u).sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp, lineHeight = (14 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 			color = News.Faint,
 		)
 		Text(
 			text = value,
-			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (13 * u).sp, lineHeight = (16 * u).sp),
+			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (13 * u).sp, lineHeight = (16 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 			color = Color.White,
 		)
 	}
@@ -990,7 +990,7 @@ private fun ArticleTag(text: String) {
 	) {
 		Text(
 			text = text,
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (11 * u).sp, lineHeight = (14 * u).sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (11 * u).sp, lineHeight = (14 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 			color = News.Muted,
 		)
 	}
@@ -1036,12 +1036,12 @@ private fun ReadNext(currentId: String, onOpen: (String) -> Unit) {
 				Column(verticalArrangement = Arrangement.spacedBy((5 * u).dp), modifier = Modifier.weight(1f)) {
 					Text(
 						text = "${next.source} · ${next.age}",
-						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp, lineHeight = (14 * u).sp),
+						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp, lineHeight = (14 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 						color = News.Muted,
 					)
 					Text(
 						text = next.headline,
-						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp, lineHeight = (19 * u).sp),
+						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp, lineHeight = (19 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 						color = Color.White,
 					)
 				}
@@ -1091,7 +1091,7 @@ private fun SaveSuccessOverlay(facts: NewsArticleFeed.StockFacts, onViewInMyStak
 				Image(painterResource(R.drawable.ic_sheet_check), null, modifier = Modifier.size((47 * u).dp))
 				Text(
 					text = "Saved to My STAK",
-					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (18 * u).sp),
+					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (18 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 					color = Color.White,
 				)
 			}
@@ -1110,32 +1110,32 @@ private fun SaveSuccessOverlay(facts: NewsArticleFeed.StockFacts, onViewInMyStak
 				) {
 					Text(
 						text = facts.shortName.take(1),
-						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp),
+						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 						color = Color(0xFF9EADC7),
 					)
 				}
 				Column(verticalArrangement = Arrangement.spacedBy((2 * u).dp), modifier = Modifier.weight(1f)) {
 					Text(
 						text = facts.shortName,
-						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp),
+						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 						color = Color.White,
 					)
 					Text(
 						text = "${facts.price} today",
-						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (10 * u).sp),
+						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (10 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 						color = News.Muted,
 					)
 				}
 				Text(
 					// "+4.84% today" -> "▲ 4.84%" (the sheet's authored format).
 					text = "${if (facts.up) "▲" else "▼"} ${facts.change.drop(1).removeSuffix(" today")}",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 					color = if (facts.up) News.Green else Color(0xFFFF5A6A),
 				)
 			}
 			Text(
 				text = "Watching from today · no money committed",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (18 * u).sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (18 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 				color = News.Body,
 				modifier = Modifier.fillMaxWidth(),
 			)
@@ -1155,7 +1155,7 @@ private fun SaveSuccessOverlay(facts: NewsArticleFeed.StockFacts, onViewInMyStak
 				) {
 					Text(
 						text = "View in My STAK",
-						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp),
+						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 						color = Color.White,
 					)
 				}
@@ -1173,7 +1173,7 @@ private fun SaveSuccessOverlay(facts: NewsArticleFeed.StockFacts, onViewInMyStak
 				) {
 					Text(
 						text = "Back",
-						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp),
+						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 						color = News.Muted,
 					)
 				}
@@ -1653,7 +1653,7 @@ private fun HeroControls(
 			) {
 				Text(
 					text = clock(shownPosition) + " / " + clock(duration),
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (16 * u).sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (16 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 					color = Color(0xF2FFFFFF),
 				)
 				Spacer(modifier = Modifier.weight(1f))
@@ -1747,7 +1747,7 @@ private fun ControlGlyph(
 private fun CueText(text: String, u: Float, modifier: Modifier = Modifier) {
 	Text(
 		text = text,
-		style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (13 * u).sp, lineHeight = (17 * u).sp),
+		style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (13 * u).sp, lineHeight = (17 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 		color = Color(0xFFFFE14D),
 		textAlign = TextAlign.Center,
 		modifier = modifier
@@ -1766,7 +1766,7 @@ private fun NoticePill(text: String, u: Float, modifier: Modifier = Modifier) {
 	) {
 		Text(
 			text = text,
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (11 * u).sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (11 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 			color = Color.White,
 		)
 	}
@@ -1864,7 +1864,7 @@ private fun PipPlaceholder(u: Float, modifier: Modifier = Modifier, onTap: () ->
 			)
 			Text(
 				text = "This video is playing in picture in picture.",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 				color = Color(0xB3FFFFFF),
 			)
 		}
@@ -2121,13 +2121,13 @@ private fun SheetRow(
 		}
 		Text(
 			text = label,
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (16 * u).sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (16 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 			color = Color(0xE6FFFFFF),
 		)
 		if (value != null) {
 			Text(
 				text = " · $value",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (16 * u).sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (16 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 				color = SheetGray,
 			)
 		}
@@ -2166,7 +2166,7 @@ private fun SheetHeader(title: String, u: Float, onBack: () -> Unit) {
 		Spacer(modifier = Modifier.width((18 * u).dp))
 		Text(
 			text = title,
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp, letterSpacing = (0.3f * u).sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp, letterSpacing = (0.3f * u + ADVANCE_ROUNDING.value).sp),
 			color = SheetGray,
 		)
 	}

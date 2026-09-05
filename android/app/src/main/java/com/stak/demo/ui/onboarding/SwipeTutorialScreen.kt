@@ -101,12 +101,12 @@ fun SwipeTutorialScreen(onBack: () -> Unit, onContinue: () -> Unit) {
 			Column(verticalArrangement = Arrangement.spacedBy((12 * u).dp)) {
 				Text(
 					text = "Now try a few swipes.",
-					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (24 * u).sp, lineHeight = (31 * u).sp),
+					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (24 * u).sp, lineHeight = (31 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 					color = StakColors.TextPrimary,
 				)
 				Text(
 					text = "Swipe down for the next card. Save what you like.",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 					color = Auth.SubtitleGray,
 				)
 			}
@@ -192,7 +192,7 @@ fun SwipeTutorialScreen(onBack: () -> Unit, onContinue: () -> Unit) {
 					}
 					Text(
 						text = "Swipe down",
-						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (8.73 * u).sp),
+						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (8.73 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 						color = Auth.FaintText,
 					)
 				}

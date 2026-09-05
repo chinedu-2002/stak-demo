@@ -68,12 +68,12 @@ fun PermissionsScreen(onBack: () -> Unit, onContinue: () -> Unit) {
 			Column(verticalArrangement = Arrangement.spacedBy((12 * u).dp)) {
 				Text(
 					text = "Stay in the loop",
-					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (26 * u).sp),
+					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (26 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 					color = StakColors.TextPrimary,
 				)
 				Text(
 					text = "Two quick permissions so STAK can alert you and keep your account secure.",
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 					color = Auth.SubtitleGray,
 					modifier = Modifier.width((276 * u).dp),
 				)
@@ -94,7 +94,7 @@ fun PermissionsScreen(onBack: () -> Unit, onContinue: () -> Unit) {
 
 			Text(
 				text = "You can change these anytime in Settings.",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 				color = Auth.FaintText,
 			)
 		}
@@ -136,12 +136,12 @@ private fun PermissionCard(title: String, description: String, checked: Boolean,
 		Column(verticalArrangement = Arrangement.spacedBy((4 * u).dp), modifier = Modifier.weight(1f)) {
 			Text(
 				text = title,
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 				color = StakColors.TextPrimary,
 			)
 			Text(
 				text = description,
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp, letterSpacing = ADVANCE_ROUNDING),
 				color = Auth.SubtitleGray,
 			)
 		}

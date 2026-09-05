@@ -433,7 +433,7 @@ private fun HeroImage(media: NewsMedia, category: String, saved: Boolean, player
 						// The clip fills the hero at ITS aspect ratio, cropped
 						// like the frame's hero image - a raw TextureView
 						// stretched it to the 350x208 box (user, 2026-09-05).
-						factory = { c -> VideoSurfaceHost(c, exo, zoom = true) },
+						factory = { c -> VideoSurfaceHost(c, exo, zoom = true, cornerRadiusPx = 10 * u * c.resources.displayMetrics.density) },
 						// Per-view clear (never clearVideoSurface): the mini
 						// player, the OS PiP overlay or the fullscreen view may
 						// already own the surface.
@@ -1194,6 +1194,7 @@ private fun SaveSuccessOverlay(facts: NewsArticleFeed.StockFacts, onViewInMyStak
  * embeddable player (WebView), any other link through the platform
  * VideoView. Both autoplay once the user tapped the play glyph.
  */
+@androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
 @Composable
 private fun NewsVideoPlayer(video: NewsMedia.Video, modifier: Modifier = Modifier, paused: Boolean = false, onDone: () -> Unit = {}) {
 	val embed = video.youTubeEmbedUrl
@@ -1250,7 +1251,8 @@ private fun NewsVideoPlayer(video: NewsMedia.Video, modifier: Modifier = Modifie
 		androidx.compose.ui.viewinterop.AndroidView(
 			modifier = modifier,
 			factory = { ctx ->
-				val player = androidx.media3.exoplayer.ExoPlayer.Builder(ctx).build().apply {
+				// Same deep-audio-buffer renderers as the cached player.
+				val player = androidx.media3.exoplayer.ExoPlayer.Builder(ctx).setRenderersFactory(SmoothAudioRenderersFactory(ctx)).build().apply {
 					setMediaItem(androidx.media3.common.MediaItem.fromUri(video.url))
 					addListener(object : androidx.media3.common.Player.Listener {
 						override fun onPlayerError(error: androidx.media3.common.PlaybackException) {
@@ -1271,8 +1273,8 @@ private fun NewsVideoPlayer(video: NewsMedia.Video, modifier: Modifier = Modifie
 					prepare()
 					playWhenReady = true
 				}
-				// Aspect-correct, cropped to the hero (never stretched).
-				VideoSurfaceHost(ctx, player, zoom = true).also { it.tag = player }
+				// Aspect-correct, cropped to the hero (never stretched), r10 corners.
+				VideoSurfaceHost(ctx, player, zoom = true, cornerRadiusPx = 10f * ctx.resources.displayMetrics.widthPixels / 390f).also { it.tag = player }  // 10u in px (figmaUnit x density)
 			},
 			// Play/pause toggle: ExoPlayer.pause keeps the position, so
 			// resuming continues where the clip stopped.
@@ -1331,11 +1333,9 @@ private object NewsVideoCache {
 					.setPrioritizeTimeOverSizeThresholds(true)
 					.build(),
 			)
-			// A decoder that fails to init (emulators, odd devices) falls
-			// back to the next one instead of killing the clip.
-			.setRenderersFactory(
-				androidx.media3.exoplayer.DefaultRenderersFactory(ctx).setEnableDecoderFallback(true),
-			)
+			// Deep AudioTrack buffer against crackling on slow audio paths
+			// (user, 2026-09-05 Pixel emulator) + decoder fallback.
+			.setRenderersFactory(SmoothAudioRenderersFactory(ctx))
 			.build().apply {
 				// Audible by default: media usage + audio focus (user,
 				// 2026-08-30 "no audio?").
@@ -1955,7 +1955,7 @@ private fun MiniPlayer(player: HeroPlayer, u: Float) {
 			// (now gone) view clears itself per-view, so the order is safe.
 			AndroidView(
 				modifier = Modifier.matchParentSize(),
-				factory = { c -> VideoSurfaceHost(c, exo, zoom = true) },
+				factory = { c -> VideoSurfaceHost(c, exo, zoom = true, cornerRadiusPx = 10 * u * c.resources.displayMetrics.density) },
 				onRelease = { v -> v.release() },
 			)
 			if (chrome) {

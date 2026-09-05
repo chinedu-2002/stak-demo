@@ -1,6 +1,7 @@
 package com.stak.demo.ui.simulate
 
 import com.stak.demo.ui.theme.FIGMA_LINE_BOX
+import com.stak.demo.ui.theme.fractionalSpacedBy
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -85,7 +86,9 @@ fun LeaderboardScreen(onBack: () -> Unit) {
 			}
 		}
 		Column(
-			verticalArrangement = Arrangement.spacedBy((16 * u).dp),
+			// Fractional gaps: nine 16u gaps rounded per step drifted the last rows 1.8
+			// above the frame (StakTest vs the 2x export of 1:4124, 2026-09-05).
+			verticalArrangement = fractionalSpacedBy((16 * u).dp),
 			modifier = Modifier
 				.weight(1f)
 				.fillMaxWidth()

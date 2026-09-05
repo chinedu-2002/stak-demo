@@ -20,6 +20,7 @@ final class Session: ObservableObject {
 	private static let keyGoal = "stak.goalAnswer"
 	private static let keyRiskAnswer = "stak.riskAnswer"
 	private static let keyNotif = "stak.notificationsOn"
+	private static let keyPrefs = "stak.prefs"
 
 	@Published private(set) var signedIn: Bool
 
@@ -45,6 +46,15 @@ final class Session: ObservableObject {
 		UserProfile.shared.goal = d.object(forKey: Self.keyGoal) as? Int ?? -1
 		UserProfile.shared.risk = d.object(forKey: Self.keyRiskAnswer) as? Int ?? -1
 		UserProfile.shared.notificationsOn = d.object(forKey: Self.keyNotif) as? Bool ?? true
+		if let prefs = d.dictionary(forKey: Self.keyPrefs) {
+			let p = UserProfile.shared
+			p.priceAlerts = prefs["priceAlerts"] as? Bool ?? true
+			p.dailyDeck = prefs["dailyDeck"] as? Bool ?? true
+			p.marketNews = prefs["marketNews"] as? Bool ?? false
+			p.appearance = prefs["appearance"] as? String ?? "dark"
+			p.linkedGoogle = prefs["linkedGoogle"] as? Bool ?? false
+			p.linkedApple = prefs["linkedApple"] as? Bool ?? false
+		}
 		UserProfile.shared.photoData = Self.loadPhoto()
 		applyAccount()
 	}
@@ -85,6 +95,12 @@ final class Session: ObservableObject {
 		UserProfile.shared.goal = -1
 		UserProfile.shared.risk = -1
 		UserProfile.shared.notificationsOn = true
+		UserProfile.shared.priceAlerts = true
+		UserProfile.shared.dailyDeck = true
+		UserProfile.shared.marketNews = false
+		UserProfile.shared.appearance = "dark"
+		UserProfile.shared.linkedGoogle = false
+		UserProfile.shared.linkedApple = false
 		let d = UserDefaults.standard
 		d.removeObject(forKey: Self.keySignedIn)
 		d.removeObject(forKey: Self.keyName)
@@ -95,6 +111,7 @@ final class Session: ObservableObject {
 		d.removeObject(forKey: Self.keyGoal)
 		d.removeObject(forKey: Self.keyRiskAnswer)
 		d.removeObject(forKey: Self.keyNotif)
+		d.removeObject(forKey: Self.keyPrefs)
 		Self.savePhoto(nil)
 		applyAccount()
 	}
@@ -109,6 +126,8 @@ final class Session: ObservableObject {
 		d.set(UserProfile.shared.goal, forKey: Self.keyGoal)
 		d.set(UserProfile.shared.risk, forKey: Self.keyRiskAnswer)
 		d.set(UserProfile.shared.notificationsOn, forKey: Self.keyNotif)
+		let p = UserProfile.shared
+		d.set(["priceAlerts": p.priceAlerts, "dailyDeck": p.dailyDeck, "marketNews": p.marketNews, "appearance": p.appearance, "linkedGoogle": p.linkedGoogle, "linkedApple": p.linkedApple] as [String: Any], forKey: Self.keyPrefs)
 		Self.savePhoto(UserProfile.shared.photoData)
 	}
 

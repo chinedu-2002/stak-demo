@@ -9,6 +9,8 @@ struct SignInView: View {
 	let onBack: () -> Void
 	let onSignIn: () -> Void
 	let onCreateAccount: () -> Void
+	/// "Forgot password?" -> the reset flow (product audit, 2026-09-05).
+	var onForgot: () -> Void = {}
 
 	@State private var email = ""
 	@State private var password = ""
@@ -59,7 +61,7 @@ struct SignInView: View {
 							ShowHideToggle(shown: $showPassword)
 						}
 						.error(attempted ? passwordError : nil)
-						Button(action: { /* recovery flow not designed yet */ }) {
+						Button(action: onForgot) {
 							Text("Forgot password?")
 								.font(StakFont.geist(12 * u, .medium))
 								.foregroundStyle(Auth.linkTeal)

@@ -8,6 +8,8 @@ private enum PushedPage: Identifiable, Equatable {
 	/// collection id (MyStak/Collections.swift).
 	case collection(id: String)
 	case profile
+	case notifications
+	case settings(SettingsKind)
 	case simPortfolio
 	/// Codex parity audit (2026-09-04): carries the tapped pick's ticker
 	/// (Simulate/PickDetailView.swift PickSpecs).
@@ -20,6 +22,8 @@ private enum PushedPage: Identifiable, Equatable {
 		case .stockDetail(let fromMyStak, let symbol): return "stockDetail-\(fromMyStak)-\(symbol)"
 		case .collection(let id): return "collection-\(id)"
 		case .profile: return "profile"
+		case .notifications: return "notifications"
+		case .settings(let kind): return "settings-\(kind.rawValue)"
 		case .simPortfolio: return "simPortfolio"
 		case .simPick(let symbol): return "simPick-\(symbol)"
 		case .leaderboard: return "leaderboard"
@@ -161,6 +165,8 @@ struct MainTabsView: View {
 							// the avatar's Profile push (1:1003, BACK) returns to first run.
 							onSeeTodaysPick: { homeFirstRun = false; switchTab(.discover) },
 							onProfile: { push(.profile) },
+							// Product audit (2026-09-05): the bell opens the inbox.
+							onBell: { push(.notifications) },
 							onOpenNews: { homeFirstRun = false; switchTab(.news) },
 							onOpenMyStak: { homeFirstRun = false; switchTab(.myStak) },
 							onOpenDeck: { homeFirstRun = false; switchTab(.discover) }
@@ -304,7 +310,11 @@ struct MainTabsView: View {
 			)
 		case .profile:
 			// Authored (171:995): Back = BACK action - the house back pop.
-			ProfileView(onBack: { pop() }, onLogOut: onLogOut)
+			ProfileView(onBack: { pop() }, onLogOut: onLogOut, onOpenSetting: { kind in push(.settings(kind)) })
+		case .notifications:
+			NotificationsView(onBack: { pop() }, onOpenSettings: { push(.settings(.notifications)) })
+		case .settings(let kind):
+			SettingsView(kind: kind, onBack: { pop() })
 		case .simPortfolio:
 			SimPortfolioView(
 				// Authored (1:4496): Back -> Simulate home, Instant; rows and

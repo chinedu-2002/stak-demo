@@ -8,6 +8,7 @@ import SwiftUI
 enum FlowScreen: Hashable {
 	case createAccount
 	case signIn
+	case forgotPassword
 	case welcome
 	case brandPicks
 	case swipeTutorial
@@ -127,6 +128,8 @@ struct RootFlowView: View {
 				// as Push Left; socials/CTA leave to Home first run as Push
 				// Right; the "Create account" link dissolves back.
 				onBack: { pop(.pushLeft) },
+				// Product audit (2026-09-05): the link opens the reset flow.
+				onForgot: { push(.forgotPassword, .pushRight) },
 				onSignIn: {
 					// Signed in = the demo account with its authored history
 					// (product audit, 2026-09-05); remembered across launches.
@@ -137,6 +140,9 @@ struct RootFlowView: View {
 				onCreateAccount: { pop(.dissolve) }
 			)
 			.id(FlowScreen.signIn)
+		case .forgotPassword:
+			ForgotPasswordView(onBack: { pop() })
+				.id(FlowScreen.forgotPassword)
 		case .welcome:
 			IntroView { push(.brandPicks, .pushRight) }
 				.id(FlowScreen.welcome)

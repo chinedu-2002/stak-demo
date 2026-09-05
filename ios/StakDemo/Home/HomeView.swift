@@ -87,6 +87,8 @@ struct HomeView: View {
 	let firstRun: Bool
 	let onSeeTodaysPick: () -> Void
 	var onProfile: () -> Void = {}
+	/// The bell opens the inbox (product audit, 2026-09-05).
+	var onBell: () -> Void = {}
 	var onOpenNews: () -> Void = {}
 	var onOpenMyStak: () -> Void = {}
 	var onOpenDeck: () -> Void = {}
@@ -99,7 +101,7 @@ struct HomeView: View {
 				// content — the greeting block lives inside scroll content.
 				ScrollView {
 					VStack(spacing: 0) {
-						TopNav(onProfile: onProfile)
+						TopNav(onProfile: onProfile, onBell: onBell)
 							.padding(.horizontal, 17 * u)
 						Spacer().frame(height: 21 * u)
 						VStack(spacing: 0) {
@@ -139,6 +141,7 @@ struct HomeView: View {
 /// block). Scrolls with the content (118:1633); authored side inset 17.
 private struct TopNav: View {
 	let onProfile: () -> Void
+	var onBell: () -> Void = {}
 	@ObservedObject var profile = UserProfile.shared
 	@ObservedObject var notifications = StakNotifications.shared
 	/// Time-of-day in the user's own timezone (device clock); re-read every
@@ -174,7 +177,7 @@ private struct TopNav: View {
 					}
 				}
 				.contentShape(Rectangle())
-				.onTapGesture { StakNotifications.shared.markAllRead() }
+				.onTapGesture { onBell() }
 				.accessibilityLabel("Notifications")
 				Spacer().frame(width: 4 * u)
 				Button(action: onProfile) {

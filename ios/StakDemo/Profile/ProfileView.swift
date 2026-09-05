@@ -36,6 +36,8 @@ struct ProfileView: View {
 	@ObservedObject private var profile = UserProfile.shared
 	let onBack: () -> Void
 	var onLogOut: () -> Void = {}
+	/// The rows open their settings pages (product audit, 2026-09-05).
+	var onOpenSetting: (SettingsKind) -> Void = { _ in }
 	/// Observed (like HomeView's TopNav) so a photo picked / name typed in
 	/// 09 Profile setup re-renders the avatar block.
 	@ObservedObject var profile = UserProfile.shared
@@ -148,7 +150,7 @@ struct ProfileView: View {
 					VStack(spacing: 0) {
 						ForEach(settingsRows, id: \.self) { label in
 							Button {
-								// Settings screens land in a later phase.
+								onOpenSetting(SettingsKind(row: label))
 							} label: {
 								HStack {
 									Text(label)
@@ -216,6 +218,18 @@ private struct ProfileStat: View {
 			Text(label)
 				.font(StakFont.geist(11 * u))
 				.foregroundStyle(StakColors.muted)
+		}
+	}
+}
+
+extension SettingsKind {
+	/// The Profile hub's row label -> its page.
+	init(row: String) {
+		switch row {
+		case "Notifications": self = .notifications
+		case "Appearance": self = .appearance
+		case "Linked accounts": self = .linked
+		default: self = .help
 		}
 	}
 }

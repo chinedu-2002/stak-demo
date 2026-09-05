@@ -11,6 +11,8 @@ struct TasteRevealView: View {
 	let onBack: () -> Void
 	let onLetsGo: () -> Void
 	@ObservedObject private var profile = UserProfile.shared
+	// Product audit (2026-09-05): the Risk style row opens a picker sheet.
+	@State private var showRisk = false
 
 	var body: some View {
 		let u = figmaUnit
@@ -90,6 +92,9 @@ struct TasteRevealView: View {
 					.padding(.trailing, 14 * u)
 					.padding(.vertical, 13 * u)
 					.background(Auth.inputBg, in: RoundedRectangle(cornerRadius: 14 * u))
+					.contentShape(Rectangle())
+					.onTapGesture { showRisk = true }
+					.sheet(isPresented: $showRisk) { RiskStyleSheet(onDismiss: { showRisk = false }) }
 
 					Text("Your deck adjusts as you swipe.")
 						.font(StakFont.geist(11 * u))

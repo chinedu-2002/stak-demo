@@ -83,7 +83,7 @@ struct PermissionsView: View {
 }
 
 /// One permission row — #181f30 r14 card, copy column + the 42x24 toggle.
-private struct PermissionCard: View {
+struct PermissionCard: View {
 	let title: String
 	let description: String
 	@Binding var isOn: Bool

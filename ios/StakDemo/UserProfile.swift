@@ -24,6 +24,13 @@ final class UserProfile: ObservableObject {
 	@Published var risk: Int = -1
 	/// 08 Permissions: the user's answer, and the OS grant when it was asked (product audit, 2026-09-05).
 	@Published var notificationsOn: Bool = true
+	// The settings pages behind the Profile hub (product audit, 2026-09-05).
+	@Published var priceAlerts: Bool = true
+	@Published var dailyDeck: Bool = true
+	@Published var marketNews: Bool = false
+	@Published var appearance: String = "dark"
+	@Published var linkedGoogle: Bool = false
+	@Published var linkedApple: Bool = false
 
 	/// The name as the app addresses the user - always capitalized.
 	var greetingName: String {

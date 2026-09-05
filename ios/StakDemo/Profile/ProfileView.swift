@@ -33,6 +33,7 @@ private let settingsRows = ["Notifications", "Appearance", "Linked accounts", "H
 /// exactly like the Android build's `u` scaling.
 /// Ports android/ ui/profile/ProfileScreen.kt.
 struct ProfileView: View {
+	@ObservedObject private var profile = UserProfile.shared
 	let onBack: () -> Void
 	var onLogOut: () -> Void = {}
 	/// Observed (like HomeView's TopNav) so a photo picked / name typed in
@@ -93,13 +94,18 @@ struct ProfileView: View {
 							.font(StakFont.geist(11 * u, .medium))
 							.foregroundStyle(StakColors.muted)
 						HStack(spacing: 8 * u) {
-							ForEach(tasteChips, id: \.label) { chip in
+							// The demo account keeps the authored chips at their pinned widths; a new
+							// account's chips come from its onboarding answers and hug their labels
+							// (product audit, 2026-09-05).
+							let chips: [TasteChip] = Session.shared.demoAccount ? tasteChips : TasteModel.chips(profile.brandPicks, goal: profile.goal, risk: profile.risk).map { TasteChip(label: $0, width: 0) }
+							ForEach(chips, id: \.label) { chip in
 								Text(chip.label)
 									.font(StakFont.geist(12 * u, .medium))
 									.foregroundStyle(chipInk)
 									.lineLimit(1)
 									.fixedSize(horizontal: true, vertical: false)
-									.frame(width: chip.width * u, height: 28 * u)
+									.frame(width: chip.width > 0 ? chip.width * u : nil, height: 28 * u)
+									.padding(.horizontal, chip.width > 0 ? 0 : 12 * u)
 									.background(chipBg, in: RoundedRectangle(cornerRadius: 14 * u))
 									.overlay(
 										RoundedRectangle(cornerRadius: 14 * u)

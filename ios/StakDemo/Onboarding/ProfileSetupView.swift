@@ -17,7 +17,9 @@ struct ProfileSetupView: View {
 	let onProceed: () -> Void
 
 	// The frame arrives with "Nedu" typed (avatar "N", counter 4 / 20) - user, 2026-09-04 (CHINEDU 01 · Onboarding 1:793): the exact frame wins.
-	@State private var name = "Nedu"
+	// Product audit (2026-09-05): a real first run starts with an empty name (the
+	// frame's "Nedu" was authored demo state) and Proceed waits for one.
+	@State private var name = ""
 	@State private var showPhotoPicker = false
 	@State private var pickedItem: PhotosPickerItem? = nil
 	/// The picked photo as a ~512px JPEG (tens of KB) - never the original.
@@ -90,7 +92,7 @@ struct ProfileSetupView: View {
 
 				// Name input — #181f30 r14 card with the live "n / 20" counter.
 				HStack {
-					TextField("", text: $name)
+					TextField("Your name", text: $name)
 						.font(StakFont.geist(14 * u))
 						.foregroundStyle(StakColors.textPrimary)
 						.tint(StakColors.accent)
@@ -119,7 +121,7 @@ struct ProfileSetupView: View {
 			.padding(.top, 14 * u)
 
 			VStack(spacing: 0) {
-				AuthCta(text: "Proceed to home", action: {
+				AuthCta(text: "Proceed to home", enabled: !name.trimmingCharacters(in: .whitespaces).isEmpty, action: {
 					UserProfile.shared.displayName = name.trimmingCharacters(in: .whitespaces).capitalizedWords
 					UserProfile.shared.photoData = photoData
 					onProceed()

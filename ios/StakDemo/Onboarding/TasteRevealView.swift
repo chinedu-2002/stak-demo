@@ -1,22 +1,5 @@
 import SwiftUI
 
-/// One taste bar — label, strength word (its own gray), fill fraction of the track.
-private struct TasteBar: Identifiable {
-	let label: String
-	let strength: String
-	let strengthColor: Color
-	let fraction: CGFloat
-	var id: String { label }
-}
-
-/// Figma fills 286/248/165/70 over the 310px track.
-private let bars: [TasteBar] = [
-	TasteBar(label: "Tech curious", strength: "Strong", strengthColor: Color(argb: 0xFF69B3CA), fraction: 286 / 310),
-	TasteBar(label: "Growth seeking", strength: "Strong", strengthColor: Color(argb: 0xFF69B3CA), fraction: 248 / 310),
-	TasteBar(label: "Consumer brands", strength: "Medium", strengthColor: Color(argb: 0xFF819ABB), fraction: 165 / 310),
-	TasteBar(label: "Income & dividends", strength: "Light", strengthColor: Color(argb: 0xFF5C6B85), fraction: 70 / 310)
-]
-
 /// Onboarding · 07 Taste reveal — Figma node 1554:9051 (CHINEDU file, "STEP 6 OF 6").
 ///
 /// The quiz result: teal eyebrow, "Here's what you're into." headline,
@@ -27,6 +10,7 @@ private let bars: [TasteBar] = [
 struct TasteRevealView: View {
 	let onBack: () -> Void
 	let onLetsGo: () -> Void
+	@ObservedObject private var profile = UserProfile.shared
 
 	var body: some View {
 		let u = figmaUnit
@@ -58,7 +42,8 @@ struct TasteRevealView: View {
 
 					// Taste card — four strength bars.
 					VStack(spacing: 14 * u) {
-						ForEach(bars) { bar in
+						// Product audit (2026-09-05): the bars come from the user's picks and answers.
+						ForEach(TasteModel.bars(profile.brandPicks, goal: profile.goal, risk: profile.risk)) { bar in
 							VStack(spacing: 6 * u) {
 								HStack {
 									Text(bar.label)
@@ -92,7 +77,7 @@ struct TasteRevealView: View {
 							Text("Risk style")
 								.font(StakFont.geist(11 * u))
 								.foregroundStyle(StakColors.muted)
-							Text("Growth-Oriented")
+							Text(profile.riskStyle)
 								.font(StakFont.geist(14 * u, .medium))
 								.foregroundStyle(StakColors.textPrimary)
 						}

@@ -24,7 +24,8 @@ struct MatrixQuizView: View {
 	let subtitle: String
 	let options: [MatrixOption]
 	let onBack: () -> Void
-	let onContinue: () -> Void
+	/// Continue reports the chosen card's index.
+	let onContinue: (Int) -> Void
 	/// The frames arrive with one card already selected (04 Goal 1554:8828,
 	/// 05 Risk 1554:8913); the caller names it (Codex parity audit
 	/// 2026-09-04). -1 = start unselected. Declared last: memberwise-init
@@ -83,8 +84,8 @@ struct MatrixQuizView: View {
 			}
 
 			VStack(spacing: 10 * u) {
-				AuthCta(text: "Continue") {
-					if selected >= 0 { onContinue() }
+				AuthCta(text: "Continue", enabled: selected >= 0) {
+					if selected >= 0 { onContinue(selected) }
 				}
 				AuthSecondaryButton(text: "Back", action: onBack)
 			}

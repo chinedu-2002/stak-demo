@@ -15,6 +15,13 @@ final class UserProfile: ObservableObject {
 	/// why-this-matters summary; the backend computes/refines it in
 	/// production. Authored demo default until then.
 	@Published var riskStyle: String = "Growth-Oriented"
+	// The onboarding answers (product audit, 2026-09-05): they shape the taste reveal,
+	// the risk style and the Profile chips instead of going nowhere.
+	@Published var brandPicks: Set<String> = []
+	/// 04 Goal card index, -1 until answered (TasteModel.goal*).
+	@Published var goal: Int = -1
+	/// 05 Risk card index, -1 until answered (TasteModel.risk*).
+	@Published var risk: Int = -1
 
 	/// The name as the app addresses the user - always capitalized.
 	var greetingName: String {

@@ -224,6 +224,10 @@ struct ShowHideToggle: View {
 /// Sharp-cornered 52pt CTA — 3-stop a6e4f7/5da8bf/3c98b4 gradient, white Geist Medium 14 (CHINEDU 1:873).
 struct AuthCta: View {
 	let text: String
+	/// A gated step (no picks / no answer / no name) shows the CTA at half strength
+	/// and swallows the tap (product audit, 2026-09-05). Declared before `action` so
+	/// trailing-closure callers keep working.
+	var enabled: Bool = true
 	let action: () -> Void
 
 	var body: some View {
@@ -253,6 +257,8 @@ struct AuthCta: View {
 				)
 		}
 		.buttonStyle(.plain)
+		.disabled(!enabled)
+		.opacity(enabled ? 1 : 0.5)
 		// Authored glow (1:873): teal drop shadows cast downward — the
 		// soft wash behind the rows under the button.
 		.background(

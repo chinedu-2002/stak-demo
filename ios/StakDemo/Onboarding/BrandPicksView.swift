@@ -23,7 +23,6 @@ private let brands: [Brand] = [
 ]
 
 /// The five tiles selected on the authored frame (1554:8541), by brand name.
-private let figmaPicks: Set<String> = ["Apple", "Tesla", "Nike", "Spotify", "Coinbase"]
 
 /// Onboarding · 02 Brand picks — Figma node 1554:8541 (CHINEDU file, "STEP 2 OF 6").
 ///
@@ -38,7 +37,9 @@ struct BrandPicksView: View {
 	// The frame (1554:8541) arrives with five brands already picked and the
 	// CTA reading "Continue · 5 picked"; the build starts in that state
 	// (Codex parity audit 2026-09-04). Every tile stays toggleable.
-	@State private var picked: Set<String> = figmaPicks
+	// Product audit (2026-09-05): a real first run starts with nothing picked (the
+	// frame's five were authored demo state).
+	@State private var picked: Set<String> = []
 
 	var body: some View {
 		let u = figmaUnit
@@ -95,9 +96,12 @@ struct BrandPicksView: View {
 			}
 
 			VStack(spacing: 10 * u) {
-				AuthCta(text: picked.isEmpty ? "Continue" : "Continue · \(picked.count) picked") {
+				AuthCta(text: picked.isEmpty ? "Continue" : "Continue · \(picked.count) picked", enabled: picked.count >= 3) {
 					// User's call (2026-08-21): Continue unlocks at three picks.
-					if picked.count >= 3 { onContinue() }
+					if picked.count >= 3 {
+						UserProfile.shared.brandPicks = picked
+						onContinue()
+					}
 				}
 				AuthSecondaryButton(text: "Back", action: onBack)
 				Text("You can change this later")

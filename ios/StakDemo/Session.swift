@@ -16,6 +16,9 @@ final class Session: ObservableObject {
 	/// to the photo file (see loadPhoto).
 	private static let keyPhoto = "stak.photoData"
 	private static let keyDemo = "stak.demoAccount"
+	private static let keyPicks = "stak.brandPicks"
+	private static let keyGoal = "stak.goalAnswer"
+	private static let keyRiskAnswer = "stak.riskAnswer"
 
 	@Published private(set) var signedIn: Bool
 
@@ -37,6 +40,9 @@ final class Session: ObservableObject {
 		demoAccount = d.object(forKey: Self.keyDemo) as? Bool ?? true
 		UserProfile.shared.displayName = d.string(forKey: Self.keyName) ?? ""
 		if let risk = d.string(forKey: Self.keyRisk) { UserProfile.shared.riskStyle = risk }
+		UserProfile.shared.brandPicks = Set(d.stringArray(forKey: Self.keyPicks) ?? [])
+		UserProfile.shared.goal = d.object(forKey: Self.keyGoal) as? Int ?? -1
+		UserProfile.shared.risk = d.object(forKey: Self.keyRiskAnswer) as? Int ?? -1
 		UserProfile.shared.photoData = Self.loadPhoto()
 		applyAccount()
 	}
@@ -67,12 +73,18 @@ final class Session: ObservableObject {
 		UserProfile.shared.displayName = ""
 		UserProfile.shared.photoData = nil
 		UserProfile.shared.riskStyle = "Growth-Oriented"
+		UserProfile.shared.brandPicks = []
+		UserProfile.shared.goal = -1
+		UserProfile.shared.risk = -1
 		let d = UserDefaults.standard
 		d.removeObject(forKey: Self.keySignedIn)
 		d.removeObject(forKey: Self.keyName)
 		d.removeObject(forKey: Self.keyRisk)
 		d.removeObject(forKey: Self.keyPhoto)
 		d.removeObject(forKey: Self.keyDemo)
+		d.removeObject(forKey: Self.keyPicks)
+		d.removeObject(forKey: Self.keyGoal)
+		d.removeObject(forKey: Self.keyRiskAnswer)
 		Self.savePhoto(nil)
 		applyAccount()
 	}
@@ -83,6 +95,9 @@ final class Session: ObservableObject {
 		d.set(demoAccount, forKey: Self.keyDemo)
 		d.set(UserProfile.shared.displayName, forKey: Self.keyName)
 		d.set(UserProfile.shared.riskStyle, forKey: Self.keyRisk)
+		d.set(Array(UserProfile.shared.brandPicks).sorted(), forKey: Self.keyPicks)
+		d.set(UserProfile.shared.goal, forKey: Self.keyGoal)
+		d.set(UserProfile.shared.risk, forKey: Self.keyRiskAnswer)
 		Self.savePhoto(UserProfile.shared.photoData)
 	}
 

@@ -19,9 +19,13 @@ struct RiskView: View {
 				MatrixOption(title: "Sell some, reduce risk", subtitle: "I’d rather protect part of my money", icon: "RiskShield", iconSize: 20, circleSize: 36, iconDy: 9.95)
 			],
 			onBack: onBack,
-			onContinue: onContinue,
-			// 1554:8913 arrives with "Sell some, reduce risk" selected.
-			initialSelection: 3
+			// Product audit (2026-09-05): nothing pre-selected; the answer IS the risk
+			// style the reveal and Profile show.
+			onContinue: { choice in
+				UserProfile.shared.risk = choice
+				UserProfile.shared.riskStyle = TasteModel.riskStyle(choice)
+				onContinue()
+			}
 		)
 	}
 }

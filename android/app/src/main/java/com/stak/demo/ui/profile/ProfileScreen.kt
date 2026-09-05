@@ -52,6 +52,7 @@ private val ChipInk = Color(0xFF7FD4E8)
  * YOUR TASTE chips, the paper stats card, the settings list and the
  * Log out hairline button.
  */
+@OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
 @Composable
 fun ProfileScreen(onBack: () -> Unit, onLogOut: () -> Unit = {}) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
@@ -132,17 +133,28 @@ fun ProfileScreen(onBack: () -> Unit, onLogOut: () -> Unit = {}) {
 					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (11 * u).sp, lineHeight = (14 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
 					color = Muted,
 				)
-				Row(horizontalArrangement = Arrangement.spacedBy((8 * u).dp)) {
+				// A new account's chips hug their labels and may not fit one row - they wrap.
+				androidx.compose.foundation.layout.FlowRow(horizontalArrangement = Arrangement.spacedBy((8 * u).dp), verticalArrangement = Arrangement.spacedBy((8 * u).dp)) {
 				// Authored chip widths (171:1004): 97 / 94 / 125 — pinned so the
 				// row fills the 332 content width and the labels never wrap.
-				listOf("Tech Curious" to 97, "High Growth" to 94, "Consumer Brands" to 125).forEach { (label, w) ->
+				// The demo account keeps the authored chips at their pinned widths; a
+				// new account's chips come from its onboarding answers and hug their
+				// labels (product audit, 2026-09-05).
+				val profile = com.stak.demo.ui.UserProfile
+				val chips: List<Pair<String, Int?>> = if (com.stak.demo.ui.Session.demoAccount) {
+					listOf("Tech Curious" to 97, "High Growth" to 94, "Consumer Brands" to 125)
+				} else {
+					com.stak.demo.ui.onboarding.TasteModel.chips(profile.brandPicks, profile.goal, profile.risk).map { it to null }
+				}
+				chips.forEach { (label, w) ->
 					Box(
 						contentAlignment = Alignment.Center,
 						modifier = Modifier
-							.requiredSize((w * u).dp, (28 * u).dp)
+							.then(if (w != null) Modifier.requiredSize((w * u).dp, (28 * u).dp) else Modifier.height((28 * u).dp))
 							.clip(RoundedCornerShape((14 * u).dp))
 							.background(ChipBg)
-							.border((1 * u).dp, ChipBorder, RoundedCornerShape((14 * u).dp)),
+							.border((1 * u).dp, ChipBorder, RoundedCornerShape((14 * u).dp))
+							.padding(horizontal = if (w == null) (12 * u).dp else 0.dp),
 					) {
 						Text(
 							text = label,

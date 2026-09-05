@@ -41,7 +41,6 @@ private data class Brand(val name: String, val iconRes: Int)
 
 /** The 12 brand tiles of Figma "Onboarding · 02 Brand picks" (1554:8541), in grid order. */
 /** The five tiles selected on the authored frame, by brand name. */
-private val FIGMA_PICKS = setOf("Apple", "Tesla", "Nike", "Spotify", "Coinbase")
 
 private val BRANDS = listOf(
 	Brand("Apple", R.drawable.brand_apple),
@@ -73,7 +72,9 @@ fun BrandPicksScreen(onBack: () -> Unit, onContinue: () -> Unit) {
 	// The frame (1554:8541) arrives with five brands already picked and the
 	// CTA reading "Continue · 5 picked"; the build starts in that state
 	// (Codex parity audit 2026-09-04). Every tile stays toggleable.
-	var picked by rememberSaveable { mutableStateOf(FIGMA_PICKS) }
+	// Product audit (2026-09-05): a real first run starts with nothing picked
+	// (the frame's five were authored demo state).
+	var picked by rememberSaveable { mutableStateOf(setOf<String>()) }
 
 	Artboard(modifier = Modifier.background(StakColors.Bg)) {
 		// Nav row — back circle + step label.
@@ -145,7 +146,13 @@ fun BrandPicksScreen(onBack: () -> Unit, onContinue: () -> Unit) {
 			AuthCta(
 				text = if (picked.isEmpty()) "Continue" else "Continue · ${picked.size} picked",
 				// User's call (2026-08-21): Continue unlocks at three picks.
-				onClick = { if (picked.size >= 3) onContinue() },
+				enabled = picked.size >= 3,
+				onClick = {
+					if (picked.size >= 3) {
+						com.stak.demo.ui.UserProfile.brandPicks = picked
+						onContinue()
+					}
+				},
 			)
 			AuthSecondaryButton(text = "Back", onClick = onBack)
 			Text(

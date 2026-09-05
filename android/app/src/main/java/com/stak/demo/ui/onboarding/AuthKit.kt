@@ -23,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.Brush
@@ -231,13 +232,18 @@ internal fun ShowHideToggle(shown: Boolean, onToggle: () -> Unit) {
 
 /** Sharp-cornered 52dp CTA — 3-stop a6e4f7/5da8bf/3c98b4 gradient, white Geist Medium 14 (CHINEDU 1:873). */
 @Composable
-internal fun AuthCta(text: String, onClick: () -> Unit) {
+internal fun AuthCta(text: String, enabled: Boolean = true, onClick: () -> Unit) {
 	val u = figmaUnit()
 	Box(
 		modifier = Modifier
 			.fillMaxWidth()
 			.padding(horizontal = (20 * u).dp)
 			.height((52 * u).dp)
+			// A gated step (no picks / no answer / no name) shows the CTA at half
+			// strength - glow, fill and label alike - and swallows the tap
+			// (product audit, 2026-09-05). alpha() only dims what is drawn AFTER
+			// it in the chain, so it sits before the glow and the fill.
+			.alpha(if (enabled) 1f else 0.5f)
 			// Authored glow (1:873): teal drop shadows cast downward — the
 			// soft wash behind the rows under the button.
 			.drawBehind {
@@ -263,7 +269,7 @@ internal fun AuthCta(text: String, onClick: () -> Unit) {
 				RoundedCornerShape((6 * u).dp),
 			)
 			.border((0.36 * u).dp, StakColors.CtaBorderBrush, RoundedCornerShape((6 * u).dp))
-			.clickable(onClick = onClick),
+			.clickable(enabled = enabled, onClick = onClick),
 		contentAlignment = Alignment.Center,
 	) {
 		Text(

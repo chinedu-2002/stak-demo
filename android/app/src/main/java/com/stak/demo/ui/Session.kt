@@ -20,6 +20,9 @@ object Session {
 	private const val KEY_PHOTO = "photo_uri"
 	private const val KEY_RISK = "risk_style"
 	private const val KEY_DEMO = "demo_account"
+	private const val KEY_PICKS = "brand_picks"
+	private const val KEY_GOAL = "goal_answer"
+	private const val KEY_RISK_ANSWER = "risk_answer"
 
 	private var prefs: SharedPreferences? = null
 
@@ -50,6 +53,9 @@ object Session {
 		UserProfile.displayName = p.getString(KEY_NAME, "") ?: ""
 		UserProfile.photoUri = p.getString(KEY_PHOTO, null)
 		UserProfile.riskStyle = p.getString(KEY_RISK, UserProfile.riskStyle) ?: UserProfile.riskStyle
+		UserProfile.brandPicks = p.getString(KEY_PICKS, "")?.split(",")?.filter { it.isNotBlank() }?.toSet() ?: emptySet()
+		UserProfile.goal = p.getInt(KEY_GOAL, -1)
+		UserProfile.risk = p.getInt(KEY_RISK_ANSWER, -1)
 		applyAccount()
 	}
 
@@ -79,6 +85,9 @@ object Session {
 		UserProfile.displayName = ""
 		UserProfile.photoUri = null
 		UserProfile.riskStyle = "Growth-Oriented"
+		UserProfile.brandPicks = emptySet()
+		UserProfile.goal = -1
+		UserProfile.risk = -1
 		prefs?.edit()?.clear()?.apply()
 		applyAccount()
 	}
@@ -90,6 +99,9 @@ object Session {
 			?.putString(KEY_NAME, UserProfile.displayName)
 			?.putString(KEY_PHOTO, UserProfile.photoUri)
 			?.putString(KEY_RISK, UserProfile.riskStyle)
+			?.putString(KEY_PICKS, UserProfile.brandPicks.joinToString(","))
+			?.putInt(KEY_GOAL, UserProfile.goal)
+			?.putInt(KEY_RISK_ANSWER, UserProfile.risk)
 			?.apply()
 	}
 }

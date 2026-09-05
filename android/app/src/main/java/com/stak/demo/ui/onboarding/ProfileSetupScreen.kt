@@ -61,7 +61,9 @@ private const val NAME_MAX = 20
 fun ProfileSetupScreen(onBack: () -> Unit, onProceed: () -> Unit) {
 	val u = figmaUnit()
 	// The frame arrives with "Nedu" typed (avatar "N", counter 4 / 20) - user, 2026-09-04 (CHINEDU 01 · Onboarding 1:793): the exact frame wins.
-	var name by rememberSaveable { mutableStateOf("Nedu") }
+	// Product audit (2026-09-05): a real first run starts with an empty name
+	// (the frame's "Nedu" was authored demo state) and Proceed waits for one.
+	var name by rememberSaveable { mutableStateOf("") }
 	// User's motion (2026-08-21): Add a photo opens the system gallery and
 	// the chosen image becomes the avatar. The photo picker carries its own
 	// permission flow, so no runtime permission is requested by the app.
@@ -195,6 +197,18 @@ fun ProfileSetupScreen(onBack: () -> Unit, onProceed: () -> Unit) {
 					),
 					cursorBrush = SolidColor(StakColors.Accent),
 					modifier = Modifier.weight(1f),
+					decorationBox = { inner ->
+						Box(contentAlignment = Alignment.CenterStart) {
+							if (name.isEmpty()) {
+								Text(
+									text = "Your name",
+									style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp),
+									color = StakColors.Muted,
+								)
+							}
+							inner()
+						}
+					},
 				)
 				Text(
 					text = "${name.length} / $NAME_MAX",
@@ -211,7 +225,7 @@ fun ProfileSetupScreen(onBack: () -> Unit, onProceed: () -> Unit) {
 		}
 
 		Column(modifier = Modifier.fillMaxWidth().padding(top = (8 * u).dp, bottom = (26 * u).dp)) {
-			AuthCta(text = "Proceed to home", onClick = {
+			AuthCta(text = "Proceed to home", enabled = name.isNotBlank(), onClick = {
 				com.stak.demo.ui.UserProfile.displayName = name.trim().capitalizeWords()
 				com.stak.demo.ui.UserProfile.photoUri = photoUri
 				onProceed()

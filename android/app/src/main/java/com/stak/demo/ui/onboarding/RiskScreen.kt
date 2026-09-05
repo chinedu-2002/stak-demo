@@ -22,8 +22,12 @@ fun RiskScreen(onBack: () -> Unit, onContinue: () -> Unit) {
 			MatrixOption("Sell some, reduce risk", "I’d rather protect part of my money", R.drawable.ic_risk_shield, iconSize = 20.dp, circleSize = 36.dp, iconDy = 9.95f),
 		),
 		onBack = onBack,
-		onContinue = onContinue,
-		// 1554:8913 arrives with "Sell some, reduce risk" selected.
-		initialSelection = 3,
+		// Product audit (2026-09-05): nothing pre-selected; the answer IS the
+		// risk style the reveal and Profile show.
+		onContinue = { choice ->
+			com.stak.demo.ui.UserProfile.risk = choice
+			com.stak.demo.ui.UserProfile.riskStyle = TasteModel.riskStyle(choice)
+			onContinue()
+		},
 	)
 }

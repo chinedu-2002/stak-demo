@@ -180,34 +180,10 @@ struct ProfileView: View {
 							.contentShape(Rectangle())
 					}
 					.buttonStyle(.plain)
-					// Authored glow (171:1037): the teal drop-shadow stack cast
-					// downward, same as the auth CTAs (user, 2026-09-04: exact frame).
-					.background(
-						ZStack {
-							RoundedRectangle(cornerRadius: 6 * u)
-								.fill(Color(argb: 0xFF52AAC7).opacity(0.10))
-								.blur(radius: 3.25 * u)
-								.offset(y: 2.89 * u)
-							RoundedRectangle(cornerRadius: 6 * u)
-								.fill(Color(argb: 0xFF52AAC7).opacity(0.09))
-								.blur(radius: 6.14 * u)
-								.offset(y: 12.29 * u)
-							RoundedRectangle(cornerRadius: 6 * u)
-								.fill(Color(argb: 0xFF52AAC7).opacity(0.05))
-								.blur(radius: 8.31 * u)
-								.offset(y: 28.18 * u)
-							RoundedRectangle(cornerRadius: 6 * u)
-								.fill(Color(argb: 0xFF52AAC7).opacity(0.01))
-								.blur(radius: 9.76 * u)
-								.offset(y: 49.86 * u)
-							// Figma casts the glow OUTSIDE only ("show behind transparent
-							// areas" off): the unfilled button must not tint from the
-							// stack beneath it (mirrors android, 2026-09-05).
-							RoundedRectangle(cornerRadius: 6 * u)
-								.fill(StakColors.bg)
-						}
-						.allowsHitTesting(false)
-					)
+					// 171:1037 authors the auth CTAs' teal drop-shadow stack, but the button
+					// has NO fill and Figma casts shadows from the rendered alpha - the 0.36
+					// hairline at 33% renders nothing (the 2x export is pure #0A1020 under the
+					// button). No glow (mirrors Android, 2026-09-05).
 				}
 				.padding(.horizontal, 20 * u)
 				.padding(.top, 16 * u)

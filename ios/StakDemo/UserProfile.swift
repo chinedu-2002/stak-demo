@@ -22,6 +22,8 @@ final class UserProfile: ObservableObject {
 	@Published var goal: Int = -1
 	/// 05 Risk card index, -1 until answered (TasteModel.risk*).
 	@Published var risk: Int = -1
+	/// 08 Permissions: the user's answer, and the OS grant when it was asked (product audit, 2026-09-05).
+	@Published var notificationsOn: Bool = true
 
 	/// The name as the app addresses the user - always capitalized.
 	var greetingName: String {

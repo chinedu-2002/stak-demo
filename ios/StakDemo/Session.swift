@@ -19,6 +19,7 @@ final class Session: ObservableObject {
 	private static let keyPicks = "stak.brandPicks"
 	private static let keyGoal = "stak.goalAnswer"
 	private static let keyRiskAnswer = "stak.riskAnswer"
+	private static let keyNotif = "stak.notificationsOn"
 
 	@Published private(set) var signedIn: Bool
 
@@ -43,6 +44,7 @@ final class Session: ObservableObject {
 		UserProfile.shared.brandPicks = Set(d.stringArray(forKey: Self.keyPicks) ?? [])
 		UserProfile.shared.goal = d.object(forKey: Self.keyGoal) as? Int ?? -1
 		UserProfile.shared.risk = d.object(forKey: Self.keyRiskAnswer) as? Int ?? -1
+		UserProfile.shared.notificationsOn = d.object(forKey: Self.keyNotif) as? Bool ?? true
 		UserProfile.shared.photoData = Self.loadPhoto()
 		applyAccount()
 	}
@@ -82,6 +84,7 @@ final class Session: ObservableObject {
 		UserProfile.shared.brandPicks = []
 		UserProfile.shared.goal = -1
 		UserProfile.shared.risk = -1
+		UserProfile.shared.notificationsOn = true
 		let d = UserDefaults.standard
 		d.removeObject(forKey: Self.keySignedIn)
 		d.removeObject(forKey: Self.keyName)
@@ -91,6 +94,7 @@ final class Session: ObservableObject {
 		d.removeObject(forKey: Self.keyPicks)
 		d.removeObject(forKey: Self.keyGoal)
 		d.removeObject(forKey: Self.keyRiskAnswer)
+		d.removeObject(forKey: Self.keyNotif)
 		Self.savePhoto(nil)
 		applyAccount()
 	}
@@ -104,6 +108,7 @@ final class Session: ObservableObject {
 		d.set(Array(UserProfile.shared.brandPicks).sorted(), forKey: Self.keyPicks)
 		d.set(UserProfile.shared.goal, forKey: Self.keyGoal)
 		d.set(UserProfile.shared.risk, forKey: Self.keyRiskAnswer)
+		d.set(UserProfile.shared.notificationsOn, forKey: Self.keyNotif)
 		Self.savePhoto(UserProfile.shared.photoData)
 	}
 

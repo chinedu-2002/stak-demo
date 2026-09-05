@@ -1,4 +1,5 @@
 import SwiftUI
+import UserNotifications
 
 /// Onboarding · 08 Permissions — Figma node 1:749 (CHINEDU file,
 /// "STEP · ALMOST THERE").
@@ -59,8 +60,20 @@ struct PermissionsView: View {
 			.padding(.top, 14 * u)
 
 			VStack(spacing: 10 * u) {
-				AuthCta(text: "Allow and continue", action: onContinue)
-				AuthSecondaryButton(text: "Not now", action: onContinue)
+				// Product audit (2026-09-05): "Allow and continue" really asks the OS; the
+				// grant is what the toggle meant. Mirrors Android's POST_NOTIFICATIONS ask.
+				AuthCta(text: "Allow and continue", action: {
+					UserProfile.shared.notificationsOn = notifications
+					guard notifications else { onContinue(); return }
+					UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, _ in
+						DispatchQueue.main.async {
+							notifications = granted
+							UserProfile.shared.notificationsOn = granted
+							onContinue()
+						}
+					}
+				})
+				AuthSecondaryButton(text: "Not now", action: { UserProfile.shared.notificationsOn = false; onContinue() })
 			}
 			.padding(.top, 8 * u)
 			.padding(.bottom, 26 * u)

@@ -190,8 +190,8 @@ private struct NewsArticlePage: View {
 						.font(StakFont.geist(14.3 * u))
 						.stakLineHeight(22 * u, size: 14.3 * u, face: .geist)
 						.foregroundStyle(News.muted)
-						// 1:1495: 26 of ink gap under the headline (the column's 15 + 5).
-						.padding(.top, 5 * u)
+						// The column's 15 alone: the headline box is the authored 64 now
+						// (stakLineHeight pads the half-leading), the old +5 is gone.
 					Byline(source: article.source, meta: article.sourceMeta)
 					if !saved {
 						AddToStakButton(action: onAddToStak)
@@ -227,8 +227,10 @@ private struct NewsArticlePage: View {
 				}
 				.frame(maxWidth: .infinity, alignment: .leading)
 				.padding(.horizontal, 20 * u)
-				// Render-measured vs 1:1495: headline cap-top 68 below the hero.
-				.padding(.top, 26 * u)
+				// Authored Content pad 22 (1:1525). The old 26 compensated the
+				// short headline box; with the half-leading in stakLineHeight the
+				// cap-top lands at the frame's 344 from 22 (mirrors android).
+				.padding(.top, 22 * u)
 				.padding(.bottom, 28 * u)
 			}
 		}

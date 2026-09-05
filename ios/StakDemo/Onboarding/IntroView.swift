@@ -33,14 +33,14 @@ struct IntroView: View {
 
 				// Hero — flattened Figma group (render bounds 342x488 at 1x),
 				// scaled to the artboard unit so proportions hold on wide devices.
-				// The hero art render sits at authored y235 (template-matched
+				// The hero art render sits at authored y235 (template-matched; 33.15 re-measured 2026-09-05 with the full line boxes, mirrors android
 				// against 1:179); this slot tops out at 200, so offset 35 —
 				// plus 3.25 measured on-device so text and art shift as one.
 				Image("IntroHeroBox")
 					.resizable()
 					.scaledToFit()
 					.frame(width: 342 * u, height: 488 * u)
-					.padding(.top, 38.25 * u)
+					.padding(.top, 33.15 * u)
 					.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
 			}
 			.padding(.horizontal, 24 * u)

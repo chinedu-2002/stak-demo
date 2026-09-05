@@ -67,11 +67,20 @@ extension View {
 	/// renders 14.3, Geist 12 at 15 renders 15.6, Sora 20 at 25 renders 25.2,
 	/// Sora 26 at 31 renders 32.76. Those sites are flagged, not hacked.
 	///
+	/// Figma's line box (2026-09-04, measured on Android vs the 2x export of
+	/// 1:1495 and mirrored here): a block is exactly lines x L with the extra
+	/// leading split evenly above and below EVERY line, the first and last
+	/// included - the cap-top of Sora 20 at L 32 sits 8.2 below the box top
+	/// (3.4 half-leading + 4.8 ascender-to-cap). `.lineSpacing` alone put the
+	/// extra only between lines, so every block ran (L - natural) short and
+	/// long pages crept upward; the half-leading padding restores the box.
+	///
 	/// - Parameters:
 	///   - lineHeight: the authored line height, already scaled (`L * u`).
 	///   - size: the point size the preceding `.font(...)` set, already scaled (`S * u`).
 	///   - face: the bundled face that `.font(StakFont.<face>(...))` used.
 	func stakLineHeight(_ lineHeight: CGFloat, size: CGFloat, face: StakFace) -> some View {
-		lineSpacing(max(0, lineHeight - size * face.naturalLineHeightFactor))
+		let extra = max(0, lineHeight - size * face.naturalLineHeightFactor)
+		return lineSpacing(extra).padding(.vertical, extra / 2)
 	}
 }

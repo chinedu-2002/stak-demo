@@ -200,6 +200,11 @@ struct ProfileView: View {
 								.fill(Color(argb: 0xFF52AAC7).opacity(0.01))
 								.blur(radius: 9.76 * u)
 								.offset(y: 49.86 * u)
+							// Figma casts the glow OUTSIDE only ("show behind transparent
+							// areas" off): the unfilled button must not tint from the
+							// stack beneath it (mirrors android, 2026-09-05).
+							RoundedRectangle(cornerRadius: 6 * u)
+								.fill(StakColors.bg)
 						}
 						.allowsHitTesting(false)
 					)

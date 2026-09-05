@@ -1,5 +1,6 @@
 package com.stak.demo.ui.simulate
 
+import com.stak.demo.ui.theme.FIGMA_LINE_BOX
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -143,12 +144,12 @@ internal fun SimulateScreen(
 				Column(verticalArrangement = Arrangement.spacedBy((3 * u).dp)) {
 					Text(
 						text = "Simulate",
-						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (26 * u).sp, lineHeight = (33 * u).sp),
+						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (26 * u).sp, lineHeight = (33 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
 						color = Color.White,
 					)
 					Text(
 						text = "Pick from your saves. Paper money does the talking.",
-						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
+						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
 						color = Sim.Muted,
 					)
 				}
@@ -223,7 +224,7 @@ internal fun SimulateScreen(
 						Text(
 							text = "Portfolio breakdown",
 							// 1:4042: Sora SemiBold 16 on a 1.34 line (21.44).
-							style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp, lineHeight = (21.44 * u).sp),
+							style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp, lineHeight = (21.44 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
 							color = Sim.HeaderGray,
 						)
 						Spacer(modifier = Modifier.weight(1f))
@@ -239,7 +240,7 @@ internal fun SimulateScreen(
 							Text(
 								text = "Portfolio",
 								// 1:4044 (exact-design audit 2026-09-04): Geist 14 on a 1.34 line, teal at 80% - was white.
-								style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp, lineHeight = (18.76 * u).sp),
+								style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp, lineHeight = (18.76 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
 								color = Color(0xCC69B3CA),
 							)
 							// 1:4045 (exact-design audit 2026-09-04): the exported 4.909x9 chevron asset, not a "›" glyph.
@@ -263,7 +264,7 @@ private fun SectionHeader(title: String) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Text(
 		text = title,
-		style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp, lineHeight = (20 * u).sp),
+		style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp, lineHeight = (20 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
 		color = Sim.HeaderGray,
 	)
 }
@@ -330,7 +331,7 @@ private fun ScoreHero(onOpenLeaderboard: () -> Unit) {
 	) {
 		Text(
 			text = "PORTFOLIO VALUE",
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, lineHeight = (13 * u).sp, letterSpacing = (0.9 * u).sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, lineHeight = (13 * u).sp, letterSpacing = (0.9 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
 			color = Sim.Faint,
 			modifier = Modifier.padding(horizontal = (20 * u).dp),
 		)
@@ -339,12 +340,12 @@ private fun ScoreHero(onOpenLeaderboard: () -> Unit) {
 				text = valueText.substringBefore('.'),
 				// Authored box (1:3924) is 55 tall — pin it so the stack sums.
 				// 1:3924 (exact-design audit 2026-09-04): the figure carries no tracking - the -0.44 was never authored.
-				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (44 * u).sp, lineHeight = (55 * u).sp),
+				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (44 * u).sp, lineHeight = (55 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
 				color = Color.White,
 			)
 			Text(
 				text = "." + valueText.substringAfter('.'),
-				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (18 * u).sp, lineHeight = (23 * u).sp),
+				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (18 * u).sp, lineHeight = (23 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
 				color = Sim.Muted,
 				// Authored (1:3923): ".00" starts 8 after the figure and its box
 				// bottom sits 8 above the figure's (55 vs y24+h23). The gap is
@@ -354,25 +355,25 @@ private fun ScoreHero(onOpenLeaderboard: () -> Unit) {
 		}
 		Text(
 			text = "+${PaperPortfolio.usd(PaperPortfolio.allTimeGain)} all time on $" + String.format(java.util.Locale.US, "%,.0f", PaperPortfolio.PAPER_START) + " paper · 12 picks",
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Light, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Light, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
 			color = Sim.Muted,
 			modifier = Modifier.padding(horizontal = (20 * u).dp),
 		)
 		Row(horizontalArrangement = Arrangement.spacedBy((6 * u).dp), modifier = Modifier.padding(horizontal = (20 * u).dp)) {
 			Text(
 				text = "Cash available",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
 				color = Sim.Muted,
 			)
 			Text(
 				text = PaperPortfolio.usd(PaperPortfolio.cash),
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
 				color = Sim.Bright,
 			)
 		}
 		Text(
 			text = "▲ ${PaperPortfolio.WEEK_GAIN} (${PaperPortfolio.WEEK_PCT}) this week",
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
 			color = Sim.Green,
 			modifier = Modifier.padding(horizontal = (20 * u).dp),
 		)
@@ -390,7 +391,7 @@ private fun ScoreHero(onOpenLeaderboard: () -> Unit) {
 		) {
 			Text(
 				text = "#${PaperPortfolio.WEEK_RANK} this week",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
 				color = Sim.Teal,
 			)
 		}
@@ -428,10 +429,10 @@ private fun ScoreHero(onOpenLeaderboard: () -> Unit) {
 							.border((0.75 * u).dp, Color(0x662C9DBC), RoundedCornerShape((11.25 * u).dp))
 							.then(select),
 					) {
-						Text(label, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp), color = Sim.Teal)
+						Text(label, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, lineHeightStyle = FIGMA_LINE_BOX), color = Sim.Teal)
 					}
 				} else {
-					Text(label, style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp, lineHeight = (16 * u).sp), color = Sim.Muted, modifier = select)
+					Text(label, style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, lineHeightStyle = FIGMA_LINE_BOX), color = Sim.Muted, modifier = select)
 				}
 			}
 		}
@@ -512,8 +513,8 @@ internal fun CenterLink(text: String, centered: Boolean = true, onClick: () -> U
 				onClick = onClick,
 			),
 	) {
-		Text(text, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp, lineHeight = (17 * u).sp), color = Sim.Teal)
-		Text("›", style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp, lineHeight = (18 * u).sp), color = Sim.Teal)
+		Text(text, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp, lineHeight = (17 * u).sp, lineHeightStyle = FIGMA_LINE_BOX), color = Sim.Teal)
+		Text("›", style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp, lineHeight = (18 * u).sp, lineHeightStyle = FIGMA_LINE_BOX), color = Sim.Teal)
 	}
 }
 
@@ -538,7 +539,7 @@ private fun InsightCard() {
 		}
 		Text(
 			text = "Three chip stocks drove 70% of your gains this month. Your taste has a type.",
-			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (20 * u).sp),
+			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (20 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
 			color = Sim.Body,
 		)
 	}
@@ -570,7 +571,7 @@ private fun PickDuo(
 				color = Sim.Faint,
 			)
 			Spacer(modifier = Modifier.weight(1f))
-			Text(pct, style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp, lineHeight = (16 * u).sp), color = pctColor)
+			Text(pct, style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, lineHeightStyle = FIGMA_LINE_BOX), color = pctColor)
 		}
 		// 1:3977 / 1:3982 (exact-design audit 2026-09-04): the badge row carries only the
 		// ticker; the "+$24 on $100" line is the card's own third row, 7 below it.
@@ -578,9 +579,9 @@ private fun PickDuo(
 			Box(contentAlignment = Alignment.Center, modifier = Modifier.size((34 * u).dp).background(Sim.ChipBg, CircleShape)) {
 				Text(badge, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (14 * u).sp), color = Sim.BadgeInk)
 			}
-			Text(ticker, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (15 * u).sp), color = Color.White)
+			Text(ticker, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (15 * u).sp, lineHeightStyle = FIGMA_LINE_BOX), color = Color.White)
 		}
-		Text(sub, style = TextStyle(fontFamily = Geist, fontSize = (11 * u).sp, lineHeight = (14 * u).sp), color = Sim.Faint)
+		Text(sub, style = TextStyle(fontFamily = Geist, fontSize = (11 * u).sp, lineHeight = (14 * u).sp, lineHeightStyle = FIGMA_LINE_BOX), color = Sim.Faint)
 	}
 }
 
@@ -612,7 +613,7 @@ private fun HowItWorksCard() {
 				}
 				Text(
 					text = rule,
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (18 * u).sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (18 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
 					color = Sim.Body,
 				)
 			}
@@ -646,20 +647,20 @@ internal fun PortfolioRow(
 			.padding(horizontal = (14 * u).dp, vertical = (12 * u).dp),
 	) {
 		Box(contentAlignment = Alignment.Center, modifier = Modifier.size((40 * u).dp).background(Sim.ChipBg, CircleShape)) {
-			Text(badge, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp, lineHeight = (20 * u).sp), color = Sim.BadgeInk)
+			Text(badge, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp, lineHeight = (20 * u).sp, lineHeightStyle = FIGMA_LINE_BOX), color = Sim.BadgeInk)
 		}
 		Column(verticalArrangement = Arrangement.spacedBy((3 * u).dp), modifier = Modifier.weight(1f)) {
-			Text(ticker, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (15 * u).sp), color = Color.White)
-			Text(sub, style = TextStyle(fontFamily = Geist, fontWeight = if (subLight) FontWeight.Light else FontWeight.Normal, fontSize = (10 * u).sp, lineHeight = (13 * u).sp), color = Sim.Muted)
+			Text(ticker, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (15 * u).sp, lineHeightStyle = FIGMA_LINE_BOX), color = Color.White)
+			Text(sub, style = TextStyle(fontFamily = Geist, fontWeight = if (subLight) FontWeight.Light else FontWeight.Normal, fontSize = (10 * u).sp, lineHeight = (13 * u).sp, lineHeightStyle = FIGMA_LINE_BOX), color = Sim.Muted)
 		}
 		Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy((2 * u).dp)) {
 			Text(
 				amount,
 				// 1:4017 (exact-design audit 2026-09-04): the P&L is Geist Regular, not Medium.
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
 				color = if (up) Sim.Green else Sim.Red,
 			)
-			Text(pct, style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp, lineHeight = (13 * u).sp), color = Sim.Faint)
+			Text(pct, style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp, lineHeight = (13 * u).sp, lineHeightStyle = FIGMA_LINE_BOX), color = Sim.Faint)
 		}
 		if (trailing != null) {
 			trailing()

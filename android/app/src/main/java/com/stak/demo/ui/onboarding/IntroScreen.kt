@@ -1,5 +1,6 @@
 package com.stak.demo.ui.onboarding
 
+import com.stak.demo.ui.theme.FIGMA_LINE_BOX
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -48,7 +49,7 @@ fun IntroScreen(onGetStarted: () -> Unit) {
 			Column(verticalArrangement = Arrangement.spacedBy((12 * u).dp)) {
 				Text(
 					text = "Find stocks you actually understand.",
-					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (26 * u).sp, lineHeight = (31 * u).sp),
+					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (26 * u).sp, lineHeight = (31 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
 					color = StakColors.TextPrimary,
 				)
 				Text(
@@ -57,7 +58,7 @@ fun IntroScreen(onGetStarted: () -> Unit) {
 					// "simple," (frame line1 ink 922, line2 991). At the authored 14 the
 					// build pulls "clear" up - the 342u (authored column) width pin forces the
 					// authored wrap (the earlier comment had the break backwards).
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp, lineHeight = (21 * u).sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp, lineHeight = (21 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
 					color = Auth.SubtitleGray,
 					modifier = Modifier.width((342 * u).dp),
 				)
@@ -66,8 +67,9 @@ fun IntroScreen(onGetStarted: () -> Unit) {
 			// scaled to the artboard unit so proportions hold on wide devices.
 			Box(
 				// The hero art render sits at authored y235 (template-matched
-				// against 1:179); this box tops out at 200, so offset 35 —
-				// plus 3.25 measured on-device so text and art shift as one.
+				// against 1:179). 33.15 = re-measured on StakTest vs the 2x export
+				// after FIGMA_LINE_BOX gave the title/subtitle their full boxes
+				// (the old 38.25 left the art 5.1 low, 2026-09-05).
 				modifier = Modifier.weight(1f).fillMaxWidth(),
 				contentAlignment = Alignment.TopCenter,
 			) {
@@ -75,7 +77,7 @@ fun IntroScreen(onGetStarted: () -> Unit) {
 					painter = painterResource(R.drawable.intro_hero_box),
 					contentDescription = null,
 					contentScale = ContentScale.Fit,
-					modifier = Modifier.padding(top = (38.25 * u).dp).size((342 * u).dp, (488 * u).dp),
+					modifier = Modifier.padding(top = (33.15 * u).dp).size((342 * u).dp, (488 * u).dp),
 				)
 			}
 		}

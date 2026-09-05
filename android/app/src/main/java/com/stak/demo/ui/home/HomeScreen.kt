@@ -1,5 +1,6 @@
 package com.stak.demo.ui.home
 
+import com.stak.demo.ui.theme.FIGMA_LINE_BOX
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -228,7 +229,7 @@ private fun TopNav(onProfile: () -> Unit, modifier: Modifier = Modifier) {
 		}
 		Text(
 			text = "$greeting, ${com.stak.demo.ui.UserProfile.greetingName}",
-			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp, lineHeight = (20 * u).sp),
+			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp, lineHeight = (20 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
 			color = Color.White,
 		)
 	}
@@ -303,7 +304,7 @@ private fun MarketMoodCard(onOpenNews: () -> Unit) {
 			Column(verticalArrangement = Arrangement.spacedBy((4 * u).dp), modifier = Modifier.width((180 * u).dp)) {
 				Text(
 					text = "Market Mood",
-					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Medium, fontSize = (20 * u).sp, lineHeight = (25 * u).sp),
+					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Medium, fontSize = (20 * u).sp, lineHeight = (25 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
 					color = Color.White,
 				)
 				Text(
@@ -313,7 +314,7 @@ private fun MarketMoodCard(onOpenNews: () -> Unit) {
 						withStyle(SpanStyle(color = Home.Teal)) { append(MarketMoodFeed.statusLead) }
 						append(MarketMoodFeed.statusRest)
 					},
-					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp),
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
 					color = Color.White,
 				)
 			}
@@ -512,14 +513,14 @@ private fun WhyThisMattersCard(onOpenMyStak: () -> Unit) {
 			Text(
 				text = "Why this matters to you",
 				// Authored (1:1040): Sora Regular 14 / lh15.
-				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp, lineHeight = (15 * u).sp),
+				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp, lineHeight = (15 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
 				color = Color.White,
 			)
 			Text(
 				// Backend-served summary of why today's news matters to THIS
 				// user (holdings + risk profile); authored demo copy this phase.
 				text = WhyThisMattersFeed.body(),
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Light, fontSize = (12 * u).sp, lineHeight = (15 * u).sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Light, fontSize = (12 * u).sp, lineHeight = (15 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
 				color = Color.White,
 				modifier = Modifier.width((198 * u).dp),
 			)
@@ -564,7 +565,7 @@ private fun DeckBanner(onOpenDeck: () -> Unit) {
 		) {
 			Text(
 				text = "Take your first deck to build your taste",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Light, fontSize = (12 * u).sp, lineHeight = (15 * u).sp),
+				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Light, fontSize = (12 * u).sp, lineHeight = (15 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
 				color = Color.Black,
 			)
 			// No clickable of its own: the authored connection is on the whole
@@ -578,7 +579,7 @@ private fun DeckBanner(onOpenDeck: () -> Unit) {
 				Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy((3 * u).dp)) {
 					Text(
 						text = "Go to Deck",
-						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (11.49 * u).sp, lineHeight = (15 * u).sp),
+						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (11.49 * u).sp, lineHeight = (15 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
 						color = Color.White,
 					)
 					Image(

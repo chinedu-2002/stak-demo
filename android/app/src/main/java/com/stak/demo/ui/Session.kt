@@ -23,6 +23,7 @@ object Session {
 	private const val KEY_PICKS = "brand_picks"
 	private const val KEY_GOAL = "goal_answer"
 	private const val KEY_RISK_ANSWER = "risk_answer"
+	private const val KEY_NOTIF = "notifications_on"
 
 	private var prefs: SharedPreferences? = null
 
@@ -57,6 +58,7 @@ object Session {
 		UserProfile.brandPicks = p.getString(KEY_PICKS, "")?.split(",")?.filter { it.isNotBlank() }?.toSet() ?: emptySet()
 		UserProfile.goal = p.getInt(KEY_GOAL, -1)
 		UserProfile.risk = p.getInt(KEY_RISK_ANSWER, -1)
+		UserProfile.notificationsOn = p.getBoolean(KEY_NOTIF, true)
 		applyAccount()
 	}
 
@@ -95,6 +97,7 @@ object Session {
 		UserProfile.brandPicks = emptySet()
 		UserProfile.goal = -1
 		UserProfile.risk = -1
+		UserProfile.notificationsOn = true
 		prefs?.edit()?.clear()?.apply()
 		applyAccount()
 	}
@@ -109,6 +112,7 @@ object Session {
 			?.putString(KEY_PICKS, UserProfile.brandPicks.joinToString(","))
 			?.putInt(KEY_GOAL, UserProfile.goal)
 			?.putInt(KEY_RISK_ANSWER, UserProfile.risk)
+			?.putBoolean(KEY_NOTIF, UserProfile.notificationsOn)
 			?.apply()
 	}
 }

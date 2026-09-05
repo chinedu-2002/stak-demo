@@ -44,6 +44,8 @@ import com.stak.demo.ui.theme.StakColors
 @Composable
 fun SignInScreen(
 	onBack: () -> Unit,
+	/** "Forgot password?" -> the reset flow (product audit, 2026-09-05). */
+	onForgot: () -> Unit = {},
 	onSignIn: () -> Unit,
 	onCreateAccount: () -> Unit,
 ) {
@@ -111,7 +113,7 @@ fun SignInScreen(
 					modifier = Modifier.clickable(
 						interactionSource = remember { MutableInteractionSource() },
 						indication = null,
-					) { /* recovery flow not designed yet */ },
+					) { onForgot() },
 				)
 			}
 

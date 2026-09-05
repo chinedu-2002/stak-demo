@@ -24,6 +24,12 @@ object Session {
 	private const val KEY_GOAL = "goal_answer"
 	private const val KEY_RISK_ANSWER = "risk_answer"
 	private const val KEY_NOTIF = "notifications_on"
+	private const val KEY_PRICE_ALERTS = "pref_price_alerts"
+	private const val KEY_DAILY_DECK = "pref_daily_deck"
+	private const val KEY_MARKET_NEWS = "pref_market_news"
+	private const val KEY_APPEARANCE = "pref_appearance"
+	private const val KEY_LINKED_GOOGLE = "linked_google"
+	private const val KEY_LINKED_APPLE = "linked_apple"
 
 	private var prefs: SharedPreferences? = null
 
@@ -59,6 +65,12 @@ object Session {
 		UserProfile.goal = p.getInt(KEY_GOAL, -1)
 		UserProfile.risk = p.getInt(KEY_RISK_ANSWER, -1)
 		UserProfile.notificationsOn = p.getBoolean(KEY_NOTIF, true)
+		UserProfile.priceAlerts = p.getBoolean(KEY_PRICE_ALERTS, true)
+		UserProfile.dailyDeck = p.getBoolean(KEY_DAILY_DECK, true)
+		UserProfile.marketNews = p.getBoolean(KEY_MARKET_NEWS, false)
+		UserProfile.appearance = p.getString(KEY_APPEARANCE, "dark") ?: "dark"
+		UserProfile.linkedGoogle = p.getBoolean(KEY_LINKED_GOOGLE, false)
+		UserProfile.linkedApple = p.getBoolean(KEY_LINKED_APPLE, false)
 		applyAccount()
 	}
 
@@ -98,6 +110,12 @@ object Session {
 		UserProfile.goal = -1
 		UserProfile.risk = -1
 		UserProfile.notificationsOn = true
+		UserProfile.priceAlerts = true
+		UserProfile.dailyDeck = true
+		UserProfile.marketNews = false
+		UserProfile.appearance = "dark"
+		UserProfile.linkedGoogle = false
+		UserProfile.linkedApple = false
 		prefs?.edit()?.clear()?.apply()
 		applyAccount()
 	}
@@ -113,6 +131,12 @@ object Session {
 			?.putInt(KEY_GOAL, UserProfile.goal)
 			?.putInt(KEY_RISK_ANSWER, UserProfile.risk)
 			?.putBoolean(KEY_NOTIF, UserProfile.notificationsOn)
+			?.putBoolean(KEY_PRICE_ALERTS, UserProfile.priceAlerts)
+			?.putBoolean(KEY_DAILY_DECK, UserProfile.dailyDeck)
+			?.putBoolean(KEY_MARKET_NEWS, UserProfile.marketNews)
+			?.putString(KEY_APPEARANCE, UserProfile.appearance)
+			?.putBoolean(KEY_LINKED_GOOGLE, UserProfile.linkedGoogle)
+			?.putBoolean(KEY_LINKED_APPLE, UserProfile.linkedApple)
 			?.apply()
 	}
 }

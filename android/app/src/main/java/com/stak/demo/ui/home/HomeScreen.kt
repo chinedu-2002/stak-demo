@@ -87,7 +87,7 @@ private object Home {
  * MainShell so the other tabs share it.
  */
 @Composable
-fun HomeScreen(firstRun: Boolean, onSeeTodaysPick: () -> Unit, onProfile: () -> Unit = {}, onOpenNews: () -> Unit = {}, onOpenMyStak: () -> Unit = {}, onOpenDeck: () -> Unit = {}) {
+fun HomeScreen(firstRun: Boolean, onSeeTodaysPick: () -> Unit, onProfile: () -> Unit = {}, onBell: () -> Unit = {}, onOpenNews: () -> Unit = {}, onOpenMyStak: () -> Unit = {}, onOpenDeck: () -> Unit = {}) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	BoxWithConstraints(modifier = Modifier.fillMaxSize().background(StakColors.Bg)) {
 		val statusPad = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
@@ -101,7 +101,7 @@ fun HomeScreen(firstRun: Boolean, onSeeTodaysPick: () -> Unit, onProfile: () -> 
 					.fillMaxWidth()
 					.verticalScroll(rememberScrollState()),
 			) {
-				TopNav(onProfile = onProfile, modifier = Modifier.fillMaxWidth().padding(horizontal = (17 * u).dp))
+				TopNav(onProfile = onProfile, onBell = onBell, modifier = Modifier.fillMaxWidth().padding(horizontal = (17 * u).dp))
 				Spacer(modifier = Modifier.height((21 * u).dp))
 				Column(
 					horizontalAlignment = Alignment.CenterHorizontally,
@@ -136,7 +136,7 @@ fun HomeScreen(firstRun: Boolean, onSeeTodaysPick: () -> Unit, onProfile: () -> 
 
 /** Fixed top nav — logo row with bell/profile circles + greeting (Figma 131px block). */
 @Composable
-private fun TopNav(onProfile: () -> Unit, modifier: Modifier = Modifier) {
+private fun TopNav(onProfile: () -> Unit, onBell: () -> Unit = {}, modifier: Modifier = Modifier) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Column(
 		// Scrolls with the content (118:1633); authored side inset 17.
@@ -167,7 +167,7 @@ private fun TopNav(onProfile: () -> Unit, modifier: Modifier = Modifier) {
 					.clickable(
 						interactionSource = remember { MutableInteractionSource() },
 						indication = null,
-					) { com.stak.demo.ui.StakNotifications.markAllRead() },
+					) { onBell() },
 			) {
 				Image(
 					painter = painterResource(R.drawable.ic_nav_bell),

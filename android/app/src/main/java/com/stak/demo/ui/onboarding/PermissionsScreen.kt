@@ -139,7 +139,7 @@ internal fun OnboardingKicker(text: String) {
 
 /** One permission row — #181f30 r14 card, copy column + the 42x24 toggle. */
 @Composable
-private fun PermissionCard(title: String, description: String, checked: Boolean, onToggle: () -> Unit) {
+internal fun PermissionCard(title: String, description: String, checked: Boolean, onToggle: () -> Unit) {
 	val u = figmaUnit()
 	Row(
 		horizontalArrangement = Arrangement.spacedBy((12 * u).dp),
@@ -167,7 +167,7 @@ private fun PermissionCard(title: String, description: String, checked: Boolean,
 
 /** 42x24 Figma toggle — #2c9dbc track when on, white 18dp thumb 3dp from the edge. */
 @Composable
-private fun StakToggle(checked: Boolean, onToggle: () -> Unit) {
+internal fun StakToggle(checked: Boolean, onToggle: () -> Unit) {
 	val u = figmaUnit()
 	val track by animateColorAsState(if (checked) Color(0xFF2C9DBC) else Color(0xFF242B3D), label = "track")
 	val thumbOffset by animateDpAsState(if (checked) (21 * u).dp else (3 * u).dp, label = "thumb")

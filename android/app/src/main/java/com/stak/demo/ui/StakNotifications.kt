@@ -5,33 +5,43 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 
 /**
- * Home bell badge state (CHINEDU 151:1207).
- *
- * The orange dot on the bell marks UNTOUCHED notifications: it stays
- * while anything remains unread and goes off once the user has opened
- * and read them (designer, 2026-08-22). In production the backend
- * serves the notification items and per-item read state drives this
- * flag; the demo carries one authored unread set so the rest state
- * matches the frame (dot on), and opening the bell reads it.
- *
- * Notification timing is per user: the backend sends time-sensitive
- * items (the morning deck, mood alerts) at the user's LOCAL hours using
- * the timezone ID the app sends with the session (UserProfile.timeZoneId).
- *
- * The notification PANEL the bell opens has no designed frame yet -
- * the tap only marks the set read until the designer draws it.
+ * The notification inbox behind the Home bell (product audit, 2026-09-05:
+ * the bell only cleared its dot and opened nothing). The demo account
+ * carries its authored activity; a new account gets its welcome. Read
+ * state persists per account (StakStore). Mirrors ios StakNotifications.swift.
  */
 object StakNotifications {
-	var hasUnread by mutableStateOf(true)
+	data class Item(val id: String, val title: String, val body: String, val time: String)
+
+	private val DEMO = listOf(
+		Item("nvda-up", "NVDA is up 4.2% today", "Chip demand keeps outrunning supply. Your biggest pick is leading the deck.", "2h"),
+		Item("deck-ready", "Your deck is ready", "Twelve fresh cards, tuned to your taste. Swipe when you have a minute.", "8h"),
+		Item("weekly-recap", "Weekly recap", "You’re up +1.9% this week and #47 on the board. Nice.", "1d"),
+	)
+
+	private fun welcome(): List<Item> = listOf(
+		Item("welcome", "Welcome to STAK, ${UserProfile.greetingName}", "Your first deck is waiting in Discover. Swipe down for the next card, save what you like.", "Just now"),
+		Item("first-save", "Save a stock to start your STAK", "Saved stocks power My STAK and the Simulate leaderboard.", "Just now"),
+	)
+
+	var items by mutableStateOf(listOf<Item>())
+		private set
+	var readIds by mutableStateOf(setOf<String>())
 		private set
 
-	fun markAllRead() {
-		hasUnread = false
-		com.stak.demo.ui.StakStore.putBoolean("notif.unread", false)
+	val unreadCount: Int get() = items.count { it.id !in readIds }
+	/** The Home bell's dot. */
+	val hasUnread: Boolean get() = unreadCount > 0
+
+	/** Restores the inbox for the current account. */
+	fun load() {
+		items = if (Session.demoAccount) DEMO else welcome()
+		readIds = StakStore.getSet("notif.read") ?: emptySet()
 	}
 
-	/** Restores the badge for the current account (product audit, 2026-09-05). */
-	fun load() {
-		hasUnread = com.stak.demo.ui.StakStore.getBoolean("notif.unread", true)
+	/** Opening the inbox reads everything - like an activity feed. */
+	fun markAllRead() {
+		readIds = items.map { it.id }.toSet()
+		StakStore.putSet("notif.read", readIds)
 	}
 }

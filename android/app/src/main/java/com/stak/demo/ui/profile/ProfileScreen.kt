@@ -26,10 +26,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -225,27 +222,11 @@ fun ProfileScreen(onBack: () -> Unit, onLogOut: () -> Unit = {}) {
 				modifier = Modifier
 					.fillMaxWidth()
 					.height((52 * u).dp)
-					// Authored glow (171:1037): the teal drop-shadow stack cast
-					// downward, same as the auth CTAs (user, 2026-09-04: exact frame).
-					.drawBehind {
-						val r = (6 * u).dp.toPx()
-						val fw = drawContext.canvas.nativeCanvas
-						val paint = android.graphics.Paint().apply { isAntiAlias = true }
-						for ((dy, blur, a) in listOf(
-							Triple(2.89f, 3.25f, 0.10f),
-							Triple(12.29f, 6.14f, 0.09f),
-							Triple(28.18f, 8.31f, 0.05f),
-							Triple(49.86f, 9.76f, 0.01f),
-						)) {
-							paint.color = android.graphics.Color.argb((a * 255).toInt(), 82, 170, 199)
-							paint.maskFilter = android.graphics.BlurMaskFilter((blur * u).dp.toPx(), android.graphics.BlurMaskFilter.Blur.NORMAL)
-							fw.drawRoundRect(0f, (dy * u).dp.toPx(), size.width, (dy * u).dp.toPx() + size.height, r, r, paint)
-						}
-						// Figma casts the glow OUTSIDE only ("show behind transparent
-						// areas" off): the unfilled button must not tint from the stack
-						// beneath it - StakTest band-diff vs 171:995, 2026-09-05.
-						drawRoundRect(color = StakColors.Bg, cornerRadius = CornerRadius(r))
-					}
+					// 171:1037 authors the auth CTAs' teal drop-shadow stack, but the button
+					// has NO fill and Figma casts shadows from the rendered alpha - the 0.36
+					// hairline at 33% renders nothing: the 2x export's rows under the button
+					// are pure #0A1020, while the old rect glow read (24,45,62) fading over
+					// 35u (StakTest, 2026-09-05). No glow.
 					.border((0.36 * u).dp, Color(0x54343B4F), RoundedCornerShape((6 * u).dp))
 					.clickable(
 						interactionSource = remember { MutableInteractionSource() },

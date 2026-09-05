@@ -678,7 +678,9 @@ private struct SinceYouSavedCard: View {
 				.stakLineHeight(14 * u, size: 11 * u, face: .geist)
 				.foregroundStyle(muted)
 		}
-		.padding(16 * u)
+		// 16:1012 authors p14/16/14/16 - 84 tall (mirrors Android, 2026-09-05).
+		.padding(.horizontal, 16 * u)
+		.padding(.vertical, 14 * u)
 		.frame(maxWidth: .infinity, alignment: .leading)
 		.background(card, in: RoundedRectangle(cornerRadius: 16 * u))
 	}

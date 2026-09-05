@@ -164,7 +164,8 @@ struct MyStakView: View {
 					.font(StakFont.sora(18 * u, .semiBold))
 					.foregroundStyle(ink)
 				// 1:3322 Geist Regular 12 / 17 (was 13) - exact-design audit 2026-09-04.
-				Text("Based on your taste, 8 fresh picks are waiting in the deck.")
+				// Authored two-line shape breaks before "deck." (1:3322; mirrors Android, 2026-09-05).
+				Text("Based on your taste, 8 fresh picks are waiting in the\ndeck.")
 					.font(StakFont.geist(12 * u))
 					.stakLineHeight(17 * u, size: 12 * u, face: .geist)
 					.foregroundStyle(ink)

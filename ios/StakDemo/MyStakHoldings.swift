@@ -30,8 +30,11 @@ final class MyStakHoldings: ObservableObject {
 
 	/// Product audit (2026-09-05): a NEW account holds nothing until the user saves; the demo keeps the seed.
 	func reset(demo: Bool) {
-		tickers = demo ? MyStakHoldings.seed : []
+		// The persisted set wins over the seed (product audit, 2026-09-05).
+		tickers = StakStore.stringSet("holdings") ?? (demo ? MyStakHoldings.seed : [])
 	}
+
+	private func persist() { StakStore.set(tickers, for: "holdings") }
 
 	/// Every held ticker - the Overview's "Across N stocks".
 	var count: Int { tickers.count }
@@ -43,12 +46,14 @@ final class MyStakHoldings: ObservableObject {
 
 	func add(_ ticker: String) {
 		tickers.insert(bare(ticker))
+		persist()
 	}
 
 	/// The saved Stock Detail's Unsave - the collection page and every
 	/// count drop the stock together (Codex audit 2026-09-04).
 	func remove(_ ticker: String) {
 		tickers.remove(bare(ticker))
+		persist()
 	}
 
 	/// Deck cards carry "NVDA · NVIDIA Corp" - hold the bare symbol.

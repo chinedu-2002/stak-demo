@@ -99,15 +99,42 @@ final class DeckSession: ObservableObject {
 	/// Confirm -> "View in My STAK" -> back to the deck - and a view-local
 	/// `seen` would restart the deck while `bought` kept counting. One
 	/// lifetime, one reset.
-	@Published var seen = 0
-	@Published var saved: Set<String> = []
-	@Published var bought = 0
+	@Published var seen = 0 { didSet { persist() } }
+	@Published var saved: Set<String> = [] { didSet { persist() } }
+	@Published var bought = 0 { didSet { persist() } }
 
 	/// "Swipe today's deck again" and the tab re-tap from the end.
 	func restart() {
 		seen = 0
 		saved = []
 		bought = 0
+	}
+
+	// Persisted per day (product audit, 2026-09-05): a relaunch resumes today's
+	// run, tomorrow lands a new deck. Mirrors android DeckSession.
+	private var loading = false
+	private static func today() -> String {
+		let f = DateFormatter(); f.dateFormat = "yyyy-MM-dd"; return f.string(from: Date())
+	}
+
+	func load() {
+		loading = true
+		if StakStore.string("deck.day") == Self.today() {
+			seen = StakStore.int("deck.seen", default: 0)
+			saved = StakStore.stringSet("deck.saved") ?? []
+			bought = StakStore.int("deck.bought", default: 0)
+		} else {
+			seen = 0; saved = []; bought = 0
+		}
+		loading = false
+	}
+
+	private func persist() {
+		guard !loading else { return }
+		StakStore.set(Self.today(), for: "deck.day")
+		StakStore.set(seen, for: "deck.seen")
+		StakStore.set(saved, for: "deck.saved")
+		StakStore.set(bought, for: "deck.bought")
 	}
 }
 

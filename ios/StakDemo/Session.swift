@@ -51,6 +51,9 @@ final class Session: ObservableObject {
 	func applyAccount() {
 		MyStakHoldings.shared.reset(demo: demoAccount)
 		PaperPortfolio.shared.reset(demo: demoAccount)
+		DeckSession.shared.load()
+		StakNotifications.shared.load()
+		NewsSaves.shared.load()
 	}
 
 	/// Sign-in CTA or account creation (09 Proceed) - remembered across launches.
@@ -59,6 +62,9 @@ final class Session: ObservableObject {
 		signedIn = true
 		demoAccount = demo
 		persist()
+		// A brand-new account starts from nothing; the demo account keeps whatever
+		// it did last time it was signed in.
+		if !demo { StakStore.clearAccount(demo: false) }
 		applyAccount()
 	}
 

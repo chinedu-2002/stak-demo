@@ -23,6 +23,12 @@ final class StakNotifications: ObservableObject {
 
 	func markAllRead() {
 		hasUnread = false
+		StakStore.set(false, for: "notif.unread")
+	}
+
+	/// Restores the badge for the current account (product audit, 2026-09-05).
+	func load() {
+		hasUnread = StakStore.bool("notif.unread", default: true)
 	}
 
 	private init() {}

@@ -10,7 +10,7 @@ import SwiftUI
 /// One Portfolio row (1:4548 template). Lives here, not in
 /// SimPortfolioView.swift, so Simulate home's three rows and the Portfolio
 /// page list the same table.
-struct SimPick {
+struct SimPick: Codable {
 	let badge: String
 	let ticker: String
 	let sub: String
@@ -63,6 +63,26 @@ final class PaperPortfolio: ObservableObject {
 			baseValue = PaperPortfolio.paperStart
 			baseCash = PaperPortfolio.paperStart
 		}
+		// The persisted ledger (buys, sells, cash) wins over the seed - product audit
+		// 2026-09-05; the seed baseline above is what value grows from.
+		if let data = StakStore.data("portfolio"), let saved = try? JSONDecoder().decode(Ledger.self, from: data) {
+			positions = saved.positions
+			realized = saved.realized
+			cash = saved.cash
+			newStake = saved.newStake
+		}
+	}
+
+	private struct Ledger: Codable {
+		let cash: Double
+		let newStake: Double
+		let positions: [Position]
+		let realized: [Realized]
+	}
+
+	private func persist() {
+		let ledger = Ledger(cash: cash, newStake: newStake, positions: positions, realized: realized)
+		if let data = try? JSONEncoder().encode(ledger) { StakStore.set(data, for: "portfolio") }
 	}
 
 	static func signedWhole(_ value: Double) -> String { (value < 0 ? "-$" : "+$") + wholeDollars(abs(value)).replacingOccurrences(of: "$", with: "") }
@@ -78,14 +98,14 @@ final class PaperPortfolio: ObservableObject {
 	static let weekPct = "+1.9%"
 
 	/// A held pick: the detail page's spec + its Portfolio row.
-	struct Position: Identifiable {
+	struct Position: Identifiable, Codable {
 		let spec: PickSpec
 		let row: SimPick
 		var id: String { spec.symbol }
 	}
 
 	/// A SOLD · REALIZED row (1:4496).
-	struct Realized: Identifiable {
+	struct Realized: Identifiable, Codable {
 		let badge: String
 		let ticker: String
 		let sub: String
@@ -155,6 +175,7 @@ final class PaperPortfolio: ObservableObject {
 				),
 				row: held.row
 			)
+			persist()
 			return
 		}
 		let day = PaperPortfolio.today()
@@ -175,6 +196,7 @@ final class PaperPortfolio: ObservableObject {
 			amount: "+$0.00", pct: "+0.0%", up: true
 		)
 		positions.insert(Position(spec: pick, row: row), at: 0)
+		persist()
 	}
 
 	/// Closes the position: its stake value returns to cash and the pick
@@ -196,6 +218,7 @@ final class PaperPortfolio: ObservableObject {
 			),
 			at: 0
 		)
+		persist()
 		return true
 	}
 

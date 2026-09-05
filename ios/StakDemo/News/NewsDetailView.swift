@@ -59,7 +59,9 @@ struct NewsDetailView: View {
 	/// the pager recycling far-off pages, and the save-success sheet (whose
 	/// authored scrim, 101:1168, dims the top bar too) keeps drawing over the
 	/// whole screen exactly as it did before the pager.
-	@State private var savedIds: Set<String> = []
+	// Product audit (2026-09-05): saves live in NewsSaves, shared and persisted.
+	@ObservedObject private var saves = NewsSaves.shared
+	private var savedIds: Set<String> { saves.ids }
 	/// The story whose save-success sheet is up (nil = none).
 	@State private var successId: String? = nil
 
@@ -153,7 +155,7 @@ struct NewsDetailView: View {
 	/// and its View in My STAK all land here: the story is saved and its
 	/// stock joins My STAK.
 	private func save(_ id: String) {
-		savedIds.insert(id)
+		saves.add(id)
 		if let t = NewsArticleFeed.article(id).ticker { MyStakHoldings.shared.add(t) }
 	}
 }

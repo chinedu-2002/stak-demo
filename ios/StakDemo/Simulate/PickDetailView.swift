@@ -6,7 +6,7 @@ import SwiftUI
 /// picks derive from the shared demo table - the same thing the Discover
 /// deck does when "Learn more" serves the tapped stock. Mirrors android/
 /// ui/simulate/PickDetailScreen.kt.
-struct PickSpec {
+struct PickSpec: Codable {
 	let symbol: String
 	let badge: String
 	/// The sell row's name - NVDA's authored "NVIDIA Corp" (1:4698).

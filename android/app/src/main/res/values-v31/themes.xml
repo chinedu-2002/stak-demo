@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Android 12+ system splash: the brand ground with the STAK mark, so a launch never shows the
-         white default splash with the template icon (product audit, 2026-09-05). The app's own
-         dark splash (00 Splash) follows it seamlessly. -->
+    <!-- Android 12+ always draws a system splash before the first frame; it cannot be turned off,
+         only coloured. It is the frame's ground (1:926 Bg) with NO icon, so the only launch screen
+         anyone sees is the authored 00 Splash that follows (user, 2026-09-05: "this should be
+         whenever a user opens STAK" - the earlier centred launcher mark was not in the design).
+         iOS does the same: LaunchBackground, no image, then SplashView. -->
     <style name="Theme.STAK" parent="android:Theme.Material.NoActionBar">
         <item name="android:windowBackground">#0A1020</item>
         <item name="android:statusBarColor">#0A1020</item>
         <item name="android:navigationBarColor">#10172A</item>
         <item name="android:windowLightStatusBar">false</item>
         <item name="android:windowSplashScreenBackground">#0A1020</item>
-        <item name="android:windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
-        <item name="android:windowSplashScreenIconBackgroundColor">#0A1020</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@android:color/transparent</item>
     </style>
 </resources>

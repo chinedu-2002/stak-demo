@@ -40,7 +40,7 @@ import kotlinx.coroutines.delay
  * logo and type matches the design on every screen instead of
  * drifting apart on taller phones.
  *
- * Auto-advances after a short hold; tapping anywhere skips ahead.
+ * Auto-advances after a short hold.
  */
 @Composable
 fun SplashScreen(onContinue: () -> Unit) {

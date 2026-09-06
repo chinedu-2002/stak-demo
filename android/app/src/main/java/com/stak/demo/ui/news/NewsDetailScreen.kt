@@ -2036,14 +2036,20 @@ private fun trackLabel(group: Tracks.Group, index: Int): String {
 /**
  * Fullscreen = a Netflix-style player (user, 2026-09-05 screenshot: the
  * old raw TextureView stretched the 16:9 clip over the portrait screen):
- * the activity turns to landscape (either way up), the system bars hide,
- * and the clip sits letterboxed on black at its own aspect ratio. It is an
- * OVERLAY in the activity window (LocalFullscreenSlot) - a Dialog window is
- * sized to the display minus bars and cutout and left article strips. The
- * controls keep their portrait size - the artboard unit comes from the
- * SHORT side, not the now-wide width. Leaving restores portrait FIRST and
- * drops the dialog once the turn has played, so the article underneath
- * never shows in landscape (its 390-wide artboard scaling is portrait-only).
+ * the system bars hide and the clip sits letterboxed on black at its own
+ * aspect ratio, the same chrome over it. The phone is NOT turned (user,
+ * 2026-09-05 screenshot #2: "the landscape should happen when the user
+ * tilts their phone horizontal; when they are vertical it should be" the
+ * upright letterboxed player): fullscreen opens the way the phone is held
+ * and follows the sensor from there - tilt sideways for landscape, back
+ * upright for portrait. It is an OVERLAY in the activity window
+ * (LocalFullscreenSlot) - a Dialog window is sized to the display minus
+ * bars and cutout and left article strips. The controls keep their
+ * portrait size - the artboard unit comes from the SHORT side, not the
+ * width. Leaving from landscape restores portrait FIRST and drops the
+ * overlay once the turn has played, so the article underneath never shows
+ * in landscape (its 390-wide artboard scaling is portrait-only); leaving
+ * from portrait drops it at once.
  */
 @Composable
 private fun FullscreenPlayer(player: HeroPlayer, exo: ExoPlayer) {
@@ -2051,14 +2057,18 @@ private fun FullscreenPlayer(player: HeroPlayer, exo: ExoPlayer) {
 	val cfg = LocalConfiguration.current
 	val u = minOf(cfg.screenWidthDp, cfg.screenHeightDp) / 390f
 	DisposableEffect(Unit) {
-		activity?.requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+		// Follow the phone (all four ways) while fullscreen is up - like a
+		// video app, the rotate lock does not pin the player.
+		activity?.requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR
 		// Every exit path (glyph, back, PiP glyph, clip end) lands back in portrait.
 		onDispose { activity?.requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT }
 	}
+	val landscape = cfg.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
 	LaunchedEffect(player.leavingFullscreen) {
 		if (player.leavingFullscreen) {
 			activity?.requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-			delay(350)
+			// Only a landscape exit has a turn to wait out.
+			if (landscape) delay(350)
 			player.fullscreen = false
 			player.leavingFullscreen = false
 		}

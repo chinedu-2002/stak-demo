@@ -59,7 +59,8 @@ struct NewsView: View {
 						.font(StakFont.sora(26 * u, .semiBold))
 						.foregroundStyle(StakColors.textPrimary)
 					// Authored date line (user, 2026-09-04 (CHINEDU 03 · News 1:1228): the authored look wins).
-					Text("Saturday, July 4")
+					// Product audit (2026-09-05): today's date, on the authored line.
+					Text(StakClock.todayLong())
 						.font(StakFont.geist(13 * u))
 						.foregroundStyle(News.muted)
 				}

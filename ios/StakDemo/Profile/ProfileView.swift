@@ -85,7 +85,7 @@ struct ProfileView: View {
 						Text(profile.greetingName)
 							.font(StakFont.sora(20 * u, .semiBold))
 							.foregroundStyle(StakColors.textPrimary)
-						Text("Paper investor · joined July 2026")
+						Text("Paper investor · joined \(profile.joined)")
 							.font(StakFont.geist(12 * u))
 							.foregroundStyle(StakColors.muted)
 					}

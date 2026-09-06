@@ -198,14 +198,15 @@ struct SimulateView: View {
 	private func savedStakRows() -> [SavedStak] {
 		if portfolio.demo {
 			return [
-				SavedStak(spec: pltrBuy, sub: savedSub("PLTR", authored: "Saved Jun 30 · not in portfolio yet")),
-				SavedStak(spec: costBuy, sub: savedSub("COST", authored: "Saved Jul 2 · not in portfolio yet"))
+				// Authored 4 and 2 days before the frame's July 4, kept as ages (product audit, 2026-09-05).
+				SavedStak(spec: pltrBuy, sub: savedSub("PLTR", authored: StakClock.savedLabel(daysAgo: 4) + " · not in portfolio yet")),
+				SavedStak(spec: costBuy, sub: savedSub("COST", authored: StakClock.savedLabel(daysAgo: 2) + " · not in portfolio yet"))
 			]
 		}
 		let tickets = [nvdaBuy, aaplBuy, googlBuy, pltrBuy, costBuy]
 		return tickets.filter { MyStakHoldings.shared.tickers.contains($0.symbol) }
 			.prefix(2)
-			.map { SavedStak(spec: $0, sub: savedSub($0.symbol, authored: "Saved · not in portfolio yet")) }
+			.map { SavedStak(spec: $0, sub: savedSub($0.symbol, authored: StakClock.savedLabel(daysAgo: 0) + " · not in portfolio yet")) }
 	}
 
 	private func sectionHeader(_ title: String) -> some View {

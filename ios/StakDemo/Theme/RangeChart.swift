@@ -16,6 +16,13 @@ struct RangeLineChart: View {
 	let authored: String
 	let width: CGFloat
 	let height: CGFloat
+	/// A real move in percent: the line is DRAWN from it - flat at 0, the
+	/// authored swing at +/-5 - instead of the demo export (a new account's
+	/// charts, product audit 2026-09-05). nil keeps the demo behaviour.
+	var move: Double? = nil
+
+	/// The 3M shape when a line is drawn instead of exported.
+	static let series3M: [CGFloat] = [0.30, 0.34, 0.32, 0.40, 0.38, 0.46, 0.52, 0.48, 0.58, 0.56, 0.64, 0.70, 0.66, 0.76, 0.84]
 
 	/// Height fraction from the bottom (0 = bottom) per point, spread
 	/// evenly across the width.
@@ -30,7 +37,13 @@ struct RangeLineChart: View {
 	var body: some View {
 		let u = figmaUnit
 		Group {
-			if let points = RangeLineChart.series[range], range != "3M" {
+			if let move {
+				let points = StakInsights.scaled(RangeLineChart.series[range] ?? RangeLineChart.series3M, move)
+				GeometryReader { geo in
+					let line = RangeLineChart.linePath(points, in: geo.size)
+					line.stroke(tint, style: StrokeStyle(lineWidth: 2 * u, lineCap: .round, lineJoin: .round))
+				}
+			} else if let points = RangeLineChart.series[range], range != "3M" {
 				GeometryReader { geo in
 					let line = RangeLineChart.linePath(points, in: geo.size)
 					line.stroke(tint, style: StrokeStyle(lineWidth: 2 * u, lineCap: .round, lineJoin: .round))

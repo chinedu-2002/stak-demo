@@ -134,7 +134,7 @@ struct SimulateView: View {
 							}
 						}
 						// Authored copy (user, 2026-09-04 (CHINEDU 07 · Simulate 423:1007): the authored look wins); the ledger still drives the rows above.
-						CenterLink(text: "See all \(portfolio.pickCountLabel) picks", action: onOpenPortfolio)
+						CenterLink(text: "See all \(portfolio.pickCountText)", action: onOpenPortfolio)
 						}
 						// 1:4040 Points breakdown (exact-design audit 2026-09-04): the section header
 						// and the Allocation card are 15 apart, not the column's 18.
@@ -258,7 +258,7 @@ private struct ScoreHero: View {
 						.padding(.leading, 8 * u)
 						.padding(.bottom, 8 * u)
 				}
-				Text("\(PaperPortfolio.signedMoney(portfolio.allTimeGain)) all time on $10,000 paper · \(portfolio.pickCountLabel) picks")
+				Text("\(PaperPortfolio.signedMoney(portfolio.allTimeGain)) all time on $10,000 paper · \(portfolio.pickCountText)")
 					.font(StakFont.geist(12 * u, .light))
 					.foregroundStyle(Sim.muted)
 				HStack(spacing: 6 * u) {
@@ -287,7 +287,8 @@ private struct ScoreHero: View {
 
 			// Authored: ranks→chart gap is exactly the column's 11 (1:3935);
 			// the chart bleeds outside the 20u text padding.
-			RangeLineChart(range: range, tint: Sim.teal, authored: "SimChartLine", width: 343 * u, height: 73.56 * u)
+			// A new account's line follows its own all-time move - flat on untouched paper (product audit, 2026-09-05).
+			RangeLineChart(range: range, tint: Sim.teal, authored: "SimChartLine", width: 343 * u, height: 73.56 * u, move: portfolio.demo ? nil : portfolio.allTimeGain / PaperPortfolio.paperStart * 100)
 				.frame(maxWidth: .infinity)
 			HStack(spacing: 37 * u) {
 				ForEach(["1D", "1W", "1M", "3M", "YTD", "1Y"], id: \.self) { label in
@@ -419,7 +420,8 @@ private struct InsightCard: View {
 					.tracking(0.9 * u)
 					.foregroundStyle(Sim.faint)
 			}
-			Text("Three chip stocks drove 70% of your gains this month. Your taste has a type.")
+			// The demo's authored insight; a new account reads its own picks (product audit, 2026-09-05).
+			Text(PaperPortfolio.shared.demo ? "Three chip stocks drove 70% of your gains this month. Your taste has a type." : StakInsights.simInsight())
 				.font(StakFont.geist(12 * u))
 				.stakLineHeight(20 * u, size: 12 * u, face: .geist)
 				.foregroundStyle(Sim.body)
@@ -612,15 +614,26 @@ private struct SimAllocationCard: View {
 			Text("Allocation")
 				.font(StakFont.sora(15 * u, .semiBold))
 				.foregroundStyle(Color.white)
-			Image("SimDonut")
-				.resizable()
-				.frame(width: 150 * u, height: 150 * u)
-			VStack(spacing: 12 * u) {
-				SimSector(name: "Tech & AI", share: "42% · 5 stocks", color: Sim.teal, fill: 132)
-				SimSector(name: "Finance", share: "25% · 3 stocks", color: Color(argb: 0xFF7AB3F0), fill: 66)
-				SimSector(name: "Green Energy", share: "17% · 2 stocks", color: Sim.green, fill: 63)
-				SimSector(name: "Real Estate", share: "8% · 1 stock", color: Color(argb: 0xFF9E8CE5), fill: 38)
-				SimSector(name: "Other", share: "8% · 1 stock", color: Sim.faint, fill: 16)
+			if PaperPortfolio.shared.demo {
+				Image("SimDonut")
+					.resizable()
+					.frame(width: 150 * u, height: 150 * u)
+				VStack(spacing: 12 * u) {
+					SimSector(name: "Tech & AI", share: "42% · 5 stocks", color: Sim.teal, fill: 132)
+					SimSector(name: "Finance", share: "25% · 3 stocks", color: Color(argb: 0xFF7AB3F0), fill: 66)
+					SimSector(name: "Green Energy", share: "17% · 2 stocks", color: Sim.green, fill: 63)
+					SimSector(name: "Real Estate", share: "8% · 1 stock", color: Color(argb: 0xFF9E8CE5), fill: 38)
+					SimSector(name: "Other", share: "8% · 1 stock", color: Sim.faint, fill: 16)
+				}
+			} else {
+				// A new account's ring and bars come from its own picks (product audit, 2026-09-05).
+				let buckets = StakInsights.buckets(PaperPortfolio.shared.positions.map { $0.spec.symbol })
+				DonutRing(shares: buckets.map { CGFloat($0.share) }, colors: buckets.map { simBucketColor($0.id) }, size: 150 * u)
+				VStack(spacing: 12 * u) {
+					ForEach(buckets, id: \.id) { b in
+						SimSector(name: b.name, share: "\(Int((b.share * 100).rounded()))% · \(heldCountLabel(b.count))", color: simBucketColor(b.id), fill: CGFloat(314 * b.share))
+					}
+				}
 			}
 		}
 		.padding(18 * u)
@@ -629,7 +642,20 @@ private struct SimAllocationCard: View {
 	}
 }
 
-private struct SimSector: View {
+private /// The authored bucket palette (1:4040), one colour per collection.
+private func simBucketColor(_ id: String) -> Color {
+	switch id {
+	case "aitech": return Sim.teal
+	case "finance": return Color(argb: 0xFF7AB3F0)
+	case "green": return Sim.green
+	case "realestate": return Color(argb: 0xFF9E8CE5)
+	case "health": return Color(argb: 0xFF5DA8BF)
+	case "consumer": return Color(argb: 0xFFE8B86D)
+	default: return Sim.faint
+	}
+}
+
+struct SimSector: View {
 	let name: String
 	let share: String
 	let color: Color

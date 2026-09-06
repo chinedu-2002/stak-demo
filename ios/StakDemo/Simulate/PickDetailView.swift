@@ -159,7 +159,7 @@ struct PickDetailView: View {
 								.frame(maxWidth: .infinity)
 								.frame(height: 73.5 * u)
 								.overlay(
-									RangeLineChart(range: range, tint: Sim.teal, authored: "SimChartLine", width: 343 * u, height: 73.5 * u)
+									RangeLineChart(range: range, tint: Sim.teal, authored: "SimChartLine", width: 343 * u, height: 73.5 * u, move: PaperPortfolio.shared.demo ? nil : (Double(pick.gainPct.filter { $0.isNumber || $0 == "." }) ?? 0) * (pick.up ? 1 : -1))
 								)
 								.padding(.top, 11 * u)
 							RangePills(selected: $range, tint: Sim.teal, muted: Sim.muted)

@@ -23,6 +23,9 @@ enum StakClock {
 		return "· \(monthDay(daysAgo: days)) · \(read)"
 	}
 
+	/// "Oct 29" for N days ahead - the stock pages' next-earnings line (product audit, 2026-09-05: "Q2 earnings land Aug 27" had passed).
+	static func daysAhead(_ days: Int) -> String { monthDay(daysAgo: -days) }
+
 	/// "Saved Jul 2" / "Saved today".
 	static func savedLabel(daysAgo: Int) -> String { daysAgo == 0 ? "Saved today" : "Saved \(monthDay(daysAgo: daysAgo))" }
 

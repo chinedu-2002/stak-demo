@@ -32,6 +32,7 @@ final class MyStakHoldings: ObservableObject {
 	func reset(demo: Bool) {
 		// The persisted set wins over the seed (product audit, 2026-09-05).
 		tickers = StakStore.stringSet("holdings") ?? (demo ? MyStakHoldings.seed : [])
+		loadSavedAt()
 	}
 
 	private func persist() { StakStore.set(tickers, for: "holdings") }
@@ -44,8 +45,30 @@ final class MyStakHoldings: ObservableObject {
 		related.contains { tickers.contains($0) }
 	}
 
+	/// When each stock was saved on THIS account (days since 1970) - the "Since you saved" card reads it (product audit, 2026-09-05).
+	private var savedAt: [String: Int] = [:]
+
+	private static var today: Int { Int(Date().timeIntervalSince1970 / 86400) }
+
+	/// Days since the stock was saved on this account; nil when the save predates the record (the demo's authored saves).
+	func daysSinceSaved(_ ticker: String) -> Int? { savedAt[bare(ticker)].map { MyStakHoldings.today - $0 } }
+
+	private func loadSavedAt() {
+		savedAt = [:]
+		for entry in (StakStore.string("saved_at") ?? "").split(separator: ",") {
+			let parts = entry.split(separator: "=", maxSplits: 1)
+			if parts.count == 2, let day = Int(parts[1]) { savedAt[String(parts[0])] = day }
+		}
+	}
+
+	private func persistSavedAt() {
+		StakStore.set(savedAt.map { "\($0.key)=\($0.value)" }.sorted().joined(separator: ","), for: "saved_at")
+	}
+
 	func add(_ ticker: String) {
-		tickers.insert(bare(ticker))
+		let sym = bare(ticker)
+		tickers.insert(sym)
+		if savedAt[sym] == nil { savedAt[sym] = MyStakHoldings.today; persistSavedAt() }
 		persist()
 	}
 
@@ -53,6 +76,8 @@ final class MyStakHoldings: ObservableObject {
 	/// count drop the stock together (Codex audit 2026-09-04).
 	func remove(_ ticker: String) {
 		tickers.remove(bare(ticker))
+		savedAt[bare(ticker)] = nil
+		persistSavedAt()
 		persist()
 	}
 

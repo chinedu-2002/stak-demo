@@ -138,13 +138,13 @@ struct MyStakView: View {
 					.foregroundStyle(StakColors.textPrimary)
 			}
 			// Product audit (2026-09-05): a new account has no read yet.
-			Text(holdings.count == 0 ? "Your read starts with your first save." : "You lean into growth and tech.")
+			Text(holdings.count == 0 ? "Your read starts with your first save." : (Session.shared.demoAccount ? "You lean into growth and tech." : StakInsights.readHeadline()))
 				.font(StakFont.sora(15 * u, .semiBold))
 				.foregroundStyle(StakColors.textPrimary)
 			// Figma 1:3155 sets the body at 13 (Codex parity audit, 2026-09-04).
 			// Authored copy, not the store's counts - user, 2026-09-04 (CHINEDU 06 ·
 			// My STAK 1:3155): the authored look wins.
-			Text(holdings.count == 0 ? "Save stocks from the Discover deck and STAK will read your taste from them." : "Six of your fourteen picks are tech or AI names. Your STAK skews high-growth, with a small hedge in real estate.")
+			Text(holdings.count == 0 ? "Save stocks from the Discover deck and STAK will read your taste from them." : (Session.shared.demoAccount ? "Six of your fourteen picks are tech or AI names. Your STAK skews high-growth, with a small hedge in real estate." : StakInsights.readBody()))
 				.font(StakFont.geist(13 * u))
 				.stakLineHeight(19 * u, size: 13 * u, face: .geist)
 				.foregroundStyle(bodyColor)
@@ -263,15 +263,15 @@ private struct PortfolioSummary: View {
 				Text("Performance this week")
 					.font(StakFont.sora(12 * u))
 					.foregroundStyle(muted)
-				Text(holdings.count == 0 ? "—" : "+4.9%")
+				Text(holdings.count == 0 ? "—" : (Session.shared.demoAccount ? "+4.9%" : StakInsights.signedPct(StakInsights.weekChangePct())))
 					.font(StakFont.sora(44 * u, .semiBold))
 					.tracking(-0.44 * u)
 					.foregroundStyle(StakColors.textPrimary)
 				HStack(spacing: 10 * u) {
 					// Authored summary copy; the store's count is not what the frame shows - user, 2026-09-04 (CHINEDU 06 · My STAK 1:3155).
-					Text(holdings.count == 0 ? "No stocks yet" : (Session.shared.demoAccount ? "Across 14 stocks" : "Across \(holdings.count) stocks"))
+					Text(holdings.count == 0 ? "No stocks yet" : (Session.shared.demoAccount ? "Across 14 stocks" : "Across " + heldCountLabel(holdings.count)))
 						.font(StakFont.geist(14 * u, .medium))
-						.foregroundStyle(green)
+						.foregroundStyle(holdings.count == 0 ? muted : (!Session.shared.demoAccount && StakInsights.weekChangePct() < 0 ? red : green))
 					Text(".")
 						.font(StakFont.sora(14 * u))
 						.foregroundStyle(muted)
@@ -283,7 +283,7 @@ private struct PortfolioSummary: View {
 			.frame(maxWidth: .infinity, alignment: .leading)
 			.padding(.leading, 20 * u)
 
-			RangeLineChart(range: range, tint: teal, authored: "MsChartLine", width: 343 * u, height: 73.56 * u)
+			RangeLineChart(range: range, tint: teal, authored: "MsChartLine", width: 343 * u, height: 73.56 * u, move: Session.shared.demoAccount ? nil : StakInsights.weekChangePct())
 
 			RangePills(selected: $range, tint: teal, muted: muted)
 				.padding(.top, 26 * u)
@@ -293,18 +293,20 @@ private struct PortfolioSummary: View {
 				.frame(maxWidth: .infinity)
 				.frame(height: 1 * u)
 
-			if holdings.count > 0 { HStack(spacing: 151 * u) {
+			// The demo's authored TSLA / SNOW; a new account's own best and worst, once it holds two (product audit, 2026-09-05).
+			let duo = Session.shared.demoAccount ? nil : StakInsights.bestWorst()
+			if holdings.count > 0 && (Session.shared.demoAccount || duo != nil) { HStack(spacing: 151 * u) {
 				VStack(alignment: .leading, spacing: 3 * u) {
 					Text("Best this week")
 						.font(StakFont.geist(11 * u))
 						.foregroundStyle(faint)
 					HStack(spacing: 6 * u) {
-						Text("TSLA")
+						Text(Session.shared.demoAccount ? "TSLA" : duo!.0.ticker)
 							.font(StakFont.sora(13 * u, .semiBold))
 							.foregroundStyle(StakColors.textPrimary)
-						Text("+3.4%")
+						Text(Session.shared.demoAccount ? "+3.4%" : StakInsights.signedPct(StakInsights.changePct(duo!.0)))
 							.font(StakFont.geist(12 * u, .medium))
-							.foregroundStyle(green)
+							.foregroundStyle(Session.shared.demoAccount || duo!.0.up ? green : red)
 					}
 				}
 				VStack(alignment: .leading, spacing: 3 * u) {
@@ -312,12 +314,12 @@ private struct PortfolioSummary: View {
 						.font(StakFont.geist(11 * u))
 						.foregroundStyle(faint)
 					HStack(spacing: 6 * u) {
-						Text("SNOW")
+						Text(Session.shared.demoAccount ? "SNOW" : duo!.1.ticker)
 							.font(StakFont.sora(13 * u, .semiBold))
 							.foregroundStyle(StakColors.textPrimary)
-						Text("-0.5%")
+						Text(Session.shared.demoAccount ? "-0.5%" : StakInsights.signedPct(StakInsights.changePct(duo!.1)))
 							.font(StakFont.geist(12 * u, .medium))
-							.foregroundStyle(red)
+							.foregroundStyle(!Session.shared.demoAccount && duo!.1.up ? green : red)
 					}
 				}
 			} }
@@ -339,16 +341,27 @@ private struct AllocationCard: View {
 			Text("Allocation")
 				.font(StakFont.sora(15 * u, .semiBold))
 				.foregroundStyle(StakColors.textPrimary)
-			Image("MsDonut")
-				.resizable()
-				.frame(width: 150 * u, height: 150 * u)
-			VStack(spacing: 12 * u) {
-				SectorBar(name: "Tech & AI", share: "42% · 6 stocks", color: teal, fill: 132)
-				SectorBar(name: "Finance", share: "21% · 3 stocks", color: Color(argb: 0xFF7AB3F0), fill: 66)
-				SectorBar(name: "Green Energy", share: "20% · 3 stocks", color: green, fill: 63)
-				// 1:3306 legend dot is #9E8CE6 while the 1:3310 bar is #9E8CE5 - exact-design audit 2026-09-04.
-				SectorBar(name: "Real Estate", share: "12% · 2 stocks", color: Color(argb: 0xFF9E8CE5), fill: 38, dot: Color(argb: 0xFF9E8CE6))
-				SectorBar(name: "Other", share: "5% · 1 stock", color: faint, fill: 16)
+			if Session.shared.demoAccount {
+				Image("MsDonut")
+					.resizable()
+					.frame(width: 150 * u, height: 150 * u)
+				VStack(spacing: 12 * u) {
+					SectorBar(name: "Tech & AI", share: "42% · 6 stocks", color: teal, fill: 132)
+					SectorBar(name: "Finance", share: "21% · 3 stocks", color: Color(argb: 0xFF7AB3F0), fill: 66)
+					SectorBar(name: "Green Energy", share: "20% · 3 stocks", color: green, fill: 63)
+					// 1:3306 legend dot is #9E8CE6 while the 1:3310 bar is #9E8CE5 - exact-design audit 2026-09-04.
+					SectorBar(name: "Real Estate", share: "12% · 2 stocks", color: Color(argb: 0xFF9E8CE5), fill: 38, dot: Color(argb: 0xFF9E8CE6))
+					SectorBar(name: "Other", share: "5% · 1 stock", color: faint, fill: 16)
+				}
+			} else {
+				// A new account's ring and bars come from its own saves (product audit, 2026-09-05).
+				let buckets = StakInsights.buckets(Array(MyStakHoldings.shared.tickers))
+				DonutRing(shares: buckets.map { CGFloat($0.share) }, colors: buckets.map { myStakBucketColor($0.id) }, size: 150 * u)
+				VStack(spacing: 12 * u) {
+					ForEach(buckets, id: \.id) { b in
+						SectorBar(name: b.name, share: "\(Int((b.share * 100).rounded()))% · \(heldCountLabel(b.count))", color: myStakBucketColor(b.id), fill: CGFloat(314 * b.share))
+					}
+				}
 			}
 			.frame(maxWidth: .infinity)
 		}
@@ -358,7 +371,20 @@ private struct AllocationCard: View {
 	}
 }
 
-private struct SectorBar: View {
+private /// The authored bucket palette (1:3155), one colour per collection.
+private func myStakBucketColor(_ id: String) -> Color {
+	switch id {
+	case "aitech": return Color(argb: 0xFF69B3CA)
+	case "finance": return Color(argb: 0xFF7AB3F0)
+	case "green": return Color(argb: 0xFF2FD08A)
+	case "realestate": return Color(argb: 0xFF9E8CE5)
+	case "health": return Color(argb: 0xFF5DA8BF)
+	case "consumer": return Color(argb: 0xFFE8B86D)
+	default: return Color(argb: 0xFF5C6B85)
+	}
+}
+
+struct SectorBar: View {
 	let name: String
 	let share: String
 	let color: Color

@@ -47,7 +47,7 @@ struct SimPortfolioView: View {
 						// 1:4519 (exact-design audit 2026-09-04): a r13 OUTLINE in #181f30 (1px, no
 						// fill) with the line inset 16 - was a filled r16 pill.
 						// Authored copy (user, 2026-09-04 (CHINEDU 07 · Simulate 423:1007): the authored look wins).
-						Text("12 picks · +$240.00 all time")
+						Text(PaperPortfolio.shared.demo ? "12 picks · +$240.00 all time" : "\(PaperPortfolio.shared.pickCountText) · \(PaperPortfolio.signedMoney(PaperPortfolio.shared.allTimeGain)) all time")
 							.font(StakFont.geist(10 * u))
 							.foregroundStyle(Sim.muted)
 							.padding(.horizontal, 16 * u)

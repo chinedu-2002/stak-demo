@@ -29,6 +29,20 @@ enum NewsArticleFeed {
 	/// just placeholder") - the served story renders into the slot.
 	static let marketTile = "amzn-cloud-beat"
 
+	/// Every ticker today's stories relate to - the Home "Why this matters" read (product audit, 2026-09-05).
+	static func relatedTickers() -> Set<String> { Set(articles.flatMap { $0.relatedTickers }) }
+
+	/// The "Your stocks" tile's story: the authored Apple story when the
+	/// user holds a stock it relates to (the demo does), else the first
+	/// story about a held stock; nil when nothing held is in the news
+	/// (product audit, 2026-09-05: a one-stock account was shown Apple).
+	static func yourStocksTile() -> Article? {
+		let held = MyStakHoldings.shared.tickers
+		let appleStory = article(apple)
+		if appleStory.relatedTickers.contains(where: { held.contains($0) }) { return appleStory }
+		return articles.first { $0.id != marketTile && $0.relatedTickers.contains(where: { held.contains($0) }) }
+	}
+
 	/// The served demo payload's off-topic story - see the gate below.
 	private static let offTopic = "wimbledon-final"
 
@@ -476,6 +490,17 @@ enum NewsArticleFeed {
 
 	/// The served stock module for a ticker - the backend resolves this in production.
 	static func stockFacts(_ ticker: String) -> StockFacts {
-		stockFactsTable[ticker] ?? stockFactsTable["AAPL"]!
+		let facts = stockFactsTable[ticker] ?? stockFactsTable["AAPL"]!
+		// Product audit (2026-09-05): the demo stand-ins quoted NVDA at $178.42
+		// while the deck and My STAK say $122.10. Every stock the catalogue
+		// carries takes ITS quote here; the authored Apple card (1:1495) stays
+		// frame-exact.
+		if ticker == "AAPL" { return facts }
+		guard let live = StakCollection.all.flatMap({ $0.stocks }).first(where: { $0.ticker == ticker }) else { return facts }
+		let pct = live.change.filter { $0.isNumber || $0 == "." }
+		return StockFacts(
+			name: facts.name, shortName: facts.shortName, price: live.price, change: (live.up ? "+" : "-") + pct + "% today", up: live.up,
+			marketCap: facts.marketCap, peRatio: facts.peRatio, dayRange: facts.dayRange, volume: facts.volume, week52: facts.week52, divYield: facts.divYield
+		)
 	}
 }

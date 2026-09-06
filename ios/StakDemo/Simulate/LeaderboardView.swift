@@ -82,7 +82,8 @@ struct LeaderboardView: View {
 							.frame(width: 28 * u, alignment: .leading)
 						ZStack {
 							Circle().fill(Sim.chipBg)
-							Text("E")
+							// The authored "E" is the demo persona's; a new account shows its own initial (product audit, 2026-09-05).
+							Text(portfolio.demo ? "E" : String(UserProfile.shared.greetingName.prefix(1)).uppercased())
 								.font(StakFont.sora(14 * u, .semiBold)) // 1:4158 is 14 (exact-design audit 2026-09-04)
 								.foregroundStyle(Sim.badgeInk)
 						}
@@ -91,7 +92,7 @@ struct LeaderboardView: View {
 							Text("You")
 								.font(StakFont.sora(12 * u, .medium)) // 1:4160 Sora Medium (exact-design audit 2026-09-04)
 								.foregroundStyle(Color.white)
-							Text("\(portfolio.pickCountLabel) picks this week")
+							Text("\(portfolio.pickCountText) this week")
 								.font(StakFont.geist(10 * u))
 								.foregroundStyle(Sim.muted)
 						}

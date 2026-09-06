@@ -523,6 +523,12 @@ private struct FirstRunOverlay: View {
 				.frame(height: 98.7 * u)
 				StakColors.bg
 			}
+			// The scrim swallows every touch (product audit, 2026-09-05: a drag
+			// that started on the dimmed deck banner beneath it opened the deck
+			// and ended the first run). The pill is a sibling above it, so its
+			// taps still land.
+			.contentShape(Rectangle())
+			.gesture(DragGesture(minimumDistance: 0))
 			Button(action: onSeeTodaysPick) {
 				// user, 2026-09-04: grammar fixed, frame typo not copied.
 				Text("See Today’s Pick")

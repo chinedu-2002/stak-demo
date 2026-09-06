@@ -288,7 +288,9 @@ private struct StoryGrid: View {
 	var body: some View {
 		let u = figmaUnit
 		let market = NewsArticleFeed.article(NewsArticleFeed.marketTile)
-		let yours = NewsArticleFeed.article(NewsArticleFeed.apple)
+		// A story about a held stock, else the authored Apple story as a plain "Trending" tile (product audit, 2026-09-05).
+		let yoursHeld = NewsArticleFeed.yourStocksTile()
+		let yours = yoursHeld ?? NewsArticleFeed.article(NewsArticleFeed.apple)
 		let showMarket = visible(market)
 		let showYours = visible(yours)
 		if showMarket || showYours {
@@ -305,7 +307,7 @@ private struct StoryGrid: View {
 				}
 				if showYours {
 					StoryTile(
-						tag: "Your stocks",
+						tag: yoursHeld != nil ? "Your stocks" : "Trending",
 						// Authored Geist Light (1:1288) - exact-design audit 2026-09-04.
 						tagWeight: .light,
 						headline: yours.headline,

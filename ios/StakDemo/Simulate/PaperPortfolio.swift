@@ -41,6 +41,9 @@ final class PaperPortfolio: ObservableObject {
 	/// "12 picks" is authored for the demo (its rows list six); a new account counts its own.
 	var pickCountLabel: Int { demo ? 12 + (positions.count - PaperPortfolio.authoredRows.count) : positions.count }
 
+	/// "1 pick" / "12 picks" (product audit, 2026-09-05: a first buy read "1 picks").
+	var pickCountText: String { pickCountLabel == 1 ? "1 pick" : "\(pickCountLabel) picks" }
+
 	/// Seeds the authored demo history or clears everything to $10,000 of untouched paper cash.
 	func reset(demo: Bool) {
 		self.demo = demo

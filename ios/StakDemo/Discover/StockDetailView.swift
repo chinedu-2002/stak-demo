@@ -120,7 +120,7 @@ struct StockDetailView: View {
 
 						VStack(spacing: 14 * u) {
 							if fromMyStak {
-								SinceYouSavedCard()
+								SinceYouSavedCard(f: f)
 							}
 							RiskFitCard(f: f)
 							NumbersCard(f: f)
@@ -322,7 +322,7 @@ private struct RiskFitCard: View {
 					.font(StakFont.sora(15 * u, .semiBold))
 					.foregroundStyle(bright)
 				Spacer()
-				Text("Matches you")
+				Text(riskFitFor(f).0)
 					.font(StakFont.geist(11 * u, .medium))
 					.foregroundStyle(Color(argb: 0xFFA6E4F7))
 					.padding(.horizontal, 10 * u)
@@ -343,7 +343,7 @@ private struct RiskFitCard: View {
 				Spacer()
 				Text("High").font(StakFont.geist(10 * u)).foregroundStyle(muted)
 			}
-			Text(f.riskCopy)
+			Text(riskFitFor(f).1)
 				.font(StakFont.geist(11 * u))
 				.foregroundStyle(muted)
 		}
@@ -550,7 +550,7 @@ private struct NewsSignalCard: View {
 					.padding(.vertical, 3 * u)
 					.background(Color(argb: 0x14FFFFFF), in: Capsule())
 			}
-			Text(f.newsHeadline)
+			Text(src == f.newsSources.first?.0 ? f.newsHeadline : f.newsHeadline2)
 				.font(StakFont.geist(12 * u))
 				.foregroundStyle(bright)
 				.frame(width: 173 * u, alignment: .leading)
@@ -656,10 +656,38 @@ private struct CompareCard: View {
 	}
 }
 
+/// The "Since you saved" line for THIS stock (product audit, 2026-09-05: the
+/// authored 16:1012 copy named AAPL on every page and "5 weeks ago" on a
+/// stock saved a minute earlier). The demo keeps the authored figures with
+/// the right symbol; a new account reads its own save date, and the move
+/// since is this week's change once a day has passed.
+private func sinceSavedFor(_ f: DetailFacts) -> (String, String, Bool) {
+	let demo = Session.shared.demoAccount
+	let days = demo ? nil : MyStakHoldings.shared.daysSinceSaved(f.symbol)
+	var move = f.change.filter { $0.isNumber || $0 == "." }
+	if move.isEmpty { move = "0.0" }
+	let up = !f.change.contains("\u{25BC}") && !f.change.trimmingCharacters(in: .whitespaces).hasPrefix("-")
+	if demo {
+		return ("+4.6%", "Saved 5 weeks ago. \(f.symbol) is up 4.6% since, moving roughly with the market. Steady giants tend to.", true)
+	}
+	// nil = a save from before the record existed; it reads as recent rather than as the demo's five weeks.
+	guard let days, days > 0 else {
+		return ("+0.0%", "Saved \(days == 0 ? "today" : "recently"). \(f.symbol) hasn't moved since you saved it - check back after a few sessions.", true)
+	}
+	return (
+		(up ? "+" : "-") + move + "%",
+		"Saved \(days == 1 ? "yesterday" : "\(days) days ago"). \(f.symbol) is \(up ? "up" : "down") \(move)% since, moving with the market this week.",
+		up
+	)
+}
+
 /// "SINCE YOU SAVED +4.6%" banner (16:1012) for the My STAK entry.
 private struct SinceYouSavedCard: View {
+	let f: DetailFacts
+
 	var body: some View {
 		let u = figmaUnit
+		let since = sinceSavedFor(f)
 		VStack(alignment: .leading, spacing: 12 * u) {
 			HStack(spacing: 8 * u) {
 				Image("IcSavedBookmark")
@@ -669,11 +697,11 @@ private struct SinceYouSavedCard: View {
 					.font(StakFont.geist(10 * u, .medium))
 					.tracking(0.8 * u)
 					.foregroundStyle(muted)
-				Text("+4.6%")
+				Text(since.0)
 					.font(StakFont.geist(12 * u, .medium))
-					.foregroundStyle(green)
+					.foregroundStyle(since.2 ? green : red)
 			}
-			Text("Saved 5 weeks ago. AAPL is up 4.6% since, moving roughly with the market. Steady giants tend to.")
+			Text(since.1)
 				.font(StakFont.geist(11 * u))
 				.stakLineHeight(14 * u, size: 11 * u, face: .geist)
 				.foregroundStyle(muted)
@@ -781,6 +809,24 @@ private struct DetailCompareRow {
 /// news feed’s StockFacts, mirroring android/ StockDetailScreen.kt.
 /// AAPL carries the authored 1:2382/92:969 frame values VERBATIM;
 /// NVDA and GOOGL extend their deck cards off the same DECK numbers.
+/// The Risk fit chip against the user's OWN risk style (product audit,
+/// 2026-09-05: it read "Matches you" for everyone, high volatility
+/// included). The pill's authored x (88 low / 150 mid / 238 high) is the
+/// stock's volatility; TasteModel.riskStyle is the user's answer.
+private func riskFitFor(_ f: DetailFacts) -> (String, String) {
+	let style = TasteModel.riskStyle(UserProfile.shared.risk)
+	let highVol = f.riskPillX > 170
+	let lowVol = f.riskPillX < 120
+	let first = (f.riskCopy.components(separatedBy: ". ").first ?? f.riskCopy) + "."
+	if highVol && (style == "Conservative" || style == "Cautious") {
+		return ("Bolder than you", "\(first) Bolder than your profile, so keep any stake small.")
+	}
+	if lowVol && style == "Growth-Oriented" {
+		return ("Calmer than you", "\(first) Calmer than your profile, a steady anchor for a bold STAK.")
+	}
+	return ("Matches you", f.riskCopy)
+}
+
 private struct DetailFacts {
 	let symbol: String
 	let title: String
@@ -806,6 +852,8 @@ private struct DetailFacts {
 	let newsEarnings: String
 	let newsSources: [(String, String)]
 	let newsHeadline: String
+	/// The second news card's own headline (product audit, 2026-09-05: both cards repeated one line).
+	let newsHeadline2: String
 	let peersLabel: String
 	let peerA: String
 	let peerB: String
@@ -845,9 +893,10 @@ private let detailFacts: [String: DetailFacts] = [
 		],
 		newsClose: "▲ +0.8% at yesterday’s close",
 		newsSignal: "Foldable iPhone reports point to a premium fall lineup.",
-		newsEarnings: "Q3 earnings land July 30.",
+		newsEarnings: "Next earnings land \(StakClock.daysAhead(26)).",
 		newsSources: [("Yahoo · 13h ago", "Neutral"), ("CNN · 1h ago", "Neutral")],
 		newsHeadline: "The rally leaves Apple about 4 percent shy of the market-cap crown",
+		newsHeadline2: "Apple's services arm posts another record quarter as the iPhone cycle steadies",
 		peersLabel: "vs MSFT · GOOGL",
 		peerA: "MSFT", peerB: "GOOGL",
 		compareRows: [
@@ -885,9 +934,10 @@ private let detailFacts: [String: DetailFacts] = [
 		],
 		newsClose: "▲ +2.1% at yesterday’s close",
 		newsSignal: "Blackwell demand keeps outrunning supply into the fall.",
-		newsEarnings: "Q2 earnings land Aug 27.",
+		newsEarnings: "Next earnings land \(StakClock.daysAhead(54)).",
 		newsSources: [("Reuters · 2h ago", "Bullish"), ("CNBC · 9h ago", "Neutral")],
 		newsHeadline: "Nvidia lags the chip rally it kicked off as orders pile up",
+		newsHeadline2: "Nvidia's data-center backlog stretches into next year, analysts say",
 		peersLabel: "vs AMD · TSM",
 		peerA: "AMD", peerB: "TSM",
 		compareRows: [
@@ -925,9 +975,10 @@ private let detailFacts: [String: DetailFacts] = [
 		],
 		newsClose: "▲ +0.6% at yesterday’s close",
 		newsSignal: "A blowout ad quarter pushed the stock to fresh highs.",
-		newsEarnings: "Q2 earnings land Jul 22.",
+		newsEarnings: "Next earnings land \(StakClock.daysAhead(18)).",
 		newsSources: [("Bloomberg · 5h ago", "Bullish"), ("Yahoo · 1d ago", "Neutral")],
 		newsHeadline: "Alphabet jumps after a blowout ad quarter as cloud accelerates",
+		newsHeadline2: "Alphabet lifts its capex plan again as Gemini demand outruns capacity",
 		peersLabel: "vs MSFT · META",
 		peerA: "MSFT", peerB: "META",
 		compareRows: [
@@ -971,9 +1022,10 @@ private let detailFacts: [String: DetailFacts] = [
 		],
 		newsClose: "▼ -0.3% at yesterday’s close",
 		newsSignal: "Azure growth and Copilot seat counts are the numbers to watch this week.",
-		newsEarnings: "Q1 earnings land Oct 29.",
+		newsEarnings: "Next earnings land \(StakClock.daysAhead(117)).",
 		newsSources: [("Bloomberg · 4h ago", "Bullish"), ("Reuters · 11h ago", "Neutral")],
 		newsHeadline: "Tech earnings week: what to watch",
+		newsHeadline2: "Microsoft's Azure growth holds as Copilot seats climb",
 		peersLabel: "vs AAPL · GOOGL",
 		peerA: "AAPL", peerB: "GOOGL",
 		compareRows: [
@@ -1011,9 +1063,10 @@ private let detailFacts: [String: DetailFacts] = [
 		],
 		newsClose: "▲ +1.6% at yesterday’s close",
 		newsSignal: "The AI rotation is lifting AMD as buyers look past the most crowded chip names.",
-		newsEarnings: "Q3 earnings land Nov 4.",
+		newsEarnings: "Next earnings land \(StakClock.daysAhead(123)).",
 		newsSources: [("CNBC · 3h ago", "Bullish"), ("Yahoo · 8h ago", "Neutral")],
 		newsHeadline: "AMD rides the AI rotation to a yearly high",
+		newsHeadline2: "AMD lands another hyperscaler for its MI-series chips",
 		peersLabel: "vs NVDA · TSM",
 		peerA: "NVDA", peerB: "TSM",
 		compareRows: [
@@ -1051,9 +1104,10 @@ private let detailFacts: [String: DetailFacts] = [
 		],
 		newsClose: "▲ +0.4% at yesterday’s close",
 		newsSignal: "Trading desks and card spending keep the bank ahead of a softer loan market.",
-		newsEarnings: "Q3 earnings land Oct 14.",
+		newsEarnings: "Next earnings land \(StakClock.daysAhead(102)).",
 		newsSources: [("Reuters · 6h ago", "Bullish"), ("WSJ · 1d ago", "Neutral")],
 		newsHeadline: "JPMorgan tops estimates again as trading and card spending hold up",
+		newsHeadline2: "JPMorgan lifts its net-interest income outlook for the year",
 		peersLabel: "vs BAC · WFC",
 		peerA: "BAC", peerB: "WFC",
 		compareRows: [
@@ -1091,9 +1145,10 @@ private let detailFacts: [String: DetailFacts] = [
 		],
 		newsClose: "▲ +0.5% at yesterday’s close",
 		newsSignal: "Cross-border travel volume keeps payment growth running in double digits.",
-		newsEarnings: "Q4 earnings land Oct 28.",
+		newsEarnings: "Next earnings land \(StakClock.daysAhead(116)).",
 		newsSources: [("Bloomberg · 7h ago", "Bullish"), ("CNBC · 1d ago", "Neutral")],
 		newsHeadline: "Visa keeps growing at a double-digit clip as cross-border spending holds",
+		newsHeadline2: "Visa's cross-border volumes climb as travel stays strong",
 		peersLabel: "vs MA · AXP",
 		peerA: "MA", peerB: "AXP",
 		compareRows: [
@@ -1131,9 +1186,10 @@ private let detailFacts: [String: DetailFacts] = [
 		],
 		newsClose: "▼ -0.7% at yesterday’s close",
 		newsSignal: "A reopening deal calendar is refilling the investment-banking pipeline.",
-		newsEarnings: "Q3 earnings land Oct 15.",
+		newsEarnings: "Next earnings land \(StakClock.daysAhead(103)).",
 		newsSources: [("Reuters · 5h ago", "Neutral"), ("FT · 14h ago", "Bullish")],
 		newsHeadline: "Goldman rides a deal-making rebound as advisory fees climb",
+		newsHeadline2: "Goldman's IPO pipeline fills up as issuers return",
 		peersLabel: "vs MS · JPM",
 		peerA: "MS", peerB: "JPM",
 		compareRows: [
@@ -1171,9 +1227,10 @@ private let detailFacts: [String: DetailFacts] = [
 		],
 		newsClose: "▲ +2.3% at yesterday’s close",
 		newsSignal: "Battery attach rates are climbing as home-storage demand builds ahead of credit changes.",
-		newsEarnings: "Q3 earnings land Oct 28.",
+		newsEarnings: "Next earnings land \(StakClock.daysAhead(116)).",
 		newsSources: [("Yahoo · 3h ago", "Neutral"), ("CNBC · 9h ago", "Bullish")],
 		newsHeadline: "Enphase bounces as battery orders pick up in a shaky solar market",
+		newsHeadline2: "Enphase guides to a rebound as installers work through inventory",
 		peersLabel: "vs SEDG · FSLR",
 		peerA: "SEDG", peerB: "FSLR",
 		compareRows: [
@@ -1211,9 +1268,10 @@ private let detailFacts: [String: DetailFacts] = [
 		],
 		newsClose: "▲ +0.6% at yesterday’s close",
 		newsSignal: "Data-center power deals are adding to a renewables backlog that already runs for years.",
-		newsEarnings: "Q3 earnings land Oct 23.",
+		newsEarnings: "Next earnings land \(StakClock.daysAhead(111)).",
 		newsSources: [("Reuters · 8h ago", "Bullish"), ("Bloomberg · 1d ago", "Neutral")],
 		newsHeadline: "NextEra signs more data-center power deals as its renewables backlog swells",
+		newsHeadline2: "NextEra's storage build-out hits a record quarter",
 		peersLabel: "vs DUK · SO",
 		peerA: "DUK", peerB: "SO",
 		compareRows: [
@@ -1251,9 +1309,10 @@ private let detailFacts: [String: DetailFacts] = [
 		],
 		newsClose: "▼ -1.4% at yesterday’s close",
 		newsSignal: "Tariff rulings on imported panels keep swinging the stock week to week.",
-		newsEarnings: "Q3 earnings land Oct 30.",
+		newsEarnings: "Next earnings land \(StakClock.daysAhead(118)).",
 		newsSources: [("Reuters · 4h ago", "Neutral"), ("WSJ · 12h ago", "Bullish")],
 		newsHeadline: "First Solar slips as a tariff ruling clouds the outlook for imported panels",
+		newsHeadline2: "First Solar books more U.S. capacity as tariffs bite imports",
 		peersLabel: "vs ENPH · NEE",
 		peerA: "ENPH", peerB: "NEE",
 		compareRows: [
@@ -1291,9 +1350,10 @@ private let detailFacts: [String: DetailFacts] = [
 		],
 		newsClose: "▲ +0.3% at yesterday’s close",
 		newsSignal: "Warehouse leasing is firming as tenants sign again after a slow stretch.",
-		newsEarnings: "Q3 earnings land Oct 15.",
+		newsEarnings: "Next earnings land \(StakClock.daysAhead(103)).",
 		newsSources: [("Bloomberg · 6h ago", "Neutral"), ("Reuters · 1d ago", "Bullish")],
 		newsHeadline: "Prologis lifts its outlook as warehouse leasing steadies",
+		newsHeadline2: "Prologis leases fill faster as e-commerce demand firms",
 		peersLabel: "vs O · AMT",
 		peerA: "O", peerB: "AMT",
 		compareRows: [
@@ -1331,9 +1391,10 @@ private let detailFacts: [String: DetailFacts] = [
 		],
 		newsClose: "▼ -0.2% at yesterday’s close",
 		newsSignal: "Monthly dividend hikes keep coming as rate-cut hopes lift REITs.",
-		newsEarnings: "Q3 earnings land Nov 3.",
+		newsEarnings: "Next earnings land \(StakClock.daysAhead(122)).",
 		newsSources: [("Yahoo · 5h ago", "Neutral"), ("CNBC · 1d ago", "Bullish")],
 		newsHeadline: "Realty Income raises its monthly dividend again as rate hopes lift REITs",
+		newsHeadline2: "Realty Income adds another European portfolio to its rent roll",
 		peersLabel: "vs PLD · SPG",
 		peerA: "PLD", peerB: "SPG",
 		compareRows: [
@@ -1371,9 +1432,10 @@ private let detailFacts: [String: DetailFacts] = [
 		],
 		newsClose: "▲ +1.1% at yesterday’s close",
 		newsSignal: "The weight-loss pill is heading toward a decision that could open a much larger market.",
-		newsEarnings: "Q3 earnings land Oct 30.",
+		newsEarnings: "Next earnings land \(StakClock.daysAhead(118)).",
 		newsSources: [("Reuters · 2h ago", "Bullish"), ("CNBC · 10h ago", "Neutral")],
 		newsHeadline: "Eli Lilly climbs as its oral weight-loss pill nears a decision",
+		newsHeadline2: "Lilly's weight-loss pill moves closer to a filing",
 		peersLabel: "vs NVO · JNJ",
 		peerA: "NVO", peerB: "JNJ",
 		compareRows: [
@@ -1411,9 +1473,10 @@ private let detailFacts: [String: DetailFacts] = [
 		],
 		newsClose: "▼ -1.0% at yesterday’s close",
 		newsSignal: "Medical-cost trends are still running hot, and the new CEO is resetting expectations.",
-		newsEarnings: "Q3 earnings land Oct 14.",
+		newsEarnings: "Next earnings land \(StakClock.daysAhead(102)).",
 		newsSources: [("WSJ · 4h ago", "Bearish"), ("Reuters · 9h ago", "Neutral")],
 		newsHeadline: "UnitedHealth slides again as medical costs keep climbing",
+		newsHeadline2: "UnitedHealth trims its outlook as medical costs stay high",
 		peersLabel: "vs ELV · CI",
 		peerA: "ELV", peerB: "CI",
 		compareRows: [
@@ -1451,9 +1514,10 @@ private let detailFacts: [String: DetailFacts] = [
 		],
 		newsClose: "▲ +0.4% at yesterday’s close",
 		newsSignal: "New drug launches are offsetting the Stelara patent cliff faster than expected.",
-		newsEarnings: "Q3 earnings land Oct 14.",
+		newsEarnings: "Next earnings land \(StakClock.daysAhead(102)).",
 		newsSources: [("Reuters · 7h ago", "Neutral"), ("Bloomberg · 1d ago", "Bullish")],
 		newsHeadline: "J&J raises its forecast as new drugs outrun the Stelara patent cliff",
+		newsHeadline2: "J&J's oncology pipeline carries the quarter",
 		peersLabel: "vs PFE · LLY",
 		peerA: "PFE", peerB: "LLY",
 		compareRows: [
@@ -1491,9 +1555,10 @@ private let detailFacts: [String: DetailFacts] = [
 		],
 		newsClose: "▼ -0.4% at yesterday’s close",
 		newsSignal: "Cost cuts are holding up profit while the post-Covid revenue reset plays out.",
-		newsEarnings: "Q3 earnings land Nov 4.",
+		newsEarnings: "Next earnings land \(StakClock.daysAhead(123)).",
 		newsSources: [("Yahoo · 6h ago", "Neutral"), ("Reuters · 1d ago", "Neutral")],
 		newsHeadline: "Pfizer leans on cost cuts as Covid sales keep fading",
+		newsHeadline2: "Pfizer pushes deeper into obesity with a new deal",
 		peersLabel: "vs MRK · JNJ",
 		peerA: "MRK", peerB: "JNJ",
 		compareRows: [
@@ -1531,9 +1596,10 @@ private let detailFacts: [String: DetailFacts] = [
 		],
 		newsClose: "▲ +0.5% at yesterday’s close",
 		newsSignal: "Membership renewals and monthly sales are still running ahead of the rest of retail.",
-		newsEarnings: "Q4 earnings land Sep 25.",
+		newsEarnings: "Next earnings land \(StakClock.daysAhead(83)).",
 		newsSources: [("CNBC · 5h ago", "Bullish"), ("Bloomberg · 1d ago", "Neutral")],
 		newsHeadline: "Costco posts another strong sales month as memberships keep renewing",
+		newsHeadline2: "Costco's membership renewals hit a fresh high",
 		peersLabel: "vs WMT · TGT",
 		peerA: "WMT", peerB: "TGT",
 		compareRows: [
@@ -1571,9 +1637,10 @@ private let detailFacts: [String: DetailFacts] = [
 		],
 		newsClose: "▼ -1.6% at yesterday’s close",
 		newsSignal: "The turnaround is showing up in wholesale orders before it shows up in sales.",
-		newsEarnings: "Q1 earnings land Sep 30.",
+		newsEarnings: "Next earnings land \(StakClock.daysAhead(88)).",
 		newsSources: [("WSJ · 3h ago", "Neutral"), ("CNBC · 12h ago", "Bearish")],
 		newsHeadline: "Nike slips as tariff costs weigh on a turnaround that is only starting",
+		newsHeadline2: "Nike's turnaround shows early signs in running",
 		peersLabel: "vs LULU · DECK",
 		peerA: "LULU", peerB: "DECK",
 		compareRows: [

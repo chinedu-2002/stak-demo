@@ -46,6 +46,8 @@ struct SettingsScaffold<Content: View>: View {
 struct SettingsLinkRow: View {
 	let label: String
 	var value: String? = nil
+	/// Off for a value row with nothing to open behind it (product audit, 2026-09-05).
+	var chevron: Bool = true
 	let action: () -> Void
 
 	var body: some View {
@@ -62,7 +64,7 @@ struct SettingsLinkRow: View {
 						.foregroundStyle(muted)
 						.padding(.trailing, 8 * u)
 				}
-				Text("›")
+				Text(chevron ? "›" : "")
 					.font(StakFont.geist(14 * u))
 					.foregroundStyle(muted)
 			}
@@ -257,7 +259,7 @@ private struct HelpSupportView: View {
 				SettingsLinkRow(label: "Email support") {
 					if let url = URL(string: "mailto:support@stak.app?subject=STAK%20support") { UIApplication.shared.open(url) }
 				}
-				SettingsLinkRow(label: "Version", value: version) {}
+				SettingsLinkRow(label: "Version", value: version, chevron: false) {}
 			}
 			.padding(.vertical, 4 * u)
 			.background(cardBg, in: RoundedRectangle(cornerRadius: 16 * u))

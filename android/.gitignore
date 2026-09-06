@@ -9,3 +9,5 @@ captures/
 keystore.properties
 *.jks
 *.keystore
+# Firebase config - per developer / CI secret, never committed (Copilot review, PR #166)
+app/google-services.json

@@ -7,9 +7,13 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     id("com.google.devtools.ksp")
     id("com.google.dagger.hilt.android")
-    id("com.google.gms.google-services")
 
 }
+
+// The Firebase config is per developer / CI (git-ignored; see google-services.json.example):
+// the Google Services plugin only applies when the file is present, so a clean checkout
+// still builds (Copilot review, PR #166).
+if (file("google-services.json").exists()) apply(plugin = "com.google.gms.google-services")
 
 // Release signing (audit 2026-09-04). The upload key is NOT in the repo:
 // fill android/keystore.properties (git-ignored; template in

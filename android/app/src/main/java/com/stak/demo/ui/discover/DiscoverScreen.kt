@@ -1095,7 +1095,8 @@ private fun PracticeBuyContent(
 								selected = i
 								// Custom re-applies whatever valid amount its field already
 								// holds; else the last pill's amount stands until one is typed.
-								if (value != null) onAmount(value)
+								// A preset above the cash on hand is refused like a custom amount (Codex review, PR #166).
+								if (value != null) { if (value <= com.stak.demo.ui.simulate.PaperPortfolio.cash) onAmount(value) }
 								else custom.toDoubleOrNull()?.takeIf { it > 0.0 && it <= com.stak.demo.ui.simulate.PaperPortfolio.cash }?.let(onAmount)
 							}
 							.padding(vertical = (8 * u).dp),
@@ -1421,7 +1422,8 @@ internal fun DiscoverBuyFlow(
 				PracticeBuyContent(
 					// Every host's Confirm (Discover, Simulate, Stock Detail) fills
 					// the order into the shared paper portfolio, then tells the host.
-					onConfirm = { if (!filled) { filled = true; com.stak.demo.ui.simulate.PaperPortfolio.buy(spec, amount); onFilled() } },
+					// The order is checked again at confirm (Codex review, PR #166) - nothing fills past the cash on hand.
+					onConfirm = { if (!filled && com.stak.demo.ui.simulate.PaperPortfolio.canBuy(amount)) { filled = true; com.stak.demo.ui.simulate.PaperPortfolio.buy(spec, amount); onFilled() } },
 					onDismiss = onClose,
 					spec = live,
 					secondary = ticketSecondary,

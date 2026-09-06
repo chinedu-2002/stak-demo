@@ -219,7 +219,11 @@ internal object PaperPortfolio {
 	 * A symbol already held grows that position (shares + stake) instead
 	 * of adding a duplicate row; a new one lands at the top of the list.
 	 */
+	/** True when the cash on hand covers the stake - the ticket's pills and the confirm both read it (Codex review, PR #166). */
+	fun canBuy(amount: Double): Boolean = amount > 0.0 && amount <= cash
+
 	fun buy(spec: BuySpec, amount: Double) {
+		if (!canBuy(amount)) return
 		val price = spec.price
 		val shares = if (price > 0.0) amount / price else 0.0
 		cash -= amount

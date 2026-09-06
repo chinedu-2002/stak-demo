@@ -32,6 +32,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -45,6 +46,8 @@ import androidx.compose.ui.unit.sp
 import com.stak.demo.ui.theme.Geist
 import com.stak.demo.ui.theme.Sora
 import com.stak.demo.ui.theme.StakColors
+import kotlinx.coroutines.launch
+import java.io.File
 
 private const val NAME_MAX = 20
 
@@ -69,6 +72,7 @@ fun ProfileSetupScreen(onBack: () -> Unit, onProceed: () -> Unit) {
 	// permission flow, so no runtime permission is requested by the app.
 	var photoUri by rememberSaveable { mutableStateOf<String?>(null) }
 	val context = LocalContext.current
+	val scope = rememberCoroutineScope()
 	// Decoded off the main thread - a large gallery image decoded inside
 	// composition can freeze the first frame after picking (audit 2026-08-25).
 	// remember + LaunchedEffect rather than produceState (audit 2026-09-04):
@@ -93,7 +97,15 @@ fun ProfileSetupScreen(onBack: () -> Unit, onProceed: () -> Unit) {
 		}
 	}
 	val pickPhoto = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
-		if (uri != null) photoUri = uri.toString()
+		if (uri == null) return@rememberLauncherForActivityResult
+		// The picker's read grant is temporary while Session persists the URI
+		// for later launches (Codex review, PR #166): keep an app-owned copy
+		// and store THAT, so the avatar survives a reboot. The picker URI is
+		// the fallback when the copy fails.
+		scope.launch {
+			val copy = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) { copyAvatar(context, uri) }
+			photoUri = copy ?: uri.toString()
+		}
 	}
 
 	Artboard(modifier = Modifier.background(StakColors.Bg)) {
@@ -233,3 +245,10 @@ fun ProfileSetupScreen(onBack: () -> Unit, onProceed: () -> Unit) {
 		}
 	}
 }
+
+/** Copies the picked image into app storage; its file URI, or null when the copy fails. */
+private fun copyAvatar(context: android.content.Context, uri: Uri): String? = runCatching {
+	val file = File(context.filesDir, "avatar.jpg")
+	context.contentResolver.openInputStream(uri)?.use { input -> file.outputStream().use { input.copyTo(it) } } ?: return null
+	Uri.fromFile(file).toString()
+}.getOrNull()

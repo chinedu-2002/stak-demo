@@ -62,4 +62,5 @@ object UserProfile {
  * in lower case must still read capitalized everywhere).
  */
 fun String.capitalizeWords(): String =
-	split(" ").joinToString(" ") { w -> w.replaceFirstChar { c -> c.titlecase() } }
+	// Consecutive spaces produce empty segments - dropped, so typed spacing never trips this (Copilot review, PR #166).
+	split(" ").filter { it.isNotEmpty() }.joinToString(" ") { w -> w.replaceFirstChar { c -> c.titlecase() } }

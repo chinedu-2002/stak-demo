@@ -30,6 +30,7 @@ object Session {
 	private const val KEY_APPEARANCE = "pref_appearance"
 	private const val KEY_LINKED_GOOGLE = "linked_google"
 	private const val KEY_LINKED_APPLE = "linked_apple"
+	private const val KEY_JOINED = "joined"
 
 	private var prefs: SharedPreferences? = null
 
@@ -71,6 +72,7 @@ object Session {
 		UserProfile.appearance = p.getString(KEY_APPEARANCE, "dark") ?: "dark"
 		UserProfile.linkedGoogle = p.getBoolean(KEY_LINKED_GOOGLE, false)
 		UserProfile.linkedApple = p.getBoolean(KEY_LINKED_APPLE, false)
+		UserProfile.joined = p.getString(KEY_JOINED, "July 2026") ?: "July 2026"
 		applyAccount()
 	}
 
@@ -79,6 +81,8 @@ object Session {
 	fun signIn(demo: Boolean) {
 		signedIn = true
 		demoAccount = demo
+		// The demo persona joined in July; a new account joins now (product audit, 2026-09-05).
+		UserProfile.joined = if (demo) "July 2026" else StakClock.monthYear()
 		persist()
 		// A brand-new account starts from nothing; the demo account keeps
 		// whatever it did last time it was signed in.
@@ -116,6 +120,7 @@ object Session {
 		UserProfile.appearance = "dark"
 		UserProfile.linkedGoogle = false
 		UserProfile.linkedApple = false
+		UserProfile.joined = "July 2026"
 		prefs?.edit()?.clear()?.apply()
 		applyAccount()
 	}
@@ -137,6 +142,7 @@ object Session {
 			?.putString(KEY_APPEARANCE, UserProfile.appearance)
 			?.putBoolean(KEY_LINKED_GOOGLE, UserProfile.linkedGoogle)
 			?.putBoolean(KEY_LINKED_APPLE, UserProfile.linkedApple)
+			?.putString(KEY_JOINED, UserProfile.joined)
 			?.apply()
 	}
 }

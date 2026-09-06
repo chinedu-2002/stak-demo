@@ -300,14 +300,15 @@ private data class SavedStak(val spec: BuySpec, val sub: String)
 private fun savedStakRows(): List<SavedStak> {
 	if (PaperPortfolio.demo) {
 		return listOf(
-			SavedStak(PLTR_BUY, savedStakSub("PLTR", "Saved Jun 30 · not in portfolio yet")),
-			SavedStak(COST_BUY, savedStakSub("COST", "Saved Jul 2 · not in portfolio yet")),
+			// Authored 4 and 2 days before the frame's July 4, kept as ages (product audit, 2026-09-05).
+			SavedStak(PLTR_BUY, savedStakSub("PLTR", com.stak.demo.ui.StakClock.savedLabel(4) + " · not in portfolio yet")),
+			SavedStak(COST_BUY, savedStakSub("COST", com.stak.demo.ui.StakClock.savedLabel(2) + " · not in portfolio yet")),
 		)
 	}
 	val tickets = listOf(com.stak.demo.ui.discover.NVDA_BUY, com.stak.demo.ui.discover.AAPL_BUY, com.stak.demo.ui.discover.GOOGL_BUY, PLTR_BUY, COST_BUY)
 	return tickets.filter { it.symbol in com.stak.demo.ui.MyStakHoldings.tickers }
 		.take(2)
-		.map { SavedStak(it, savedStakSub(it.symbol, "Saved · not in portfolio yet")) }
+		.map { SavedStak(it, savedStakSub(it.symbol, com.stak.demo.ui.StakClock.savedLabel(0) + " · not in portfolio yet")) }
 }
 
 /** The card an empty section shows a new account (CardBg r14, Sora title, Geist body, optional teal link). */

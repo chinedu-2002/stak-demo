@@ -128,8 +128,6 @@ struct RootFlowView: View {
 				// as Push Left; socials/CTA leave to Home first run as Push
 				// Right; the "Create account" link dissolves back.
 				onBack: { pop(.pushLeft) },
-				// Product audit (2026-09-05): the link opens the reset flow.
-				onForgot: { push(.forgotPassword, .pushRight) },
 				onSignIn: {
 					// Signed in = the demo account with its authored history
 					// (product audit, 2026-09-05); remembered across launches.
@@ -137,7 +135,9 @@ struct RootFlowView: View {
 					anim = .pushRight
 					withAnimation(FlowAnim.pushRight.animation) { phase = .main }
 				},
-				onCreateAccount: { pop(.dissolve) }
+				onCreateAccount: { pop(.dissolve) },
+				// Product audit (2026-09-05): the link opens the reset flow.
+				onForgot: { push(.forgotPassword, .pushRight) }
 			)
 			.id(FlowScreen.signIn)
 		case .forgotPassword:

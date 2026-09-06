@@ -162,7 +162,11 @@ final class PaperPortfolio: ObservableObject {
 	/// A practice buy of `amount` paper dollars at the ticket's price: cash
 	/// moves into a new position at the front of the list. A symbol already
 	/// held adds to its position (shares and stake grow) - no duplicate row.
+	/// True when the cash on hand covers the stake - the ticket's pills and the confirm both read it (Codex review, PR #166).
+	func canBuy(_ amount: Double) -> Bool { amount > 0 && amount <= cash }
+
 	func buy(_ spec: BuySpec, amount: Double) {
+		guard canBuy(amount) else { return }
 		let price = spec.price
 		cash -= amount
 		newStake += amount

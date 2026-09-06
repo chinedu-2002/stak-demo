@@ -931,7 +931,13 @@ struct PracticeBuySheet: View {
 	/// its field already holds (else the last pill value stands).
 	private func pick(_ i: Int) {
 		selected = i
-		if i < practicePillAmounts.count { onAmount(practicePillAmounts[i]) } else { applyCustom() }
+		// A preset above the cash on hand is refused like a custom amount (Codex review, PR #166).
+		if i < practicePillAmounts.count {
+			let value = practicePillAmounts[i]
+			if value <= PaperPortfolio.shared.cash { onAmount(value) }
+		} else {
+			applyCustom()
+		}
 	}
 
 	/// Codex audit (2026-09-04): a typed stake counts once it parses to > 0
@@ -1134,7 +1140,7 @@ struct DiscoverBuyFlow: View {
 					// Codex audit (2026-09-04): every host (Discover, Simulate, Stock
 					// Detail) fills through here, so the paper buy lands once, before
 					// the host's onFilled.
-					PracticeBuySheet(spec: live, onConfirm: { guard !filled else { return }; PaperPortfolio.shared.buy(spec, amount: amount); filled = true; onFilled() }, onDismiss: onTicketSecondary ?? onClose, secondary: ticketSecondary, amount: amount, onAmount: { amount = $0 })
+					PracticeBuySheet(spec: live, onConfirm: { guard !filled, PaperPortfolio.shared.canBuy(amount) else { return }; PaperPortfolio.shared.buy(spec, amount: amount); filled = true; onFilled() }, onDismiss: onTicketSecondary ?? onClose, secondary: ticketSecondary, amount: amount, onAmount: { amount = $0 })
 						.transition(.opacity)
 				} else {
 					// Review (2026-09-04): "You now hold" is the FULL holding after the

@@ -57,7 +57,8 @@ extension String {
 	/// word uppercased, the rest left as typed (user, 2026-08-22: names
 	/// typed in lower case must still read capitalized everywhere).
 	var capitalizedWords: String {
-		split(separator: " ", omittingEmptySubsequences: false)
+		// Consecutive spaces produce empty segments - dropped, so typed spacing never trips this (mirrors Android, PR #166).
+		split(separator: " ", omittingEmptySubsequences: true)
 			.map { w -> String in
 				guard let first = w.first else { return String(w) }
 				return first.uppercased() + w.dropFirst()

@@ -1042,8 +1042,10 @@ private struct NativePlayerView: UIViewControllerRepresentable {
 		func playerViewController(_ playerViewController: AVPlayerViewController, willBeginFullScreenPresentationWithAnimationCoordinator coordinator: UIViewControllerTransitionCoordinator) {
 			onFullScreenChange(true)
 			// Netflix-style fullscreen (user, 2026-09-05; mirrors Android): the
-			// scene turns to landscape and the clip sits letterboxed at its own
-			// aspect ratio - the inline hero's crop-fill is for the 350x208 box.
+			// clip sits letterboxed at its own aspect ratio - the inline hero's
+			// crop-fill is for the 350x208 box - and the scene follows the
+			// phone: upright stays upright, a sideways tilt gives landscape
+			// (user's screenshot: no forced turn).
 			OrientationLock.shared.allowLandscape(true)
 			playerViewController.videoGravity = .resizeAspect
 			coordinator.animate(alongsideTransition: nil) { [weak self] context in

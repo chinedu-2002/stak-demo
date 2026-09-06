@@ -2,11 +2,14 @@ import SwiftUI
 import UIKit
 
 /// The app is portrait-locked (Info.plist), EXCEPT while the article
-/// player's native fullscreen presentation is up: then the scene turns to
-/// landscape and may be held either way up, so the clip plays like a
-/// Netflix player (user, 2026-09-05; mirrors Android's fullscreen
-/// SENSOR_LANDSCAPE). Leaving fullscreen turns the scene back to portrait
-/// before the dismissal lands. The delegate's answer overrides Info.plist.
+/// player's native fullscreen presentation is up: then the scene FOLLOWS
+/// the phone - it opens the way the phone is held (upright = the clip
+/// letterboxed on black with the same chrome, user's 2026-09-05
+/// screenshot) and turns to landscape only when the phone is tilted
+/// sideways, back to portrait when it is held upright again (mirrors
+/// Android's fullscreen FULL_SENSOR; the phone is never turned for the
+/// user). Leaving fullscreen pins the scene back to portrait before the
+/// dismissal lands. The delegate's answer overrides Info.plist.
 final class OrientationLock {
 	static let shared = OrientationLock()
 	private(set) var landscapeAllowed = false
@@ -14,7 +17,10 @@ final class OrientationLock {
 	func allowLandscape(_ allow: Bool) {
 		guard landscapeAllowed != allow else { return }
 		landscapeAllowed = allow
-		let mask: UIInterfaceOrientationMask = allow ? .landscape : .portrait
+		// Widening to every orientation does not turn the scene; it stays
+		// where the phone is and rotates with it. Narrowing to portrait
+		// turns it back upright.
+		let mask: UIInterfaceOrientationMask = allow ? .allButUpsideDown : .portrait
 		for scene in UIApplication.shared.connectedScenes.compactMap({ $0 as? UIWindowScene }) {
 			if #available(iOS 16.0, *) {
 				scene.keyWindow?.rootViewController?.setNeedsUpdateOfSupportedInterfaceOrientations()

@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -602,7 +603,22 @@ private fun DeckBanner(onOpenDeck: () -> Unit) {
 private fun FirstRunOverlay(onSeeTodaysPick: () -> Unit, modifier: Modifier = Modifier) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Box(modifier = modifier.fillMaxWidth()) {
-		Column(modifier = Modifier.matchParentSize()) {
+		// The scrim swallows every touch (product audit, 2026-09-05: an upward
+		// drag that started on the dimmed deck banner beneath it opened the
+		// deck and ended the first run). The pill below is a child, so it
+		// still receives its own taps.
+		Column(
+			modifier = Modifier
+				.matchParentSize()
+				.pointerInput(Unit) {
+					awaitEachGesture {
+						do {
+							val event = awaitPointerEvent()
+							event.changes.forEach { it.consume() }
+						} while (event.changes.any { it.pressed })
+					}
+				},
+		) {
 			Box(
 				modifier = Modifier
 					.fillMaxWidth()

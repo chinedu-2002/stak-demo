@@ -85,7 +85,7 @@ fun SettingsScaffold(title: String, onBack: () -> Unit, content: @Composable Col
 
 /** A hub-style row: label, chevron, tap. */
 @Composable
-fun SettingsLinkRow(label: String, value: String? = null, onClick: () -> Unit) {
+fun SettingsLinkRow(label: String, value: String? = null, chevron: Boolean = true, onClick: () -> Unit) {
 	val u = figmaUnit()
 	Row(
 		verticalAlignment = Alignment.CenterVertically,
@@ -98,7 +98,7 @@ fun SettingsLinkRow(label: String, value: String? = null, onClick: () -> Unit) {
 		Text(label, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp), color = Color.White)
 		Spacer(modifier = Modifier.weight(1f))
 		if (value != null) Text(value, style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp), color = Muted, modifier = Modifier.padding(end = (8 * u).dp))
-		Text("›", style = TextStyle(fontFamily = Geist, fontSize = (14 * u).sp), color = Muted)
+		if (chevron) Text("›", style = TextStyle(fontFamily = Geist, fontSize = (14 * u).sp), color = Muted)
 	}
 }
 
@@ -226,7 +226,8 @@ private fun HelpSupportScreen(onBack: () -> Unit) {
 				val intent = Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:support@stak.app")).putExtra(Intent.EXTRA_SUBJECT, "STAK support")
 				runCatching { context.startActivity(intent) }
 			}
-			SettingsLinkRow(label = "Version", value = version) {}
+			// A value row - nothing to open behind it (product audit, 2026-09-05).
+			SettingsLinkRow(label = "Version", value = version, chevron = false) {}
 		}
 	}
 }

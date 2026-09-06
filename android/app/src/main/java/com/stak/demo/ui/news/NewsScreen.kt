@@ -358,7 +358,9 @@ private fun BriefCard(brief: NewsBriefFeed.Brief, onRead: () -> Unit) {
 private fun StoryGrid(onOpenArticle: (String) -> Unit, query: String = "") {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	val market = NewsArticleFeed.article(NewsArticleFeed.MARKET_TILE)
-	val yours = NewsArticleFeed.article(NewsArticleFeed.APPLE)
+	// A story about a held stock, else the authored Apple story as a plain "Trending" tile (product audit, 2026-09-05).
+	val yoursHeld = NewsArticleFeed.yourStocksTile()
+	val yours = yoursHeld ?: NewsArticleFeed.article(NewsArticleFeed.APPLE)
 	fun visible(a: NewsArticleFeed.Article) = NewsArticleFeed.isStockNews(a) && articleMatches(a, query)
 	val showMarket = visible(market)
 	val showYours = visible(yours)
@@ -377,7 +379,7 @@ private fun StoryGrid(onOpenArticle: (String) -> Unit, query: String = "") {
 		}
 		if (showYours) {
 			StoryTile(
-				tag = "Your stocks",
+				tag = if (yoursHeld != null) "Your stocks" else "Trending",
 				// Authored Geist Light (1:1288) - exact-design audit 2026-09-04.
 				tagWeight = FontWeight.Light,
 				headline = yours.headline,

@@ -119,7 +119,7 @@ fun SimPortfolioScreen(
 				) {
 					Text(
 						// Authored copy (user, 2026-09-04 (CHINEDU 07 · Simulate 423:1007): the authored look wins).
-						"12 picks · +$240.00 all time",
+						if (PaperPortfolio.demo) "12 picks · +$240.00 all time" else "${PaperPortfolio.pickCountText} · ${PaperPortfolio.signedUsd(PaperPortfolio.allTimeGain)} all time",
 						style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp, lineHeight = (13 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
 						color = Sim.Muted,
 					)

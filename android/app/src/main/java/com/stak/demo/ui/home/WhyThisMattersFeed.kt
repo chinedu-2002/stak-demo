@@ -25,5 +25,10 @@ object WhyThisMattersFeed {
 	const val EMPTY_BODY = "Save a few stocks and STAK will show how today's news hits them."
 
 	/** The current summary - the served personalized copy once the backend exists. */
-	fun body(): String = if (com.stak.demo.ui.MyStakHoldings.count == 0) EMPTY_BODY else DEMO_BODY
+	fun body(): String = when {
+		com.stak.demo.ui.MyStakHoldings.count == 0 -> EMPTY_BODY
+		com.stak.demo.ui.Session.demoAccount -> DEMO_BODY
+		// A new account's saves against today's stories (product audit, 2026-09-05).
+		else -> com.stak.demo.ui.StakInsights.whyThisMattersBody(com.stak.demo.ui.news.NewsArticleFeed.relatedTickers())
+	}
 }

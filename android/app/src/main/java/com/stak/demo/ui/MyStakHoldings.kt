@@ -35,13 +35,27 @@ object MyStakHoldings {
 	var tickers by mutableStateOf(SEED)
 		private set
 
+	/** When each stock was saved on THIS account (epoch day) - the "Since you saved" card reads it (product audit, 2026-09-05). */
+	private var savedAt: Map<String, Long> = emptyMap()
+
 	/** Product audit (2026-09-05): a NEW account holds nothing until the user saves; the demo account keeps the seed. */
 	fun reset(demo: Boolean) {
 		// The persisted set wins over the seed (product audit, 2026-09-05).
 		tickers = StakStore.getSet("holdings") ?: if (demo) SEED else emptySet()
+		savedAt = StakStore.getString("saved_at")?.split(",")?.mapNotNull { e ->
+			val sym = e.substringBefore("=").trim()
+			val day = e.substringAfter("=", "").toLongOrNull()
+			if (sym.isNotBlank() && day != null) sym to day else null
+		}?.toMap() ?: emptyMap()
 	}
 
-	private fun persist() = StakStore.putSet("holdings", tickers)
+	private fun persist() {
+		StakStore.putSet("holdings", tickers)
+		StakStore.putString("saved_at", savedAt.entries.joinToString(",") { "${it.key}=${it.value}" })
+	}
+
+	/** Days since the stock was saved on this account; null when the save predates the record (the demo's authored saves). */
+	fun daysSinceSaved(ticker: String): Int? = savedAt[symbolOf(ticker)]?.let { (java.time.LocalDate.now().toEpochDay() - it).toInt() }
 
 	/** How many stocks the user holds - the Overview's "Across N stocks". */
 	val count: Int get() = tickers.size
@@ -50,13 +64,16 @@ object MyStakHoldings {
 	fun holdsAny(related: List<String>): Boolean = related.any { it in tickers }
 
 	fun add(ticker: String) {
-		tickers = tickers + symbolOf(ticker)
+		val sym = symbolOf(ticker)
+		tickers = tickers + sym
+		if (sym !in savedAt) savedAt = savedAt + (sym to java.time.LocalDate.now().toEpochDay())
 		persist()
 	}
 
 	/** Unsave (Stock Detail from My STAK) - the same bare-symbol normalisation as add. */
 	fun remove(ticker: String) {
 		tickers = tickers - symbolOf(ticker)
+		savedAt = savedAt - symbolOf(ticker)
 		persist()
 	}
 

@@ -214,7 +214,7 @@ fun StockDetailScreen(
 					modifier = Modifier.fillMaxWidth().padding(horizontal = (20 * u).dp, vertical = (12 * u).dp),
 				) {
 					if (fromMyStak) {
-						SinceYouSavedCard()
+						SinceYouSavedCard(f)
 					}
 					RiskFitCard(f)
 					NumbersCard(f)
@@ -349,7 +349,7 @@ private fun RiskFitCard(f: DetailFacts) {
 					.padding(horizontal = (10 * u).dp, vertical = (4 * u).dp),
 			) {
 				Text(
-					"Matches you",
+					riskFitFor(f).first,
 					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (11 * u).sp),
 					color = Color(0xFFA6E4F7),
 				)
@@ -365,7 +365,7 @@ private fun RiskFitCard(f: DetailFacts) {
 			Text("High", style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp), color = Muted)
 		}
 		Text(
-			f.riskCopy,
+			riskFitFor(f).second,
 			style = TextStyle(fontFamily = Geist, fontSize = (11 * u).sp),
 			color = Muted,
 		)
@@ -468,7 +468,7 @@ private fun NewsSignalCard(f: DetailFacts) {
 			horizontalArrangement = Arrangement.spacedBy((12 * u).dp),
 			modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
 		) {
-			f.newsSources.forEach { (src, tag) ->
+			f.newsSources.forEachIndexed { i, (src, tag) ->
 				Column(
 					verticalArrangement = Arrangement.spacedBy((8 * u).dp),
 					modifier = Modifier
@@ -498,7 +498,7 @@ private fun NewsSignalCard(f: DetailFacts) {
 						}
 					}
 					Text(
-						f.newsHeadline,
+						if (i == 0) f.newsHeadline else f.newsHeadline2,
 						style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp),
 						color = Bright,
 						modifier = Modifier.width((173 * u).dp),
@@ -874,10 +874,35 @@ private fun CompareRow(label: String, a: String, m: String, g: String, header: B
 	}
 }
 
+/**
+ * The "Since you saved" line for THIS stock (product audit, 2026-09-05: the
+ * authored 16:1012 copy named AAPL on every page and "5 weeks ago" on a
+ * stock saved a minute earlier). The demo keeps the authored figures with
+ * the right symbol; a new account reads its own save date, and the move
+ * since is this week's change once a day has passed.
+ */
+private fun sinceSavedFor(f: DetailFacts): Triple<String, String, Boolean> {
+	val demo = com.stak.demo.ui.Session.demoAccount
+	val days = if (demo) null else com.stak.demo.ui.MyStakHoldings.daysSinceSaved(f.symbol)
+	val move = f.change.filter { it.isDigit() || it == '.' }.ifBlank { "0.0" }
+	val up = !f.change.contains('\u25BC') && !f.change.trimStart().startsWith("-")
+	return when {
+		demo -> Triple("+4.6%", "Saved 5 weeks ago. ${f.symbol} is up 4.6% since, moving roughly with the market. Steady giants tend to.", true)
+		// null = a save from before the record existed; it reads as recent rather than as the demo's five weeks.
+		days == null || days == 0 -> Triple("+0.0%", "Saved ${if (days == 0) "today" else "recently"}. ${f.symbol} hasn't moved since you saved it - check back after a few sessions.", true)
+		else -> Triple(
+			(if (up) "+" else "-") + move + "%",
+			"Saved ${if (days == 1) "yesterday" else "$days days ago"}. ${f.symbol} is ${if (up) "up" else "down"} $move% since, moving with the market this week.",
+			up,
+		)
+	}
+}
+
 /** "SINCE YOU SAVED +4.6%" banner (16:1012) for the My STAK entry. */
 @Composable
-private fun SinceYouSavedCard() {
+private fun SinceYouSavedCard(f: DetailFacts) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
+	val since = sinceSavedFor(f)
 	Column(
 		verticalArrangement = Arrangement.spacedBy((12 * u).dp),
 		modifier = Modifier
@@ -896,13 +921,13 @@ private fun SinceYouSavedCard() {
 				color = Muted,
 			)
 			Text(
-				"+4.6%",
+				since.first,
 				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp),
-				color = Green,
+				color = if (since.third) Green else Red,
 			)
 		}
 		Text(
-			"Saved 5 weeks ago. AAPL is up 4.6% since, moving roughly with the market. Steady giants tend to.",
+			since.second,
 			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp, lineHeight = (14 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
 			color = Muted,
 		)
@@ -922,6 +947,24 @@ private data class DetailCompare(val label: String, val a: String, val b: String
  * values VERBATIM; NVDA and GOOGL extend their deck cards, priced off
  * the same DECK numbers so every surface agrees.
  */
+/**
+ * The Risk fit chip against the user's OWN risk style (product audit,
+ * 2026-09-05: it read "Matches you" for everyone, high volatility
+ * included). The pill's authored x (88 low / 150 mid / 238 high) is the
+ * stock's volatility; TasteModel.riskStyle is the user's answer.
+ */
+private fun riskFitFor(f: DetailFacts): Pair<String, String> {
+	val style = com.stak.demo.ui.onboarding.TasteModel.riskStyle(com.stak.demo.ui.UserProfile.risk)
+	val highVol = f.riskPillX > 170f
+	val lowVol = f.riskPillX < 120f
+	val first = f.riskCopy.substringBefore(". ") + "."
+	return when {
+		highVol && (style == "Conservative" || style == "Cautious") -> "Bolder than you" to "$first Bolder than your profile, so keep any stake small."
+		lowVol && style == "Growth-Oriented" -> "Calmer than you" to "$first Calmer than your profile, a steady anchor for a bold STAK."
+		else -> "Matches you" to f.riskCopy
+	}
+}
+
 private data class DetailFacts(
 	val symbol: String,
 	val title: String,
@@ -947,6 +990,8 @@ private data class DetailFacts(
 	val newsEarnings: String,
 	val newsSources: List<Pair<String, String>>,
 	val newsHeadline: String,
+	/** The second news card's own headline (product audit, 2026-09-05: both cards repeated one line). */
+	val newsHeadline2: String,
 	val peersLabel: String,
 	val peerA: String,
 	val peerB: String,
@@ -986,9 +1031,10 @@ private val DETAIL_FACTS = mapOf(
 		),
 		newsClose = "▲ +0.8% at yesterday’s close",
 		newsSignal = "Foldable iPhone reports point to a premium fall lineup.",
-		newsEarnings = "Q3 earnings land July 30.",
+		newsEarnings = "Next earnings land ${com.stak.demo.ui.StakClock.daysAhead(26)}.",
 		newsSources = listOf("Yahoo · 13h ago" to "Neutral", "CNN · 1h ago" to "Neutral"),
 		newsHeadline = "The rally leaves Apple about 4 percent shy of the market-cap crown",
+		newsHeadline2 = "Apple's services arm posts another record quarter as the iPhone cycle steadies",
 		peersLabel = "vs MSFT · GOOGL",
 		peerA = "MSFT", peerB = "GOOGL",
 		compareRows = listOf(
@@ -1026,9 +1072,10 @@ private val DETAIL_FACTS = mapOf(
 		),
 		newsClose = "▲ +2.1% at yesterday’s close",
 		newsSignal = "Blackwell demand keeps outrunning supply into the fall.",
-		newsEarnings = "Q2 earnings land Aug 27.",
+		newsEarnings = "Next earnings land ${com.stak.demo.ui.StakClock.daysAhead(54)}.",
 		newsSources = listOf("Reuters · 2h ago" to "Bullish", "CNBC · 9h ago" to "Neutral"),
 		newsHeadline = "Nvidia lags the chip rally it kicked off as orders pile up",
+		newsHeadline2 = "Nvidia's data-center backlog stretches into next year, analysts say",
 		peersLabel = "vs AMD · TSM",
 		peerA = "AMD", peerB = "TSM",
 		compareRows = listOf(
@@ -1066,9 +1113,10 @@ private val DETAIL_FACTS = mapOf(
 		),
 		newsClose = "▲ +0.6% at yesterday’s close",
 		newsSignal = "A blowout ad quarter pushed the stock to fresh highs.",
-		newsEarnings = "Q2 earnings land Jul 22.",
+		newsEarnings = "Next earnings land ${com.stak.demo.ui.StakClock.daysAhead(18)}.",
 		newsSources = listOf("Bloomberg · 5h ago" to "Bullish", "Yahoo · 1d ago" to "Neutral"),
 		newsHeadline = "Alphabet jumps after a blowout ad quarter as cloud accelerates",
+		newsHeadline2 = "Alphabet lifts its capex plan again as Gemini demand outruns capacity",
 		peersLabel = "vs MSFT · META",
 		peerA = "MSFT", peerB = "META",
 		compareRows = listOf(
@@ -1112,9 +1160,10 @@ private val DETAIL_FACTS = mapOf(
 		),
 		newsClose = "▼ -0.3% at yesterday’s close",
 		newsSignal = "Azure growth and Copilot seat counts are the numbers to watch this week.",
-		newsEarnings = "Q1 earnings land Oct 29.",
+		newsEarnings = "Next earnings land ${com.stak.demo.ui.StakClock.daysAhead(117)}.",
 		newsSources = listOf("Bloomberg · 4h ago" to "Bullish", "Reuters · 11h ago" to "Neutral"),
 		newsHeadline = "Tech earnings week: what to watch",
+		newsHeadline2 = "Microsoft's Azure growth holds as Copilot seats climb",
 		peersLabel = "vs AAPL · GOOGL",
 		peerA = "AAPL", peerB = "GOOGL",
 		compareRows = listOf(
@@ -1152,9 +1201,10 @@ private val DETAIL_FACTS = mapOf(
 		),
 		newsClose = "▲ +1.6% at yesterday’s close",
 		newsSignal = "The AI rotation is lifting AMD as buyers look past the most crowded chip names.",
-		newsEarnings = "Q3 earnings land Nov 4.",
+		newsEarnings = "Next earnings land ${com.stak.demo.ui.StakClock.daysAhead(123)}.",
 		newsSources = listOf("CNBC · 3h ago" to "Bullish", "Yahoo · 8h ago" to "Neutral"),
 		newsHeadline = "AMD rides the AI rotation to a yearly high",
+		newsHeadline2 = "AMD lands another hyperscaler for its MI-series chips",
 		peersLabel = "vs NVDA · TSM",
 		peerA = "NVDA", peerB = "TSM",
 		compareRows = listOf(
@@ -1192,9 +1242,10 @@ private val DETAIL_FACTS = mapOf(
 		),
 		newsClose = "▲ +0.4% at yesterday’s close",
 		newsSignal = "Trading desks and card spending keep the bank ahead of a softer loan market.",
-		newsEarnings = "Q3 earnings land Oct 14.",
+		newsEarnings = "Next earnings land ${com.stak.demo.ui.StakClock.daysAhead(102)}.",
 		newsSources = listOf("Reuters · 6h ago" to "Bullish", "WSJ · 1d ago" to "Neutral"),
 		newsHeadline = "JPMorgan tops estimates again as trading and card spending hold up",
+		newsHeadline2 = "JPMorgan lifts its net-interest income outlook for the year",
 		peersLabel = "vs BAC · WFC",
 		peerA = "BAC", peerB = "WFC",
 		compareRows = listOf(
@@ -1232,9 +1283,10 @@ private val DETAIL_FACTS = mapOf(
 		),
 		newsClose = "▲ +0.5% at yesterday’s close",
 		newsSignal = "Cross-border travel volume keeps payment growth running in double digits.",
-		newsEarnings = "Q4 earnings land Oct 28.",
+		newsEarnings = "Next earnings land ${com.stak.demo.ui.StakClock.daysAhead(116)}.",
 		newsSources = listOf("Bloomberg · 7h ago" to "Bullish", "CNBC · 1d ago" to "Neutral"),
 		newsHeadline = "Visa keeps growing at a double-digit clip as cross-border spending holds",
+		newsHeadline2 = "Visa's cross-border volumes climb as travel stays strong",
 		peersLabel = "vs MA · AXP",
 		peerA = "MA", peerB = "AXP",
 		compareRows = listOf(
@@ -1272,9 +1324,10 @@ private val DETAIL_FACTS = mapOf(
 		),
 		newsClose = "▼ -0.7% at yesterday’s close",
 		newsSignal = "A reopening deal calendar is refilling the investment-banking pipeline.",
-		newsEarnings = "Q3 earnings land Oct 15.",
+		newsEarnings = "Next earnings land ${com.stak.demo.ui.StakClock.daysAhead(103)}.",
 		newsSources = listOf("Reuters · 5h ago" to "Neutral", "FT · 14h ago" to "Bullish"),
 		newsHeadline = "Goldman rides a deal-making rebound as advisory fees climb",
+		newsHeadline2 = "Goldman's IPO pipeline fills up as issuers return",
 		peersLabel = "vs MS · JPM",
 		peerA = "MS", peerB = "JPM",
 		compareRows = listOf(
@@ -1312,9 +1365,10 @@ private val DETAIL_FACTS = mapOf(
 		),
 		newsClose = "▲ +2.3% at yesterday’s close",
 		newsSignal = "Battery attach rates are climbing as home-storage demand builds ahead of credit changes.",
-		newsEarnings = "Q3 earnings land Oct 28.",
+		newsEarnings = "Next earnings land ${com.stak.demo.ui.StakClock.daysAhead(116)}.",
 		newsSources = listOf("Yahoo · 3h ago" to "Neutral", "CNBC · 9h ago" to "Bullish"),
 		newsHeadline = "Enphase bounces as battery orders pick up in a shaky solar market",
+		newsHeadline2 = "Enphase guides to a rebound as installers work through inventory",
 		peersLabel = "vs SEDG · FSLR",
 		peerA = "SEDG", peerB = "FSLR",
 		compareRows = listOf(
@@ -1352,9 +1406,10 @@ private val DETAIL_FACTS = mapOf(
 		),
 		newsClose = "▲ +0.6% at yesterday’s close",
 		newsSignal = "Data-center power deals are adding to a renewables backlog that already runs for years.",
-		newsEarnings = "Q3 earnings land Oct 23.",
+		newsEarnings = "Next earnings land ${com.stak.demo.ui.StakClock.daysAhead(111)}.",
 		newsSources = listOf("Reuters · 8h ago" to "Bullish", "Bloomberg · 1d ago" to "Neutral"),
 		newsHeadline = "NextEra signs more data-center power deals as its renewables backlog swells",
+		newsHeadline2 = "NextEra's storage build-out hits a record quarter",
 		peersLabel = "vs DUK · SO",
 		peerA = "DUK", peerB = "SO",
 		compareRows = listOf(
@@ -1392,9 +1447,10 @@ private val DETAIL_FACTS = mapOf(
 		),
 		newsClose = "▼ -1.4% at yesterday’s close",
 		newsSignal = "Tariff rulings on imported panels keep swinging the stock week to week.",
-		newsEarnings = "Q3 earnings land Oct 30.",
+		newsEarnings = "Next earnings land ${com.stak.demo.ui.StakClock.daysAhead(118)}.",
 		newsSources = listOf("Reuters · 4h ago" to "Neutral", "WSJ · 12h ago" to "Bullish"),
 		newsHeadline = "First Solar slips as a tariff ruling clouds the outlook for imported panels",
+		newsHeadline2 = "First Solar books more U.S. capacity as tariffs bite imports",
 		peersLabel = "vs ENPH · NEE",
 		peerA = "ENPH", peerB = "NEE",
 		compareRows = listOf(
@@ -1432,9 +1488,10 @@ private val DETAIL_FACTS = mapOf(
 		),
 		newsClose = "▲ +0.3% at yesterday’s close",
 		newsSignal = "Warehouse leasing is firming as tenants sign again after a slow stretch.",
-		newsEarnings = "Q3 earnings land Oct 15.",
+		newsEarnings = "Next earnings land ${com.stak.demo.ui.StakClock.daysAhead(103)}.",
 		newsSources = listOf("Bloomberg · 6h ago" to "Neutral", "Reuters · 1d ago" to "Bullish"),
 		newsHeadline = "Prologis lifts its outlook as warehouse leasing steadies",
+		newsHeadline2 = "Prologis leases fill faster as e-commerce demand firms",
 		peersLabel = "vs O · AMT",
 		peerA = "O", peerB = "AMT",
 		compareRows = listOf(
@@ -1472,9 +1529,10 @@ private val DETAIL_FACTS = mapOf(
 		),
 		newsClose = "▼ -0.2% at yesterday’s close",
 		newsSignal = "Monthly dividend hikes keep coming as rate-cut hopes lift REITs.",
-		newsEarnings = "Q3 earnings land Nov 3.",
+		newsEarnings = "Next earnings land ${com.stak.demo.ui.StakClock.daysAhead(122)}.",
 		newsSources = listOf("Yahoo · 5h ago" to "Neutral", "CNBC · 1d ago" to "Bullish"),
 		newsHeadline = "Realty Income raises its monthly dividend again as rate hopes lift REITs",
+		newsHeadline2 = "Realty Income adds another European portfolio to its rent roll",
 		peersLabel = "vs PLD · SPG",
 		peerA = "PLD", peerB = "SPG",
 		compareRows = listOf(
@@ -1512,9 +1570,10 @@ private val DETAIL_FACTS = mapOf(
 		),
 		newsClose = "▲ +1.1% at yesterday’s close",
 		newsSignal = "The weight-loss pill is heading toward a decision that could open a much larger market.",
-		newsEarnings = "Q3 earnings land Oct 30.",
+		newsEarnings = "Next earnings land ${com.stak.demo.ui.StakClock.daysAhead(118)}.",
 		newsSources = listOf("Reuters · 2h ago" to "Bullish", "CNBC · 10h ago" to "Neutral"),
 		newsHeadline = "Eli Lilly climbs as its oral weight-loss pill nears a decision",
+		newsHeadline2 = "Lilly's weight-loss pill moves closer to a filing",
 		peersLabel = "vs NVO · JNJ",
 		peerA = "NVO", peerB = "JNJ",
 		compareRows = listOf(
@@ -1552,9 +1611,10 @@ private val DETAIL_FACTS = mapOf(
 		),
 		newsClose = "▼ -1.0% at yesterday’s close",
 		newsSignal = "Medical-cost trends are still running hot, and the new CEO is resetting expectations.",
-		newsEarnings = "Q3 earnings land Oct 14.",
+		newsEarnings = "Next earnings land ${com.stak.demo.ui.StakClock.daysAhead(102)}.",
 		newsSources = listOf("WSJ · 4h ago" to "Bearish", "Reuters · 9h ago" to "Neutral"),
 		newsHeadline = "UnitedHealth slides again as medical costs keep climbing",
+		newsHeadline2 = "UnitedHealth trims its outlook as medical costs stay high",
 		peersLabel = "vs ELV · CI",
 		peerA = "ELV", peerB = "CI",
 		compareRows = listOf(
@@ -1592,9 +1652,10 @@ private val DETAIL_FACTS = mapOf(
 		),
 		newsClose = "▲ +0.4% at yesterday’s close",
 		newsSignal = "New drug launches are offsetting the Stelara patent cliff faster than expected.",
-		newsEarnings = "Q3 earnings land Oct 14.",
+		newsEarnings = "Next earnings land ${com.stak.demo.ui.StakClock.daysAhead(102)}.",
 		newsSources = listOf("Reuters · 7h ago" to "Neutral", "Bloomberg · 1d ago" to "Bullish"),
 		newsHeadline = "J&J raises its forecast as new drugs outrun the Stelara patent cliff",
+		newsHeadline2 = "J&J's oncology pipeline carries the quarter",
 		peersLabel = "vs PFE · LLY",
 		peerA = "PFE", peerB = "LLY",
 		compareRows = listOf(
@@ -1632,9 +1693,10 @@ private val DETAIL_FACTS = mapOf(
 		),
 		newsClose = "▼ -0.4% at yesterday’s close",
 		newsSignal = "Cost cuts are holding up profit while the post-Covid revenue reset plays out.",
-		newsEarnings = "Q3 earnings land Nov 4.",
+		newsEarnings = "Next earnings land ${com.stak.demo.ui.StakClock.daysAhead(123)}.",
 		newsSources = listOf("Yahoo · 6h ago" to "Neutral", "Reuters · 1d ago" to "Neutral"),
 		newsHeadline = "Pfizer leans on cost cuts as Covid sales keep fading",
+		newsHeadline2 = "Pfizer pushes deeper into obesity with a new deal",
 		peersLabel = "vs MRK · JNJ",
 		peerA = "MRK", peerB = "JNJ",
 		compareRows = listOf(
@@ -1672,9 +1734,10 @@ private val DETAIL_FACTS = mapOf(
 		),
 		newsClose = "▲ +0.5% at yesterday’s close",
 		newsSignal = "Membership renewals and monthly sales are still running ahead of the rest of retail.",
-		newsEarnings = "Q4 earnings land Sep 25.",
+		newsEarnings = "Next earnings land ${com.stak.demo.ui.StakClock.daysAhead(83)}.",
 		newsSources = listOf("CNBC · 5h ago" to "Bullish", "Bloomberg · 1d ago" to "Neutral"),
 		newsHeadline = "Costco posts another strong sales month as memberships keep renewing",
+		newsHeadline2 = "Costco's membership renewals hit a fresh high",
 		peersLabel = "vs WMT · TGT",
 		peerA = "WMT", peerB = "TGT",
 		compareRows = listOf(
@@ -1712,9 +1775,10 @@ private val DETAIL_FACTS = mapOf(
 		),
 		newsClose = "▼ -1.6% at yesterday’s close",
 		newsSignal = "The turnaround is showing up in wholesale orders before it shows up in sales.",
-		newsEarnings = "Q1 earnings land Sep 30.",
+		newsEarnings = "Next earnings land ${com.stak.demo.ui.StakClock.daysAhead(88)}.",
 		newsSources = listOf("WSJ · 3h ago" to "Neutral", "CNBC · 12h ago" to "Bearish"),
 		newsHeadline = "Nike slips as tariff costs weigh on a turnaround that is only starting",
+		newsHeadline2 = "Nike's turnaround shows early signs in running",
 		peersLabel = "vs LULU · DECK",
 		peerA = "LULU", peerB = "DECK",
 		compareRows = listOf(

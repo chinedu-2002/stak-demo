@@ -128,16 +128,18 @@ fun LeaderboardScreen(onBack: () -> Unit) {
 					Text(PaperPortfolio.weekRank?.toString() ?: "—", style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp, lineHeight = (20 * u).sp, lineHeightStyle = FIGMA_LINE_BOX), color = Sim.Teal)
 				}
 				Box(contentAlignment = Alignment.Center, modifier = Modifier.size((36 * u).dp).background(Sim.ChipBg, CircleShape)) {
-					Text("E", style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (14 * u).sp, lineHeight = (18 * u).sp, lineHeightStyle = FIGMA_LINE_BOX), color = Sim.BadgeInk) // 1:4158 is 14 (exact-design audit 2026-09-04)
+					// The authored "E" is the demo persona's; a new account shows its own initial (product audit, 2026-09-05).
+					Text(if (PaperPortfolio.demo) "E" else com.stak.demo.ui.UserProfile.greetingName.take(1).uppercase(), style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (14 * u).sp, lineHeight = (18 * u).sp, lineHeightStyle = FIGMA_LINE_BOX), color = Sim.BadgeInk) // 1:4158 is 14 (exact-design audit 2026-09-04)
 				}
 				Column(verticalArrangement = Arrangement.spacedBy((2 * u).dp), modifier = Modifier.weight(1f)) {
 					Text("You", style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (15 * u).sp, lineHeightStyle = FIGMA_LINE_BOX), color = Color.White) // 1:4160 Sora Medium (exact-design audit 2026-09-04)
-					Text("${PaperPortfolio.pickCountLabel} picks this week", style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp, lineHeight = (13 * u).sp, lineHeightStyle = FIGMA_LINE_BOX), color = Sim.Muted)
+					Text("${PaperPortfolio.pickCountText} this week", style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp, lineHeight = (13 * u).sp, lineHeightStyle = FIGMA_LINE_BOX), color = Sim.Muted)
 				}
 				Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy((2 * u).dp)) {
 					// Authored You row (user, 2026-09-04 (CHINEDU 07 · Simulate 423:1007): the authored look wins).
-					Text("+4.2%", style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (13 * u).sp, lineHeight = (16 * u).sp, lineHeightStyle = FIGMA_LINE_BOX), color = Sim.Teal)
-					Text("▲ 12 spots", style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp, lineHeight = (13 * u).sp, lineHeightStyle = FIGMA_LINE_BOX), color = Sim.Green)
+					// A new account's You row reads its own week - it was the authored +4.2% / 12 spots for everyone (product audit, 2026-09-05).
+					Text(if (PaperPortfolio.demo) "+4.2%" else PaperPortfolio.weekPctText, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (13 * u).sp, lineHeight = (16 * u).sp, lineHeightStyle = FIGMA_LINE_BOX), color = Sim.Teal)
+					Text(if (PaperPortfolio.demo) "▲ 12 spots" else "new this week", style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp, lineHeight = (13 * u).sp, lineHeightStyle = FIGMA_LINE_BOX), color = Sim.Green)
 				}
 			}
 			TOP.forEach { LeaderRow(it) }

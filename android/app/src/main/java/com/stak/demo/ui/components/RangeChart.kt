@@ -23,6 +23,13 @@ internal val RANGE_LABELS = listOf("1D", "1W", "1M", "3M", "YTD", "1Y")
  * 2026-09-05: "be able to click on the timeline"). Mirrors
  * ios/StakDemo/Theme/RangeChart.swift.
  */
+/**
+ * The 3M shape when a line is DRAWN instead of exported - a new account's
+ * charts follow its own move (StakInsights.scaled), so the authored 3M
+ * export cannot stand in for them (product audit, 2026-09-05).
+ */
+internal val SERIES_3M: List<Float> = listOf(0.30f, 0.34f, 0.32f, 0.40f, 0.38f, 0.46f, 0.52f, 0.48f, 0.58f, 0.56f, 0.64f, 0.70f, 0.66f, 0.76f, 0.84f)
+
 internal val RANGE_SERIES: Map<String, List<Float>> = mapOf(
 	"1D" to listOf(0.45f, 0.50f, 0.42f, 0.55f, 0.60f, 0.52f, 0.58f, 0.66f, 0.62f, 0.70f),
 	"1W" to listOf(0.30f, 0.38f, 0.35f, 0.50f, 0.46f, 0.60f, 0.72f),

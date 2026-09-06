@@ -52,7 +52,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.stak.demo.R
 import com.stak.demo.ui.components.RANGE_SERIES
+import com.stak.demo.ui.components.DonutRing
 import com.stak.demo.ui.components.RangeChart
+import com.stak.demo.ui.components.SERIES_3M
+import com.stak.demo.ui.mystak.heldCountLabel
 import com.stak.demo.ui.discover.BuySpec
 import com.stak.demo.ui.discover.DiscoverBuyFlow
 import com.stak.demo.ui.theme.Geist
@@ -231,7 +234,7 @@ internal fun SimulateScreen(
 					}
 				}
 				// Authored copy (user, 2026-09-04 (CHINEDU 07 · Simulate 423:1007): the authored look wins); the ledger still drives the rows above.
-				CenterLink("See all ${PaperPortfolio.pickCountLabel} picks", onClick = onOpenPortfolio)
+				CenterLink("See all ${PaperPortfolio.pickCountText}", onClick = onOpenPortfolio)
 				}
 				// 1:4040 Points breakdown (exact-design audit 2026-09-04): the section header
 				// and the Allocation card are 15 apart, not the column's 18.
@@ -388,7 +391,7 @@ private fun ScoreHero(onOpenLeaderboard: () -> Unit) {
 			)
 		}
 		Text(
-			text = "${PaperPortfolio.signedUsd(PaperPortfolio.allTimeGain)} all time on $" + String.format(java.util.Locale.US, "%,.0f", PaperPortfolio.PAPER_START) + " paper · ${PaperPortfolio.pickCountLabel} picks",
+			text = "${PaperPortfolio.signedUsd(PaperPortfolio.allTimeGain)} all time on $" + String.format(java.util.Locale.US, "%,.0f", PaperPortfolio.PAPER_START) + " paper · ${PaperPortfolio.pickCountText}",
 			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Light, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
 			color = Sim.Muted,
 			modifier = Modifier.padding(horizontal = (20 * u).dp),
@@ -432,7 +435,7 @@ private fun ScoreHero(onOpenLeaderboard: () -> Unit) {
 		// Authored: ranks→chart gap is exactly the column's 11 (1:3935).
 		val chartModifier = Modifier.align(Alignment.CenterHorizontally).size((343 * u).dp, (73.56 * u).dp)
 		val series = RANGE_SERIES[range]
-		if (series == null) {
+		if (series == null && PaperPortfolio.demo) {
 			Image(
 				painter = painterResource(R.drawable.sim_chart_line),
 				contentDescription = null,
@@ -440,7 +443,10 @@ private fun ScoreHero(onOpenLeaderboard: () -> Unit) {
 				modifier = chartModifier,
 			)
 		} else {
-			RangeChart(series = series, tint = Sim.Teal, modifier = chartModifier)
+			// A new account's line follows its own all-time move - flat on untouched paper (product audit, 2026-09-05).
+			val pct = PaperPortfolio.allTimeGain / PaperPortfolio.PAPER_START * 100
+			val line = if (PaperPortfolio.demo) series!! else com.stak.demo.ui.StakInsights.scaled(series ?: SERIES_3M, pct)
+			RangeChart(series = line, tint = Sim.Teal, modifier = chartModifier)
 		}
 		Row(
 			verticalAlignment = Alignment.CenterVertically,
@@ -572,7 +578,8 @@ private fun InsightCard() {
 			)
 		}
 		Text(
-			text = "Three chip stocks drove 70% of your gains this month. Your taste has a type.",
+			// The demo's authored insight; a new account reads its own picks (product audit, 2026-09-05).
+			text = if (PaperPortfolio.demo) "Three chip stocks drove 70% of your gains this month. Your taste has a type." else com.stak.demo.ui.StakInsights.simInsight(),
 			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (20 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
 			color = Sim.Body,
 		)
@@ -716,15 +723,37 @@ private fun SimAllocationCard() {
 			.padding((18 * u).dp),
 	) {
 		Text("Allocation", style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp), color = Color.White)
-		Image(painterResource(R.drawable.sim_donut), null, modifier = Modifier.size((150 * u).dp))
-		Column(verticalArrangement = Arrangement.spacedBy((12 * u).dp), modifier = Modifier.fillMaxWidth()) {
-			SimSector("Tech & AI", "42% · 5 stocks", Sim.Teal, (132 * u).dp)
-			SimSector("Finance", "25% · 3 stocks", Color(0xFF7AB3F0), (66 * u).dp)
-			SimSector("Green Energy", "17% · 2 stocks", Sim.Green, (63 * u).dp)
-			SimSector("Real Estate", "8% · 1 stock", Color(0xFF9E8CE5), (38 * u).dp)
-			SimSector("Other", "8% · 1 stock", Sim.Faint, (16 * u).dp)
+		if (PaperPortfolio.demo) {
+			Image(painterResource(R.drawable.sim_donut), null, modifier = Modifier.size((150 * u).dp))
+			Column(verticalArrangement = Arrangement.spacedBy((12 * u).dp), modifier = Modifier.fillMaxWidth()) {
+				SimSector("Tech & AI", "42% · 5 stocks", Sim.Teal, (132 * u).dp)
+				SimSector("Finance", "25% · 3 stocks", Color(0xFF7AB3F0), (66 * u).dp)
+				SimSector("Green Energy", "17% · 2 stocks", Sim.Green, (63 * u).dp)
+				SimSector("Real Estate", "8% · 1 stock", Color(0xFF9E8CE5), (38 * u).dp)
+				SimSector("Other", "8% · 1 stock", Sim.Faint, (16 * u).dp)
+			}
+		} else {
+			// A new account's ring and bars come from its own picks (product audit, 2026-09-05).
+			val buckets = com.stak.demo.ui.StakInsights.buckets(PaperPortfolio.positions.map { it.spec.symbol })
+			DonutRing(buckets.map { it.share }, buckets.map { simBucketColor(it.id) }, Modifier.size((150 * u).dp))
+			Column(verticalArrangement = Arrangement.spacedBy((12 * u).dp), modifier = Modifier.fillMaxWidth()) {
+				buckets.forEach { b ->
+					SimSector(b.name, "${Math.round(b.share * 100)}% · ${heldCountLabel(b.count)}", simBucketColor(b.id), (314 * b.share * u).dp)
+				}
+			}
 		}
 	}
+}
+
+/** The authored bucket palette (1:4040), one colour per collection. */
+private fun simBucketColor(id: String): Color = when (id) {
+	"aitech" -> Sim.Teal
+	"finance" -> Color(0xFF7AB3F0)
+	"green" -> Sim.Green
+	"realestate" -> Color(0xFF9E8CE5)
+	"health" -> Color(0xFF5DA8BF)
+	"consumer" -> Color(0xFFE8B86D)
+	else -> Sim.Faint
 }
 
 @Composable

@@ -114,7 +114,7 @@ fun ProfileScreen(onBack: () -> Unit, onLogOut: () -> Unit = {}, onOpenSetting: 
 					color = Color.White,
 				)
 				Text(
-					text = "Paper investor · joined July 2026",
+					text = "Paper investor · joined ${com.stak.demo.ui.UserProfile.joined}",
 					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
 					color = Muted,
 				)

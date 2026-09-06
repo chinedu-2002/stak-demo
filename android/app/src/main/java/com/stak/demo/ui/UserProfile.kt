@@ -36,6 +36,8 @@ object UserProfile {
 	var appearance by mutableStateOf("dark")
 	var linkedGoogle by mutableStateOf(false)
 	var linkedApple by mutableStateOf(false)
+	/** The month the account was created ("September 2026"); the demo's authored "July 2026". */
+	var joined by mutableStateOf("July 2026")
 
 	/** The name as the app addresses the user - always capitalized. */
 	val greetingName: String

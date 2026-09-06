@@ -100,7 +100,8 @@ fun NewsScreen(onOpenArticle: (String) -> Unit) {
 				)
 				// Authored date line (user, 2026-09-04 (CHINEDU 03 · News 1:1228): the authored look wins).
 				Text(
-					text = "Saturday, July 4",
+					// Product audit (2026-09-05): today's date, on the authored line.
+					text = com.stak.demo.ui.StakClock.todayLong(),
 					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (13 * u).sp, lineHeight = (17 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
 					color = News.Muted,
 				)

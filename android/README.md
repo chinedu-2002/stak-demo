@@ -120,3 +120,48 @@ box, tutorial cards, 12 brand circles, Google/Apple marks);
 `res/drawable/` holds icon vector drawables converted from the Figma
 SVGs. Tab-bar icons, chevrons and the spinner are drawn with Canvas
 from the Figma vector geometry.
+
+## Backend handoff
+
+Everything the app shows today is local state or hand-written demo data.
+The seams below are where a backend plugs in. iOS mirrors every store and
+file name (see `ios/README.md`), so one API shape serves both apps.
+
+**Local state a backend would own** (all under `app/src/main/java/com/stak/demo/`):
+
+- `ui/Session.kt` — sign-in state, which account this is (`demoAccount`:
+  Sign in = the authored demo persona, Create account = an empty account),
+  the persisted profile.
+- `ui/StakStore.kt` — the per-account key-value store (SharedPreferences,
+  `demo.` / `new.` key prefixes) every store below persists through.
+- `ui/simulate/PaperPortfolio.kt` — the paper ledger: cash, positions,
+  realized sales, buy/sell (`canBuy` guards every order).
+- `ui/MyStakHoldings.kt` — saved stocks and when each was saved.
+- `ui/discover/DiscoverScreen.kt` (`DeckSession`) — the day's deck and
+  what was swiped or saved.
+- `ui/StakNotifications.kt` — inbox items and read state.
+- `ui/news/NewsSaves.kt` — bookmarked stories.
+- `ui/UserProfile.kt` — display name, photo, onboarding answers (brand
+  picks, goal, risk), notification settings. `timeZoneId` is the device's
+  IANA timezone the app sends with the session so deliveries can be
+  scheduled in the user's local time (contract of 2026-08-22).
+
+**Demo data a backend would replace:**
+
+- `ui/news/NewsArticleFeed.kt` — stories (headline, body, media, related
+  tickers) and the per-stock facts on the article card.
+- `ui/mystak/Collections.kt` — the six collections and their stocks
+  (price, weekly change).
+- `ui/discover/StockDetailScreen.kt` — per-stock detail facts (stats,
+  analyst view, news signal, next earnings date).
+- `ui/simulate/PickDetailScreen.kt` — pick specs (price then / now,
+  shares); `ui/simulate/LeaderboardScreen.kt` — the board rows.
+- `ui/StakInsights.kt` — derives a NEW account's reads (My STAK read,
+  allocation, insights) from the stores above; the demo persona keeps its
+  authored copy.
+
+**Firebase:** `core/firebase/FirebaseModule.kt` provides `FirebaseAuth`
+and `FirebaseFirestore` through Hilt, but nothing injects them yet.
+`app/google-services.json` is git-ignored — use your own project's file
+(template in `app/google-services.json.example`); the app builds and runs
+without it.

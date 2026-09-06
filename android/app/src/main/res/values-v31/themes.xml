@@ -11,10 +11,6 @@
         <item name="android:navigationBarColor">#10172A</item>
         <item name="android:windowLightStatusBar">false</item>
         <item name="android:windowSplashScreenBackground">#0A1020</item>
-        <!-- The 00 Splash frame's logo mark at its authored size and height (splash_system_mark):
-             the one part of 1:926 the system splash can carry, so the launch reads as the frame
-             from its first pixel; the ball and type follow in the app's own first frame
-             (user, 2026-09-05: "if it is mandatory then replace it with 1:926"). -->
-        <item name="android:windowSplashScreenAnimatedIcon">@drawable/splash_system_mark</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@android:color/transparent</item>
     </style>
 </resources>

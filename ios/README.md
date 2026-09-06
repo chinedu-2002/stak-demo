@@ -109,3 +109,46 @@ in both apps (the authored frames themselves are untouched):
   already serves the tapped stock (Codex parity audit 2026-09-04).
 - Portrait lock: the design is a fixed 390x844 portrait artboard (2026-09-04).
 - The My STAK holdings store drives the collection chips' counts, the collection pages, Unsave and the stock page's saved state (Codex audit 2026-09-04); the Overview's summary copy ('Across 14 stocks', 'Six of your fourteen picks', the allocation donut and bars) stays the authored frame (user, 2026-09-04: the exact design wins). The seeded demo holds the three deck stocks, so the deck's Learn more pages open already saved; Unsave one from AI & Tech to demo the authored Save flow.
+
+## Backend handoff
+
+Everything the app shows today is local state or hand-written demo data.
+The seams below are where a backend plugs in. Android mirrors every store
+and file name (see `android/README.md`), so one API shape serves both apps.
+
+**Local state a backend would own** (all under `StakDemo/`):
+
+- `Session.swift` — sign-in state, which account this is (`demoAccount`:
+  Sign in = the authored demo persona, Create account = an empty account),
+  the persisted profile.
+- `StakStore.swift` — the per-account key-value store (UserDefaults,
+  `demo.` / `new.` key prefixes) every store below persists through.
+- `Simulate/PaperPortfolio.swift` — the paper ledger: cash, positions,
+  realized sales, buy/sell (`canBuy` guards every order).
+- `MyStakHoldings.swift` — saved stocks and when each was saved.
+- `Discover/DiscoverView.swift` (`DeckSession`) — the day's deck and what
+  was swiped or saved.
+- `StakNotifications.swift` — inbox items and read state.
+- `News/NewsSaves.swift` — bookmarked stories.
+- `UserProfile.swift` — display name, photo, onboarding answers (brand
+  picks, goal, risk), notification settings. The device's IANA timezone is
+  sent with the session so deliveries can be scheduled in the user's local
+  time (contract of 2026-08-22).
+
+**Demo data a backend would replace:**
+
+- `News/NewsArticleFeed.swift` — stories (headline, body, media, related
+  tickers) and the per-stock facts on the article card.
+- `MyStak/Collections.swift` — the six collections and their stocks
+  (price, weekly change).
+- `Discover/StockDetailView.swift` — per-stock detail facts (stats,
+  analyst view, news signal, next earnings date).
+- `Simulate/PickDetailView.swift` — pick specs (price then / now,
+  shares); `Simulate/LeaderboardView.swift` — the board rows.
+- `StakInsights.swift` — derives a NEW account's reads (My STAK read,
+  allocation, insights) from the stores above; the demo persona keeps its
+  authored copy.
+
+**Firebase:** not wired on iOS yet (Android carries a Hilt module for
+Auth and Firestore); add the Firebase iOS SDK through Swift Package
+Manager in `project.yml` when the backend lands.

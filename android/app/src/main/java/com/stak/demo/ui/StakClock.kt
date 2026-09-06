@@ -25,6 +25,9 @@ object StakClock {
 		return "· ${monthDay(days)} · $read"
 	}
 
+	/** "Oct 29" for N days ahead - the stock pages' next-earnings line (product audit, 2026-09-05: "Q2 earnings land Aug 27" had passed). */
+	fun daysAhead(days: Int): String = monthDay(-days)
+
 	/** "Saved Jul 2" / "Saved today". */
 	fun savedLabel(daysAgo: Int): String = if (daysAgo == 0) "Saved today" else "Saved ${monthDay(daysAgo)}"
 

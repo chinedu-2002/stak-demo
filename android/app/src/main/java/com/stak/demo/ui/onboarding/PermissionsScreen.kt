@@ -103,7 +103,8 @@ fun PermissionsScreen(onBack: () -> Unit, onContinue: () -> Unit) {
 			)
 			PermissionCard(
 				title = "Account security",
-				description = "Face ID keeps your account locked to you.",
+				// The frame says Face ID; on Android that is fingerprint or face unlock (product audit, 2026-09-05).
+				description = "Fingerprint or face unlock keeps your account locked to you.",
 				checked = accountSecurity,
 				onToggle = { accountSecurity = !accountSecurity },
 			)

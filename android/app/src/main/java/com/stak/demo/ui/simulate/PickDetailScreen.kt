@@ -42,6 +42,7 @@ import com.stak.demo.R
 import com.stak.demo.ui.components.RANGE_LABELS
 import com.stak.demo.ui.components.RANGE_SERIES
 import com.stak.demo.ui.components.RangeChart
+import com.stak.demo.ui.components.SERIES_3M
 import com.stak.demo.ui.onboarding.AuthBackCircle
 import com.stak.demo.ui.theme.Geist
 import com.stak.demo.ui.theme.Sora
@@ -207,7 +208,7 @@ fun PickDetailScreen(
 					)
 					val chartModifier = Modifier.padding(top = (11 * u).dp).requiredSize((343 * u).dp, (73.5 * u).dp)
 					val series = RANGE_SERIES[range]
-					if (series == null) {
+					if (series == null && PaperPortfolio.demo) {
 						Image(
 							painter = painterResource(R.drawable.sim_chart_line),
 							contentDescription = null,
@@ -215,7 +216,10 @@ fun PickDetailScreen(
 							modifier = chartModifier,
 						)
 					} else {
-						RangeChart(series = series, tint = Sim.Teal, modifier = chartModifier)
+						// A new account's pick draws its own move - flat until the price moves (product audit, 2026-09-05).
+						val pct = (p.gainPct.filter { it.isDigit() || it == '.' }.toDoubleOrNull() ?: 0.0) * (if (p.up) 1 else -1)
+						val line = if (PaperPortfolio.demo) series!! else com.stak.demo.ui.StakInsights.scaled(series ?: SERIES_3M, pct)
+						RangeChart(series = line, tint = Sim.Teal, modifier = chartModifier)
 					}
 					Row(
 						verticalAlignment = Alignment.CenterVertically,

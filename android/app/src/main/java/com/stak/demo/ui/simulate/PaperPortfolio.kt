@@ -89,6 +89,9 @@ internal object PaperPortfolio {
 	/** "12 picks" is authored for the demo (its rows list six); a new account counts its own. */
 	val pickCountLabel: Int get() = if (demo) 12 + (positions.size - SEED_ROWS.size) else positions.size
 
+	/** "1 pick" / "12 picks" (product audit, 2026-09-05: a first buy read "1 picks"). */
+	val pickCountText: String get() = pickCountLabel.let { if (it == 1) "1 pick" else "$it picks" }
+
 	// The authored hero (1:3924): $10,240.00 of which $8,800.00 is cash.
 	private const val AUTHORED_VALUE = 10240.0
 	private const val SEED_CASH = 8800.0

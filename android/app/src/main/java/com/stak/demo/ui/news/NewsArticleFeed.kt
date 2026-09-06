@@ -34,6 +34,22 @@ object NewsArticleFeed {
 	 */
 	const val MARKET_TILE = "amzn-cloud-beat"
 
+	/** Every ticker today's stories relate to - the Home "Why this matters" read (product audit, 2026-09-05). */
+	fun relatedTickers(): Set<String> = ARTICLES.flatMap { it.relatedTickers }.toSet()
+
+	/**
+	 * The "Your stocks" tile's story: the authored Apple story when the
+	 * user holds a stock it relates to (the demo does), else the first
+	 * story about a held stock; null when nothing held is in the news
+	 * (product audit, 2026-09-05: a one-stock account was shown Apple).
+	 */
+	fun yourStocksTile(): Article? {
+		val held = com.stak.demo.ui.MyStakHoldings.tickers
+		val apple = article(APPLE)
+		if (apple.relatedTickers.any { it in held }) return apple
+		return ARTICLES.firstOrNull { it.id != MARKET_TILE && it.relatedTickers.any { t -> t in held } }
+	}
+
 	/** The served demo payload's off-topic story - see the gate below. */
 	private const val OFF_TOPIC = "wimbledon-final"
 
@@ -487,6 +503,15 @@ object NewsArticleFeed {
 	)
 
 	/** The served stock module for a ticker - the backend resolves this in production. */
-	fun stockFacts(ticker: String): StockFacts =
-		STOCK_FACTS[ticker] ?: STOCK_FACTS.getValue("AAPL")
+	fun stockFacts(ticker: String): StockFacts {
+		val facts = STOCK_FACTS[ticker] ?: STOCK_FACTS.getValue("AAPL")
+		// Product audit (2026-09-05): the demo stand-ins quoted NVDA at $178.42
+		// while the deck and My STAK say $122.10. Every stock the catalogue
+		// carries takes ITS quote here; the authored Apple card (1:1495) stays
+		// frame-exact.
+		if (ticker == "AAPL") return facts
+		val live = com.stak.demo.ui.mystak.COLLECTIONS.flatMap { it.stocks }.firstOrNull { it.ticker == ticker } ?: return facts
+		val pct = live.change.filter { it.isDigit() || it == '.' }
+		return facts.copy(price = live.price, change = (if (live.up) "+" else "-") + pct + "% today", up = live.up)
+	}
 }

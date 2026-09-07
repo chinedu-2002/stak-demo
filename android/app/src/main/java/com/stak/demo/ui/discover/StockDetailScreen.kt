@@ -269,7 +269,14 @@ fun StockDetailScreen(
 							com.stak.demo.ui.MyStakHoldings.remove(f.symbol)
 						}
 					} else {
-						DetailCta("Save") { showSuccess = true }
+						// The save is committed on the tap itself (Codex review, PR #166): the
+						// overlay's paths only navigate, so no dismissal can lose it.
+						DetailCta("Save") {
+							saved = true
+							DeckSession.saved = DeckSession.saved + f.symbol
+							com.stak.demo.ui.MyStakHoldings.add(f.symbol)
+							showSuccess = true
+						}
 						DetailSecondary("Practice buy") { if (onPracticeBuy != null) onPracticeBuy() else showBuy = true }
 					}
 				}
@@ -280,6 +287,8 @@ fun StockDetailScreen(
 				MainTabBar(selected = MainTab.Discover, onSelect = onTab)
 			}
 		}
+		// System Back dismisses the overlay like the scrim does (Codex review, PR #166).
+		androidx.activity.compose.BackHandler(enabled = showSuccess) { showSuccess = false }
 		// B6: the save-success sheet enters like the News one - scale
 		// 0.92 -> 1 + fade - at the authored 350 ease-out (92:969).
 		AnimatedVisibility(

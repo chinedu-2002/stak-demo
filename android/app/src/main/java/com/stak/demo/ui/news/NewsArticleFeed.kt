@@ -503,6 +503,9 @@ object NewsArticleFeed {
 	)
 
 	/** The served stock module for a ticker - the backend resolves this in production. */
+	/** True when the feed carries facts for the ticker (the Other collection reads them). */
+	fun hasStockFacts(ticker: String): Boolean = ticker in STOCK_FACTS
+
 	fun stockFacts(ticker: String): StockFacts {
 		val facts = STOCK_FACTS[ticker] ?: STOCK_FACTS.getValue("AAPL")
 		// Product audit (2026-09-05): the demo stand-ins quoted NVDA at $178.42

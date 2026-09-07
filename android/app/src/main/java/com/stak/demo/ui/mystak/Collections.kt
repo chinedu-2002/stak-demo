@@ -123,7 +123,45 @@ internal val COLLECTIONS = listOf(
 
 /** The served collection - an unknown id falls back to the authored AI & Tech frame. */
 internal fun collection(id: String): StakCollection =
-	COLLECTIONS.firstOrNull { it.id == id } ?: COLLECTIONS.first()
+	if (id == OTHER_ID) otherCollection() ?: COLLECTIONS.first()
+	else COLLECTIONS.firstOrNull { it.id == id } ?: COLLECTIONS.first()
+
+internal const val OTHER_ID = "other"
+
+/**
+ * The stocks the user holds that no collection catalogues - news saves such
+ * as AMZN, MU, PLTR, TSLA or XOM (Codex review, PR #166). Built from the
+ * holdings and the news feed's stock facts, so every saved ticker has a tile
+ * to open and unsave from; null while nothing uncatalogued is held. The demo
+ * persona keeps its authored six-tile grid (its TSLA / SNOW are the authored
+ * Best / Worst stand-ins). Mirrors ios StakCollections.other.
+ */
+internal fun otherCollection(): StakCollection? {
+	val catalogued = COLLECTIONS.flatMap { it.stocks }.map { it.ticker }.toSet()
+	val extra = MyStakHoldings.tickers.filter { it !in catalogued }.sorted()
+	if (extra.isEmpty()) return null
+	val stocks = extra.map { t ->
+		val known = com.stak.demo.ui.news.NewsArticleFeed.hasStockFacts(t)
+		val f = com.stak.demo.ui.news.NewsArticleFeed.stockFacts(t)
+		CollStock(
+			badge = t.take(1),
+			change = if (known) (if (f.up) "▲ " else "▼ ") + f.change.removePrefix("+").removePrefix("-").removeSuffix(" today") else "—",
+			up = if (known) f.up else true,
+			ticker = t,
+			company = if (known) f.shortName else t,
+			price = if (known) f.price else "—",
+		)
+	}
+	return StakCollection(
+		id = OTHER_ID,
+		name = "Other",
+		countLabel = "",
+		blurb = "Stocks you saved from the news that sit outside the six collections.",
+		iconRes = R.drawable.ic_saved_bookmark,
+		heroRes = R.drawable.ic_saved_bookmark,
+		stocks = stocks,
+	)
+}
 
 /**
  * The collection's stocks the user actually holds. Codex audit

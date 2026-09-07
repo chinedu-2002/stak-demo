@@ -118,7 +118,10 @@ fun MyStakScreen(onOpenCollection: (String) -> Unit, onStartSwiping: () -> Unit)
 				// Codex parity audit (2026-09-04): each chip carries ITS
 				// catalogue id (Collections.kt) so the page serves that
 				// collection, the way the deck's Learn more serves its stock.
-				COLLECTIONS.chunked(2).forEach { pair ->
+				// A seventh, "Other" tile appears only while a new account holds stocks
+				// no collection catalogues (Codex review, PR #166); the demo keeps its six.
+				val other = if (com.stak.demo.ui.Session.demoAccount) null else otherCollection()
+				(COLLECTIONS + listOfNotNull(other)).chunked(2).forEach { pair ->
 					Row(horizontalArrangement = Arrangement.spacedBy((10 * u).dp), modifier = Modifier.fillMaxWidth()) {
 						pair.forEach { c ->
 							// Codex audit (2026-09-04): the count is the HELD count from
@@ -126,6 +129,7 @@ fun MyStakScreen(onOpenCollection: (String) -> Unit, onStartSwiping: () -> Unit)
 							// drops it here too.
 							CollectionChip(c.name, heldCountLabel(c.held().size), imageRes = c.imageRes, iconRes = c.iconRes, onClick = { onOpenCollection(c.id) }, modifier = Modifier.weight(1f))
 						}
+						if (pair.size == 1) Spacer(modifier = Modifier.weight(1f))
 					}
 				}
 			}

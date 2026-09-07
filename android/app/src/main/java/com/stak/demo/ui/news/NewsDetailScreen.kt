@@ -248,7 +248,8 @@ fun NewsDetailScreen(articleId: String = NewsArticleFeed.APPLE, onBack: () -> Un
 						article = article,
 						saved = article.id in savedIds,
 						onSave = { save(article) },
-						onAddToStak = { successId = article.id; showSuccess = true },
+						// The save is committed on the tap (Codex review, PR #166); the sheet's paths only navigate.
+						onAddToStak = { save(article); successId = article.id; showSuccess = true },
 						onOpenArticle = onOpenArticle,
 					)
 				}
@@ -266,6 +267,8 @@ fun NewsDetailScreen(articleId: String = NewsArticleFeed.APPLE, onBack: () -> Un
 				fadeIn(tween(350, easing = EaseOut)),
 			exit = fadeOut(tween(300, easing = EaseOut)),
 		) {
+			// System Back dismisses the sheet like the scrim does (Codex review, PR #166).
+			androidx.activity.compose.BackHandler(enabled = showSuccess) { showSuccess = false }
 			SaveSuccessOverlay(
 				facts = NewsArticleFeed.stockFacts(successArticle.ticker ?: "AAPL"),
 				onViewInMyStak = { save(successArticle); onViewInMyStak() },
@@ -468,6 +471,7 @@ private fun HeroImage(media: NewsMedia, category: String, saved: Boolean, player
 				}
 			} else {
 				NewsVideoPlayer(
+					onLoaded = { player.firstFrame = true },
 					video = video,
 					paused = paused,
 					modifier = Modifier
@@ -1192,7 +1196,7 @@ private fun SaveSuccessOverlay(facts: NewsArticleFeed.StockFacts, onViewInMyStak
  */
 @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
 @Composable
-private fun NewsVideoPlayer(video: NewsMedia.Video, modifier: Modifier = Modifier, paused: Boolean = false, onDone: () -> Unit = {}) {
+private fun NewsVideoPlayer(video: NewsMedia.Video, modifier: Modifier = Modifier, paused: Boolean = false, onDone: () -> Unit = {}, onLoaded: () -> Unit = {}) {
 	val embed = video.youTubeEmbedUrl
 	if (embed != null) {
 		androidx.compose.ui.viewinterop.AndroidView(
@@ -1206,6 +1210,8 @@ private fun NewsVideoPlayer(video: NewsMedia.Video, modifier: Modifier = Modifie
 					webViewClient = object : android.webkit.WebViewClient() {
 						override fun onPageFinished(view: android.webkit.WebView?, url: String?) {
 							android.util.Log.i("NewsMedia", "embed loaded: $url")
+							// The hero's poster lifts once the embed has loaded (Codex review, PR #167 mirror).
+							onLoaded()
 						}
 						override fun onReceivedError(view: android.webkit.WebView?, request: android.webkit.WebResourceRequest?, error: android.webkit.WebResourceError?) {
 							android.util.Log.w("NewsMedia", "embed error ${error?.errorCode} ${error?.description} for ${request?.url}")

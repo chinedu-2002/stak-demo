@@ -29,6 +29,8 @@ object UserProfile {
 	var risk by mutableStateOf(-1)
 	/** 08 Permissions: the user's answer, and the OS grant when it was asked (product audit, 2026-09-05). */
 	var notificationsOn by mutableStateOf(true)
+	/** 08 Permissions "Account security": a signed-in user unlocks with biometrics / the device credential before Home (Codex review, PR #167 mirror). */
+	var accountLock by mutableStateOf(false)
 	// The settings pages behind the Profile hub (product audit, 2026-09-05).
 	var priceAlerts by mutableStateOf(true)
 	var dailyDeck by mutableStateOf(true)

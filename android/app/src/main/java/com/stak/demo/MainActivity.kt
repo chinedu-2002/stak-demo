@@ -24,7 +24,8 @@ import com.stak.demo.ui.theme.StakTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+// A FragmentActivity so BiometricPrompt can attach (the account lock, PR #167 mirror); setContent and edge-to-edge are unchanged.
+class MainActivity : androidx.fragment.app.FragmentActivity() {
 	/** The PiP window's rewind/play-pause/forward actions (user, 2026-08-31 video_app reference). */
 	private val pipControls = object : BroadcastReceiver() {
 		override fun onReceive(context: Context?, intent: Intent?) {

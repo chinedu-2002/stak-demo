@@ -101,6 +101,10 @@ struct PermissionCard: View {
 			}
 			.frame(maxWidth: .infinity, alignment: .leading)
 			StakToggle(isOn: $isOn)
+				// VoiceOver reads the row it switches (Copilot review, PR #167).
+				.accessibilityLabel(title)
+				.accessibilityValue(isOn ? "On" : "Off")
+				.accessibilityAddTraits(.isButton)
 		}
 		.padding(16 * u)
 		.background(Auth.inputBg, in: RoundedRectangle(cornerRadius: 14 * u))

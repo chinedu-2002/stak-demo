@@ -5,8 +5,18 @@ import Foundation
 /// Story and save dates are relative ages, so they stay fresh. Mirrors android
 /// StakClock.kt.
 enum StakClock {
+	/// One formatter per pattern (Copilot review, PR #167: a new DateFormatter per call
+	/// is expensive in feed paths); en_US_POSIX for fixed-format output, the device's
+	/// live time zone.
+	private static var formatters: [String: DateFormatter] = [:]
 	private static func formatter(_ pattern: String) -> DateFormatter {
-		let f = DateFormatter(); f.locale = Locale(identifier: "en_US"); f.dateFormat = pattern; return f
+		if let f = formatters[pattern] { return f }
+		let f = DateFormatter()
+		f.locale = Locale(identifier: "en_US_POSIX")
+		f.timeZone = .autoupdatingCurrent
+		f.dateFormat = pattern
+		formatters[pattern] = f
+		return f
 	}
 
 	/// "Saturday, July 4" for today.

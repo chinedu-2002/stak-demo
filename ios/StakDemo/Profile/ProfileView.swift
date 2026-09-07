@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 // Palette of the Profile hub. Card surfaces here are #10182B — deliberately
 // not the #181F30 onboarding card color. Mirrors android/ ProfileScreen.kt.

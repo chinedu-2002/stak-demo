@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 /// Palette of the CHINEDU "02 · Home" frames.
 private enum Home {

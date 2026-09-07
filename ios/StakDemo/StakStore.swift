@@ -7,7 +7,14 @@ import Foundation
 /// Session.applyAccount() reads it back. Mirrors android StakStore.kt.
 enum StakStore {
 	private static var defaults: UserDefaults { .standard }
-	private static func key(_ name: String) -> String { (Session.shared.demoAccount ? "demo." : "new.") + name }
+
+	/// Which account's keys to use. Session sets it BEFORE it reads any store (its
+	/// init, sign-in and sign-out) - the store must never reach for
+	/// `Session.shared`, whose static init is what calls it (Copilot review, PR
+	/// #167: a re-entrant `Session.shared` access during launch).
+	static var demoAccount: Bool = true
+
+	private static func key(_ name: String) -> String { (demoAccount ? "demo." : "new.") + name }
 
 	static func string(_ name: String) -> String? { defaults.string(forKey: key(name)) }
 	static func set(_ value: String, for name: String) { defaults.set(value, forKey: key(name)) }

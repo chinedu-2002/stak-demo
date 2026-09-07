@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 /// Persisted sign-in state (user, 2026-08-23): a user who already signed
 /// in is not asked to sign in again - the splash goes straight to Home;
@@ -41,6 +42,7 @@ final class Session: ObservableObject {
 		signedIn = wasSignedIn
 		resumedSignedIn = wasSignedIn
 		demoAccount = d.object(forKey: Self.keyDemo) as? Bool ?? true
+		StakStore.demoAccount = d.object(forKey: Self.keyDemo) as? Bool ?? true
 		UserProfile.shared.displayName = d.string(forKey: Self.keyName) ?? ""
 		if let risk = d.string(forKey: Self.keyRisk) { UserProfile.shared.riskStyle = risk }
 		UserProfile.shared.brandPicks = Set(d.stringArray(forKey: Self.keyPicks) ?? [])
@@ -75,6 +77,7 @@ final class Session: ObservableObject {
 	func signIn(demo: Bool) {
 		signedIn = true
 		demoAccount = demo
+		StakStore.demoAccount = demo
 		// The demo persona joined in July; a new account joins now (product audit, 2026-09-05).
 		UserProfile.shared.joined = demo ? "July 2026" : StakClock.monthYear()
 		persist()
@@ -92,6 +95,7 @@ final class Session: ObservableObject {
 		signedIn = false
 		resumedSignedIn = false
 		demoAccount = true
+		StakStore.demoAccount = true
 		UserProfile.shared.displayName = ""
 		UserProfile.shared.photoData = nil
 		UserProfile.shared.riskStyle = "Growth-Oriented"

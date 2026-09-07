@@ -31,6 +31,8 @@ object StakRoutes {
 	const val PROFILE = "profile"
 	/** The Home bell's inbox (product audit, 2026-09-05). */
 	const val NOTIFICATIONS = "notifications"
+	/** The account lock between the splash and Home (PR #167 mirror). */
+	const val LOCK = "lock"
 	/** The Profile hub's settings pages - `kind` is a SettingsKind. */
 	const val SETTINGS = "settings/{kind}"
 	fun settings(kind: String) = "settings/$kind"

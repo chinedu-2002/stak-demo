@@ -116,12 +116,23 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
 					// Returning user (signed in before) goes straight to Home;
 					// a first-time user is taken to create an account
 					// (user, 2026-08-23).
-					val next = if (com.stak.demo.ui.Session.signedIn) StakRoutes.MAIN else StakRoutes.createAccount(via = "dissolve")
+					// A signed-in user who left "Account security" on unlocks first (Codex review, PR #167 mirror).
+					val locked = com.stak.demo.ui.Session.signedIn && com.stak.demo.ui.UserProfile.accountLock
+					val next = if (com.stak.demo.ui.Session.signedIn) (if (locked) StakRoutes.LOCK else StakRoutes.MAIN) else StakRoutes.createAccount(via = "dissolve")
 					navController.navigate(next) {
 						popUpTo(StakRoutes.SPLASH) { inclusive = true }
 					}
 				},
 			)
+		}
+		composable(
+			StakRoutes.LOCK,
+			enterTransition = { fadeIn(tween(350, easing = EaseOut)) },
+			exitTransition = { fadeOut(tween(350, easing = EaseOut)) },
+		) {
+			com.stak.demo.ui.onboarding.BiometricGate(onUnlocked = {
+				navController.navigate(StakRoutes.MAIN) { popUpTo(StakRoutes.LOCK) { inclusive = true } }
+			})
 		}
 		composable(
 			StakRoutes.INTRO,

@@ -56,6 +56,7 @@ import com.stak.demo.ui.theme.StakColors
 fun PermissionsScreen(onBack: () -> Unit, onContinue: () -> Unit) {
 	val u = figmaUnit()
 	var notifications by rememberSaveable { mutableStateOf(true) }
+	var accountSecurity by rememberSaveable { mutableStateOf(true) }
 	// Product audit (2026-09-05): "Allow and continue" really asks the OS
 	// (Android 13+ POST_NOTIFICATIONS); the grant is what the toggle meant.
 	val context = LocalContext.current
@@ -68,9 +69,10 @@ fun PermissionsScreen(onBack: () -> Unit, onContinue: () -> Unit) {
 		val needsAsk = notifications && android.os.Build.VERSION.SDK_INT >= 33 &&
 			androidx.core.content.ContextCompat.checkSelfPermission(context, android.Manifest.permission.POST_NOTIFICATIONS) != android.content.pm.PackageManager.PERMISSION_GRANTED
 		com.stak.demo.ui.UserProfile.notificationsOn = notifications
+		// The lock the toggle promises is real: enforced at the next launch (Codex review, PR #167 mirror).
+		com.stak.demo.ui.UserProfile.accountLock = accountSecurity
 		if (needsAsk) askNotifications.launch(android.Manifest.permission.POST_NOTIFICATIONS) else onContinue()
 	}
-	var accountSecurity by rememberSaveable { mutableStateOf(true) }
 
 	Artboard(modifier = Modifier.background(StakColors.Bg)) {
 		Row(modifier = Modifier.fillMaxWidth().padding(horizontal = (20 * u).dp).padding(top = (10 * u).dp, bottom = (4 * u).dp)) {
@@ -126,7 +128,7 @@ fun PermissionsScreen(onBack: () -> Unit, onContinue: () -> Unit) {
 			modifier = Modifier.fillMaxWidth().padding(top = (8 * u).dp, bottom = (26 * u).dp),
 		) {
 			AuthCta(text = "Allow and continue", onClick = { allowAndContinue() })
-			AuthSecondaryButton(text = "Not now", onClick = { com.stak.demo.ui.UserProfile.notificationsOn = false; onContinue() })
+			AuthSecondaryButton(text = "Not now", onClick = { com.stak.demo.ui.UserProfile.notificationsOn = false; com.stak.demo.ui.UserProfile.accountLock = false; onContinue() })
 		}
 	}
 }

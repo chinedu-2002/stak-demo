@@ -68,7 +68,8 @@ class MainActivity : androidx.fragment.app.FragmentActivity() {
 			// opens on the identical SplashScreen, so nothing visibly changes.
 			val first = PreSplashView(this)
 			setContentView(first)
-			first.doOnPreDraw { first.post { compose() } }
+			// The post can land after a finish (back before the first frame): skip it then.
+			first.doOnPreDraw { first.post { if (!isFinishing && !isDestroyed) compose() } }
 		} else {
 			compose()
 		}

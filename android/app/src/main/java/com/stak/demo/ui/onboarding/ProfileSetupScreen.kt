@@ -73,6 +73,9 @@ fun ProfileSetupScreen(onBack: () -> Unit, onProceed: () -> Unit) {
 	var photoUri by rememberSaveable { mutableStateOf<String?>(null) }
 	val context = LocalContext.current
 	val scope = rememberCoroutineScope()
+	// Proceed waits for the avatar copy (Codex review, PR #166): leaving the screen
+	// mid-copy would cancel it and persist a null photo.
+	var copying by remember { mutableStateOf(false) }
 	// Decoded off the main thread - a large gallery image decoded inside
 	// composition can freeze the first frame after picking (audit 2026-08-25).
 	// remember + LaunchedEffect rather than produceState (audit 2026-09-04):
@@ -102,9 +105,11 @@ fun ProfileSetupScreen(onBack: () -> Unit, onProceed: () -> Unit) {
 		// for later launches (Codex review, PR #166): keep an app-owned copy
 		// and store THAT, so the avatar survives a reboot. The picker URI is
 		// the fallback when the copy fails.
+		copying = true
 		scope.launch {
 			val copy = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) { copyAvatar(context, uri) }
 			photoUri = copy ?: uri.toString()
+			copying = false
 		}
 	}
 
@@ -237,7 +242,7 @@ fun ProfileSetupScreen(onBack: () -> Unit, onProceed: () -> Unit) {
 		}
 
 		Column(modifier = Modifier.fillMaxWidth().padding(top = (8 * u).dp, bottom = (26 * u).dp)) {
-			AuthCta(text = "Proceed to home", enabled = name.isNotBlank(), onClick = {
+			AuthCta(text = "Proceed to home", enabled = name.isNotBlank() && !copying, onClick = {
 				com.stak.demo.ui.UserProfile.displayName = name.trim().capitalizeWords()
 				com.stak.demo.ui.UserProfile.photoUri = photoUri
 				onProceed()

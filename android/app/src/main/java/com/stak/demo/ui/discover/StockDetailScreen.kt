@@ -253,7 +253,8 @@ fun StockDetailScreen(
 						DetailCta("Practice buy") { showBuy = true }
 						// Codex audit (2026-09-04): Unsave drops the stock from the
 						// holdings store, so the collection page and every count follow.
-						DetailSecondary("Unsave") { com.stak.demo.ui.MyStakHoldings.remove(f.symbol); onBack() }
+						// Unsave clears this run's deck save too (Codex review, PR #167 mirror).
+						DetailSecondary("Unsave") { DeckSession.saved = DeckSession.saved - f.symbol; com.stak.demo.ui.MyStakHoldings.remove(f.symbol); onBack() }
 					} else if (saved) {
 						// A saved stock reads the same from every entry: the authored
 						// saved block (16:1012) - Practice buy + Unsave. The "Saved to
@@ -290,7 +291,8 @@ fun StockDetailScreen(
 		) {
 			DetailSavedSheet(
 				f = f,
-				onDone = { showSuccess = false; saved = true; DeckSession.saved = DeckSession.saved + f.symbol },
+				// The scrim dismiss saves like the two CTAs do (Codex review, PR #166).
+				onDone = { showSuccess = false; saved = true; DeckSession.saved = DeckSession.saved + f.symbol; com.stak.demo.ui.MyStakHoldings.add(f.symbol) },
 				// B7/B8: both CTAs mark the stock saved, then leave the page
 				// (forward push to My STAK / dissolve back to the deck).
 				onViewInMyStak = {

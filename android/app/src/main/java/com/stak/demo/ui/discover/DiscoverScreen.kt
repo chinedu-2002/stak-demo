@@ -1092,12 +1092,15 @@ private fun PracticeBuyContent(
 								interactionSource = remember { MutableInteractionSource() },
 								indication = com.stak.demo.ui.theme.PressDim,
 							) {
-								selected = i
-								// Custom re-applies whatever valid amount its field already
-								// holds; else the last pill's amount stands until one is typed.
-								// A preset above the cash on hand is refused like a custom amount (Codex review, PR #166).
-								if (value != null) { if (value <= com.stak.demo.ui.simulate.PaperPortfolio.cash) onAmount(value) }
-								else custom.toDoubleOrNull()?.takeIf { it > 0.0 && it <= com.stak.demo.ui.simulate.PaperPortfolio.cash }?.let(onAmount)
+								// A preset above the cash on hand is refused and does not become the
+								// selection (Codex review, PR #166); Custom re-applies whatever valid
+								// amount its field already holds, else the last amount stands.
+								if (value != null) {
+									if (value <= com.stak.demo.ui.simulate.PaperPortfolio.cash) { selected = i; onAmount(value) }
+								} else {
+									selected = i
+									custom.toDoubleOrNull()?.takeIf { it > 0.0 && it <= com.stak.demo.ui.simulate.PaperPortfolio.cash }?.let(onAmount)
+								}
 							}
 							.padding(vertical = (8 * u).dp),
 					) {

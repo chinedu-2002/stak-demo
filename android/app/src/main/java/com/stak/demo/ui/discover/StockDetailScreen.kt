@@ -44,6 +44,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Size
@@ -695,9 +696,10 @@ private fun AnalystCard(f: DetailFacts, open: Boolean, onToggle: () -> Unit) {
 				color = Bright,
 			)
 			Spacer(modifier = Modifier.weight(1f))
-			if (!open) {
-				Image(painterResource(R.drawable.ic_sd_caret), null, modifier = Modifier.size((20 * u).dp))
-			}
+			// The caret stays when the card is open, flipped into a drop-up so the user
+			// sees it folds back (user, 2026-09-06: "no drop up when a user is on it");
+			// the open frames (1:2651 / 1:2719) author none. Mirrors iOS.
+			Image(painterResource(R.drawable.ic_sd_caret), null, modifier = Modifier.size((20 * u).dp).rotate(if (open) 180f else 0f))
 		}
 		if (!open) {
 			Text(
@@ -799,9 +801,10 @@ private fun CompareCard(f: DetailFacts) {
 				color = Bright,
 			)
 			Spacer(modifier = Modifier.weight(1f))
-			if (!open) {
-				Image(painterResource(R.drawable.ic_sd_caret), null, modifier = Modifier.size((20 * u).dp))
-			}
+			// The caret stays when the card is open, flipped into a drop-up so the user
+			// sees it folds back (user, 2026-09-06: "no drop up when a user is on it");
+			// the open frames (1:2651 / 1:2719) author none. Mirrors iOS.
+			Image(painterResource(R.drawable.ic_sd_caret), null, modifier = Modifier.size((20 * u).dp).rotate(if (open) 180f else 0f))
 		}
 		if (!open) {
 			// 1:2531 authors Geist Regular - exact-design audit 2026-09-04 (was Medium).

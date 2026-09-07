@@ -930,12 +930,13 @@ struct PracticeBuySheet: View {
 	/// A pill selects its stake; Custom re-applies whatever valid amount
 	/// its field already holds (else the last pill value stands).
 	private func pick(_ i: Int) {
-		selected = i
-		// A preset above the cash on hand is refused like a custom amount (Codex review, PR #166).
+		// A preset above the cash on hand is refused and does not become the selection
+		// (Codex review, PR #166); Custom re-applies whatever valid amount its field holds.
 		if i < practicePillAmounts.count {
 			let value = practicePillAmounts[i]
-			if value <= PaperPortfolio.shared.cash { onAmount(value) }
+			if value <= PaperPortfolio.shared.cash { selected = i; onAmount(value) }
 		} else {
+			selected = i
 			applyCustom()
 		}
 	}

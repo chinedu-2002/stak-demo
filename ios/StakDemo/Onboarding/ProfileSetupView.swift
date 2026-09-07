@@ -25,6 +25,8 @@ struct ProfileSetupView: View {
 	@State private var pickedItem: PhotosPickerItem? = nil
 	/// The picked photo as a ~512px JPEG (tens of KB) - never the original.
 	@State private var photoData: Data? = nil
+	/// Proceed waits for the thumbnail (mirrors the Android review fix, PR #166): leaving mid-load would persist a nil photo.
+	@State private var loadingPhoto = false
 	/// The same thumbnail decoded once, so the avatar does not re-decode
 	/// on every keystroke of the name field.
 	@State private var photo: UIImage? = nil
@@ -122,7 +124,7 @@ struct ProfileSetupView: View {
 			.padding(.top, 14 * u)
 
 			VStack(spacing: 0) {
-				AuthCta(text: "Proceed to home", enabled: !name.trimmingCharacters(in: .whitespaces).isEmpty, action: {
+				AuthCta(text: "Proceed to home", enabled: !name.trimmingCharacters(in: .whitespaces).isEmpty && !loadingPhoto, action: {
 					UserProfile.shared.displayName = name.trimmingCharacters(in: .whitespaces).capitalizedWords
 					UserProfile.shared.photoData = photoData
 					onProceed()
@@ -136,6 +138,8 @@ struct ProfileSetupView: View {
 		.onChange(of: pickedItem) { _, item in
 			guard let item else { return }
 			Task {
+				loadingPhoto = true
+				defer { loadingPhoto = false }
 				// A camera-roll original is tens of MB once decoded, so only a
 				// 512px thumbnail survives the pick (ImageIO downsample, EXIF
 				// orientation applied) as an 85% JPEG of a few tens of KB -

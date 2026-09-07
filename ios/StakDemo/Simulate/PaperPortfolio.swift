@@ -211,20 +211,30 @@ final class PaperPortfolio: ObservableObject {
 	/// the symbol is not held - no phantom sell; the hosts only morph to
 	/// "Position closed" on true.
 	@discardableResult
-	func sell(_ symbol: String) -> Bool {
+	func sell(_ symbol: String, portion: Double = 1) -> Bool {
 		guard let i = positions.firstIndex(where: { $0.spec.symbol == symbol }) else { return false }
-		let spec = positions.remove(at: i).spec
+		let p = min(max(portion, 0), 1)
+		guard p > 0 else { return false }
+		let held = positions[i]
+		let spec = held.spec
 		let stake = PaperPortfolio.amount(spec.stakeValue)
-		cash += stake
-		newStake -= stake
-		realized.insert(
-			Realized(
-				badge: spec.badge, ticker: symbol,
-				sub: "Sold \(PaperPortfolio.today()) · \(spec.up ? "profit banked" : "loss realized")",
-				amount: spec.gainSigned, up: spec.up
-			),
-			at: 0
-		)
+		let sub = "Sold \(PaperPortfolio.today()) · \(spec.up ? "profit banked" : "loss realized")"
+		if p >= 0.999 {
+			positions.remove(at: i)
+			cash += stake
+			newStake -= stake
+			realized.insert(Realized(badge: spec.badge, ticker: symbol, sub: sub, amount: spec.gainSigned, up: spec.up), at: 0)
+		} else {
+			// A partial sell - the Half / Custom chips (Codex review, PR #167): the sold
+			// slice returns to cash and banks its share of the gain; the rest of the
+			// position stays, scaled.
+			let keep = 1 - p
+			let gain = PaperPortfolio.amount(spec.gainSigned)
+			cash += stake * p
+			newStake -= stake * p
+			positions[i] = Position(spec: spec.scaled(keep), row: SimPick(badge: held.row.badge, ticker: held.row.ticker, sub: held.row.sub, amount: PaperPortfolio.signedMoney(gain * keep), pct: held.row.pct, up: held.row.up))
+			realized.insert(Realized(badge: spec.badge, ticker: symbol, sub: sub, amount: PaperPortfolio.signedMoney(gain * p), up: spec.up), at: 0)
+		}
 		persist()
 		return true
 	}
@@ -320,6 +330,22 @@ private extension PickSpec {
 			gainPct: gainPct, up: up, shares: PaperPortfolio.shares(shares), vsMarket: vsMarket, ahead: ahead,
 			dayChange: dayChange, dayUp: dayUp, stakeValue: PaperPortfolio.money(stakeValue),
 			stakeBasis: PaperPortfolio.stakeLabel(stakeBasis), weekGain: weekGain
+		)
+	}
+
+	/// The spec for a slice of a position (partial sells, PR #167): shares, value,
+	/// basis and gain scaled; the hero split follows the scaled gain.
+	func scaled(_ portion: Double) -> PickSpec {
+		if portion >= 0.999 { return self }
+		let gain = PaperPortfolio.amount(gainSigned) * portion
+		let signed = PaperPortfolio.signedMoney(gain)
+		let parts = signed.split(separator: ".", maxSplits: 1)
+		return PickSpec(
+			symbol: symbol, badge: badge, company: company, priceNow: priceNow, priceThen: priceThen,
+			pickedLine: pickedLine, gainWhole: String(parts[0]), gainCents: parts.count > 1 ? "." + parts[1] : ".00", gainSigned: signed,
+			gainPct: gainPct, up: up, shares: PaperPortfolio.shares((Double(shares) ?? 0) * portion), vsMarket: vsMarket, ahead: ahead,
+			dayChange: dayChange, dayUp: dayUp, stakeValue: PaperPortfolio.money(PaperPortfolio.amount(stakeValue) * portion),
+			stakeBasis: PaperPortfolio.stakeLabel(PaperPortfolio.amount(stakeBasis) * portion), weekGain: weekGain
 		)
 	}
 }

@@ -102,7 +102,7 @@ struct SimPortfolioView: View {
 					SellConfirmSheet(
 						// Unwired on this page - the authored NVDA sample.
 						pick: PickSpecs.pick("NVDA"),
-						onConfirm: { showSell = false; showClosed = true },
+						onConfirm: { _ in showSell = false; showClosed = true },
 						onDismiss: { showSell = false }
 					)
 				}
@@ -272,10 +272,26 @@ private struct PickSellRow: View {
 struct SellConfirmSheet: View {
 	/// The pick being sold - NVDA renders the frame's literals verbatim.
 	let pick: PickSpec
-	let onConfirm: () -> Void
+	let onConfirm: (Double) -> Void
 	let onDismiss: () -> Void
 
 	@State private var mode = 0
+	@State private var customText = ""
+
+	private var positionValue: Double { PaperPortfolio.amount(pick.stakeValue) }
+
+	/// Half / Custom sell a slice of the position (Codex review, PR #167): the chips
+	/// pick the portion; Custom takes a dollar amount up to the position value.
+	private var portion: Double {
+		switch mode {
+		case 0: return 1
+		case 1: return 0.5
+		default:
+			let raw = customText.replacingOccurrences(of: "$", with: "").replacingOccurrences(of: ",", with: "")
+			guard let value = Double(raw), value > 0, positionValue > 0, value <= positionValue else { return 0 }
+			return value / positionValue
+		}
+	}
 
 	var body: some View {
 		let u = figmaUnit
@@ -326,13 +342,34 @@ struct SellConfirmSheet: View {
 							.buttonStyle(.pressDim)
 						}
 					}
+					if mode == 2 {
+						// Custom borrows the chip chrome; a value > 0 and within the position value drives the sell.
+						HStack(spacing: 4 * u) {
+							Text("$")
+								.font(StakFont.geist(12 * u, .medium))
+								.foregroundStyle(Color(argb: 0xFFDCE7F7))
+							TextField("0.00", text: $customText)
+								.keyboardType(.decimalPad)
+								.onChange(of: customText) { _, new in
+									let clean = String(new.filter { $0.isNumber || $0 == "." }.prefix(9))
+									if clean != new { customText = clean }
+								}
+								.textFieldStyle(.plain)
+								.font(StakFont.geist(12 * u, .medium))
+								.foregroundStyle(Color(argb: 0xFFDCE7F7))
+						}
+						.padding(.horizontal, 12 * u)
+						.padding(.vertical, 8 * u)
+						.background(Color(argb: 0xFF0B1430), in: RoundedRectangle(cornerRadius: 6 * u))
+						.overlay(RoundedRectangle(cornerRadius: 6 * u).strokeBorder(Color(argb: 0xFF5DA8BF), lineWidth: 0.5 * u))
+					}
 					// 1:4861 (exact-design audit 2026-09-04): the three runs share one baseline.
 					HStack(alignment: .firstTextBaseline, spacing: 6 * u) {
 						Spacer()
 						Text("Returning")
 							.font(StakFont.geist(12 * u))
 							.foregroundStyle(Sim.muted)
-						Text(pick.stakeValue)
+						Text(PaperPortfolio.money(positionValue * portion))
 							.font(StakFont.sora(15 * u, .semiBold))
 							.foregroundStyle(Sim.bright)
 						Text("to your cash")
@@ -344,7 +381,7 @@ struct SellConfirmSheet: View {
 				VStack(spacing: 16 * u) {
 					// 1:4866 (exact-design audit 2026-09-04): #12203e, 51 tall, under the 0.361 CTA
 					// hairline and the 4% teal wash; the label is Sora Regular 14 (was Geist Medium, 52, no hairline).
-					Button(action: onConfirm) {
+					Button(action: { if portion > 0 { onConfirm(portion) } }) {
 						Text("Confirm sell")
 							.font(StakFont.sora(14 * u))
 							.foregroundStyle(Color.white)
@@ -391,6 +428,8 @@ private struct SimSheetSecondary: View {
 struct PositionClosedSheet: View {
 	/// The pick just sold - NVDA renders the frame's literals verbatim.
 	let pick: PickSpec
+	/// False after a partial sell - the receipt reads "Position reduced" (PR #167). Declared before the closures with a default - memberwise order.
+	var full: Bool = true
 	let onBackToSimulate: () -> Void
 	let onViewPortfolio: () -> Void
 
@@ -401,7 +440,7 @@ struct PositionClosedSheet: View {
 				Image("IcSheetCheck")
 					.resizable()
 					.frame(width: 47 * u, height: 47 * u)
-				Text("Position closed")
+				Text(full ? "Position closed" : "Position reduced")
 					.font(StakFont.sora(18 * u, .semiBold))
 					.foregroundStyle(Color.white)
 				PickSellRow(pick: pick)
@@ -474,6 +513,8 @@ struct SellFlowHost: View {
 	var onViewPortfolio: (() -> Void)? = nil
 
 	@State private var closed = false
+	/// The slice that was sold - the receipt shows it (PR #167).
+	@State private var soldPortion = 1.0
 
 	var body: some View {
 		SimSheet(onDismiss: {
@@ -484,11 +525,12 @@ struct SellFlowHost: View {
 					// Codex audit (2026-09-04): the confirm closes the position in
 					// PaperPortfolio exactly once - here, where the receipt appears.
 					// Review (2026-09-04): the receipt only follows a real sell.
-					SellConfirmSheet(pick: pick, onConfirm: { guard !closed else { return }; if PaperPortfolio.shared.sell(pick.symbol) { closed = true } }, onDismiss: onClose)
+					SellConfirmSheet(pick: pick, onConfirm: { portion in guard !closed else { return }; if PaperPortfolio.shared.sell(pick.symbol, portion: portion) { soldPortion = portion; closed = true } }, onDismiss: onClose)
 						.transition(.opacity)
 				} else {
 					PositionClosedSheet(
-						pick: pick,
+						pick: pick.scaled(soldPortion),
+						full: soldPortion >= 0.999,
 						onBackToSimulate: onBackToSimulate ?? onClose,
 						onViewPortfolio: onViewPortfolio ?? onClose
 					)

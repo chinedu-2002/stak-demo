@@ -152,6 +152,8 @@ struct StockDetailView: View {
 								// the authored Back -> Collection, Instant (16:1012).
 								// Mirrors android ui/discover/StockDetailScreen.kt.
 								DetailSecondary(text: "Unsave") {
+									// Unsave clears this run's deck save too (Codex review, PR #167).
+									DeckSession.shared.saved.remove(f.symbol)
 									MyStakHoldings.shared.remove(f.symbol)
 									onBack()
 								}
@@ -194,7 +196,8 @@ struct StockDetailView: View {
 				DetailSavedSheet(
 					f: f,
 					// Unauthored scrim tap - keeps its instant dismiss-and-mark.
-					onDismiss: { showSuccess = false; saved = true; DeckSession.shared.saved.insert(f.symbol) },
+					// The scrim dismiss saves like the two CTAs do (Codex review, PR #167).
+					onDismiss: { showSuccess = false; saved = true; DeckSession.shared.saved.insert(f.symbol); MyStakHoldings.shared.add(f.symbol) },
 					// Authored (92:969): View in My STAK -> Overview, the
 					// forward push; Keep exploring -> deck, dissolve 300 -
 					// the stock is marked saved before the page leaves.

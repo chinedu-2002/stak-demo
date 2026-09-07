@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.res.Configuration
+import android.os.Build
 import android.os.Bundle
 import android.view.TextureView
 import androidx.activity.ComponentActivity
@@ -68,8 +69,19 @@ class MainActivity : androidx.fragment.app.FragmentActivity() {
 			// opens on the identical SplashScreen, so nothing visibly changes.
 			val first = PreSplashView(this)
 			setContentView(first)
-			// The post can land after a finish (back before the first frame): skip it then.
-			first.doOnPreDraw { first.post { if (!isFinishing && !isDestroyed) compose() } }
+			first.doOnPreDraw {
+				first.post {
+					// The post can land after a finish (back before the first frame): skip it then.
+					if (isFinishing || isDestroyed) return@post
+					// The Android 12+ theme declares the window translucent so the OS skips its
+					// own launch window (the navy blank the user ruled out) and the launcher
+					// stays put until this first frame. That frame is up now, fully opaque, so
+					// convert to an ordinary opaque activity: the launcher behind gets stopped
+					// and picture-in-picture, recents and composition behave as before.
+					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) setTranslucent(false)
+					compose()
+				}
+			}
 		} else {
 			compose()
 		}

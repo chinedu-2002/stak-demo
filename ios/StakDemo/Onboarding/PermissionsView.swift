@@ -64,6 +64,8 @@ struct PermissionsView: View {
 				// grant is what the toggle meant. Mirrors Android's POST_NOTIFICATIONS ask.
 				AuthCta(text: "Allow and continue", action: {
 					UserProfile.shared.notificationsOn = notifications
+					// The lock the toggle promises is real: enforced at the next launch (Codex review, PR #167).
+					UserProfile.shared.accountLock = accountSecurity
 					guard notifications else { onContinue(); return }
 					UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, _ in
 						DispatchQueue.main.async {
@@ -73,7 +75,7 @@ struct PermissionsView: View {
 						}
 					}
 				})
-				AuthSecondaryButton(text: "Not now", action: { UserProfile.shared.notificationsOn = false; onContinue() })
+				AuthSecondaryButton(text: "Not now", action: { UserProfile.shared.notificationsOn = false; UserProfile.shared.accountLock = false; onContinue() })
 			}
 			.padding(.top, 8 * u)
 			.padding(.bottom, 26 * u)

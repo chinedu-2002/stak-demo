@@ -127,6 +127,39 @@ enum StakCollections {
 	/// The collection an Overview chip pushed; an unknown id serves the
 	/// authored AI & Tech sample, like `stockFacts` falls back to AAPL.
 	static func collection(_ id: String) -> StakCollection {
-		all.first { $0.id == id } ?? all[0]
+		if id == otherId { return other(holdings: MyStakHoldings.shared.tickers) ?? all[0] }
+		return all.first { $0.id == id } ?? all[0]
+	}
+
+	static let otherId = "other"
+
+	/// The stocks the user holds that no collection catalogues - news saves such
+	/// as AMZN, MU, PLTR, TSLA or XOM (Codex review, PR #167). Built from the
+	/// holdings and the news feed's stock facts, so every saved ticker has a tile
+	/// to open and unsave from; nil while nothing uncatalogued is held. The demo
+	/// persona keeps its authored six-tile grid (its TSLA / SNOW are the authored
+	/// Best / Worst stand-ins). Mirrors android otherCollection().
+	static func other(holdings: Set<String>) -> StakCollection? {
+		let catalogued = Set(all.flatMap { $0.stocks }.map(\.ticker))
+		let extra = holdings.filter { !catalogued.contains($0) }.sorted()
+		if extra.isEmpty { return nil }
+		let stocks = extra.map { t -> CollStock in
+			let known = NewsArticleFeed.hasStockFacts(t)
+			let f = NewsArticleFeed.stockFacts(t)
+			let move = f.change.replacingOccurrences(of: "+", with: "").replacingOccurrences(of: "-", with: "").replacingOccurrences(of: " today", with: "")
+			return CollStock(
+				badge: String(t.prefix(1)),
+				change: known ? (f.up ? "▲ " : "▼ ") + move : "—",
+				up: known ? f.up : true,
+				ticker: t,
+				company: known ? f.shortName : t,
+				price: known ? f.price : "—"
+			)
+		}
+		return StakCollection(
+			id: otherId, name: "Other", count: "",
+			blurb: "Stocks you saved from the news that sit outside the six collections.",
+			icon: "IcSavedBookmark", hero: "IcSavedBookmark", stocks: stocks
+		)
 	}
 }

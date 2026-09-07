@@ -21,6 +21,7 @@ final class Session: ObservableObject {
 	private static let keyGoal = "stak.goalAnswer"
 	private static let keyRiskAnswer = "stak.riskAnswer"
 	private static let keyNotif = "stak.notificationsOn"
+	private static let keyLock = "stak.accountLock"
 	private static let keyPrefs = "stak.prefs"
 	private static let keyJoined = "stak.joined"
 
@@ -49,6 +50,7 @@ final class Session: ObservableObject {
 		UserProfile.shared.goal = d.object(forKey: Self.keyGoal) as? Int ?? -1
 		UserProfile.shared.risk = d.object(forKey: Self.keyRiskAnswer) as? Int ?? -1
 		UserProfile.shared.notificationsOn = d.object(forKey: Self.keyNotif) as? Bool ?? true
+		UserProfile.shared.accountLock = d.bool(forKey: Self.keyLock)
 		UserProfile.shared.joined = d.string(forKey: Self.keyJoined) ?? "July 2026"
 		if let prefs = d.dictionary(forKey: Self.keyPrefs) {
 			let p = UserProfile.shared
@@ -103,6 +105,7 @@ final class Session: ObservableObject {
 		UserProfile.shared.goal = -1
 		UserProfile.shared.risk = -1
 		UserProfile.shared.notificationsOn = true
+		UserProfile.shared.accountLock = false
 		UserProfile.shared.priceAlerts = true
 		UserProfile.shared.dailyDeck = true
 		UserProfile.shared.marketNews = false
@@ -120,6 +123,7 @@ final class Session: ObservableObject {
 		d.removeObject(forKey: Self.keyGoal)
 		d.removeObject(forKey: Self.keyRiskAnswer)
 		d.removeObject(forKey: Self.keyNotif)
+		d.removeObject(forKey: Self.keyLock)
 		d.removeObject(forKey: Self.keyPrefs)
 		d.removeObject(forKey: Self.keyJoined)
 		Self.savePhoto(nil)
@@ -136,6 +140,7 @@ final class Session: ObservableObject {
 		d.set(UserProfile.shared.goal, forKey: Self.keyGoal)
 		d.set(UserProfile.shared.risk, forKey: Self.keyRiskAnswer)
 		d.set(UserProfile.shared.notificationsOn, forKey: Self.keyNotif)
+		d.set(UserProfile.shared.accountLock, forKey: Self.keyLock)
 		d.set(UserProfile.shared.joined, forKey: Self.keyJoined)
 		let p = UserProfile.shared
 		d.set(["priceAlerts": p.priceAlerts, "dailyDeck": p.dailyDeck, "marketNews": p.marketNews, "appearance": p.appearance, "linkedGoogle": p.linkedGoogle, "linkedApple": p.linkedApple] as [String: Any], forKey: Self.keyPrefs)

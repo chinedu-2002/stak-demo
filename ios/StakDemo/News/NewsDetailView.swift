@@ -124,7 +124,8 @@ struct NewsDetailView: View {
 							// Designer's call (2026-08-22): the sheet scale-ins; its
 							// authored entry is Smart Animate 350 (1:1359, Codex parity
 							// audit 2026-09-04) - the dismiss below stays the 300 dissolve.
-							onAddToStak: { withAnimation(.easeOut(duration: 0.35)) { successId = id } },
+							// The save is committed on the tap (Codex review, PR #167); the sheet's paths only navigate.
+							onAddToStak: { save(id); withAnimation(.easeOut(duration: 0.35)) { successId = id } },
 							onOpenArticle: onOpenArticle
 						)
 						.tag(i)
@@ -313,10 +314,23 @@ private struct HeroImage: View {
 					case let .video(_, asset, _, _): return asset
 					}
 				}()
+				// A story whose artwork is a remote URL, not a bundled poster, shows it
+				// before playback too (Codex review, PR #167).
+				let remotePoster: String? = {
+					switch media {
+					case let .image(_, url, _): return url
+					case let .video(_, _, posterUrl, _): return posterUrl
+					}
+				}()
 				if let poster {
 					Image(poster)
 						.resizable()
 						.scaledToFill()
+						.frame(width: 407 * u, height: 271.18 * u)
+						.clipped()
+						.offset(x: -0.5 * u, y: 16.59 * u)
+				} else if let remotePoster, let remoteURL = URL(string: remotePoster) {
+					AsyncImage(url: remoteURL) { img in img.resizable().scaledToFill() } placeholder: { Color(argb: 0xFFC4C4C4) }
 						.frame(width: 407 * u, height: 271.18 * u)
 						.clipped()
 						.offset(x: -0.5 * u, y: 16.59 * u)
@@ -933,7 +947,8 @@ private struct NewsVideoPlayer: View {
 
 	var body: some View {
 		if let embed = NewsMedia.youTubeEmbedURL(for: url) {
-			YouTubeEmbedView(url: embed)
+			// The poster lifts once the embed has loaded (Codex review, PR #167).
+			YouTubeEmbedView(url: embed, onLoaded: onBegan)
 		} else if let direct = URL(string: url) {
 			AutoplayVideoPlayer(url: direct, prebuffered: prebuffered, onBegan: onBegan, onDone: onDone)
 		}
@@ -1128,12 +1143,23 @@ private struct NativePlayerView: UIViewControllerRepresentable {
 
 private struct YouTubeEmbedView: UIViewRepresentable {
 	let url: URL
+	/// Fires once the embed page has loaded - the hero drops its poster overlay then.
+	var onLoaded: () -> Void = {}
+
+	func makeCoordinator() -> Coordinator { Coordinator(onLoaded: onLoaded) }
+
+	final class Coordinator: NSObject, WKNavigationDelegate {
+		let onLoaded: () -> Void
+		init(onLoaded: @escaping () -> Void) { self.onLoaded = onLoaded }
+		func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) { onLoaded() }
+	}
 
 	func makeUIView(context: Context) -> WKWebView {
 		let config = WKWebViewConfiguration()
 		config.allowsInlineMediaPlayback = true
 		config.mediaTypesRequiringUserActionForPlayback = []
 		let view = WKWebView(frame: .zero, configuration: config)
+		view.navigationDelegate = context.coordinator
 		view.isOpaque = false
 		view.scrollView.isScrollEnabled = false
 		// YouTube's player refuses embeds with no HTTP Referer - a bare

@@ -24,6 +24,8 @@ final class UserProfile: ObservableObject {
 	@Published var risk: Int = -1
 	/// 08 Permissions: the user's answer, and the OS grant when it was asked (product audit, 2026-09-05).
 	@Published var notificationsOn: Bool = true
+	/// 08 Permissions "Account security": a signed-in user unlocks with Face ID / Touch ID / the passcode before Home (Codex review, PR #167).
+	@Published var accountLock: Bool = false
 	// The settings pages behind the Profile hub (product audit, 2026-09-05).
 	@Published var priceAlerts: Bool = true
 	@Published var dailyDeck: Bool = true

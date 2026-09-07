@@ -83,7 +83,10 @@ struct MyStakView: View {
 		// Collection screen, Instant. Codex parity audit (2026-09-04): each
 		// chip carries its own collection id so the page serves the tapped
 		// one; the six catalogue chips fill the authored three rows of two.
-		let all = StakCollections.all
+		// A seventh, "Other" tile appears only while a new account holds stocks no
+		// collection catalogues (Codex review, PR #167); the demo keeps its six.
+		let other = Session.shared.demoAccount ? nil : StakCollections.other(holdings: holdings.tickers)
+		let all = StakCollections.all + (other.map { [$0] } ?? [])
 		let rows = stride(from: 0, to: all.count, by: 2).map {
 			Array(all[$0..<min($0 + 2, all.count)])
 		}
@@ -97,6 +100,7 @@ struct MyStakView: View {
 							countLabel: heldCountLabel(collection.held(in: holdings.tickers).count)
 						)
 					}
+					if row.count == 1 { Spacer() }
 				}
 			}
 		}

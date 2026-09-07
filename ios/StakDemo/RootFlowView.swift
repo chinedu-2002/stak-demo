@@ -56,6 +56,8 @@ enum FlowAnim {
 struct RootFlowView: View {
 	private enum Phase {
 		case splash
+		/// The account lock between the splash and Home (Codex review, PR #167).
+		case locked
 		case flow
 		case main
 	}
@@ -73,10 +75,14 @@ struct RootFlowView: View {
 					// (signed in before) goes straight to Home; a first-time
 					// user is taken to create an account (user, 2026-08-23).
 					withAnimation(.easeOut(duration: 0.35)) {
-						phase = Session.shared.signedIn ? .main : .flow
+						let locked = Session.shared.signedIn && UserProfile.shared.accountLock
+						phase = Session.shared.signedIn ? (locked ? .locked : .main) : .flow
 					}
 				}
 				.transition(.opacity)
+			case .locked:
+				LockGateView { withAnimation(.easeOut(duration: 0.35)) { phase = .main } }
+					.transition(.opacity)
 			case .main:
 				MainTabsView(onLogOut: {
 					// Authored (171:995): Log out -> Sign in, the authored

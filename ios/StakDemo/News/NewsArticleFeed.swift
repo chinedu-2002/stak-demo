@@ -489,6 +489,9 @@ enum NewsArticleFeed {
 	]
 
 	/// The served stock module for a ticker - the backend resolves this in production.
+	/// True when the feed carries facts for the ticker (the Other collection reads them).
+	static func hasStockFacts(_ ticker: String) -> Bool { stockFactsTable[ticker] != nil }
+
 	static func stockFacts(_ ticker: String) -> StockFacts {
 		let facts = stockFactsTable[ticker] ?? stockFactsTable["AAPL"]!
 		// Product audit (2026-09-05): the demo stand-ins quoted NVDA at $178.42
@@ -496,7 +499,7 @@ enum NewsArticleFeed {
 		// carries takes ITS quote here; the authored Apple card (1:1495) stays
 		// frame-exact.
 		if ticker == "AAPL" { return facts }
-		guard let live = StakCollection.all.flatMap({ $0.stocks }).first(where: { $0.ticker == ticker }) else { return facts }
+		guard let live = StakCollections.all.flatMap({ $0.stocks }).first(where: { $0.ticker == ticker }) else { return facts }
 		let pct = live.change.filter { $0.isNumber || $0 == "." }
 		return StockFacts(
 			name: facts.name, shortName: facts.shortName, price: live.price, change: (live.up ? "+" : "-") + pct + "% today", up: live.up,

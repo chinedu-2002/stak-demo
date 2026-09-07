@@ -38,7 +38,8 @@ final class StakNotifications: ObservableObject {
 
 	/// Restores the inbox for the current account.
 	func load() {
-		items = Session.shared.demoAccount ? Self.demo : Self.welcome()
+		// StakStore.demoAccount, never Session.shared: this runs inside Session's init (Codex review, PR #167).
+		items = StakStore.demoAccount ? Self.demo : Self.welcome()
 		readIds = StakStore.stringSet("notif.read") ?? []
 	}
 

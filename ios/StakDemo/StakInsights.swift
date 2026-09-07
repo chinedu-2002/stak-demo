@@ -28,7 +28,7 @@ enum StakInsights {
 	/// The collections the user holds stocks in, biggest first.
 	static func heldGroups() -> [(StakCollection, [CollStock])] {
 		let holdings = MyStakHoldings.shared.tickers
-		return StakCollection.all
+		return StakCollections.all
 			.map { ($0, $0.held(in: holdings)) }
 			.filter { !$0.1.isEmpty }
 			.sorted { $0.1.count > $1.1.count }
@@ -91,7 +91,7 @@ enum StakInsights {
 	/// Allocation by collection for the given symbols; unknown symbols land in Other.
 	static func buckets(_ symbols: [String]) -> [Bucket] {
 		guard !symbols.isEmpty else { return [] }
-		let ids = symbols.map { sym in StakCollection.all.first { $0.stocks.contains { $0.ticker == sym } }?.id ?? "other" }
+		let ids = symbols.map { sym in StakCollections.all.first { $0.stocks.contains { $0.ticker == sym } }?.id ?? "other" }
 		var counts: [String: Int] = [:]
 		for id in ids { counts[id, default: 0] += 1 }
 		return counts

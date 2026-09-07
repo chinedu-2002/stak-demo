@@ -12,9 +12,11 @@ import java.util.Locale
  */
 object StakClock {
 	private val monthDay = DateTimeFormatter.ofPattern("MMM d", Locale.US)
+	private val dayLong = DateTimeFormatter.ofPattern("EEEE, MMMM d", Locale.US)
+	private val monthYearFmt = DateTimeFormatter.ofPattern("MMMM yyyy", Locale.US)
 
 	/** "Saturday, July 4" for today. */
-	fun todayLong(): String = LocalDate.now().format(DateTimeFormatter.ofPattern("EEEE, MMMM d", Locale.US))
+	fun todayLong(): String = LocalDate.now().format(dayLong)
 
 	/** "Jul 2" for N days ago. */
 	fun monthDay(daysAgo: Int): String = LocalDate.now().minusDays(daysAgo.toLong()).format(monthDay)
@@ -32,5 +34,5 @@ object StakClock {
 	fun savedLabel(daysAgo: Int): String = if (daysAgo == 0) "Saved today" else "Saved ${monthDay(daysAgo)}"
 
 	/** "September 2026" for the month a new account was created. */
-	fun monthYear(): String = LocalDate.now().format(DateTimeFormatter.ofPattern("MMMM yyyy", Locale.US))
+	fun monthYear(): String = LocalDate.now().format(monthYearFmt)
 }

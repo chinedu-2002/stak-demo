@@ -275,19 +275,36 @@ internal object PaperPortfolio {
 	 * REALIZED at the top. False when the symbol is not held (review
 	 * 2026-09-04) - hosts never morph to Position closed on a phantom sell.
 	 */
-	fun sell(symbol: String): Boolean {
+	fun sell(symbol: String, portion: Double = 1.0): Boolean {
 		val held = positions.firstOrNull { it.spec.symbol == symbol } ?: return false
-		positions = positions.filterNot { it === held }
-		cash += held.stake
+		val p = portion.coerceIn(0.0, 1.0)
+		if (p <= 0.0) return false
 		val banked = !held.spec.gain.startsWith("-")
-		val sold = Realized(
-			badge = held.spec.badge,
-			ticker = symbol,
-			sub = "Sold ${today()} · ${if (banked) "profit banked" else "loss realized"}",
-			amount = held.spec.gain,
-			up = banked,
-		)
-		realized = listOf(sold) + realized
+		val sub = "Sold ${today()} · ${if (banked) "profit banked" else "loss realized"}"
+		if (p >= 0.999) {
+			positions = positions.filterNot { it === held }
+			cash += held.stake
+			realized = listOf(Realized(badge = held.spec.badge, ticker = symbol, sub = sub, amount = held.spec.gain, up = banked)) + realized
+		} else {
+			// A partial sell - the Half / Custom chips (Codex review, PR #167): the sold
+			// slice returns to cash and banks its share of the gain; the rest of the
+			// position stays, scaled.
+			val keep = 1.0 - p
+			val gain = held.gainDollars
+			val basis = held.spec.stakeBasis.removePrefix("$").replace(",", "").toDoubleOrNull() ?: 0.0
+			cash += held.stake * p
+			val rest = held.copy(
+				spec = held.spec.copy(
+					shares = String.format(Locale.US, "%.4f", (held.spec.shares.toDoubleOrNull() ?: 0.0) * keep),
+					stakeValue = usd(held.stake * keep),
+					stakeBasis = stakeLabel(basis * keep),
+					gain = signedUsd(gain * keep),
+				),
+				row = held.row.copy(amount = signedUsd(gain * keep)),
+			)
+			positions = positions.map { if (it === held) rest else it }
+			realized = listOf(Realized(badge = held.spec.badge, ticker = symbol, sub = sub, amount = signedUsd(gain * p), up = banked)) + realized
+		}
 		persist()
 		return true
 	}

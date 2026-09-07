@@ -421,11 +421,13 @@ private struct AnalystCard: View {
 					.font(StakFont.sora(15 * u, .semiBold))
 					.foregroundStyle(bright)
 				Spacer()
-				if !open {
-					Image("IcSdCaret")
-						.resizable()
-						.frame(width: 20 * u, height: 20 * u)
-				}
+				// The caret stays when the card is open, flipped into a drop-up so the user
+				// sees it folds back (user, 2026-09-06); the open frames (1:2651 / 1:2719)
+				// author none. Mirrors Android.
+				Image("IcSdCaret")
+					.resizable()
+					.frame(width: 20 * u, height: 20 * u)
+					.rotationEffect(.degrees(open ? 180 : 0))
 			}
 			.frame(height: open ? nil : 22 * u)
 			if !open {
@@ -581,11 +583,13 @@ private struct CompareCard: View {
 					.font(StakFont.sora(15 * u, .semiBold))
 					.foregroundStyle(bright)
 				Spacer()
-				if !open {
-					Image("IcSdCaret")
-						.resizable()
-						.frame(width: 20 * u, height: 20 * u)
-				}
+				// The caret stays when the card is open, flipped into a drop-up so the user
+				// sees it folds back (user, 2026-09-06); the open frames (1:2651 / 1:2719)
+				// author none. Mirrors Android.
+				Image("IcSdCaret")
+					.resizable()
+					.frame(width: 20 * u, height: 20 * u)
+					.rotationEffect(.degrees(open ? 180 : 0))
 			}
 			.frame(height: open ? nil : 22 * u)
 			if !open {

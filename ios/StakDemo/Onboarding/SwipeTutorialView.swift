@@ -43,6 +43,9 @@ private let deck: [DeckCard] = [
 // Discover card template. Slab poses template-matched to the frame.
 private let deckScale: CGFloat = 305.75 / 350
 
+/// The authored mid slab (1:344, 273.5 wide) over the front card (305.75): the queue's next-card geometry.
+private let midScale: CGFloat = 273.5 / 305.75
+
 /// Onboarding · 03 Swipe tutorial — Figma node 1:344 (CHINEDU file, "STEP 3 OF 6").
 ///
 /// The stacked swipe deck: the authored queue slabs (AAPL and GOOGL at
@@ -51,16 +54,32 @@ private let deckScale: CGFloat = 305.75 / 350
 /// front card flies off to the back of the queue and the next design
 /// takes the front row, cycling in order. Chevrons + "Swipe down" hint
 /// under the stack, Continue/Back below.
+///
+/// The swipe IS the Discover deck's swipe (user, 2026-09-07: the practice
+/// swipe must be Discover's swipe down, nothing else): commit-first ghost
+/// fly-off, fling commit, the mid slab crossfading into the live next card
+/// as the drag reveals it, the new front promoting from the slab geometry;
+/// a dragged or flying card stays whole past the deck bounds. Same numbers
+/// as DiscoverView at this deck's 87.4% unit.
 /// Ported from android/ ui/onboarding/SwipeTutorialScreen.kt.
 struct SwipeTutorialView: View {
 	let onBack: () -> Void
 	let onContinue: () -> Void
 
 	@State private var swiped = 0
-	@State private var topOffset: CGFloat = 0
-	@State private var promote: CGFloat = 0
-	@State private var enter: CGFloat = 1
-	@State private var entering = false
+	@State private var dragOffset: CGFloat = 0
+	@State private var frontOpacity: Double = 1
+	// Promote progress: 0 = the authored mid-slab geometry (y 21 / 273.5
+	// wide), 1 = settled in the front slot.
+	@State private var promote: CGFloat = 1
+	// Swipes must NEVER be eaten (Discover, user 2026-09-02): the deck
+	// advances the moment a swipe commits and the swiped card flies off as
+	// a non-interactive GHOST above the live deck - the finger owns the new
+	// front card immediately, so any cadence lands.
+	@State private var flyingCard: DeckCard? = nil
+	@State private var flyOffset: CGFloat = 0
+	@State private var flyFade: Double = 0
+	@State private var flyGen = 0
 
 	var body: some View {
 		let u = figmaUnit
@@ -96,59 +115,97 @@ struct SwipeTutorialView: View {
 					// reshuffles the front card to the back and the next takes the
 					// front row in an organized sequence — the Discover grammar.
 					ZStack(alignment: .topLeading) {
+						let reveal = min(1, max(0, dragOffset / (110 * u2)))
 						Image("TutorialCardGOOGL")
 							.resizable()
 							.frame(width: 238.75 * u, height: 290.75 * u)
 							.offset(x: 33.5 * u, y: 0)
+						// As the drag exposes the mid slab it crossfades into the LIVE
+						// next card at the SAME authored geometry (Discover's rule), so
+						// the queue always tells the truth.
 						Image("TutorialCardAAPL")
 							.resizable()
 							.frame(width: 273.5 * u, height: 309.5 * u)
 							.offset(x: 15.5 * u, y: 21 * u)
-						FrontDeckCard(card: deck[swiped % 3], onSave: {}, u: u2)
-							.scaleEffect(0.97 + 0.03 * enter)
-							.opacity((1 - promote) * enter)
+							.opacity(1 - reveal)
+						FrontDeckCard(card: deck[(swiped + 1) % 3], onSave: {}, u: u2)
+							.scaleEffect(midScale, anchor: .top)
+							.opacity(reveal)
 							.frame(maxWidth: .infinity, alignment: .top)
-							.offset(y: 47.5 * u + topOffset)
+							.offset(y: 21 * u)
+							.allowsHitTesting(false)
+						// The promote: from the authored mid-slab geometry (y 21,
+						// 273.5 wide) into the front slot as `promote` settles - the
+						// queue visibly steps forward.
+						FrontDeckCard(card: deck[swiped % 3], onSave: {}, u: u2)
+							.scaleEffect(midScale + (1 - midScale) * promote, anchor: .top)
+							.opacity(frontOpacity)
+							.frame(maxWidth: .infinity, alignment: .top)
+							.offset(y: 47.5 * u - 26.5 * u * (1 - promote) + dragOffset)
+						if let ghost = flyingCard {
+							// The swiped-away card flying off above the live deck;
+							// input falls through to the front card.
+							FrontDeckCard(card: ghost, onSave: {}, u: u2)
+								.opacity(flyFade)
+								.frame(maxWidth: .infinity, alignment: .top)
+								.offset(y: 47.5 * u + flyOffset)
+								.allowsHitTesting(false)
+						}
 					}
 					.frame(width: 306 * u, height: 423.07 * u, alignment: .topLeading)
-					.clipped()
+					// Unclipped and above its siblings, like Discover: a dragged or
+					// flying card stays WHOLE past the deck bounds, passing over the
+					// hint/CTA zone like a real card deck.
+					.zIndex(1)
 					.contentShape(Rectangle())
 					.gesture(
 						DragGesture()
 							.onChanged { value in
-								if promote == 0 && !entering {
-									topOffset = max(0, value.translation.height)
-								}
+								dragOffset = max(0, value.translation.height)
 							}
-							.onEnded { _ in
-								guard promote == 0 && !entering else { return }
-								if topOffset > 110 * u2 {
-									// The frame's card shuffle: the swiped card flies
-									// off fading while the next design takes the front.
-									withAnimation(.easeOut(duration: 0.28)) { topOffset = 500 * u2 }
-									withAnimation(.easeOut(duration: 0.3)) {
-										promote = 1
-									} completion: {
-										entering = true
+							.onEnded { value in
+								let committed = max(0, value.translation.height)
+								// Commit on distance OR on a fling (the predicted end
+								// folds velocity in) - a fast short flick advances too,
+								// the Instagram rule (Discover, 2026-09-02).
+								let flung = value.predictedEndTranslation.height > 110 * u2 && committed > 20 * u2
+								if committed > 110 * u2 || flung {
+									// The frame's card shuffle, commit-first: the swiped
+									// card becomes the ghost and the deck advances NOW - a
+									// second swipe grabs the next card even while the
+									// ghost is still flying.
+									flyingCard = deck[swiped % 3]
+									flyGen += 1
+									let gen = flyGen
+									var reset = Transaction()
+									reset.disablesAnimations = true
+									withTransaction(reset) {
+										flyOffset = committed
+										flyFade = 1
 										swiped += 1
-										topOffset = 0
+										dragOffset = 0
+										// The new front takes over at the mid-slab geometry
+										// the finger just revealed, then promotes forward.
 										promote = 0
-										enter = 0
+										// A velocity flick can commit before the crossfade
+										// finished - pick the alpha up from the reveal.
+										frontOpacity = Double(min(1, committed / (110 * u2)))
+									}
+									DispatchQueue.main.async {
+										withAnimation(.easeOut(duration: 0.28)) { flyOffset = 500 * u2 }
+										withAnimation(.easeOut(duration: 0.3)) { flyFade = 0 }
+										withAnimation(.easeOut(duration: 0.2)) { promote = 1 }
+										withAnimation(.easeOut(duration: 0.12)) { frontOpacity = 1 }
+									}
+									DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+										if gen == flyGen { flyingCard = nil }
 									}
 								} else {
 									// Compose tween(180) — default FastOutSlowIn curve.
-									withAnimation(.timingCurve(0.4, 0, 0.2, 1, duration: 0.18)) { topOffset = 0 }
+									withAnimation(.timingCurve(0.4, 0, 0.2, 1, duration: 0.18)) { dragOffset = 0 }
 								}
 							}
 					)
-					.onChange(of: swiped) { _, _ in
-						// Next design enters: alpha + scale 0.97 -> 1, 200ms ease-out.
-						withAnimation(.easeOut(duration: 0.2)) {
-							enter = 1
-						} completion: {
-							entering = false
-						}
-					}
 
 					Spacer().frame(height: 9 * u)
 

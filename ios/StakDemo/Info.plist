@@ -26,23 +26,16 @@
 	<array>
 		<string>audio</string>
 	</array>
-	<!-- The launch screen IS the 00 Splash frame (1:926, exported at 3x, 390x844pt, its fake
-	     status bar painted over with the ground): iOS shows this before the first frame, so the
-	     launch reads as the frame from its first pixel and SplashView follows it seamlessly
-	     (user, 2026-09-05: "if it is mandatory then replace it with 1:926"). The image is drawn at
-	     its point size, centred, edge to edge, on the frame's ground; a taller phone gains ground
-	     above and below like the artboard scaling in SplashView. -->
+	<!-- The launch screen IS the 00 Splash frame (1:926): LaunchScreen.storyboard pins the
+	     LaunchArt render (exported at 3x, 390x844pt, its fake status bar painted over with the ground) to the
+	     top of the screen at the screen width, exactly how SplashView lays out its canvas, so
+	     the launch reads as the frame from its first pixel and SplashView follows it seamlessly
+	     on every device size. No launch icon: the user ruled one out (2026-09-05). Mirrors
+	     Android's PreSplashView. -->
 	<key>NSFaceIDUsageDescription</key>
 	<string>STAK locks your account to you.</string>
-	<key>UILaunchScreen</key>
-	<dict>
-		<key>UIColorName</key>
-		<string>LaunchBackground</string>
-		<key>UIImageName</key>
-		<string>LaunchArt</string>
-		<key>UIImageRespectsSafeAreaInsets</key>
-		<false/>
-	</dict>
+	<key>UILaunchStoryboardName</key>
+	<string>LaunchScreen</string>
 	<key>UIUserInterfaceStyle</key>
 	<string>Dark</string>
 	<key>UISupportedInterfaceOrientations</key>

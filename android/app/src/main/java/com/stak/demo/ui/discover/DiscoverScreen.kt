@@ -344,6 +344,45 @@ internal fun DiscoverScreen(
 	val density = LocalDensity.current
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 
+	/**
+	 * The deck advances: the front card leaves and the next promotes - the
+	 * swipe commit (from `committed` px of travel) and the Save chip (from
+	 * rest; user, 2026-09-08: a saved card must not stay on the deck) share
+	 * it, so Save reads exactly like a swipe.
+	 */
+	val advance: suspend (Float) -> Unit = { committed ->
+		if (seen >= DECK_SIZE - 1) {
+			// The final card: the authored fly-off finishes
+			// before the end-of-deck receipt lands (1:2330).
+			scope.launch { topOffset.animateTo(with(density) { (500 * u).dp.toPx() }, tween(280, easing = EaseOut)) }
+			frontFade.animateTo(0f, tween(300, easing = EaseOut))
+			seen += 1
+			topOffset.snapTo(0f)
+			frontFade.snapTo(1f)
+		} else {
+			// The frame's card shuffle (1:1627), commit-first:
+			// the swiped card becomes the ghost and the deck
+			// advances NOW - a second swipe grabs the next
+			// card even while the ghost is still flying.
+			flyingCard = DECK[seen % DECK.size]
+			flyFade.snapTo(1f)
+			flyOffset.snapTo(committed)
+			seen += 1
+			topOffset.snapTo(0f)
+			// The new front takes over at the mid-slab geometry
+			// the finger just revealed, then promotes forward.
+			enter.snapTo(0f)
+			// A velocity flick can commit before the crossfade
+			// finished - pick the alpha up from the reveal.
+			frontFade.snapTo((committed / with(density) { (110 * u).dp.toPx() }).coerceIn(0f, 1f))
+			scope.launch { frontFade.animateTo(1f, tween(120, easing = EaseOut)) }
+			scope.launch { flyOffset.animateTo(with(density) { (500 * u).dp.toPx() }, tween(280, easing = EaseOut)) }
+			scope.launch { enter.animateTo(1f, tween(200, easing = EaseOut)) }
+			flyFade.animateTo(0f, tween(300, easing = EaseOut))
+			flyingCard = null
+		}
+	}
+
 	LaunchedEffect(savedToast) {
 		if (savedToast) {
 			delay(2200)
@@ -440,36 +479,7 @@ internal fun DiscoverScreen(
 										if (committed > with(density) { (110 * u).dp.toPx() } ||
 											(flung && committed > with(density) { (20 * u).dp.toPx() })
 										) {
-											if (seen >= DECK_SIZE - 1) {
-												// The final card: the authored fly-off finishes
-												// before the end-of-deck receipt lands (1:2330).
-												launch { topOffset.animateTo(with(density) { (500 * u).dp.toPx() }, tween(280, easing = EaseOut)) }
-												frontFade.animateTo(0f, tween(300, easing = EaseOut))
-												seen += 1
-												topOffset.snapTo(0f)
-												frontFade.snapTo(1f)
-											} else {
-												// The frame's card shuffle (1:1627), commit-first:
-												// the swiped card becomes the ghost and the deck
-												// advances NOW - a second swipe grabs the next
-												// card even while the ghost is still flying.
-												flyingCard = DECK[seen % DECK.size]
-												flyFade.snapTo(1f)
-												flyOffset.snapTo(committed)
-												seen += 1
-												topOffset.snapTo(0f)
-												// The new front takes over at the mid-slab geometry
-												// the finger just revealed, then promotes forward.
-												enter.snapTo(0f)
-												// A velocity flick can commit before the crossfade
-												// finished - pick the alpha up from the reveal.
-												frontFade.snapTo((committed / with(density) { (110 * u).dp.toPx() }).coerceIn(0f, 1f))
-												launch { frontFade.animateTo(1f, tween(120, easing = EaseOut)) }
-												launch { flyOffset.animateTo(with(density) { (500 * u).dp.toPx() }, tween(280, easing = EaseOut)) }
-												launch { enter.animateTo(1f, tween(200, easing = EaseOut)) }
-												flyFade.animateTo(0f, tween(300, easing = EaseOut))
-												flyingCard = null
-											}
+											advance(committed)
 										} else {
 											topOffset.animateTo(0f, tween(180))
 										}
@@ -540,7 +550,8 @@ internal fun DiscoverScreen(
 					// 2026-09-04). Saving still lands the pick in My STAK.
 					FrontDeckCard(
 						card = frontCard,
-						onSave = { savedCards = savedCards + frontCard.symbol; com.stak.demo.ui.MyStakHoldings.add(frontCard.symbol); savedToast = true },
+						// Saving takes the card off the deck like a swipe (user, 2026-09-08).
+						onSave = { savedCards = savedCards + frontCard.symbol; com.stak.demo.ui.MyStakHoldings.add(frontCard.symbol); savedToast = true; scope.launch { advance(0f) } },
 						saved = frontCard.symbol in savedCards,
 						u = u,
 						modifier = Modifier

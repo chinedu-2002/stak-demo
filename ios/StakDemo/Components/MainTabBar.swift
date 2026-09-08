@@ -70,7 +70,7 @@ struct MainTabBar: View {
 							Text(tab.rawValue)
 								// Authored label face: Inter Regular 12.
 								.font(StakFont.inter(12 * u))
-								.foregroundStyle(StakColors.textPrimary)
+								.foregroundStyle(Color.white)
 						}
 						// Authored: only Tab - Home has a fixed width (34); the rest hug.
 						.frame(width: tab == .home ? 34 * u : nil)

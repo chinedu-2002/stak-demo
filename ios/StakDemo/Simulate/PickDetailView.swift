@@ -100,7 +100,7 @@ struct PickDetailView: View {
 					Spacer()
 					Text(pick.symbol)
 						.font(StakFont.sora(16 * u, .semiBold))
-						.foregroundStyle(StakColors.textPrimary)
+						.foregroundStyle(Color.white)
 					Spacer()
 					ZStack {
 						Circle().fill(Sim.cardBg)
@@ -137,7 +137,7 @@ struct PickDetailView: View {
 								Text(pick.gainWhole)
 									.font(StakFont.sora(38 * u, .semiBold))
 									// 1:4660 (exact-design audit 2026-09-04): no tracking - the -0.38 was never authored.
-									.foregroundStyle(pick.up ? StakColors.textPrimary : Sim.red)
+									.foregroundStyle(pick.up ? Color.white : Sim.red)
 								Text(pick.gainCents)
 									.font(StakFont.sora(16 * u, .semiBold))
 									.foregroundStyle(Sim.muted)
@@ -182,8 +182,8 @@ struct PickDetailView: View {
 							}
 							HStack(spacing: 10 * u) {
 								// 1:4684 / 1:4687 (exact-design audit 2026-09-04): the prices are plain white, not #f2f6fc.
-								StatBox(label: "Price then", value: pick.priceThen, valueColor: StakColors.textPrimary)
-								StatBox(label: "Price now", value: pick.priceNow, valueColor: StakColors.textPrimary)
+								StatBox(label: "Price then", value: pick.priceThen, valueColor: Color.white)
+								StatBox(label: "Price now", value: pick.priceNow, valueColor: Color.white)
 							}
 						}
 						// WHY / insight card — teal-tinted like the deck tips.
@@ -217,7 +217,7 @@ struct PickDetailView: View {
 								Text("Sell")
 									// 1:4695 (exact-design audit 2026-09-04): Sora Regular 14 - was Geist Medium.
 									.font(StakFont.sora(14 * u))
-									.foregroundStyle(StakColors.textPrimary)
+									.foregroundStyle(Color.white)
 									.frame(maxWidth: .infinity)
 									.frame(height: 51 * u)
 									.background(Sim.darkCta, in: RoundedRectangle(cornerRadius: 6 * u))

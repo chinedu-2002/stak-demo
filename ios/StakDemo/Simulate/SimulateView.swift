@@ -64,7 +64,7 @@ struct SimulateView: View {
 					VStack(alignment: .leading, spacing: 3 * u) {
 						Text("Simulate")
 							.font(StakFont.sora(26 * u, .semiBold))
-							.foregroundStyle(StakColors.textPrimary)
+							.foregroundStyle(Color.white)
 							.frame(height: 33 * u) // 1:3916 line box (exact-design audit 2026-09-04)
 						Text("Pick from your saves. Paper money does the talking.")
 							.font(StakFont.geist(12 * u))
@@ -274,7 +274,7 @@ private struct ScoreHero: View {
 						// 1:3924 (exact-design audit 2026-09-04): no tracking - the -0.44 was never authored.
 						// Authored box (1:3924) is 55 tall — pin it so the stack sums.
 						.frame(height: 55 * u)
-						.foregroundStyle(StakColors.textPrimary)
+						.foregroundStyle(Color.white)
 					Text(figure.cents)
 						.font(StakFont.sora(18 * u, .semiBold))
 						.foregroundStyle(Sim.muted)
@@ -370,7 +370,7 @@ private struct SavedStakRow: View {
 			VStack(alignment: .leading, spacing: 3 * u) {
 				Text(ticker)
 					.font(StakFont.sora(12 * u, .medium))
-					.foregroundStyle(StakColors.textPrimary)
+					.foregroundStyle(Color.white)
 				Text(sub)
 					.font(StakFont.geist(10 * u))
 					.foregroundStyle(Sim.muted)
@@ -394,7 +394,7 @@ struct BuyPill: View {
 		Button(action: action) {
 			Text(text)
 				.font(StakFont.sora(12 * u))
-				.foregroundStyle(StakColors.textPrimary)
+				.foregroundStyle(Color.white)
 				.frame(width: 60 * u, height: 30 * u)
 				.background(discCtaGradient, in: RoundedRectangle(cornerRadius: 6 * u))
 				.overlay(RoundedRectangle(cornerRadius: 6 * u).strokeBorder(Sim.ctaBorder, lineWidth: 0.36 * u))
@@ -494,7 +494,7 @@ private struct PickDuo: View {
 					.frame(width: 34 * u, height: 34 * u)
 					Text(ticker)
 						.font(StakFont.sora(12 * u, .medium))
-						.foregroundStyle(StakColors.textPrimary)
+						.foregroundStyle(Color.white)
 				}
 				Text(sub)
 					.font(StakFont.geist(11 * u))
@@ -593,7 +593,7 @@ struct PortfolioRow<Trailing: View>: View {
 				VStack(alignment: .leading, spacing: 3 * u) {
 					Text(ticker)
 						.font(StakFont.sora(12 * u, .medium))
-						.foregroundStyle(StakColors.textPrimary)
+						.foregroundStyle(Color.white)
 					Text(sub)
 						.font(StakFont.geist(10 * u, subLight ? .light : .regular))
 						.foregroundStyle(Sim.muted)
@@ -639,7 +639,7 @@ private struct SimAllocationCard: View {
 		VStack(spacing: 16 * u) {
 			Text("Allocation")
 				.font(StakFont.sora(15 * u, .semiBold))
-				.foregroundStyle(StakColors.textPrimary)
+				.foregroundStyle(Color.white)
 			if PaperPortfolio.shared.demo {
 				Image("SimDonut")
 					.resizable()
@@ -695,7 +695,7 @@ struct SimSector: View {
 				Spacer().frame(width: 8 * u)
 				Text(name)
 					.font(StakFont.geist(13 * u))
-					.foregroundStyle(StakColors.textPrimary)
+					.foregroundStyle(Color.white)
 				Spacer()
 				Text(share)
 					.font(StakFont.geist(12 * u))
@@ -751,7 +751,7 @@ private struct BoardCard: View {
 				.frame(width: 22 * u, alignment: .leading)
 			Text(name)
 				.font(StakFont.geist(13 * u, you ? .semiBold : .medium))
-				.foregroundStyle(StakColors.textPrimary)
+				.foregroundStyle(Color.white)
 				.frame(maxWidth: .infinity, alignment: .leading)
 			Text(pct)
 				.font(StakFont.sora((you ? 13 : 12) * u, .semiBold))

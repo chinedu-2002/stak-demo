@@ -312,12 +312,12 @@ private struct DeckCardBody: View {
 					Text(card.headline)
 						.font(StakFont.geist(16 * u))
 						.stakLineHeight(23 * u, size: 16 * u, face: .geist)
-						.foregroundStyle(StakColors.textPrimary)
+						.foregroundStyle(Color.white)
 						.padding(.top, 0.55 * u)
 					HStack(alignment: .bottom, spacing: 9 * u) {
 						Text(card.price)
 							.font(StakFont.sora(20 * u, .semiBold))
-							.foregroundStyle(StakColors.textPrimary)
+							.foregroundStyle(Color.white)
 						Text(card.change)
 							.font(StakFont.geist(11 * u, .medium))
 							.foregroundStyle(Disc.green)
@@ -364,7 +364,7 @@ private struct SaveChip: View {
 		HStack(spacing: 6 * u) {
 			Text("Save")
 				.font(StakFont.geist(12 * u, .medium))
-				.foregroundStyle(StakColors.textPrimary)
+				.foregroundStyle(Color.white)
 			Image("IcSaveBookmark")
 				.resizable()
 				.frame(width: 12 * u, height: 12 * u)

@@ -83,7 +83,8 @@ struct LeaderboardView: View {
 						ZStack {
 							Circle().fill(Sim.chipBg)
 							// The authored "E" is the demo persona's; a new account shows its own initial (product audit, 2026-09-05).
-							Text(portfolio.demo ? "E" : String(UserProfile.shared.greetingName.prefix(1)).uppercased())
+							// A renamed persona reaches the board too (the edit page promises it; review 2026-09-07).
+							Text(portfolio.demo && UserProfile.shared.displayName.trimmingCharacters(in: .whitespaces).isEmpty ? "E" : String(UserProfile.shared.greetingName.prefix(1)).uppercased())
 								.font(StakFont.sora(14 * u, .semiBold)) // 1:4158 is 14 (exact-design audit 2026-09-04)
 								.foregroundStyle(Sim.badgeInk)
 						}

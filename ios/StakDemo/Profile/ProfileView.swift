@@ -41,6 +41,8 @@ struct ProfileView: View {
 	var onLogOut: () -> Void = {}
 	/// The rows open their settings pages (product audit, 2026-09-05).
 	var onOpenSetting: (SettingsKind) -> Void = { _ in }
+	/// The avatar and the name open the edit page (user, 2026-09-07).
+	var onEditProfile: () -> Void = {}
 	/// The paper stats card reads the live ledger (product audit, 2026-09-05).
 	@ObservedObject private var portfolio = PaperPortfolio.shared
 
@@ -63,33 +65,43 @@ struct ProfileView: View {
 
 			ScrollView {
 				VStack(spacing: 16 * u) {
-					// Avatar block.
+					// Avatar block. The avatar and the name open the edit page - 09 Profile
+					// setup's own promise, "You can change this anytime in Profile."
+					// (user, 2026-09-07: a photo of their choice, editable after sign-up).
 					VStack(spacing: 8 * u) {
-						ZStack {
-							Circle().fill(Color(argb: 0xFF242B3D))
-							// The picked photo when one exists; else the live initial of
-							// the display name - "H" for the demo persona Hamza, so the
-							// authored 171:995 frame is unchanged (Codex parity audit
-							// 2026-09-04; mirrors android ProfileScreen.kt).
-							if let data = profile.photoData, let photo = UIImage(data: data) {
-								Image(uiImage: photo)
-									.resizable()
-									.scaledToFill()
-									.frame(width: 64 * u, height: 64 * u)
-									.clipShape(Circle())
-							} else {
-								Text(profile.greetingName.prefix(1).uppercased())
-									.font(StakFont.sora(22 * u, .semiBold))
-									.foregroundStyle(Color(argb: 0xFF9EADC7))
+						Button(action: onEditProfile) {
+							VStack(spacing: 8 * u) {
+							ZStack {
+								Circle().fill(Color(argb: 0xFF242B3D))
+								// The picked photo when one exists; else the live initial of
+								// the display name - "H" for the demo persona Hamza, so the
+								// authored 171:995 frame is unchanged (Codex parity audit
+								// 2026-09-04; mirrors android ProfileScreen.kt).
+								if let data = profile.photoData, let photo = UIImage(data: data) {
+									Image(uiImage: photo)
+										.resizable()
+										.scaledToFill()
+										.frame(width: 64 * u, height: 64 * u)
+										.clipShape(Circle())
+								} else {
+									Text(profile.greetingName.prefix(1).uppercased())
+										.font(StakFont.sora(22 * u, .semiBold))
+										.foregroundStyle(Color(argb: 0xFF9EADC7))
+								}
+							}
+							.frame(width: 64 * u, height: 64 * u)
+							Text(profile.greetingName)
+								.font(StakFont.sora(20 * u, .semiBold))
+								.foregroundStyle(StakColors.textPrimary)
+							Text("Paper investor · joined \(profile.joined)")
+								.font(StakFont.geist(12 * u))
+								.foregroundStyle(StakColors.muted)
 							}
 						}
-						.frame(width: 64 * u, height: 64 * u)
-						Text(profile.greetingName)
-							.font(StakFont.sora(20 * u, .semiBold))
-							.foregroundStyle(StakColors.textPrimary)
-						Text("Paper investor · joined \(profile.joined)")
-							.font(StakFont.geist(12 * u))
-							.foregroundStyle(StakColors.muted)
+						.buttonStyle(.pressDim)
+						// VoiceOver keeps the name; the action is the hint (review 2026-09-07).
+						.accessibilityLabel(profile.greetingName)
+						.accessibilityHint("Edit profile")
 					}
 
 					// YOUR TASTE card.

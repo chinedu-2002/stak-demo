@@ -8,6 +8,8 @@ private enum PushedPage: Identifiable, Equatable {
 	/// collection id (MyStak/Collections.swift).
 	case collection(id: String)
 	case profile
+	/// 09 Profile setup as the hub's edit page (user, 2026-09-07).
+	case editProfile
 	case notifications
 	case settings(SettingsKind)
 	case simPortfolio
@@ -22,6 +24,7 @@ private enum PushedPage: Identifiable, Equatable {
 		case .stockDetail(let fromMyStak, let symbol): return "stockDetail-\(fromMyStak)-\(symbol)"
 		case .collection(let id): return "collection-\(id)"
 		case .profile: return "profile"
+		case .editProfile: return "editProfile"
 		case .notifications: return "notifications"
 		case .settings(let kind): return "settings-\(kind.rawValue)"
 		case .simPortfolio: return "simPortfolio"
@@ -312,7 +315,16 @@ struct MainTabsView: View {
 			)
 		case .profile:
 			// Authored (171:995): Back = BACK action - the house back pop.
-			ProfileView(onBack: { pop() }, onLogOut: onLogOut, onOpenSetting: { kind in push(.settings(kind)) })
+			ProfileView(onBack: { pop() }, onLogOut: onLogOut, onOpenSetting: { kind in push(.settings(kind)) }, onEditProfile: {
+				// Two fingers on the block must not stack two edit pages (review 2026-09-07).
+				if pushed.last?.page != .editProfile { push(.editProfile) }
+			})
+		case .editProfile:
+			// House push in, house back out; Save pops back to the hub, which
+			// observes UserProfile and re-renders the avatar block. Pops only while
+			// this page is still on top: a second tap on Save during the pop must
+			// not take the hub with it.
+			ProfileSetupView(onBack: { if pushed.last?.page == .editProfile { pop() } }, onProceed: { if pushed.last?.page == .editProfile { pop() } }, editing: true)
 		case .notifications:
 			NotificationsView(onBack: { pop() }, onOpenSettings: { push(.settings(.notifications)) })
 		case .settings(let kind):

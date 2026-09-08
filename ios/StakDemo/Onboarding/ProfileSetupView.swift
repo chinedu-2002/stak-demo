@@ -16,6 +16,11 @@ private let nameMax = 20
 struct ProfileSetupView: View {
 	let onBack: () -> Void
 	let onProceed: () -> Void
+	/// The same frame serves as the Profile hub's edit page (its own copy promises
+	/// "You can change this anytime in Profile."; user, 2026-09-07) - it arrives
+	/// with the account's name and photo and saves in place.
+	var editing: Bool = false
+	@State private var seeded = false
 
 	// The frame arrives with "Nedu" typed (avatar "N", counter 4 / 20) - user, 2026-09-04 (CHINEDU 01 · Onboarding 1:793): the exact frame wins.
 	// Product audit (2026-09-05): a real first run starts with an empty name (the
@@ -41,7 +46,7 @@ struct ProfileSetupView: View {
 			.padding(.horizontal, 20 * u)
 			.padding(.top, 10 * u)
 			.padding(.bottom, 4 * u)
-			OnboardingKicker(text: "STEP · LAST ONE")
+			OnboardingKicker(text: editing ? "PROFILE" : "STEP · LAST ONE")
 
 			VStack(alignment: .leading, spacing: 18 * u) {
 				VStack(alignment: .leading, spacing: 12 * u) {
@@ -79,7 +84,7 @@ struct ProfileSetupView: View {
 					.buttonStyle(.pressDim)
 					.accessibilityLabel(photoData == nil ? "Add a photo" : "Profile photo")
 					Button(action: { showPhotoPicker = true }) {
-						Text("Add a photo")
+						Text(photo == nil ? "Add a photo" : "Change photo")
 							.font(StakFont.geist(12 * u, .medium))
 							.foregroundStyle(Auth.linkTeal)
 					}
@@ -113,9 +118,12 @@ struct ProfileSetupView: View {
 				.padding(16 * u)
 				.background(Auth.inputBg, in: RoundedRectangle(cornerRadius: 14 * u))
 
-				Text("You can change this anytime in Profile.")
-					.font(StakFont.geist(11 * u))
-					.foregroundStyle(Auth.faintText)
+				// The onboarding footnote; on the edit page the user is already in Profile.
+				if !editing {
+					Text("You can change this anytime in Profile.")
+						.font(StakFont.geist(11 * u))
+						.foregroundStyle(Auth.faintText)
+				}
 
 				Spacer(minLength: 0)
 			}
@@ -124,9 +132,11 @@ struct ProfileSetupView: View {
 			.padding(.top, 14 * u)
 
 			VStack(spacing: 0) {
-				AuthCta(text: "Proceed to home", enabled: !name.trimmingCharacters(in: .whitespaces).isEmpty && !loadingPhoto, action: {
+				AuthCta(text: editing ? "Save changes" : "Proceed to home", enabled: !name.trimmingCharacters(in: .whitespaces).isEmpty && !loadingPhoto, action: {
 					UserProfile.shared.displayName = name.trimmingCharacters(in: .whitespaces).capitalizedWords
 					UserProfile.shared.photoData = photoData
+					// Editing saves in place; onboarding persists with the account at Proceed.
+					if editing { Session.shared.saveProfile() }
 					onProceed()
 				})
 			}
@@ -134,6 +144,15 @@ struct ProfileSetupView: View {
 			.padding(.bottom, 26 * u)
 		}
 		.background(StakColors.bg.ignoresSafeArea())
+		.onAppear {
+			// Edit mode arrives with the account's current name and photo.
+			guard editing, !seeded else { return }
+			seeded = true
+			let current = UserProfile.shared.displayName.trimmingCharacters(in: .whitespaces)
+			name = current.isEmpty ? UserProfile.shared.greetingName : current
+			photoData = UserProfile.shared.photoData
+			photo = photoData.flatMap { UIImage(data: $0) }
+		}
 		.photosPicker(isPresented: $showPhotoPicker, selection: $pickedItem, matching: .images)
 		.onChange(of: pickedItem) { _, item in
 			guard let item else { return }

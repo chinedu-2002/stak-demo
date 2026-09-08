@@ -116,12 +116,16 @@ struct LeaderboardView: View {
 					.background(Sim.tealTint, in: RoundedRectangle(cornerRadius: 14 * u))
 
 					ForEach(top, id: \.rank) { LeaderRow(r: $0) }
-					Text("· · ·")
-						// 1:4205 (exact-design audit 2026-09-04): Geist Medium 13 - was Regular 12.
-						.font(StakFont.geist(13 * u, .medium))
-						.foregroundStyle(Sim.faint)
-						.frame(maxWidth: .infinity)
-					ForEach(near, id: \.rank) { LeaderRow(r: $0) }
+					// The authored #46/#48 neighbours cluster around the persona's #47; an unranked
+					// first-time user sees the top five only (audit 2026-09-07).
+					if PaperPortfolio.shared.rank != nil {
+						Text("· · ·")
+							// 1:4205 (exact-design audit 2026-09-04): Geist Medium 13 - was Regular 12.
+							.font(StakFont.geist(13 * u, .medium))
+							.foregroundStyle(Sim.faint)
+							.frame(maxWidth: .infinity)
+						ForEach(near, id: \.rank) { LeaderRow(r: $0) }
+					}
 					Text("Percentage return, not dollar size, so everyone competes on the same scale. This week ranks the trailing 7 days.")
 						.font(StakFont.geist(11 * u))
 						.stakLineHeight(16 * u, size: 11 * u, face: .geist)

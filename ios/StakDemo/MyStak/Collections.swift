@@ -141,7 +141,8 @@ enum StakCollections {
 	/// Best / Worst stand-ins). Mirrors android otherCollection().
 	static func other(holdings: Set<String>) -> StakCollection? {
 		let catalogued = Set(all.flatMap { $0.stocks }.map(\.ticker))
-		let extra = holdings.filter { !catalogued.contains($0) }.sorted()
+		// The persona's seeded TSLA/SNOW are the frame's; only saves the account made itself count.
+		let extra = holdings.filter { !catalogued.contains($0) && !(StakStore.demoAccount && MyStakHoldings.seed.contains($0)) }.sorted()
 		if extra.isEmpty { return nil }
 		let stocks = extra.map { t -> CollStock in
 			let known = NewsArticleFeed.hasStockFacts(t)

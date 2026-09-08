@@ -54,43 +54,49 @@ struct SimPortfolioView: View {
 							.frame(width: 158 * u, height: 32 * u, alignment: .leading)
 							.overlay(RoundedRectangle(cornerRadius: 13 * u).strokeBorder(Sim.cardBg, lineWidth: 1 * u))
 							.frame(maxWidth: .infinity)
-						HStack(spacing: 8 * u) {
-							FilterChip(label: "Top gainers", selected: true)
-							FilterChip(label: "Newest", selected: false)
-							FilterChip(label: "Worst", selected: false)
+						if !portfolio.demo && portfolio.positions.isEmpty && portfolio.realized.isEmpty {
+							// A first-time user's history before the first practice buy (audit 2026-09-07):
+							// the Simulate home's empty card instead of empty chrome.
+							EmptyStateCard(title: "No picks yet", text: "Your first practice buy lands here with its live gain.")
+						} else {
+							HStack(spacing: 8 * u) {
+								FilterChip(label: "Top gainers", selected: true)
+								FilterChip(label: "Newest", selected: false)
+								FilterChip(label: "Worst", selected: false)
+							}
+							ForEach(portfolio.positions) { position in
+								let p = position.row
+								PortfolioRow(
+									badge: p.badge, ticker: p.ticker, sub: p.sub,
+									amount: p.amount, pct: p.pct, up: p.up,
+									action: { onOpenPick(p.ticker) },
+									// Authored (1:4548 template): every Sell pill opens
+									// the Pick detail of ITS ticker, Instant - the authored
+									// sell flow lives there; this page's sheets stay unwired.
+									trailing: { SellPill(action: { onOpenPick(p.ticker) }) },
+									// 1:4539 (exact-design audit 2026-09-04): this page's picked line is Geist Light.
+									subLight: true
+								)
+							}
+							Text("SOLD · REALIZED")
+								.font(StakFont.geist(10 * u, .medium))
+								.tracking(0.9 * u)
+								.foregroundStyle(Sim.faint)
+								// 1:4605 gk (exact-design audit 2026-09-04): the kicker sits 4 below the box top (13 in a 17), not centred.
+								.frame(height: 17 * u, alignment: .bottom)
+								.frame(maxWidth: .infinity, alignment: .leading)
+								.padding(.leading, 2 * u)
+							ForEach(portfolio.realized) { r in
+								RealizedRow(badge: r.badge, ticker: r.ticker, sub: r.sub, amount: r.amount, up: r.up)
+							}
+							Text("Sell a pick and the cash returns to your balance, gain or loss.")
+								.font(StakFont.geist(11 * u))
+								.stakLineHeight(14 * u, size: 11 * u, face: .geist)
+								.foregroundStyle(Sim.faint)
+								// 1:4621 (exact-design audit 2026-09-04): centre-aligned, so a wrap stays centred.
+								.multilineTextAlignment(.center)
+								.frame(maxWidth: .infinity)
 						}
-						ForEach(portfolio.positions) { position in
-							let p = position.row
-							PortfolioRow(
-								badge: p.badge, ticker: p.ticker, sub: p.sub,
-								amount: p.amount, pct: p.pct, up: p.up,
-								action: { onOpenPick(p.ticker) },
-								// Authored (1:4548 template): every Sell pill opens
-								// the Pick detail of ITS ticker, Instant - the authored
-								// sell flow lives there; this page's sheets stay unwired.
-								trailing: { SellPill(action: { onOpenPick(p.ticker) }) },
-								// 1:4539 (exact-design audit 2026-09-04): this page's picked line is Geist Light.
-								subLight: true
-							)
-						}
-						Text("SOLD · REALIZED")
-							.font(StakFont.geist(10 * u, .medium))
-							.tracking(0.9 * u)
-							.foregroundStyle(Sim.faint)
-							// 1:4605 gk (exact-design audit 2026-09-04): the kicker sits 4 below the box top (13 in a 17), not centred.
-							.frame(height: 17 * u, alignment: .bottom)
-							.frame(maxWidth: .infinity, alignment: .leading)
-							.padding(.leading, 2 * u)
-						ForEach(portfolio.realized) { r in
-							RealizedRow(badge: r.badge, ticker: r.ticker, sub: r.sub, amount: r.amount, up: r.up)
-						}
-						Text("Sell a pick and the cash returns to your balance, gain or loss.")
-							.font(StakFont.geist(11 * u))
-							.stakLineHeight(14 * u, size: 11 * u, face: .geist)
-							.foregroundStyle(Sim.faint)
-							// 1:4621 (exact-design audit 2026-09-04): centre-aligned, so a wrap stays centred.
-							.multilineTextAlignment(.center)
-							.frame(maxWidth: .infinity)
 					}
 					.padding(.horizontal, 20 * u)
 					.padding(.top, 6 * u)

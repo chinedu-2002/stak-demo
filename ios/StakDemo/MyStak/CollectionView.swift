@@ -114,11 +114,16 @@ struct CollectionView: View {
 				Text("·")
 					.font(StakFont.geist(13 * u))
 					.foregroundStyle(faint)
-				// The week move is authored copy (1:3333) the shared demo
-				// data does not define per collection - it stays as drawn.
-				Text("+2.4% this week")
-					.font(StakFont.geist(13 * u, .medium))
-					.foregroundStyle(green)
+				// The persona keeps the authored 1:3333 literal; a first-time user's
+				// collection reads the week move of ITS held stocks, none while it is
+				// empty (audit 2026-09-07: "0 stocks · +2.4% this week").
+				let ownMove: Double? = Session.shared.demoAccount || held.isEmpty ? nil
+					: held.reduce(0.0) { $0 + StakInsights.changePct($1) } / Double(held.count)
+				if Session.shared.demoAccount || ownMove != nil {
+					Text(ownMove.map { StakInsights.signedPct($0) + " this week" } ?? "+2.4% this week")
+						.font(StakFont.geist(13 * u, .medium))
+						.foregroundStyle((ownMove ?? 0) < 0 ? Color(argb: 0xFFE5484D) : green)
+				}
 			}
 			Text(collection.blurb)
 				.font(StakFont.geist(13 * u))

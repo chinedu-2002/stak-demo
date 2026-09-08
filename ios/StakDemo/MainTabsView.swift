@@ -85,9 +85,11 @@ private enum NavStyle {
 struct MainTabsView: View {
 	var onLogOut: () -> Void = {}
 	@State private var tab = MainTab.home
-	// First run shows only in the session that signed in / created the
-	// account; a launch that resumed a saved session lands on Home Main.
-	@State private var homeFirstRun = !Session.shared.resumedSignedIn
+	// First run (1:958) is for a FIRST-TIME user only: the account was created
+	// here and the run has not been completed yet. An active/returning user -
+	// Sign in, or any relaunch after the first run - lands on Home Main
+	// (user, 2026-09-07). Completion persists in Session.
+	@State private var homeFirstRun = Session.shared.firstRunPending
 	@State private var pushed: [PushedEntry] = []
 
 	/// One live entry on the pushed stack. Identity is PER PUSH (a fresh
@@ -163,13 +165,13 @@ struct MainTabsView: View {
 							// 1:958 Market Mood -> News -> Home lands on Main, never back on
 							// the scrim (prototype walk, 2026-09-05; mirrors Android). Only
 							// the avatar's Profile push (1:1003, BACK) returns to first run.
-							onSeeTodaysPick: { homeFirstRun = false; switchTab(.discover) },
+							onSeeTodaysPick: { endFirstRun(); switchTab(.discover) },
 							onProfile: { push(.profile) },
 							// Product audit (2026-09-05): the bell opens the inbox.
 							onBell: { push(.notifications) },
-							onOpenNews: { homeFirstRun = false; switchTab(.news) },
-							onOpenMyStak: { homeFirstRun = false; switchTab(.myStak) },
-							onOpenDeck: { homeFirstRun = false; switchTab(.discover) }
+							onOpenNews: { endFirstRun(); switchTab(.news) },
+							onOpenMyStak: { endFirstRun(); switchTab(.myStak) },
+							onOpenDeck: { endFirstRun(); switchTab(.discover) }
 						)
 					case .news:
 						// Authored (1:1228): Story tile -> News detail unsaved, Instant.
@@ -343,6 +345,12 @@ struct MainTabsView: View {
 	/// tab passes .forwardPush and the whole tab page slides out trailing
 	/// while the target enters from leading, 300 ease-out. `also` runs in
 	/// the same transaction (e.g. dismissing a hoisted ticket with it).
+	/// Home's first run ends (the pill or any tab hop): the user is a returning user from here on.
+	private func endFirstRun() {
+		homeFirstRun = false
+		Session.shared.completeFirstRun()
+	}
+
 	private func switchTab(_ target: MainTab, _ style: NavStyle = .instant, also: () -> Void = {}) {
 		tabStyle = style
 		if style == .instant {

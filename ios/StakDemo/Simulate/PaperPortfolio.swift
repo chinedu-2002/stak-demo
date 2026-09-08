@@ -319,11 +319,11 @@ final class PaperPortfolio: ObservableObject {
 	private init() {}
 }
 
-private extension PickSpec {
+extension PickSpec {
 	/// The same pick holding more: a top-up buy adds shares and stake at
 	/// cost; the authored gain lines (and the week move) stand until
 	/// prices move. Review (2026-09-04): the basis follows the stake.
-	func holding(shares: Double, stakeValue: Double, stakeBasis: Double) -> PickSpec {
+	fileprivate func holding(shares: Double, stakeValue: Double, stakeBasis: Double) -> PickSpec {
 		PickSpec(
 			symbol: symbol, badge: badge, company: company, priceNow: priceNow, priceThen: priceThen,
 			pickedLine: pickedLine, gainWhole: gainWhole, gainCents: gainCents, gainSigned: gainSigned,

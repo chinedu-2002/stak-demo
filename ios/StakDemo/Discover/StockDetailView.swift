@@ -68,7 +68,7 @@ struct StockDetailView: View {
 
 	var body: some View {
 		let u = figmaUnit
-		let f = detailFacts[symbol] ?? detailFacts["AAPL"]!
+		let f = detailFactsFor(symbol)
 		// Authored (1:2579): ONLY the Discover-entry open state composes the
 		// shell tab bar (an authored inconsistency - matched per frame).
 		let showsBar = !fromMyStak && analystOpen && onTab != nil
@@ -248,7 +248,7 @@ struct StockDetailView: View {
 	/// detail for the Simulate tab, Instant - not a ticket; only the
 	/// My STAK entry raises the in-page ticket (16:1012).
 	private func practiceBuy() {
-		if !fromMyStak, let onPracticeBuyToSimulate {
+		if !fromMyStak, let onPracticeBuyToSimulate, hopsToSimulate(symbol) {
 			onPracticeBuyToSimulate()
 		} else {
 			showBuy = true
@@ -555,7 +555,7 @@ private struct NewsSignalCard: View {
 					.padding(.vertical, 3 * u)
 					.background(Color(argb: 0x14FFFFFF), in: Capsule())
 			}
-			Text(src == f.newsSources.first?.0 ? f.newsHeadline : f.newsHeadline2)
+			Text(source == f.newsSources.first?.0 ? f.newsHeadline : f.newsHeadline2)
 				.font(StakFont.geist(12 * u))
 				.foregroundStyle(bright)
 				.frame(width: 173 * u, alignment: .leading)
@@ -669,8 +669,12 @@ private struct CompareCard: View {
 /// the right symbol; a new account reads its own save date, and the move
 /// since is this week's change once a day has passed.
 private func sinceSavedFor(_ f: DetailFacts) -> (String, String, Bool) {
-	let demo = Session.shared.demoAccount
-	let days = demo ? nil : MyStakHoldings.shared.daysSinceSaved(f.symbol)
+	// A save with a recorded day reads its real age on either account; the authored
+	// "5 weeks ago" belongs to the demo persona's SEED saves, which predate the record
+	// (audit 2026-09-07: the persona's own saves read "5 weeks ago" a minute later).
+	let recorded = MyStakHoldings.shared.daysSinceSaved(f.symbol)
+	let demo = Session.shared.demoAccount && recorded == nil
+	let days = demo ? nil : recorded
 	var move = f.change.filter { $0.isNumber || $0 == "." }
 	if move.isEmpty { move = "0.0" }
 	let up = !f.change.contains("\u{25BC}") && !f.change.trimmingCharacters(in: .whitespaces).hasPrefix("-")
@@ -821,6 +825,10 @@ private struct DetailCompareRow {
 /// included). The pill's authored x (88 low / 150 mid / 238 high) is the
 /// stock's volatility; TasteModel.riskStyle is the user's answer.
 private func riskFitFor(_ f: DetailFacts) -> (String, String) {
+	// The active user (Sign in) is the authored persona: its page reads the frame's
+	// "Matches you"; only a first-time user's own 05 Risk answer drives the variants
+	// (audit 2026-09-07 - the persona never answers 05, so its risk is -1).
+	if Session.shared.demoAccount { return ("Matches you", f.riskCopy) }
 	let style = TasteModel.riskStyle(UserProfile.shared.risk)
 	let highVol = f.riskPillX > 170
 	let lowVol = f.riskPillX < 120
@@ -834,11 +842,38 @@ private func riskFitFor(_ f: DetailFacts) -> (String, String) {
 	return ("Matches you", f.riskCopy)
 }
 
+/// The page's facts for a symbol. The nineteen designed pages carry their own; any
+/// other stock a first-time user saved (a Tesla or Amazon story, the Other
+/// collection) keeps ITS identity - symbol, name, quote - over the Apple
+/// template's body, so the header, the Since-you-saved line and Unsave are about
+/// the stock the user tapped (audit 2026-09-07: they opened Apple's page).
+private func detailFactsFor(_ symbol: String) -> DetailFacts {
+	if let designed = detailFacts[symbol] { return designed }
+	var f = detailFacts["AAPL"]!
+	f.symbol = symbol
+	guard NewsArticleFeed.hasStockFacts(symbol) else { f.title = symbol; return f }
+	let sf = NewsArticleFeed.stockFacts(symbol)
+	var pct = sf.change.filter { $0.isNumber || $0 == "." }
+	if pct.isEmpty { pct = "0.0" }
+	f.title = "\(symbol) · \(sf.name)"
+	f.price = sf.price
+	f.change = (sf.up ? "\u{25B2} " : "\u{25BC} ") + pct + "% today"
+	return f
+}
+
+/// The authored Discover-entry Practice buy hops to the Simulate tab (1:2382,
+/// Instant), whose Saved staks list the ACCOUNT's saves. For the demo persona that
+/// is the authored frame; for a first-time user the hop is a dead end unless the
+/// stock is one of their saves - then the in-page ticket (16:1012) serves it.
+private func hopsToSimulate(_ symbol: String) -> Bool {
+	Session.shared.demoAccount || MyStakHoldings.shared.tickers.contains(symbol)
+}
+
 private struct DetailFacts {
-	let symbol: String
-	let title: String
-	let price: String
-	let change: String
+	var symbol: String
+	var title: String
+	var price: String
+	var change: String
 	let tip: String
 	let riskPillX: CGFloat
 	let riskCopy: String

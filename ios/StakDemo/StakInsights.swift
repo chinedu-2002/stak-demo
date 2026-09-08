@@ -63,14 +63,19 @@ enum StakInsights {
 
 	/// "You lean into tech and AI."
 	static func readHeadline() -> String {
-		guard let top = heldGroups().first else { return "Your read starts with your first save." }
+		guard let top = heldGroups().first else {
+			return MyStakHoldings.shared.count > 0 ? "Your saves sit outside the six collections." : "Your read starts with your first save."
+		}
 		return "You lean into \(theme[top.0.id] ?? top.0.name)."
 	}
 
 	static func readBody() -> String {
 		let groups = heldGroups()
 		let total = groups.reduce(0) { $0 + $1.1.count }
-		guard let top = groups.first else { return "Save stocks from the Discover deck and STAK will read your taste from them." }
+		guard let top = groups.first else {
+			return MyStakHoldings.shared.count > 0 ? "Save a stock from one of the collections and STAK will read your taste from it."
+				: "Save stocks from the Discover deck and STAK will read your taste from them."
+		}
 		let themeName = theme[top.0.id] ?? top.0.name
 		if total == 1 {
 			return "\(top.1[0].ticker) is your first save, a \(themeName) name. Save a few more and STAK will read the pattern."

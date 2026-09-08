@@ -83,9 +83,11 @@ struct MyStakView: View {
 		// Collection screen, Instant. Codex parity audit (2026-09-04): each
 		// chip carries its own collection id so the page serves the tapped
 		// one; the six catalogue chips fill the authored three rows of two.
-		// A seventh, "Other" tile appears only while a new account holds stocks no
-		// collection catalogues (Codex review, PR #167); the demo keeps its six.
-		let other = Session.shared.demoAccount ? nil : StakCollections.other(holdings: holdings.tickers)
+		// A seventh, "Other" tile appears only while the account holds stocks no
+		// collection catalogues (Codex review, PR #167) - the persona's seeded
+		// TSLA/SNOW never count, so the frame keeps its six; a save the persona
+		// makes itself (an Amazon story) is visible and reversible (audit 2026-09-07).
+		let other = StakCollections.other(holdings: holdings.tickers)
 		let all = StakCollections.all + (other.map { [$0] } ?? [])
 		let rows = stride(from: 0, to: all.count, by: 2).map {
 			Array(all[$0..<min($0 + 2, all.count)])
@@ -259,6 +261,7 @@ private struct PortfolioSummary: View {
 	/// timeline"); "3M" is the authored default (1:3155) and keeps the
 	/// authored chart image. Mirrors android.
 	@State private var range = "3M"
+	@ObservedObject private var holdings = MyStakHoldings.shared
 
 	var body: some View {
 		let u = figmaUnit
@@ -299,7 +302,8 @@ private struct PortfolioSummary: View {
 
 			// The demo's authored TSLA / SNOW; a new account's own best and worst, once it holds two (product audit, 2026-09-05).
 			let duo = Session.shared.demoAccount ? nil : StakInsights.bestWorst()
-			if holdings.count > 0 && (Session.shared.demoAccount || duo != nil) { HStack(spacing: 151 * u) {
+			if holdings.count > 0 && (Session.shared.demoAccount || duo != nil) {
+				HStack(spacing: 151 * u) {
 				VStack(alignment: .leading, spacing: 3 * u) {
 					Text("Best this week")
 						.font(StakFont.geist(11 * u))
@@ -326,8 +330,9 @@ private struct PortfolioSummary: View {
 							.foregroundStyle(!Session.shared.demoAccount && duo!.1.up ? green : red)
 					}
 				}
-			} }
-			.frame(maxWidth: .infinity)
+				}
+				.frame(maxWidth: .infinity)
+			}
 		}
 		.frame(maxWidth: .infinity)
 		.padding(.vertical, 13.5 * u)
@@ -345,25 +350,27 @@ private struct AllocationCard: View {
 			Text("Allocation")
 				.font(StakFont.sora(15 * u, .semiBold))
 				.foregroundStyle(StakColors.textPrimary)
-			if Session.shared.demoAccount {
-				Image("MsDonut")
-					.resizable()
-					.frame(width: 150 * u, height: 150 * u)
-				VStack(spacing: 12 * u) {
-					SectorBar(name: "Tech & AI", share: "42% · 6 stocks", color: teal, fill: 132)
-					SectorBar(name: "Finance", share: "21% · 3 stocks", color: Color(argb: 0xFF7AB3F0), fill: 66)
-					SectorBar(name: "Green Energy", share: "20% · 3 stocks", color: green, fill: 63)
-					// 1:3306 legend dot is #9E8CE6 while the 1:3310 bar is #9E8CE5 - exact-design audit 2026-09-04.
-					SectorBar(name: "Real Estate", share: "12% · 2 stocks", color: Color(argb: 0xFF9E8CE5), fill: 38, dot: Color(argb: 0xFF9E8CE6))
-					SectorBar(name: "Other", share: "5% · 1 stock", color: faint, fill: 16)
-				}
-			} else {
-				// A new account's ring and bars come from its own saves (product audit, 2026-09-05).
-				let buckets = StakInsights.buckets(Array(MyStakHoldings.shared.tickers))
-				DonutRing(shares: buckets.map { CGFloat($0.share) }, colors: buckets.map { myStakBucketColor($0.id) }, size: 150 * u)
-				VStack(spacing: 12 * u) {
-					ForEach(buckets, id: \.id) { b in
-						SectorBar(name: b.name, share: "\(Int((b.share * 100).rounded()))% · \(heldCountLabel(b.count))", color: myStakBucketColor(b.id), fill: CGFloat(314 * b.share))
+			Group {
+				if Session.shared.demoAccount {
+					Image("MsDonut")
+						.resizable()
+						.frame(width: 150 * u, height: 150 * u)
+					VStack(spacing: 12 * u) {
+						SectorBar(name: "Tech & AI", share: "42% · 6 stocks", color: teal, fill: 132)
+						SectorBar(name: "Finance", share: "21% · 3 stocks", color: Color(argb: 0xFF7AB3F0), fill: 66)
+						SectorBar(name: "Green Energy", share: "20% · 3 stocks", color: green, fill: 63)
+						// 1:3306 legend dot is #9E8CE6 while the 1:3310 bar is #9E8CE5 - exact-design audit 2026-09-04.
+						SectorBar(name: "Real Estate", share: "12% · 2 stocks", color: Color(argb: 0xFF9E8CE5), fill: 38, dot: Color(argb: 0xFF9E8CE6))
+						SectorBar(name: "Other", share: "5% · 1 stock", color: faint, fill: 16)
+					}
+				} else {
+					// A new account's ring and bars come from its own saves (product audit, 2026-09-05).
+					let buckets = StakInsights.buckets(Array(MyStakHoldings.shared.tickers))
+					DonutRing(shares: buckets.map { CGFloat($0.share) }, colors: buckets.map { myStakBucketColor($0.id) }, size: 150 * u)
+					VStack(spacing: 12 * u) {
+						ForEach(buckets, id: \.id) { b in
+							SectorBar(name: b.name, share: "\(Int((b.share * 100).rounded()))% · \(heldCountLabel(b.count))", color: myStakBucketColor(b.id), fill: CGFloat(314 * b.share))
+						}
 					}
 				}
 			}
@@ -375,7 +382,7 @@ private struct AllocationCard: View {
 	}
 }
 
-private /// The authored bucket palette (1:3155), one colour per collection.
+/// The authored bucket palette (1:3155), one colour per collection.
 private func myStakBucketColor(_ id: String) -> Color {
 	switch id {
 	case "aitech": return Color(argb: 0xFF69B3CA)

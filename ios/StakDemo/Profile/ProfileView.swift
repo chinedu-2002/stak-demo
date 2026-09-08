@@ -34,14 +34,15 @@ private let settingsRows = ["Notifications", "Appearance", "Linked accounts", "H
 /// exactly like the Android build's `u` scaling.
 /// Ports android/ ui/profile/ProfileScreen.kt.
 struct ProfileView: View {
+	/// Observed (like HomeView's TopNav) so a photo picked / name typed in
+	/// 09 Profile setup re-renders the avatar block.
 	@ObservedObject private var profile = UserProfile.shared
 	let onBack: () -> Void
 	var onLogOut: () -> Void = {}
 	/// The rows open their settings pages (product audit, 2026-09-05).
 	var onOpenSetting: (SettingsKind) -> Void = { _ in }
-	/// Observed (like HomeView's TopNav) so a photo picked / name typed in
-	/// 09 Profile setup re-renders the avatar block.
-	@ObservedObject var profile = UserProfile.shared
+	/// The paper stats card reads the live ledger (product audit, 2026-09-05).
+	@ObservedObject private var portfolio = PaperPortfolio.shared
 
 	var body: some View {
 		let u = figmaUnit

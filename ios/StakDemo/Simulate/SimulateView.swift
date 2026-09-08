@@ -98,7 +98,7 @@ struct SimulateView: View {
 						let savedRows = savedStakRows()
 						if savedRows.isEmpty {
 							// Product audit (2026-09-05): a new account has saved nothing yet.
-							EmptyStateCard(title: "Nothing saved yet", body: "Save stocks from the Discover deck and practice buy them here.", link: "Go to Discover", onLink: onOpenDiscover)
+							EmptyStateCard(title: "Nothing saved yet", text: "Save stocks from the Discover deck and practice buy them here.", link: "Go to Discover", onLink: onOpenDiscover)
 						} else {
 							VStack(spacing: 10 * u) {
 								ForEach(savedRows, id: \.spec.symbol) { row in
@@ -125,7 +125,7 @@ struct SimulateView: View {
 						// 1:4009 plist (exact-design audit 2026-09-04): the three rows sit 10 apart, not the column's 18.
 						if portfolio.pickCount == 0 {
 							// Product audit (2026-09-05): a new account has no picks yet.
-							EmptyStateCard(title: "No picks yet", body: "Your first practice buy lands here with its live gain.")
+							EmptyStateCard(title: "No picks yet", text: "Your first practice buy lands here with its live gain.")
 						} else {
 						VStack(spacing: 10 * u) {
 							ForEach(Array(portfolio.positions.prefix(3))) { position in
@@ -203,10 +203,36 @@ struct SimulateView: View {
 				SavedStak(spec: costBuy, sub: savedSub("COST", authored: StakClock.savedLabel(daysAgo: 2) + " · not in portfolio yet"))
 			]
 		}
-		let tickets = [nvdaBuy, aaplBuy, googlBuy, pltrBuy, costBuy]
-		return tickets.filter { MyStakHoldings.shared.tickers.contains($0.symbol) }
+		// Every save the account made is a candidate - a Tesla or Amazon story's save
+		// gets a ticket built from the catalogue quote, the way the Other collection
+		// tile does - newest first, and the sub line reads the real save day (audit
+		// 2026-09-07: a TSLA-only account was told nothing was saved, every row "today").
+		let designed = [nvdaBuy, aaplBuy, googlBuy, pltrBuy, costBuy]
+		let held = MyStakHoldings.shared
+		let ordered = held.tickers.sorted { a, b in
+			let da = held.daysSinceSaved(a) ?? Int.max, db = held.daysSinceSaved(b) ?? Int.max
+			return da != db ? da < db : a < b
+		}
+		return ordered
+			.map { t in designed.first { $0.symbol == t } ?? Self.catalogueTicket(t) }
 			.prefix(2)
-			.map { SavedStak(spec: $0, sub: savedSub($0.symbol, authored: StakClock.savedLabel(daysAgo: 0) + " · not in portfolio yet")) }
+			.map { SavedStak(spec: $0, sub: savedSub($0.symbol, authored: StakClock.savedLabel(daysAgo: held.daysSinceSaved($0.symbol) ?? 0) + " · not in portfolio yet")) }
+	}
+
+	/// A $25 paper ticket for a saved stock without a designed one, priced off the catalogue quote.
+	private static func catalogueTicket(_ symbol: String) -> BuySpec {
+		let known = NewsArticleFeed.hasStockFacts(symbol)
+		let sf = NewsArticleFeed.stockFacts(symbol)
+		let price = known ? (Double(sf.price.replacingOccurrences(of: "$", with: "").replacingOccurrences(of: ",", with: "")) ?? 0) : 0
+		var pct = sf.change.filter { $0.isNumber || $0 == "." }
+		if pct.isEmpty { pct = "0.0" }
+		return BuySpec(
+			title: "Buy \(symbol)?", badge: String(symbol.prefix(1)), name: known ? sf.name : symbol,
+			priceLine: known ? "\(sf.price) today" : "\u{2014} today",
+			change: known ? (sf.up ? "\u{25B2} " : "\u{25BC} ") + pct + "%" : "\u{2014}",
+			cashBefore: "$8,800.00", cashAfter: "$8,775.00",
+			shares: price > 0 ? String(format: "%.4f", 25.0 / price) : "0", symbol: symbol
+		)
 	}
 
 	private func sectionHeader(_ title: String) -> some View {
@@ -642,7 +668,7 @@ private struct SimAllocationCard: View {
 	}
 }
 
-private /// The authored bucket palette (1:4040), one colour per collection.
+/// The authored bucket palette (1:4040), one colour per collection.
 private func simBucketColor(_ id: String) -> Color {
 	switch id {
 	case "aitech": return Sim.teal
@@ -686,6 +712,7 @@ struct SimSector: View {
 /// THIS WEEK'S BOARD mini-leaderboard.
 private struct BoardCard: View {
 	let onOpenLeaderboard: () -> Void
+	@ObservedObject private var portfolio = PaperPortfolio.shared
 
 	var body: some View {
 		let u = figmaUnit
@@ -757,7 +784,7 @@ extension View {
 /// mirrors Android's EmptyStateCard (product audit, 2026-09-05).
 struct EmptyStateCard: View {
 	let title: String
-	let body: String
+	let text: String
 	var link: String? = nil
 	var onLink: () -> Void = {}
 
@@ -767,7 +794,7 @@ struct EmptyStateCard: View {
 			Text(title)
 				.font(StakFont.sora(15 * u, .semiBold))
 				.foregroundStyle(StakColors.textPrimary)
-			Text(body)
+			Text(text)
 				.font(StakFont.geist(13 * u))
 				.stakLineHeight(19 * u, size: 13 * u, face: .geist)
 				.foregroundStyle(Sim.muted)

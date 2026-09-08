@@ -117,6 +117,11 @@ final class DeckSession: ObservableObject {
 		let f = DateFormatter(); f.dateFormat = "yyyy-MM-dd"; return f.string(from: Date())
 	}
 
+	/// Re-entering Discover on a later day starts the day's deck without a relaunch (audit 2026-09-07).
+	func refreshDay() {
+		if StakStore.string("deck.day") != Self.today() { load() }
+	}
+
 	func load() {
 		loading = true
 		if StakStore.string("deck.day") == Self.today() {
@@ -514,6 +519,7 @@ struct DiscoverView: View {
 		// itself, so a deck the user comes back to from My STAK / Simulate keeps
 		// its end state (prototype walk 2026-09-05; Android mirrors this with a
 		// remembered initial key).
+		.onAppear { DeckSession.shared.refreshDay() }
 		.onChange(of: resetKey) { if seen >= deckSize { restart() } }
 	}
 }
@@ -748,29 +754,32 @@ private struct EndOfDeck: View {
 			Spacer().frame(height: 52 * u)
 			SheetCta(text: "Practice buy your saves", action: onPracticeBuySaves)
 			Spacer().frame(height: 9 * u)
-			// Authored (1:2330): Review saves -> My STAK Overview, Instant.
-			Button(action: onReviewSaves) {
-				Text("Review saves in My STAK")
-					.font(StakFont.sora(13 * u))
+			// Grouped: a ViewBuilder block takes ten children at most (Swift 5.9).
+			Group {
+				// Authored (1:2330): Review saves -> My STAK Overview, Instant.
+				Button(action: onReviewSaves) {
+					Text("Review saves in My STAK")
+						.font(StakFont.sora(13 * u))
+						.foregroundStyle(Disc.muted)
+						.frame(maxWidth: .infinity)
+						.frame(height: 52 * u)
+						.overlay(RoundedRectangle(cornerRadius: 6 * u).strokeBorder(Color(argb: 0x54343B4F), lineWidth: 0.36 * u))
+				}
+				.buttonStyle(.pressDim)
+				Spacer().frame(height: 14 * u)
+				Text("A new deck lands tomorrow with your morning brief.")
+					.font(StakFont.geist(10 * u))
 					.foregroundStyle(Disc.muted)
-					.frame(maxWidth: .infinity)
-					.frame(height: 52 * u)
-					.overlay(RoundedRectangle(cornerRadius: 6 * u).strokeBorder(Color(argb: 0x54343B4F), lineWidth: 0.36 * u))
+				Spacer().frame(height: 40.5 * u)
+				Button(action: onSwipeAgain) {
+					Text("Swipe today’s deck again")
+						.font(StakFont.sora(13 * u))
+						.foregroundStyle(Disc.muted)
+						.frame(maxWidth: .infinity)
+						.frame(height: 32 * u)
+				}
+				.buttonStyle(.pressDim)
 			}
-			.buttonStyle(.pressDim)
-			Spacer().frame(height: 14 * u)
-			Text("A new deck lands tomorrow with your morning brief.")
-				.font(StakFont.geist(10 * u))
-				.foregroundStyle(Disc.muted)
-			Spacer().frame(height: 40.5 * u)
-			Button(action: onSwipeAgain) {
-				Text("Swipe today’s deck again")
-					.font(StakFont.sora(13 * u))
-					.foregroundStyle(Disc.muted)
-					.frame(maxWidth: .infinity)
-					.frame(height: 32 * u)
-			}
-			.buttonStyle(.pressDim)
 		}
 		.padding(.horizontal, 20 * u)
 	}

@@ -183,50 +183,59 @@ private struct NewsArticlePage: View {
 				// page saved, Instant - a direct save that skips the sheet.
 				HeroImage(media: article.media, category: article.category, saved: saved, isActive: isActive, onBookmark: onSave)
 				VStack(alignment: .leading, spacing: 15 * u) {
-					Text(article.headline)
-						// RENDER-measured 20sp (the metadata's 24 lied); lh32 box stands.
-						.font(StakFont.sora(20 * u, .semiBold))
-						.stakLineHeight(32 * u, size: 20 * u, face: .sora)
-						.foregroundStyle(StakColors.textPrimary)
-					Text(article.subtitle)
-						// 14.3 keeps the authored line-1 break after "lineup".
-						.font(StakFont.geist(14.3 * u))
-						.stakLineHeight(22 * u, size: 14.3 * u, face: .geist)
-						.foregroundStyle(News.muted)
-						// The column's 15 alone: the headline box is the authored 64 now
-						// (stakLineHeight pads the half-leading), the old +5 is gone.
-					Byline(source: article.source, meta: article.sourceMeta)
-					if !saved {
-						AddToStakButton(action: onAddToStak)
-					}
-					NewsHairline()
-					// ONE template for every story (user, 2026-08-25: the
-					// Apple article is the section's PLACEHOLDER - each
-					// block renders per story from served data; stock
-					// blocks appear whenever the story has a ticker).
-					if let ticker = article.ticker { StockCard(saved: saved, ticker: ticker, facts: NewsArticleFeed.stockFacts(ticker)) }
-					if !article.gist.isEmpty { GistCard(bullets: article.gist) }
-					if let first = article.paragraphs.first {
-						Paragraph(text: first, size: 15, line: 24)
-					}
-					if article.paragraphs.count > 1 {
-						Paragraph(text: article.paragraphs[1])
-					}
-					if let quote = article.pullQuote { PullQuote(text: quote) }
-					if let explainer = article.explainer { NewToThisCard(body_: explainer) }
-					ForEach(Array(article.paragraphs.dropFirst(2).enumerated()), id: \.offset) { _, text in
-						Paragraph(text: text)
-					}
-					SourceRow()
-					if let ticker = article.ticker { KeyStatsCard(facts: NewsArticleFeed.stockFacts(ticker)) }
-					NewsHairline()
-					HStack(spacing: 8 * u) {
-						if let first = article.tags.first { ArticleTag(text: first) }
-						if saved, article.tags.count > 1 {
-							ArticleTag(text: article.tags[1])
+					// Grouped: a ViewBuilder block takes ten children at most (Swift 5.9).
+					Group {
+						Text(article.headline)
+							// RENDER-measured 20sp (the metadata's 24 lied); lh32 box stands.
+							.font(StakFont.sora(20 * u, .semiBold))
+							.stakLineHeight(32 * u, size: 20 * u, face: .sora)
+							.foregroundStyle(StakColors.textPrimary)
+						Text(article.subtitle)
+							// 14.3 keeps the authored line-1 break after "lineup".
+							.font(StakFont.geist(14.3 * u))
+							.stakLineHeight(22 * u, size: 14.3 * u, face: .geist)
+							.foregroundStyle(News.muted)
+							// The column's 15 alone: the headline box is the authored 64 now
+							// (stakLineHeight pads the half-leading), the old +5 is gone.
+						Byline(source: article.source, meta: article.sourceMeta)
+						if !saved {
+							AddToStakButton(action: onAddToStak)
 						}
+						NewsHairline()
 					}
-					ReadNext(currentId: article.id, onOpen: onOpenArticle)
+					// Story blocks.
+					Group {
+						// ONE template for every story (user, 2026-08-25: the
+						// Apple article is the section's PLACEHOLDER - each
+						// block renders per story from served data; stock
+						// blocks appear whenever the story has a ticker).
+						if let ticker = article.ticker { StockCard(saved: saved, ticker: ticker, facts: NewsArticleFeed.stockFacts(ticker)) }
+						if !article.gist.isEmpty { GistCard(bullets: article.gist) }
+						if let first = article.paragraphs.first {
+							Paragraph(text: first, size: 15, line: 24)
+						}
+						if article.paragraphs.count > 1 {
+							Paragraph(text: article.paragraphs[1])
+						}
+						if let quote = article.pullQuote { PullQuote(text: quote) }
+						if let explainer = article.explainer { NewToThisCard(body_: explainer) }
+					}
+					// Tail.
+					Group {
+						ForEach(Array(article.paragraphs.dropFirst(2).enumerated()), id: \.offset) { _, text in
+							Paragraph(text: text)
+						}
+						SourceRow()
+						if let ticker = article.ticker { KeyStatsCard(facts: NewsArticleFeed.stockFacts(ticker)) }
+						NewsHairline()
+						HStack(spacing: 8 * u) {
+							if let first = article.tags.first { ArticleTag(text: first) }
+							if saved, article.tags.count > 1 {
+								ArticleTag(text: article.tags[1])
+							}
+						}
+						ReadNext(currentId: article.id, onOpen: onOpenArticle)
+					}
 				}
 				.frame(maxWidth: .infinity, alignment: .leading)
 				.padding(.horizontal, 20 * u)

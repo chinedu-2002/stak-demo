@@ -24,6 +24,7 @@ final class Session: ObservableObject {
 	private static let keyLock = "stak.accountLock"
 	private static let keyPrefs = "stak.prefs"
 	private static let keyJoined = "stak.joined"
+	private static let keyFirstRun = "stak.firstRunPending"
 
 	@Published private(set) var signedIn: Bool
 
@@ -33,6 +34,13 @@ final class Session: ObservableObject {
 	/// DEMO account with the authored history, Create account = a NEW account that starts
 	/// empty and earns its numbers. Persisted with the sign-in.
 	@Published private(set) var demoAccount: Bool
+	/// True for a FIRST-TIME user: the account was created here (Create account ->
+	/// onboarding) and Home's first run (1:958) has not been completed yet. An
+	/// active/returning user - Sign in (the demo persona) or any relaunch after the
+	/// first run - lands on Home Main (user, 2026-09-07: "there should be a first
+	/// time user and active/returning user"). Persisted, so a relaunch in the
+	/// middle of the first run keeps it. Mirrors Android's Session.firstRunPending.
+	@Published private(set) var firstRunPending: Bool
 
 	private init() {
 		let d = UserDefaults.standard
@@ -43,6 +51,7 @@ final class Session: ObservableObject {
 		signedIn = wasSignedIn
 		resumedSignedIn = wasSignedIn
 		demoAccount = d.object(forKey: Self.keyDemo) as? Bool ?? true
+		firstRunPending = d.bool(forKey: Self.keyFirstRun)
 		StakStore.demoAccount = d.object(forKey: Self.keyDemo) as? Bool ?? true
 		UserProfile.shared.displayName = d.string(forKey: Self.keyName) ?? ""
 		if let risk = d.string(forKey: Self.keyRisk) { UserProfile.shared.riskStyle = risk }
@@ -80,23 +89,46 @@ final class Session: ObservableObject {
 		signedIn = true
 		demoAccount = demo
 		StakStore.demoAccount = demo
+		// Only a brand-new account is a first-time user; Sign in is an active user.
+		firstRunPending = !demo
+		if demo {
+			// The persona's own profile: an onboarding started and abandoned before
+			// "Already have an account? Sign in" must not leak its brand picks or
+			// risk answer into the active user's account (audit 2026-09-07).
+			UserProfile.shared.riskStyle = "Growth-Oriented"
+			UserProfile.shared.brandPicks = []
+			UserProfile.shared.goal = -1
+			UserProfile.shared.risk = -1
+		}
 		// The demo persona joined in July; a new account joins now (product audit, 2026-09-05).
 		UserProfile.shared.joined = demo ? "July 2026" : StakClock.monthYear()
 		persist()
 		// A brand-new account starts from nothing; the demo account keeps whatever
 		// it did last time it was signed in.
-		if !demo { StakStore.clearAccount(demo: false) }
+		if !demo {
+			StakStore.clearAccount(demo: false)
+			// The day the account was created: the inbox ages its welcome from it.
+			StakStore.set(String(Int(Date().timeIntervalSince1970 / 86400)), for: "created_day")
+		}
 		applyAccount()
 	}
 
 	/// Profile edits after sign-in stay with the session.
 	func saveProfile() { persist() }
 
+	/// Home's first run is over (the pill or any tab hop, 1:958 -> 1:1097): the user is a returning user from here on.
+	func completeFirstRun() {
+		guard firstRunPending else { return }
+		firstRunPending = false
+		persist()
+	}
+
 	/// Log out: forget the session and the profile; next launch asks to sign in.
 	func signOut() {
 		signedIn = false
 		resumedSignedIn = false
 		demoAccount = true
+		firstRunPending = false
 		StakStore.demoAccount = true
 		UserProfile.shared.displayName = ""
 		UserProfile.shared.photoData = nil
@@ -126,6 +158,7 @@ final class Session: ObservableObject {
 		d.removeObject(forKey: Self.keyLock)
 		d.removeObject(forKey: Self.keyPrefs)
 		d.removeObject(forKey: Self.keyJoined)
+		d.removeObject(forKey: Self.keyFirstRun)
 		Self.savePhoto(nil)
 		applyAccount()
 	}
@@ -142,6 +175,7 @@ final class Session: ObservableObject {
 		d.set(UserProfile.shared.notificationsOn, forKey: Self.keyNotif)
 		d.set(UserProfile.shared.accountLock, forKey: Self.keyLock)
 		d.set(UserProfile.shared.joined, forKey: Self.keyJoined)
+		d.set(firstRunPending, forKey: Self.keyFirstRun)
 		let p = UserProfile.shared
 		d.set(["priceAlerts": p.priceAlerts, "dailyDeck": p.dailyDeck, "marketNews": p.marketNews, "appearance": p.appearance, "linkedGoogle": p.linkedGoogle, "linkedApple": p.linkedApple] as [String: Any], forKey: Self.keyPrefs)
 		Self.savePhoto(UserProfile.shared.photoData)

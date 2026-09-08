@@ -1,5 +1,6 @@
 package com.stak.demo.ui.discover
 
+import com.stak.demo.ui.theme.stakColor
 import com.stak.demo.ui.theme.FIGMA_LINE_BOX
 import com.stak.demo.ui.theme.fractionalSpacedBy
 import androidx.compose.animation.AnimatedVisibility
@@ -67,14 +68,14 @@ import com.stak.demo.ui.theme.Geist
 import com.stak.demo.ui.theme.Sora
 import com.stak.demo.ui.theme.StakColors
 
-private val Card = Color(0xFF181F30)
-private val Bright = Color(0xFFF2F6FC)
-private val Muted = Color(0xFF819ABB)
-private val Green = Color(0xFF2FD08A)
+private val Card: Color get() = stakColor(0xFF181F30)
+private val Bright: Color get() = stakColor(0xFFF2F6FC)
+private val Muted: Color get() = stakColor(0xFF819ABB)
+private val Green: Color get() = stakColor(0xFF2FD08A)
 // Down moves (Codex parity audit 2026-09-04): the template only ever served up
 // tickers; the same red the Simulate rows use, keyed on the ▼ glyph.
-private val Red = Color(0xFFFF5A6A)
-private val Teal = Color(0xFF69B3CA)
+private val Red: Color get() = stakColor(0xFFFF5A6A)
+private val Teal: Color get() = stakColor(0xFF69B3CA)
 
 /**
  * Discover · Stock Detail (CHINEDU 1:2382 folded, 92:969 save success)
@@ -135,7 +136,7 @@ fun StockDetailScreen(
 				Text(
 					text = f.symbol,
 					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp),
-					color = Color.White,
+					color = StakColors.TextPrimary,
 				)
 				Spacer(modifier = Modifier.weight(1f))
 				Box(
@@ -144,7 +145,7 @@ fun StockDetailScreen(
 				) {
 					// 1:2382 authors the share glyph WHITE (1.5 strokes); the News page's
 					// asset is its own #AEAEAE - tinted here (StakTest audit, 2026-09-05).
-					Image(painterResource(R.drawable.ic_news_share), null, modifier = Modifier.size((17 * u).dp), colorFilter = androidx.compose.ui.graphics.ColorFilter.tint(Color.White))
+					Image(painterResource(R.drawable.ic_news_share), null, modifier = Modifier.size((17 * u).dp), colorFilter = androidx.compose.ui.graphics.ColorFilter.tint(StakColors.TextPrimary))
 				}
 			}
 			Column(modifier = Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState())) {
@@ -193,8 +194,8 @@ fun StockDetailScreen(
 								modifier = Modifier
 									.size((39 * u).dp, (22.5 * u).dp)
 									.clip(RoundedCornerShape((11.25 * u).dp))
-									.background(Color(0x292C9DBC))
-									.border((0.75 * u).dp, Color(0x662C9DBC), RoundedCornerShape((11.25 * u).dp))
+									.background(stakColor(0x292C9DBC))
+									.border((0.75 * u).dp, stakColor(0x662C9DBC), RoundedCornerShape((11.25 * u).dp))
 									.then(select),
 							) {
 								Text(
@@ -233,7 +234,7 @@ fun StockDetailScreen(
 						Text(
 							"TIP",
 							style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (11 * u).sp),
-							color = Color(0xFF5BD7E4),
+							color = stakColor(0xFF5BD7E4),
 						)
 						Text(
 							f.tip,
@@ -357,19 +358,19 @@ private fun RiskFitCard(f: DetailFacts) {
 			Box(
 				modifier = Modifier
 					.clip(RoundedCornerShape((999 * u).dp))
-					.background(Color(0x1F5DA8BF))
+					.background(stakColor(0x1F5DA8BF))
 					.padding(horizontal = (10 * u).dp, vertical = (4 * u).dp),
 			) {
 				Text(
 					riskFitFor(f).first,
 					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (11 * u).sp),
-					color = Color(0xFFA6E4F7),
+					color = stakColor(0xFFA6E4F7),
 				)
 			}
 		}
 		// Authored (1:2382): a lone 14x8 pill indicator - the frame draws no track.
 		Box(modifier = Modifier.fillMaxWidth().height((8 * u).dp)) {
-			Box(modifier = Modifier.offset(x = (f.riskPillX * u).dp).size((14 * u).dp, (8 * u).dp).background(Color(0xFFA6E4F7), RoundedCornerShape((4 * u).dp)))
+			Box(modifier = Modifier.offset(x = (f.riskPillX * u).dp).size((14 * u).dp, (8 * u).dp).background(stakColor(0xFFA6E4F7), RoundedCornerShape((4 * u).dp)))
 		}
 		Row(modifier = Modifier.fillMaxWidth()) {
 			Text("Low", style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp), color = Muted)
@@ -418,7 +419,7 @@ private fun StatCell(label: String, value: String, verdict: String, verdictColor
 		modifier = modifier
 			.clip(RoundedCornerShape((12 * u).dp))
 			.background(Card)
-			.then(if (border) Modifier.border((1 * u).dp, Color(0xFF212D4B), RoundedCornerShape((12 * u).dp)) else Modifier)
+			.then(if (border) Modifier.border((1 * u).dp, stakColor(0xFF212D4B), RoundedCornerShape((12 * u).dp)) else Modifier)
 			.padding((10 * u).dp),
 	) {
 		Text(label, style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp), color = Muted)
@@ -499,7 +500,7 @@ private fun NewsSignalCard(f: DetailFacts) {
 						Box(
 							modifier = Modifier
 								.clip(RoundedCornerShape((999 * u).dp))
-								.background(Color(0x14FFFFFF))
+								.background(stakColor(0x14FFFFFF))
 								.padding(horizontal = (8 * u).dp, vertical = (3 * u).dp),
 						) {
 							Text(
@@ -531,10 +532,10 @@ private fun DetailCta(text: String, onClick: () -> Unit) {
 			.height((52 * u).dp)
 			.background(
 				androidx.compose.ui.graphics.Brush.verticalGradient(
-					0.0889f to Color(0xFFA6E4F7),
-					0.3919f to Color(0xFF5DA8BF),
-					0.7255f to Color(0xFF3C98B4),
-					1f to Color(0xFF3C98B4),
+					0.0889f to stakColor(0xFFA6E4F7),
+					0.3919f to stakColor(0xFF5DA8BF),
+					0.7255f to stakColor(0xFF3C98B4),
+					1f to stakColor(0xFF3C98B4),
 				),
 				RoundedCornerShape((6 * u).dp),
 			)
@@ -545,7 +546,7 @@ private fun DetailCta(text: String, onClick: () -> Unit) {
 				onClick = onClick,
 			),
 	) {
-		Text(text, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp), color = Color.White)
+		Text(text, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp), color = StakColors.TextPrimary)
 	}
 }
 
@@ -561,7 +562,7 @@ private fun DetailSecondary(text: String, size: Float = 13f, onClick: () -> Unit
 		modifier = Modifier
 			.fillMaxWidth()
 			.height((52 * u).dp)
-			.border((0.36 * u).dp, Color(0x54343B4F), RoundedCornerShape((6 * u).dp))
+			.border((0.36 * u).dp, stakColor(0x54343B4F), RoundedCornerShape((6 * u).dp))
 			.clickable(
 				interactionSource = remember { MutableInteractionSource() },
 				indication = com.stak.demo.ui.theme.PressDim,
@@ -581,7 +582,7 @@ private fun DetailSavedSheet(f: DetailFacts, onDone: () -> Unit, onViewInMyStak:
 			modifier = Modifier
 				.fillMaxSize()
 				// Authored scrim rgba(12,19,32,0.55) (106:1037).
-				.background(Color(0x8C0C1320))
+				.background(stakColor(0x8C0C1320))
 				.clickable(
 					interactionSource = remember { MutableInteractionSource() },
 					indication = com.stak.demo.ui.theme.PressDim,
@@ -604,13 +605,13 @@ private fun DetailSavedSheet(f: DetailFacts, onDone: () -> Unit, onViewInMyStak:
 				modifier = Modifier
 					.padding(bottom = (4 * u).dp)
 					.size((40 * u).dp, (4 * u).dp)
-					.background(Color(0xFF2A3346), RoundedCornerShape((2 * u).dp)),
+					.background(stakColor(0xFF2A3346), RoundedCornerShape((2 * u).dp)),
 			)
 			Image(painterResource(R.drawable.ic_sheet_check), null, modifier = Modifier.size((47 * u).dp))
 			Text(
 				"Saved to My STAK",
 				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (18 * u).sp),
-				color = Color.White,
+				color = StakColors.TextPrimary,
 			)
 			Row(
 				verticalAlignment = Alignment.CenterVertically,
@@ -618,14 +619,14 @@ private fun DetailSavedSheet(f: DetailFacts, onDone: () -> Unit, onViewInMyStak:
 				modifier = Modifier
 					.fillMaxWidth()
 					.clip(RoundedCornerShape((6 * u).dp))
-					.background(Color(0x1A69B3CA))
+					.background(stakColor(0x1A69B3CA))
 					.padding(horizontal = (14 * u).dp, vertical = (12 * u).dp),
 			) {
-				Box(contentAlignment = Alignment.Center, modifier = Modifier.size((38 * u).dp).background(Color(0xFF242B3D), CircleShape)) {
-					Text(f.sheetBadge, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp), color = Color(0xFF9EADC7))
+				Box(contentAlignment = Alignment.Center, modifier = Modifier.size((38 * u).dp).background(stakColor(0xFF242B3D), CircleShape)) {
+					Text(f.sheetBadge, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp), color = stakColor(0xFF9EADC7))
 				}
 				Column(verticalArrangement = Arrangement.spacedBy((2 * u).dp), modifier = Modifier.weight(1f)) {
-					Text(f.sheetName, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp), color = Color.White)
+					Text(f.sheetName, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp), color = StakColors.TextPrimary)
 					Text(f.sheetPrice, style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp), color = Muted)
 				}
 				Text(f.sheetChange, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp), color = if (f.sheetChange.startsWith("▼")) Red else Green)
@@ -633,7 +634,7 @@ private fun DetailSavedSheet(f: DetailFacts, onDone: () -> Unit, onViewInMyStak:
 			Text(
 				"Watching from today · no money committed",
 				style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp, lineHeight = (18 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
-				color = Color(0xFFC8D2E0),
+				color = stakColor(0xFFC8D2E0),
 				modifier = Modifier.fillMaxWidth(),
 			)
 			Column(verticalArrangement = Arrangement.spacedBy((16 * u).dp), modifier = Modifier.fillMaxWidth()) {
@@ -712,8 +713,8 @@ private fun AnalystCard(f: DetailFacts, open: Boolean, onToggle: () -> Unit) {
 			// 1:2656: a 14 circle at y-3 inside the 8-tall clipped track renders as
 			// a 14x8 cap - exact-design audit 2026-09-04 (was 13 wide).
 			Box(modifier = Modifier.fillMaxWidth().height((8 * u).dp)) {
-				Box(modifier = Modifier.width((180 * u).dp).height((8 * u).dp).background(Color(0x8C5DA8BF), RoundedCornerShape((4 * u).dp)))
-				Box(modifier = Modifier.offset(x = (f.targetMarkerX * u).dp).size((14 * u).dp, (8 * u).dp).background(Color(0xFFA6E4F7), RoundedCornerShape((4 * u).dp)))
+				Box(modifier = Modifier.width((180 * u).dp).height((8 * u).dp).background(stakColor(0x8C5DA8BF), RoundedCornerShape((4 * u).dp)))
+				Box(modifier = Modifier.offset(x = (f.targetMarkerX * u).dp).size((14 * u).dp, (8 * u).dp).background(stakColor(0xFFA6E4F7), RoundedCornerShape((4 * u).dp)))
 			}
 			Row(modifier = Modifier.fillMaxWidth()) {
 				Column(verticalArrangement = Arrangement.spacedBy((1 * u).dp)) {
@@ -825,7 +826,7 @@ private fun CompareCard(f: DetailFacts) {
 						// AAPL column tint (1:2721): 81x170 r8 at card (94, 43.94) - 12
 						// above the table top - exact-design audit 2026-09-04.
 						drawRoundRect(
-							color = Color(0x125DA8BF),
+							color = stakColor(0x125DA8BF),
 							topLeft = Offset((78 * u).dp.toPx(), (-12 * u).dp.toPx()),
 							size = Size((81 * u).dp.toPx(), (170 * u).dp.toPx()),
 							cornerRadius = CornerRadius((8 * u).dp.toPx()),
@@ -833,7 +834,7 @@ private fun CompareCard(f: DetailFacts) {
 						// 1:2722: a 0.5-wide #272F40 hairline between the MSFT and GOOGL
 						// columns, card x257 y49.94, 134.5 tall - exact-design audit 2026-09-04.
 						drawRect(
-							color = Color(0xFF272F40),
+							color = stakColor(0xFF272F40),
 							topLeft = Offset((241 * u).dp.toPx(), (-6 * u).dp.toPx()),
 							size = Size((0.5 * u).dp.toPx(), (134.5 * u).dp.toPx()),
 						)

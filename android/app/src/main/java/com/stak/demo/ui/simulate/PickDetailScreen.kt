@@ -1,5 +1,6 @@
 package com.stak.demo.ui.simulate
 
+import com.stak.demo.ui.theme.stakColor
 import com.stak.demo.ui.theme.FIGMA_LINE_BOX
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -144,7 +145,7 @@ fun PickDetailScreen(
 				Text(
 					text = p.symbol,
 					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp),
-					color = Color.White,
+					color = StakColors.TextPrimary,
 				)
 				Spacer(modifier = Modifier.weight(1f))
 				Box(
@@ -190,7 +191,7 @@ fun PickDetailScreen(
 							gainWhole,
 							style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (38 * u).sp, lineHeight = (48 * u).sp, lineHeightStyle = FIGMA_LINE_BOX), // 1:4660 carries no tracking (exact-design audit 2026-09-04)
 							// A losing pick's figure takes the authored red (the rows' Sim.Red).
-							color = if (p.up) Color.White else Sim.Red,
+							color = if (p.up) StakColors.TextPrimary else Sim.Red,
 						)
 						Text(
 							gainCents,
@@ -237,8 +238,8 @@ fun PickDetailScreen(
 									modifier = Modifier
 										.size((39 * u).dp, (22.5 * u).dp)
 										.clip(RoundedCornerShape((11.25 * u).dp))
-										.background(Color(0x292C9DBC))
-										.border((0.75 * u).dp, Color(0x662C9DBC), RoundedCornerShape((11.25 * u).dp))
+										.background(stakColor(0x292C9DBC))
+										.border((0.75 * u).dp, stakColor(0x662C9DBC), RoundedCornerShape((11.25 * u).dp))
 										.then(select),
 								) {
 									Text(label, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp), color = Sim.Teal)
@@ -259,8 +260,8 @@ fun PickDetailScreen(
 					}
 					Row(horizontalArrangement = Arrangement.spacedBy((10 * u).dp)) {
 						// 1:4684 / 1:4687 (exact-design audit 2026-09-04): the prices are plain white, not #f2f6fc.
-						StatBox("Price then", p.priceThen, Color.White, Modifier.weight(1f))
-						StatBox("Price now", p.priceNow, Color.White, Modifier.weight(1f))
+						StatBox("Price then", p.priceThen, StakColors.TextPrimary, Modifier.weight(1f))
+						StatBox("Price now", p.priceNow, StakColors.TextPrimary, Modifier.weight(1f))
 					}
 				}
 				// WHY / insight card — teal-tinted like the deck tips.
@@ -311,7 +312,7 @@ fun PickDetailScreen(
 							"Sell",
 							// 1:4695 (exact-design audit 2026-09-04): Sora Regular 14 on a 20.69 line - was Geist Medium.
 							style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp, lineHeight = (20.69 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
-							color = Color.White,
+							color = StakColors.TextPrimary,
 						)
 					}
 				}
@@ -320,7 +321,7 @@ fun PickDetailScreen(
 					modifier = Modifier
 						.fillMaxWidth()
 						.height((52 * u).dp)
-						.border((0.36 * u).dp, Color(0x54343B4F), RoundedCornerShape((6 * u).dp))
+						.border((0.36 * u).dp, stakColor(0x54343B4F), RoundedCornerShape((6 * u).dp))
 						.clickable(
 							interactionSource = remember { MutableInteractionSource() },
 							indication = com.stak.demo.ui.theme.PressDim,

@@ -53,7 +53,8 @@ fun SplashScreen(onContinue: () -> Unit) {
 	BoxWithConstraints(
 		modifier = Modifier
 			.fillMaxSize()
-			.background(StakColors.Bg),
+			// The splash is the brand moment: navy in both appearances (like the OS launch window).
+			.background(androidx.compose.ui.graphics.Color(0xFF0A1020)),
 	) {
 		val scale = maxWidth / 390.dp
 
@@ -97,7 +98,7 @@ fun SplashScreen(onContinue: () -> Unit) {
 					Text(
 						text = "Welcome to STAK",
 						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = 29.87.sp),
-						color = StakColors.TextPrimary,
+						color = androidx.compose.ui.graphics.Color.White,
 					)
 				}
 				Text(
@@ -108,7 +109,7 @@ fun SplashScreen(onContinue: () -> Unit) {
 						fontSize = 16.sp,
 						textAlign = TextAlign.Center,
 					),
-					color = StakColors.TextPrimary.copy(alpha = 0.7f),
+					color = androidx.compose.ui.graphics.Color.White.copy(alpha = 0.7f),
 				)
 			}
 		}

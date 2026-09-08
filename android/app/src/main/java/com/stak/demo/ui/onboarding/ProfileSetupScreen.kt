@@ -61,16 +61,19 @@ private const val NAME_MAX = 20
  * "Proceed to home" CTA.
  */
 @Composable
-fun ProfileSetupScreen(onBack: () -> Unit, onProceed: () -> Unit) {
+fun ProfileSetupScreen(onBack: () -> Unit, onProceed: () -> Unit, editing: Boolean = false) {
 	val u = figmaUnit()
+	// `editing`: the same frame serves as the Profile hub's edit page (its own copy
+	// promises "You can change this anytime in Profile."; user, 2026-09-07) - it
+	// arrives with the account's name and photo and saves in place.
 	// The frame arrives with "Nedu" typed (avatar "N", counter 4 / 20) - user, 2026-09-04 (CHINEDU 01 · Onboarding 1:793): the exact frame wins.
 	// Product audit (2026-09-05): a real first run starts with an empty name
 	// (the frame's "Nedu" was authored demo state) and Proceed waits for one.
-	var name by rememberSaveable { mutableStateOf("") }
+	var name by rememberSaveable { mutableStateOf(if (editing) com.stak.demo.ui.UserProfile.displayName.ifBlank { com.stak.demo.ui.UserProfile.greetingName } else "") }
 	// User's motion (2026-08-21): Add a photo opens the system gallery and
 	// the chosen image becomes the avatar. The photo picker carries its own
 	// permission flow, so no runtime permission is requested by the app.
-	var photoUri by rememberSaveable { mutableStateOf<String?>(null) }
+	var photoUri by rememberSaveable { mutableStateOf(if (editing) com.stak.demo.ui.UserProfile.photoUri else null) }
 	val context = LocalContext.current
 	val scope = rememberCoroutineScope()
 	// Proceed waits for the avatar copy (Codex review, PR #166): leaving the screen
@@ -108,16 +111,26 @@ fun ProfileSetupScreen(onBack: () -> Unit, onProceed: () -> Unit) {
 		copying = true
 		scope.launch {
 			val copy = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) { copyAvatar(context, uri) }
+			// A pick that replaces an unsaved pick drops the earlier copy at once.
+			val previous = photoUri
 			photoUri = copy ?: uri.toString()
+			if (previous != null && previous != com.stak.demo.ui.UserProfile.photoUri) deleteAvatarFile(previous)
 			copying = false
 		}
 	}
+	// Leaving without saving (back circle or system back) discards the unsaved
+	// copies; only the photo the account already keeps survives (review 2026-09-07).
+	val leave: () -> Unit = {
+		pruneAvatars(context, keep = com.stak.demo.ui.UserProfile.photoUri)
+		onBack()
+	}
+	androidx.activity.compose.BackHandler(onBack = leave)
 
 	Artboard(modifier = Modifier.background(StakColors.Bg)) {
 		Row(modifier = Modifier.fillMaxWidth().padding(horizontal = (20 * u).dp).padding(top = (10 * u).dp, bottom = (4 * u).dp)) {
-			AuthBackCircle(onClick = onBack)
+			AuthBackCircle(onClick = leave)
 		}
-		OnboardingKicker(text = "STEP · LAST ONE")
+		OnboardingKicker(text = if (editing) "PROFILE" else "STEP · LAST ONE")
 
 		Column(
 			verticalArrangement = Arrangement.spacedBy((18 * u).dp),
@@ -177,7 +190,7 @@ fun ProfileSetupScreen(onBack: () -> Unit, onProceed: () -> Unit) {
 					}
 				}
 				Text(
-					text = "Add a photo",
+					text = if (photoUri != null) "Change photo" else "Add a photo",
 					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp),
 					color = Auth.LinkTeal,
 					modifier = Modifier.clickable(
@@ -234,17 +247,23 @@ fun ProfileSetupScreen(onBack: () -> Unit, onProceed: () -> Unit) {
 				)
 			}
 
-			Text(
-				text = "You can change this anytime in Profile.",
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp),
-				color = Auth.FaintText,
-			)
+			// The onboarding footnote; on the edit page the user is already in Profile.
+			if (!editing) {
+				Text(
+					text = "You can change this anytime in Profile.",
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp),
+					color = Auth.FaintText,
+				)
+			}
 		}
 
 		Column(modifier = Modifier.fillMaxWidth().padding(top = (8 * u).dp, bottom = (26 * u).dp)) {
-			AuthCta(text = "Proceed to home", enabled = name.isNotBlank() && !copying, onClick = {
+			AuthCta(text = if (editing) "Save changes" else "Proceed to home", enabled = name.isNotBlank() && !copying, onClick = {
 				com.stak.demo.ui.UserProfile.displayName = name.trim().capitalizeWords()
 				com.stak.demo.ui.UserProfile.photoUri = photoUri
+				pruneAvatars(context, keep = photoUri)
+				// Editing saves in place; onboarding persists with the account at Proceed.
+				if (editing) com.stak.demo.ui.Session.saveProfile()
 				onProceed()
 			})
 		}
@@ -253,7 +272,23 @@ fun ProfileSetupScreen(onBack: () -> Unit, onProceed: () -> Unit) {
 
 /** Copies the picked image into app storage; its file URI, or null when the copy fails. */
 private fun copyAvatar(context: android.content.Context, uri: Uri): String? = runCatching {
-	val file = File(context.filesDir, "avatar.jpg")
+	// A fresh file per pick: the hub's image loader keys its cache on the URI, so
+	// rewriting one "avatar.jpg" would keep showing the previous photo.
+	val file = File(context.filesDir, "avatar_${System.currentTimeMillis()}.jpg")
 	context.contentResolver.openInputStream(uri)?.use { input -> file.outputStream().use { input.copyTo(it) } } ?: return null
 	Uri.fromFile(file).toString()
 }.getOrNull()
+
+/** Deletes one app-owned avatar copy (a file:// URI); anything else is left alone. */
+private fun deleteAvatarFile(stored: String) {
+	runCatching {
+		val uri = Uri.parse(stored)
+		if (uri.scheme == "file") File(uri.path ?: return).takeIf { it.name.startsWith("avatar") }?.delete()
+	}
+}
+
+/** Drops every app-owned avatar copy except the one being kept. */
+private fun pruneAvatars(context: android.content.Context, keep: String?) {
+	val keepName = keep?.let { runCatching { File(Uri.parse(it).path ?: "").name }.getOrNull() }
+	context.filesDir.listFiles { f -> f.name.startsWith("avatar") && f.name.endsWith(".jpg") && f.name != keepName }?.forEach { it.delete() }
+}

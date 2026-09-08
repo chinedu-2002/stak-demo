@@ -29,6 +29,8 @@ object StakRoutes {
 	const val MYSTAK_STOCK = "mystak/stock/{symbol}"
 	fun myStakStock(symbol: String) = "mystak/stock/$symbol"
 	const val PROFILE = "profile"
+	/** 09 Profile setup reused as the hub's edit page (user, 2026-09-07). */
+	const val EDIT_PROFILE = "profile/edit"
 	/** The Home bell's inbox (product audit, 2026-09-05). */
 	const val NOTIFICATIONS = "notifications"
 	/** The account lock between the splash and Home (PR #167 mirror). */

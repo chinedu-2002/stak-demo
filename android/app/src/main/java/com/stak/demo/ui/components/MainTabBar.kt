@@ -1,7 +1,5 @@
 package com.stak.demo.ui.components
 
-import com.stak.demo.ui.theme.stakColor
-import com.stak.demo.ui.theme.StakColors
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -59,7 +57,7 @@ fun MainTabBar(selected: MainTab, onSelect: (MainTab) -> Unit) {
 	Box(
 		modifier = Modifier
 			.fillMaxWidth()
-			.background(stakColor(0xFF060C1D))
+			.background(Color(0xFF060C1D))
 			.navigationBarsPadding()
 			.height((86 * u).dp),
 	) {
@@ -94,7 +92,7 @@ fun MainTabBar(selected: MainTab, onSelect: (MainTab) -> Unit) {
 						// compensation pushed "Home" onto two lines - the labels take
 						// no tracking and never wrap.
 						style = TextStyle(fontFamily = Inter, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp),
-						color = StakColors.TextPrimary,
+						color = Color.White,
 						maxLines = 1,
 						softWrap = false,
 					)

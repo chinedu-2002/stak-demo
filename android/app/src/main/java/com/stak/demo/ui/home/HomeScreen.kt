@@ -1,6 +1,5 @@
 package com.stak.demo.ui.home
 
-import com.stak.demo.ui.theme.stakColor
 import com.stak.demo.ui.theme.FIGMA_LINE_BOX
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -69,12 +68,12 @@ import com.stak.demo.ui.theme.StakColors
 
 /** Palette of the CHINEDU "02 · Home" frames. */
 private object Home {
-	val CardBg: Color get() = stakColor(0xFF171D2C)
-	val TabBg: Color get() = stakColor(0xFF060C1D)
-	val Teal: Color get() = stakColor(0xFF69B3CA)
-	val CardInk: Color get() = stakColor(0xFF0E162B)
-	val PaperWhite: Color get() = stakColor(0xFFF9F9F9)
-	val NavCircle: Color get() = stakColor(0xFF192238)
+	val CardBg = Color(0xFF171D2C)
+	val TabBg = Color(0xFF060C1D)
+	val Teal = Color(0xFF69B3CA)
+	val CardInk = Color(0xFF0E162B)
+	val PaperWhite = Color(0xFFF9F9F9)
+	val NavCircle = Color(0xFF192238)
 }
 
 /**
@@ -181,7 +180,7 @@ private fun TopNav(onProfile: () -> Unit, onBell: () -> Unit = {}, modifier: Mod
 						modifier = Modifier
 							.offset(x = (23.333 * u).dp, y = (8.75 * u).dp)
 							.size((5.833 * u).dp)
-							.background(stakColor(0xFFFF8030), CircleShape),
+							.background(Color(0xFFFF8030), CircleShape),
 					)
 				}
 			}
@@ -232,7 +231,7 @@ private fun TopNav(onProfile: () -> Unit, onBell: () -> Unit = {}, modifier: Mod
 		Text(
 			text = "$greeting, ${com.stak.demo.ui.UserProfile.greetingName}",
 			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp, lineHeight = (20 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
-			color = StakColors.TextPrimary,
+			color = Color.White,
 		)
 	}
 }
@@ -307,7 +306,7 @@ private fun MarketMoodCard(onOpenNews: () -> Unit) {
 				Text(
 					text = "Market Mood",
 					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Medium, fontSize = (20 * u).sp, lineHeight = (25 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
-					color = StakColors.TextPrimary,
+					color = Color.White,
 				)
 				Text(
 					// Backend-served with the mood score in production (the words
@@ -317,7 +316,7 @@ private fun MarketMoodCard(onOpenNews: () -> Unit) {
 						append(MarketMoodFeed.statusRest)
 					},
 					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
-					color = StakColors.TextPrimary,
+					color = Color.White,
 				)
 			}
 			Spacer(modifier = Modifier.width((46 * u).dp))
@@ -516,14 +515,14 @@ private fun WhyThisMattersCard(onOpenMyStak: () -> Unit) {
 				text = "Why this matters to you",
 				// Authored (1:1040): Sora Regular 14 / lh15.
 				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp, lineHeight = (15 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
-				color = StakColors.TextPrimary,
+				color = Color.White,
 			)
 			Text(
 				// Backend-served summary of why today's news matters to THIS
 				// user (holdings + risk profile); authored demo copy this phase.
 				text = WhyThisMattersFeed.body(),
 				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Light, fontSize = (12 * u).sp, lineHeight = (15 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
-				color = StakColors.TextPrimary,
+				color = Color.White,
 				modifier = Modifier.width((198 * u).dp),
 			)
 		}
@@ -582,7 +581,7 @@ private fun DeckBanner(onOpenDeck: () -> Unit) {
 					Text(
 						text = "Go to Deck",
 						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (11.49 * u).sp, lineHeight = (15 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
-						color = StakColors.TextPrimary,
+						color = Color.White,
 					)
 					Image(
 						painter = painterResource(R.drawable.ic_arrow_right_small),
@@ -624,7 +623,7 @@ private fun FirstRunOverlay(onSeeTodaysPick: () -> Unit, modifier: Modifier = Mo
 				modifier = Modifier
 					.fillMaxWidth()
 					.height((98.7 * u).dp)
-					.background(Brush.verticalGradient(0f to stakColor(0x000A1020), 1f to StakColors.Bg)),
+					.background(Brush.verticalGradient(0f to Color(0x000A1020), 1f to StakColors.Bg)),
 			)
 			Box(modifier = Modifier.fillMaxWidth().weight(1f).background(StakColors.Bg))
 		}
@@ -649,10 +648,10 @@ private fun FirstRunOverlay(onSeeTodaysPick: () -> Unit, modifier: Modifier = Mo
 				// 0.57, right 0.49 white, the cap is 19% of the width) and holds
 				// 0.21 along the straight top and bottom runs - a flat 40% rim read
 				// 122 everywhere vs the frame's 77-154.
-				.background(stakColor(0x15C8D7FF))
+				.background(Color(0x15C8D7FF))
 				.border(
 					(0.94 * u).dp,
-					Brush.horizontalGradient(0f to stakColor(0x91FFFFFF), 0.19f to stakColor(0x36FFFFFF), 0.81f to stakColor(0x36FFFFFF), 1f to stakColor(0x7DFFFFFF)),
+					Brush.horizontalGradient(0f to Color(0x91FFFFFF), 0.19f to Color(0x36FFFFFF), 0.81f to Color(0x36FFFFFF), 1f to Color(0x7DFFFFFF)),
 					RoundedCornerShape(50),
 				)
 				.clickable(
@@ -665,7 +664,7 @@ private fun FirstRunOverlay(onSeeTodaysPick: () -> Unit, modifier: Modifier = Mo
 				// user, 2026-09-04: grammar fixed, frame typo not copied.
 				text = "See Today’s Pick",
 				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp),
-				color = StakColors.TextPrimary,
+				color = Color.White,
 				// 1:1083/1:1093: the label box sits at pill centre +0.5 with a
 				// 7.524/5.643 top/bottom padding split, so its cap box rests 1.44
 				// below centre (render: caps at 128-136 in the 105-156 pill) -
@@ -718,9 +717,9 @@ internal fun MarketMoodGauge(u: Float) {
 		val stroke = 7.1127f * k
 		val rect = androidx.compose.ui.geometry.Rect(cx - rc, cy - rc, cx + rc, cy + rc)
 		for ((start, color) in listOf(
-			180f to stakColor(0xFF61A57F),
-			240f to stakColor(0xFFD8CFCF),
-			300f to stakColor(0xFFDE4E71),
+			180f to Color(0xFF61A57F),
+			240f to Color(0xFFD8CFCF),
+			300f to Color(0xFFDE4E71),
 		)) {
 			drawArc(
 				color = color,

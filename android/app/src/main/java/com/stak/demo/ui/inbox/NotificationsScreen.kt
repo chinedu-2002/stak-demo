@@ -1,7 +1,5 @@
 package com.stak.demo.ui.inbox
 
-import com.stak.demo.ui.theme.stakColor
-import com.stak.demo.ui.theme.StakColors
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -35,13 +33,13 @@ import com.stak.demo.ui.theme.FIGMA_LINE_BOX
 import com.stak.demo.ui.theme.Geist
 import com.stak.demo.ui.theme.Sora
 
-private val CardBg: Color get() = stakColor(0xFF10182B)
-private val Muted: Color get() = stakColor(0xFF819ABB)
-private val Body: Color get() = stakColor(0xFFC8D2E0)
-private val Divider: Color get() = stakColor(0xFF1A2333)
-private val IconBg: Color get() = stakColor(0xFF1A2333)
-private val Teal: Color get() = stakColor(0xFF69B3CA)
-private val Dot: Color get() = stakColor(0xFFFF8030)
+private val CardBg = Color(0xFF10182B)
+private val Muted = Color(0xFF819ABB)
+private val Body = Color(0xFFC8D2E0)
+private val Divider = Color(0xFF1A2333)
+private val IconBg = Color(0xFF1A2333)
+private val Teal = Color(0xFF69B3CA)
+private val Dot = Color(0xFFFF8030)
 
 /**
  * The inbox behind the Home bell (product audit, 2026-09-05). Built in
@@ -67,7 +65,7 @@ fun NotificationsScreen(onBack: () -> Unit, onOpenSettings: () -> Unit) {
 					verticalArrangement = Arrangement.spacedBy((6 * u).dp),
 					modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape((16 * u).dp)).background(CardBg).padding((16 * u).dp),
 				) {
-					Text("You’re all caught up.", style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp), color = StakColors.TextPrimary)
+					Text("You’re all caught up.", style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp), color = Color.White)
 					Text("Price moves on your picks and your daily deck land here.", style = TextStyle(fontFamily = Geist, fontSize = (13 * u).sp, lineHeight = (19 * u).sp, lineHeightStyle = FIGMA_LINE_BOX), color = Muted)
 				}
 			} else {
@@ -97,7 +95,7 @@ private fun NotificationRow(item: StakNotifications.Item, unread: Boolean) {
 			Text(item.title.take(1).uppercase(), style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (14 * u).sp), color = Teal)
 		}
 		Column(verticalArrangement = Arrangement.spacedBy((2 * u).dp), modifier = Modifier.weight(1f)) {
-			Text(item.title, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp, lineHeight = (18 * u).sp, lineHeightStyle = FIGMA_LINE_BOX), color = StakColors.TextPrimary)
+			Text(item.title, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp, lineHeight = (18 * u).sp, lineHeightStyle = FIGMA_LINE_BOX), color = Color.White)
 			Text(item.body, style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, lineHeightStyle = FIGMA_LINE_BOX), color = Body)
 			Text(item.time, style = TextStyle(fontFamily = Geist, fontSize = (11 * u).sp), color = Muted)
 		}

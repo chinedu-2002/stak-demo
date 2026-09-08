@@ -1,6 +1,5 @@
 package com.stak.demo.ui.mystak
 
-import com.stak.demo.ui.theme.stakColor
 import com.stak.demo.ui.theme.FIGMA_LINE_BOX
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -53,22 +52,22 @@ import com.stak.demo.ui.theme.Geist
 import com.stak.demo.ui.theme.Sora
 import com.stak.demo.ui.theme.StakColors
 
-private val CardBg: Color get() = stakColor(0xFF181F30)
-private val Muted: Color get() = stakColor(0xFF819ABB)
-private val Faint: Color get() = stakColor(0xFF5C6B85)
-private val Body: Color get() = stakColor(0xFFC8D2E0)
-private val Green: Color get() = stakColor(0xFF2FD08A)
-private val Red: Color get() = stakColor(0xFFFF5A6A)
-private val Teal: Color get() = stakColor(0xFF69B3CA)
-private val Ink: Color get() = stakColor(0xFF0E162B)
-private val Track: Color get() = stakColor(0xFF2A3346)
-private val HeaderGray: Color get() = stakColor(0xFFD3D3DD)
+private val CardBg = Color(0xFF181F30)
+private val Muted = Color(0xFF819ABB)
+private val Faint = Color(0xFF5C6B85)
+private val Body = Color(0xFFC8D2E0)
+private val Green = Color(0xFF2FD08A)
+private val Red = Color(0xFFFF5A6A)
+private val Teal = Color(0xFF69B3CA)
+private val Ink = Color(0xFF0E162B)
+private val Track = Color(0xFF2A3346)
+private val HeaderGray = Color(0xFFD3D3DD)
 
 private val CtaGradient = Brush.verticalGradient(
-	0.0889f to stakColor(0xFFA6E4F7),
-	0.3919f to stakColor(0xFF5DA8BF),
-	0.7255f to stakColor(0xFF3C98B4),
-	1f to stakColor(0xFF3C98B4),
+	0.0889f to Color(0xFFA6E4F7),
+	0.3919f to Color(0xFF5DA8BF),
+	0.7255f to Color(0xFF3C98B4),
+	1f to Color(0xFF3C98B4),
 )
 
 /**
@@ -94,7 +93,7 @@ fun MyStakScreen(onOpenCollection: (String) -> Unit, onStartSwiping: () -> Unit)
 			Text(
 				text = "My STAK",
 				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (26 * u).sp, lineHeight = (33 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
-				color = StakColors.TextPrimary,
+				color = Color.White,
 			)
 			Text(
 				text = "Your saved stocks, live.",
@@ -154,7 +153,7 @@ fun MyStakScreen(onOpenCollection: (String) -> Unit, onStartSwiping: () -> Unit)
 					// Codex parity audit (2026-09-04): 1:3155 sets the CTA at 14.
 					// 1:3226 line-height 20.69 (was 21) - exact-design audit 2026-09-04.
 					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp, lineHeight = (20.69 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
-					color = StakColors.TextPrimary,
+					color = Color.White,
 				)
 				Image(painterResource(R.drawable.ic_plus_small), null, modifier = Modifier.size((14 * u).dp))
 			}
@@ -172,7 +171,7 @@ fun MyStakScreen(onOpenCollection: (String) -> Unit, onStartSwiping: () -> Unit)
 					Text(
 						text = "Your read",
 						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (14 * u).sp, lineHeight = (18 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
-						color = StakColors.TextPrimary,
+						color = Color.White,
 					)
 				}
 				// Product audit (2026-09-05): a new account has no read yet.
@@ -180,7 +179,7 @@ fun MyStakScreen(onOpenCollection: (String) -> Unit, onStartSwiping: () -> Unit)
 				Text(
 					text = if (empty) "Your read starts with your first save." else if (com.stak.demo.ui.Session.demoAccount) "You lean into growth and tech." else com.stak.demo.ui.StakInsights.readHeadline(),
 					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp, lineHeight = (19 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
-					color = StakColors.TextPrimary,
+					color = Color.White,
 				)
 				// Authored insight copy - user, 2026-09-04 (CHINEDU 06 · My STAK 1:3155): the authored look wins over a store-derived count.
 				Text(
@@ -238,7 +237,7 @@ fun MyStakScreen(onOpenCollection: (String) -> Unit, onStartSwiping: () -> Unit)
 					Text(
 						text = "Start swiping",
 						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp, lineHeight = (17 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
-						color = stakColor(0xB80A1020),
+						color = Color(0xB80A1020),
 					)
 					Text(
 						text = "›",
@@ -302,7 +301,7 @@ private fun CollectionChip(
 			Text(
 				text = name,
 				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (13 * u).sp, lineHeight = (16 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
-				color = StakColors.TextPrimary,
+				color = Color.White,
 				maxLines = 1,
 				softWrap = false,
 				// Authored: "Green Energy" (box 90) overflows its 84 column —
@@ -354,7 +353,7 @@ private fun PortfolioSummary() {
 				text = if (empty) "—" else if (demo) "+4.9%" else com.stak.demo.ui.StakInsights.signedPct(weekPct),
 				// 1:3239 tracking -0.44 - exact-design audit 2026-09-04.
 				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (44 * u).sp, lineHeight = (55 * u).sp, letterSpacing = (-0.44 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
-				color = StakColors.TextPrimary,
+				color = Color.White,
 			)
 			Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy((10 * u).dp)) {
 				Text(
@@ -405,8 +404,8 @@ private fun PortfolioSummary() {
 						modifier = Modifier
 							.size((39 * u).dp, (22.5 * u).dp)
 							.clip(RoundedCornerShape((11.25 * u).dp))
-							.background(stakColor(0x292C9DBC))
-							.border((0.75 * u).dp, stakColor(0x662C9DBC), RoundedCornerShape((11.25 * u).dp))
+							.background(Color(0x292C9DBC))
+							.border((0.75 * u).dp, Color(0x662C9DBC), RoundedCornerShape((11.25 * u).dp))
 							.then(select),
 					) {
 						Text(label, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp), color = Teal)
@@ -423,14 +422,14 @@ private fun PortfolioSummary() {
 			Column(verticalArrangement = Arrangement.spacedBy((3 * u).dp)) {
 				Text("Best this week", style = TextStyle(fontFamily = Geist, fontSize = (11 * u).sp, lineHeight = (14 * u).sp, lineHeightStyle = FIGMA_LINE_BOX), color = Faint)
 				Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy((6 * u).dp)) {
-					Text(if (demo) "TSLA" else duo!!.first.ticker, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (13 * u).sp, lineHeight = (16 * u).sp, lineHeightStyle = FIGMA_LINE_BOX), color = StakColors.TextPrimary)
+					Text(if (demo) "TSLA" else duo!!.first.ticker, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (13 * u).sp, lineHeight = (16 * u).sp, lineHeightStyle = FIGMA_LINE_BOX), color = Color.White)
 					Text(if (demo) "+3.4%" else com.stak.demo.ui.StakInsights.signedPct(com.stak.demo.ui.StakInsights.changePct(duo!!.first)), style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, lineHeightStyle = FIGMA_LINE_BOX), color = if (demo || duo!!.first.up) Green else Red)
 				}
 			}
 			Column(verticalArrangement = Arrangement.spacedBy((3 * u).dp)) {
 				Text("Worst", style = TextStyle(fontFamily = Geist, fontSize = (11 * u).sp, lineHeight = (14 * u).sp, lineHeightStyle = FIGMA_LINE_BOX), color = Faint)
 				Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy((6 * u).dp)) {
-					Text(if (demo) "SNOW" else duo!!.second.ticker, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (13 * u).sp, lineHeight = (16 * u).sp, lineHeightStyle = FIGMA_LINE_BOX), color = StakColors.TextPrimary)
+					Text(if (demo) "SNOW" else duo!!.second.ticker, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (13 * u).sp, lineHeight = (16 * u).sp, lineHeightStyle = FIGMA_LINE_BOX), color = Color.White)
 					Text(if (demo) "-0.5%" else com.stak.demo.ui.StakInsights.signedPct(com.stak.demo.ui.StakInsights.changePct(duo!!.second)), style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, lineHeightStyle = FIGMA_LINE_BOX), color = if (!demo && duo!!.second.up) Green else Red)
 				}
 			}
@@ -458,16 +457,16 @@ private fun AllocationCard() {
 		Text(
 			text = "Allocation",
 			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp, lineHeight = (19 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
-			color = StakColors.TextPrimary,
+			color = Color.White,
 		)
 		if (com.stak.demo.ui.Session.demoAccount) {
 			Image(painterResource(R.drawable.ms_donut), null, modifier = Modifier.size((150 * u).dp))
 			Column(verticalArrangement = Arrangement.spacedBy((12 * u).dp), modifier = Modifier.fillMaxWidth()) {
 				SectorBar("Tech & AI", "42% · 6 stocks", Teal, (132 * u).dp)
-				SectorBar("Finance", "21% · 3 stocks", stakColor(0xFF7AB3F0), (66 * u).dp)
+				SectorBar("Finance", "21% · 3 stocks", Color(0xFF7AB3F0), (66 * u).dp)
 				SectorBar("Green Energy", "20% · 3 stocks", Green, (63 * u).dp)
 				// 1:3306 legend dot is #9E8CE6 while the 1:3310 bar is #9E8CE5 - exact-design audit 2026-09-04.
-				SectorBar("Real Estate", "12% · 2 stocks", stakColor(0xFF9E8CE5), (38 * u).dp, dot = stakColor(0xFF9E8CE6))
+				SectorBar("Real Estate", "12% · 2 stocks", Color(0xFF9E8CE5), (38 * u).dp, dot = Color(0xFF9E8CE6))
 				SectorBar("Other", "5% · 1 stock", Faint, (16 * u).dp)
 			}
 		} else {
@@ -486,11 +485,11 @@ private fun AllocationCard() {
 /** The authored bucket palette (1:3155), one colour per collection. */
 private fun bucketColor(id: String): Color = when (id) {
 	"aitech" -> Teal
-	"finance" -> stakColor(0xFF7AB3F0)
+	"finance" -> Color(0xFF7AB3F0)
 	"green" -> Green
-	"realestate" -> stakColor(0xFF9E8CE5)
-	"health" -> stakColor(0xFF5DA8BF)
-	"consumer" -> stakColor(0xFFE8B86D)
+	"realestate" -> Color(0xFF9E8CE5)
+	"health" -> Color(0xFF5DA8BF)
+	"consumer" -> Color(0xFFE8B86D)
 	else -> Faint
 }
 
@@ -501,7 +500,7 @@ private fun SectorBar(name: String, share: String, color: Color, fill: Dp, dot: 
 		Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
 			Box(modifier = Modifier.size((9 * u).dp).background(dot, CircleShape))
 			Spacer(modifier = Modifier.width((8 * u).dp))
-			Text(name, style = TextStyle(fontFamily = Geist, fontSize = (13 * u).sp, lineHeight = (17 * u).sp, lineHeightStyle = FIGMA_LINE_BOX), color = StakColors.TextPrimary)
+			Text(name, style = TextStyle(fontFamily = Geist, fontSize = (13 * u).sp, lineHeight = (17 * u).sp, lineHeightStyle = FIGMA_LINE_BOX), color = Color.White)
 			Spacer(modifier = Modifier.weight(1f))
 			Text(share, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, lineHeightStyle = FIGMA_LINE_BOX), color = Muted)
 		}

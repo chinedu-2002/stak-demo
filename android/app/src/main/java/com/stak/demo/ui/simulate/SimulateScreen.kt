@@ -1,6 +1,5 @@
 package com.stak.demo.ui.simulate
 
-import com.stak.demo.ui.theme.stakColor
 import com.stak.demo.ui.theme.FIGMA_LINE_BOX
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
@@ -65,23 +64,23 @@ import com.stak.demo.ui.theme.StakColors
 import kotlin.math.roundToInt
 
 internal object Sim {
-	val CardBg: Color get() = stakColor(0xFF181F30)
-	val Muted: Color get() = stakColor(0xFF819ABB)
-	val Faint: Color get() = stakColor(0xFF5C6B85)
-	val Body: Color get() = stakColor(0xFFC8D2E0)
-	val Green: Color get() = stakColor(0xFF2FD08A)
-	val Red: Color get() = stakColor(0xFFFF5A6A)
-	val Teal: Color get() = stakColor(0xFF69B3CA)
-	val TealTint: Color get() = stakColor(0x1A69B3CA)
-	val ChipBg: Color get() = stakColor(0xFF242B3D)
-	val Track: Color get() = stakColor(0xFF2A3346)
-	val BadgeInk: Color get() = stakColor(0xFF9EADC7)
-	val Bright: Color get() = stakColor(0xFFF2F6FC)
-	val HeaderGray: Color get() = stakColor(0xFFD3D3DD)
-	val DarkCta: Color get() = stakColor(0xFF12203E)
+	val CardBg = Color(0xFF181F30)
+	val Muted = Color(0xFF819ABB)
+	val Faint = Color(0xFF5C6B85)
+	val Body = Color(0xFFC8D2E0)
+	val Green = Color(0xFF2FD08A)
+	val Red = Color(0xFFFF5A6A)
+	val Teal = Color(0xFF69B3CA)
+	val TealTint = Color(0x1A69B3CA)
+	val ChipBg = Color(0xFF242B3D)
+	val Track = Color(0xFF2A3346)
+	val BadgeInk = Color(0xFF9EADC7)
+	val Bright = Color(0xFFF2F6FC)
+	val HeaderGray = Color(0xFFD3D3DD)
+	val DarkCta = Color(0xFF12203E)
 	val CtaBorder = androidx.compose.ui.graphics.Brush.verticalGradient(
-		0f to stakColor(0xA1659EAD),
-		1f to stakColor(0x6E16363F),
+		0f to Color(0xA1659EAD),
+		1f to Color(0x6E16363F),
 	)
 }
 
@@ -153,7 +152,7 @@ internal fun SimulateScreen(
 					Text(
 						text = "Simulate",
 						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (26 * u).sp, lineHeight = (33 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
-						color = StakColors.TextPrimary,
+						color = Color.White,
 					)
 					Text(
 						text = "Pick from your saves. Paper money does the talking.",
@@ -261,7 +260,7 @@ internal fun SimulateScreen(
 								text = "Portfolio",
 								// 1:4044 (exact-design audit 2026-09-04): Geist 14 on a 1.34 line, teal at 80% - was white.
 								style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp, lineHeight = (18.76 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
-								color = stakColor(0xCC69B3CA),
+								color = Color(0xCC69B3CA),
 							)
 							// 1:4045 (exact-design audit 2026-09-04): the exported 4.909x9 chevron asset, not a "›" glyph.
 							Image(painterResource(R.drawable.ic_sim_chevron), null, modifier = Modifier.size((4.909 * u).dp, (9 * u).dp))
@@ -354,7 +353,7 @@ internal fun EmptyStateCard(title: String, body: String, link: String? = null, o
 		Text(
 			text = title,
 			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp, lineHeight = (19 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
-			color = StakColors.TextPrimary,
+			color = Color.White,
 		)
 		Text(
 			text = body,
@@ -403,7 +402,7 @@ private fun ScoreHero(onOpenLeaderboard: () -> Unit) {
 				// Authored box (1:3924) is 55 tall — pin it so the stack sums.
 				// 1:3924 (exact-design audit 2026-09-04): the figure carries no tracking - the -0.44 was never authored.
 				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (44 * u).sp, lineHeight = (55 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
-				color = StakColors.TextPrimary,
+				color = Color.White,
 			)
 			Text(
 				text = "." + valueText.substringAfter('.'),
@@ -490,8 +489,8 @@ private fun ScoreHero(onOpenLeaderboard: () -> Unit) {
 						modifier = Modifier
 							.size((39 * u).dp, (22.5 * u).dp)
 							.clip(RoundedCornerShape((11.25 * u).dp))
-							.background(stakColor(0x292C9DBC))
-							.border((0.75 * u).dp, stakColor(0x662C9DBC), RoundedCornerShape((11.25 * u).dp))
+							.background(Color(0x292C9DBC))
+							.border((0.75 * u).dp, Color(0x662C9DBC), RoundedCornerShape((11.25 * u).dp))
 							.then(select),
 					) {
 						Text(label, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, lineHeightStyle = FIGMA_LINE_BOX), color = Sim.Teal)
@@ -521,7 +520,7 @@ private fun SavedStakRow(badge: String, ticker: String, sub: String, spec: BuySp
 			Text(badge, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp), color = Sim.BadgeInk)
 		}
 		Column(verticalArrangement = Arrangement.spacedBy((3 * u).dp), modifier = Modifier.weight(1f)) {
-			Text(ticker, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp), color = StakColors.TextPrimary)
+			Text(ticker, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp), color = Color.White)
 			Text(sub, style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp), color = Sim.Muted)
 		}
 		BuyPill(onClick = { onBuy(spec) })
@@ -540,10 +539,10 @@ internal fun BuyPill(text: String = "Buy", onClick: () -> Unit) {
 			.tealShadow(u, dy = 12.285f, blur = 12.285f, alpha = 0.04f)
 			.background(
 				androidx.compose.ui.graphics.Brush.verticalGradient(
-					0.0889f to stakColor(0xFFA6E4F7),
-					0.3919f to stakColor(0xFF5DA8BF),
-					0.7255f to stakColor(0xFF3C98B4),
-					1f to stakColor(0xFF3C98B4),
+					0.0889f to Color(0xFFA6E4F7),
+					0.3919f to Color(0xFF5DA8BF),
+					0.7255f to Color(0xFF3C98B4),
+					1f to Color(0xFF3C98B4),
 				),
 				RoundedCornerShape((6 * u).dp),
 			)
@@ -554,7 +553,7 @@ internal fun BuyPill(text: String = "Buy", onClick: () -> Unit) {
 				onClick = onClick,
 			),
 	) {
-		Text(text, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp), color = StakColors.TextPrimary)
+		Text(text, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp), color = Color.White)
 	}
 }
 
@@ -645,7 +644,7 @@ private fun PickDuo(
 			Box(contentAlignment = Alignment.Center, modifier = Modifier.size((34 * u).dp).background(Sim.ChipBg, CircleShape)) {
 				Text(badge, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (14 * u).sp), color = Sim.BadgeInk)
 			}
-			Text(ticker, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (15 * u).sp, lineHeightStyle = FIGMA_LINE_BOX), color = StakColors.TextPrimary)
+			Text(ticker, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (15 * u).sp, lineHeightStyle = FIGMA_LINE_BOX), color = Color.White)
 		}
 		Text(sub, style = TextStyle(fontFamily = Geist, fontSize = (11 * u).sp, lineHeight = (14 * u).sp, lineHeightStyle = FIGMA_LINE_BOX), color = Sim.Faint)
 	}
@@ -716,7 +715,7 @@ internal fun PortfolioRow(
 			Text(badge, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp, lineHeight = (20 * u).sp, lineHeightStyle = FIGMA_LINE_BOX), color = Sim.BadgeInk)
 		}
 		Column(verticalArrangement = Arrangement.spacedBy((3 * u).dp), modifier = Modifier.weight(1f)) {
-			Text(ticker, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (15 * u).sp, lineHeightStyle = FIGMA_LINE_BOX), color = StakColors.TextPrimary)
+			Text(ticker, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (15 * u).sp, lineHeightStyle = FIGMA_LINE_BOX), color = Color.White)
 			Text(sub, style = TextStyle(fontFamily = Geist, fontWeight = if (subLight) FontWeight.Light else FontWeight.Normal, fontSize = (10 * u).sp, lineHeight = (13 * u).sp, lineHeightStyle = FIGMA_LINE_BOX), color = Sim.Muted)
 		}
 		Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy((2 * u).dp)) {
@@ -747,14 +746,14 @@ private fun SimAllocationCard() {
 			.background(Sim.CardBg)
 			.padding((18 * u).dp),
 	) {
-		Text("Allocation", style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp), color = StakColors.TextPrimary)
+		Text("Allocation", style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp), color = Color.White)
 		if (PaperPortfolio.demo) {
 			Image(painterResource(R.drawable.sim_donut), null, modifier = Modifier.size((150 * u).dp))
 			Column(verticalArrangement = Arrangement.spacedBy((12 * u).dp), modifier = Modifier.fillMaxWidth()) {
 				SimSector("Tech & AI", "42% · 5 stocks", Sim.Teal, (132 * u).dp)
-				SimSector("Finance", "25% · 3 stocks", stakColor(0xFF7AB3F0), (66 * u).dp)
+				SimSector("Finance", "25% · 3 stocks", Color(0xFF7AB3F0), (66 * u).dp)
 				SimSector("Green Energy", "17% · 2 stocks", Sim.Green, (63 * u).dp)
-				SimSector("Real Estate", "8% · 1 stock", stakColor(0xFF9E8CE5), (38 * u).dp)
+				SimSector("Real Estate", "8% · 1 stock", Color(0xFF9E8CE5), (38 * u).dp)
 				SimSector("Other", "8% · 1 stock", Sim.Faint, (16 * u).dp)
 			}
 		} else {
@@ -773,11 +772,11 @@ private fun SimAllocationCard() {
 /** The authored bucket palette (1:4040), one colour per collection. */
 private fun simBucketColor(id: String): Color = when (id) {
 	"aitech" -> Sim.Teal
-	"finance" -> stakColor(0xFF7AB3F0)
+	"finance" -> Color(0xFF7AB3F0)
 	"green" -> Sim.Green
-	"realestate" -> stakColor(0xFF9E8CE5)
-	"health" -> stakColor(0xFF5DA8BF)
-	"consumer" -> stakColor(0xFFE8B86D)
+	"realestate" -> Color(0xFF9E8CE5)
+	"health" -> Color(0xFF5DA8BF)
+	"consumer" -> Color(0xFFE8B86D)
 	else -> Sim.Faint
 }
 
@@ -788,7 +787,7 @@ private fun SimSector(name: String, share: String, color: Color, fill: Dp) {
 		Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
 			Box(modifier = Modifier.size((9 * u).dp).background(color, CircleShape))
 			Spacer(modifier = Modifier.width((8 * u).dp))
-			Text(name, style = TextStyle(fontFamily = Geist, fontSize = (13 * u).sp), color = StakColors.TextPrimary)
+			Text(name, style = TextStyle(fontFamily = Geist, fontSize = (13 * u).sp), color = Color.White)
 			Spacer(modifier = Modifier.weight(1f))
 			Text(share, style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp), color = Sim.Muted)
 		}
@@ -853,7 +852,7 @@ private fun BoardRow(rank: String, name: String, pct: String, you: Boolean) {
 		Text(
 			name,
 			style = TextStyle(fontFamily = Geist, fontWeight = if (you) FontWeight.SemiBold else FontWeight.Medium, fontSize = (13 * u).sp),
-			color = StakColors.TextPrimary,
+			color = Color.White,
 			modifier = Modifier.weight(1f),
 		)
 		Text(

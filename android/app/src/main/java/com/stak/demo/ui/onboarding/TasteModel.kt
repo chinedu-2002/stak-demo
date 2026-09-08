@@ -1,6 +1,5 @@
 package com.stak.demo.ui.onboarding
 
-import com.stak.demo.ui.theme.stakColor
 import androidx.compose.ui.graphics.Color
 
 /**
@@ -79,8 +78,8 @@ internal object TasteModel {
 
 	// The authored strength colours (1:687): teal / muted / faint.
 	private fun colorOf(strength: String): Color = when (strength) {
-		"Strong" -> stakColor(0xFF69B3CA)
-		"Medium" -> stakColor(0xFF819ABB)
-		else -> stakColor(0xFF5C6B85)
+		"Strong" -> Color(0xFF69B3CA)
+		"Medium" -> Color(0xFF819ABB)
+		else -> Color(0xFF5C6B85)
 	}
 }

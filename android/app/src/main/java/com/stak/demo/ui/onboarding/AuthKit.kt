@@ -1,6 +1,5 @@
 package com.stak.demo.ui.onboarding
 
-import com.stak.demo.ui.theme.stakColor
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -55,15 +54,15 @@ import androidx.compose.foundation.layout.statusBarsPadding
  * inputs, the sharp-cornered gradient CTA and the switch link row.
  */
 internal object Auth {
-	val NavCircle: Color get() = stakColor(0xFF192238)
-	val SubtitleGray: Color get() = stakColor(0xFFACAFB1)
-	val InputBg: Color get() = stakColor(0xFF181F30)
-	val DividerLine: Color get() = stakColor(0xFF2A3346)
-	val FaintText: Color get() = stakColor(0xFF5C6B85)
+	val NavCircle = Color(0xFF192238)
+	val SubtitleGray = Color(0xFFACAFB1)
+	val InputBg = Color(0xFF181F30)
+	val DividerLine = Color(0xFF2A3346)
+	val FaintText = Color(0xFF5C6B85)
 	/** Inline validation red (the app's negative tone). */
-	val ErrorRed: Color get() = stakColor(0xFFE5484D)
-	val LinkTeal: Color get() = stakColor(0xFF69B3CA)
-	val DarkOnWhite: Color get() = stakColor(0xFF0E162B)
+	val ErrorRed = Color(0xFFE5484D)
+	val LinkTeal = Color(0xFF69B3CA)
+	val DarkOnWhite = Color(0xFF0E162B)
 }
 
 /**
@@ -304,10 +303,10 @@ internal fun AuthCta(text: String, enabled: Boolean = true, onClick: () -> Unit)
 			}
 			.background(
 				Brush.verticalGradient(
-					0.0889f to stakColor(0xFFA6E4F7),
-					0.3919f to stakColor(0xFF5DA8BF),
-					0.7255f to stakColor(0xFF3C98B4),
-					1f to stakColor(0xFF3C98B4),
+					0.0889f to Color(0xFFA6E4F7),
+					0.3919f to Color(0xFF5DA8BF),
+					0.7255f to Color(0xFF3C98B4),
+					1f to Color(0xFF3C98B4),
 				),
 				RoundedCornerShape((6 * u).dp),
 			)
@@ -332,7 +331,7 @@ internal fun AuthSecondaryButton(text: String, onClick: () -> Unit) {
 			.fillMaxWidth()
 			.padding(horizontal = (20 * u).dp)
 			.height((52 * u).dp)
-			.border((0.36 * u).dp, stakColor(0x54343B4F), RoundedCornerShape((6 * u).dp))
+			.border((0.36 * u).dp, Color(0x54343B4F), RoundedCornerShape((6 * u).dp))
 			.clickable(onClick = onClick),
 		contentAlignment = Alignment.Center,
 	) {

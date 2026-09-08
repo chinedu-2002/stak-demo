@@ -286,6 +286,24 @@ internal val DECK = listOf(
 internal const val DECK_SIZE = 12
 
 /**
+ * The designed cards this account has NOT saved in the app: a save recorded on
+ * this account (MyStakHoldings.add stamps its day) takes the card off the deck
+ * until it is unsaved from My STAK; the persona's seeded holdings carry no day,
+ * so its authored deck stands (user, 2026-09-08: a card already in My STAK
+ * should not be on Discover, and Save only shows on cards not yet saved).
+ */
+internal fun deckCards(): List<DeckCard> {
+	val held = com.stak.demo.ui.MyStakHoldings.tickers
+	return DECK.filter { it.symbol !in held || com.stak.demo.ui.MyStakHoldings.daysSinceSaved(it.symbol) == null }
+}
+
+/** The card at a run position over the cards still on the deck (the full design set when none are). */
+internal fun deckCardAt(position: Int): DeckCard {
+	val cards = deckCards().ifEmpty { DECK }
+	return cards[((position % cards.size) + cards.size) % cards.size]
+}
+
+/**
  * 04 · Discover — "first run" (CHINEDU 1:1627) with its states: the
  * swipe deck (twelve cards cycling the three designed ones), the Save chip
  * toast (1:1796), the Buy-NVDA practice sheet (1:1970) and the Order
@@ -364,7 +382,7 @@ internal fun DiscoverScreen(
 			// the swiped card becomes the ghost and the deck
 			// advances NOW - a second swipe grabs the next
 			// card even while the ghost is still flying.
-			flyingCard = DECK[seen % DECK.size]
+			flyingCard = deckCardAt(seen)
 			flyFade.snapTo(1f)
 			flyOffset.snapTo(committed)
 			seen += 1
@@ -395,7 +413,7 @@ internal fun DiscoverScreen(
 			// Header — Discover + progress ring, kicker below.
 			// 1:2330 authors the whole header 10 lower than 1:1627 (ring y64 vs
 			// 54) with an 8 kicker gap (y116) - exact-design audit 2026-09-04.
-			val atEnd = seen >= DECK_SIZE
+			val atEnd = seen >= DECK_SIZE || deckCards().isEmpty()
 			Column(
 				verticalArrangement = Arrangement.spacedBy(((if (atEnd) 8 else 5) * u).dp),
 				modifier = Modifier.fillMaxWidth().padding(horizontal = (20 * u).dp).padding(top = ((if (atEnd) 20 else 10) * u).dp),
@@ -434,7 +452,7 @@ internal fun DiscoverScreen(
 				)
 			}
 			Spacer(modifier = Modifier.height((27 * u).dp))
-			if (seen >= DECK_SIZE) {
+			if (seen >= DECK_SIZE || deckCards().isEmpty()) {
 				EndOfDeck(
 					seen = seen.coerceAtMost(DECK_SIZE),
 					saved = savedCards.size,
@@ -446,7 +464,7 @@ internal fun DiscoverScreen(
 				)
 			} else {
 			// The front card cycles the three designs across the twelve-card run.
-			val frontCard = DECK[seen % DECK.size]
+			val frontCard = deckCardAt(seen)
 			// Deck — a fixed composition: every dimension scales by the 390dp
 			// artboard unit so proportions match the frame on any device.
 			Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f).fillMaxWidth()) {
@@ -527,7 +545,7 @@ internal fun DiscoverScreen(
 							.graphicsLayer { alpha = 1f - (topOffset.value / commitPx).coerceIn(0f, 1f) },
 					)
 					if (seen < DECK_SIZE - 1) {
-						val next = DECK[(seen + 1) % DECK.size]
+						val next = deckCardAt(seen + 1)
 						FrontDeckCard(
 							card = next,
 							onSave = {},

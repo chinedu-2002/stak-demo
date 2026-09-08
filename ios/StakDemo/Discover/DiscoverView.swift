@@ -102,12 +102,15 @@ final class DeckSession: ObservableObject {
 	@Published var seen = 0 { didSet { persist() } }
 	@Published var saved: Set<String> = [] { didSet { persist() } }
 	@Published var bought = 0 { didSet { persist() } }
+	/// Where the run is in the cards still on the deck - swipes move it, a save-driven removal does not (Codex review, PR #167).
+	@Published var cursor = 0 { didSet { persist() } }
 
 	/// "Swipe today's deck again" and the tab re-tap from the end.
 	func restart() {
 		seen = 0
 		saved = []
 		bought = 0
+		cursor = 0
 	}
 
 	// Persisted per day (product audit, 2026-09-05): a relaunch resumes today's
@@ -128,8 +131,9 @@ final class DeckSession: ObservableObject {
 			seen = StakStore.int("deck.seen", default: 0)
 			saved = StakStore.stringSet("deck.saved") ?? []
 			bought = StakStore.int("deck.bought", default: 0)
+			cursor = StakStore.int("deck.cursor", default: 0)
 		} else {
-			seen = 0; saved = []; bought = 0
+			seen = 0; saved = []; bought = 0; cursor = 0
 		}
 		loading = false
 	}
@@ -140,6 +144,7 @@ final class DeckSession: ObservableObject {
 		StakStore.set(seen, for: "deck.seen")
 		StakStore.set(saved, for: "deck.saved")
 		StakStore.set(bought, for: "deck.bought")
+		StakStore.set(cursor, for: "deck.cursor")
 	}
 }
 
@@ -225,6 +230,10 @@ struct DiscoverView: View {
 		get { session.seen }
 		nonmutating set { session.seen = newValue }
 	}
+	private var cursor: Int {
+		get { session.cursor }
+		nonmutating set { session.cursor = newValue }
+	}
 	@State private var savedToast = false
 	/// THIS RUN's saves (symbols) - the Save chip AND the receipt's Saved
 	/// count read it; proxies DeckSession. The chip follows this run, not
@@ -272,13 +281,12 @@ struct DiscoverView: View {
 		return pool[((position % pool.count) + pool.count) % pool.count]
 	}
 
-	private var front: Int { seen % max(1, cards.count) }
 
 	/// The deck advances: the front card leaves and the next promotes - the swipe
 	/// commit (from `committed` pt of travel) and the Save chip (from rest; user,
 	/// 2026-09-08: a saved card must not stay on the deck) share it, so Save reads
 	/// exactly like a swipe.
-	private func advance(committed: CGFloat) {
+	private func advance(committed: CGFloat, saving: DeckCard? = nil) {
 		let u = figmaUnit
 		if seen >= deckSize - 1 {
 			// The final card: the authored fly-off finishes
@@ -286,6 +294,8 @@ struct DiscoverView: View {
 			withAnimation(.easeOut(duration: 0.28)) { dragOffset = 500 * u }
 			withAnimation(.easeOut(duration: 0.3)) { frontOpacity = 0 }
 			DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+				// The save lands once the card has left, so the card flying off is the one saved.
+				if let saving { MyStakHoldings.shared.add(saving.symbol) }
 				seen += 1
 				dragOffset = 0
 				frontOpacity = 1
@@ -296,7 +306,7 @@ struct DiscoverView: View {
 			// the swiped card becomes the ghost and the deck
 			// advances NOW - a second swipe grabs the next
 			// card even while the ghost is still flying.
-			flyingCard = card(at: seen)
+			flyingCard = saving ?? card(at: cursor)
 			flyGen += 1
 			let gen = flyGen
 			var reset = Transaction()
@@ -304,7 +314,11 @@ struct DiscoverView: View {
 			withTransaction(reset) {
 				flyOffset = committed
 				flyFade = 1
+				// A saved card leaves the pool now - the next card shifts into this cursor,
+				// so only a swipe moves the cursor (Codex review, PR #167: AAPL was skipped).
+				if let saving { MyStakHoldings.shared.add(saving.symbol) }
 				seen += 1
+				if saving == nil { cursor += 1 }
 				dragOffset = 0
 				// The new front takes over at the mid-slab geometry
 				// the finger just revealed, then promotes forward.
@@ -379,7 +393,8 @@ struct DiscoverView: View {
 						onSwipeAgain: { restart() },
 						seen: min(seen, deckSize),
 						saved: savedCards.count,
-						bought: session.bought
+						bought: session.bought,
+						canReplay: !cards.isEmpty
 					)
 					Spacer(minLength: 0)
 				} else {
@@ -412,16 +427,16 @@ struct DiscoverView: View {
 								// 2026-09-02): as the drag exposes the mid slab it
 								// crossfades into the LIVE next card at the SAME
 								// authored geometry, so the queue tells the truth.
-								let next = card(at: seen + 1)
+								let next = card(at: cursor + 1)
 								FrontDeckCard(card: next, onSave: {}, u: u, saved: savedCards.contains(next.symbol))
 									.scaleEffect(0.8947, anchor: .top)
 									.opacity(min(1, max(0, dragOffset / (110 * u))))
 									.offset(y: 36.39 * u)
 									.allowsHitTesting(false)
 							}
-							let frontCard = card(at: seen)
+							let frontCard = card(at: cursor)
 							// Saving takes the card off the deck like a swipe (user, 2026-09-08).
-							FrontDeckCard(card: frontCard, onSave: { savedCards.insert(frontCard.symbol); MyStakHoldings.shared.add(frontCard.symbol); savedToast = true; advance(committed: 0) }, u: u, saved: savedCards.contains(frontCard.symbol))
+							FrontDeckCard(card: frontCard, onSave: { savedCards.insert(frontCard.symbol); savedToast = true; advance(committed: 0, saving: frontCard) }, u: u, saved: savedCards.contains(frontCard.symbol))
 								.scaleEffect(0.8947 + 0.1053 * promote, anchor: .top)
 								.opacity(frontOpacity)
 								.offset(y: 54.65 * u - 18.26 * u * (1 - promote) + dragOffset)
@@ -474,7 +489,7 @@ struct DiscoverView: View {
 						Spacer().frame(height: 19 * u)
 						HStack(spacing: 36 * u) {
 							// Codex audit (2026-09-04): the ticket serves the FRONT card.
-							Button { onPracticeBuy(buySpec(for: card(at: seen).symbol)) } label: {
+							Button { onPracticeBuy(buySpec(for: card(at: cursor).symbol)) } label: {
 								Text("Practice buy")
 									.font(StakFont.geist(14 * u, .medium))
 									.foregroundStyle(Color.white)
@@ -492,7 +507,7 @@ struct DiscoverView: View {
 									.overlay(RoundedRectangle(cornerRadius: 6 * u).strokeBorder(Disc.ctaBorder, lineWidth: 0.36 * u))
 							}
 							.buttonStyle(.pressDim)
-							Button(action: { onLearnMore(card(at: seen).symbol) }) {
+							Button(action: { onLearnMore(card(at: cursor).symbol) }) {
 								Text("Learn more")
 									.font(StakFont.sora(12 * u))
 									.foregroundStyle(Disc.muted)
@@ -757,6 +772,8 @@ private struct EndOfDeck: View {
 	var seen = 0
 	var saved = 0
 	var bought = 0
+	/// No replay when every card is saved (Codex review, PR #167).
+	var canReplay = true
 
 	var body: some View {
 		let u = figmaUnit
@@ -798,14 +815,16 @@ private struct EndOfDeck: View {
 					.font(StakFont.geist(10 * u))
 					.foregroundStyle(Disc.muted)
 				Spacer().frame(height: 40.5 * u)
-				Button(action: onSwipeAgain) {
-					Text("Swipe today’s deck again")
-						.font(StakFont.sora(13 * u))
-						.foregroundStyle(Disc.muted)
-						.frame(maxWidth: .infinity)
-						.frame(height: 32 * u)
+				if canReplay {
+					Button(action: onSwipeAgain) {
+						Text("Swipe today’s deck again")
+							.font(StakFont.sora(13 * u))
+							.foregroundStyle(Disc.muted)
+							.frame(maxWidth: .infinity)
+							.frame(height: 32 * u)
+					}
+					.buttonStyle(.pressDim)
 				}
-				.buttonStyle(.pressDim)
 			}
 		}
 		.padding(.horizontal, 20 * u)

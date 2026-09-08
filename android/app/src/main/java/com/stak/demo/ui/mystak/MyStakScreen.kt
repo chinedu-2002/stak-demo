@@ -118,9 +118,11 @@ fun MyStakScreen(onOpenCollection: (String) -> Unit, onStartSwiping: () -> Unit)
 				// Codex parity audit (2026-09-04): each chip carries ITS
 				// catalogue id (Collections.kt) so the page serves that
 				// collection, the way the deck's Learn more serves its stock.
-				// A seventh, "Other" tile appears only while a new account holds stocks
-				// no collection catalogues (Codex review, PR #166); the demo keeps its six.
-				val other = if (com.stak.demo.ui.Session.demoAccount) null else otherCollection()
+				// A seventh, "Other" tile appears only while the account holds stocks no
+				// collection catalogues (Codex review, PR #166) - the persona's seeded
+				// TSLA/SNOW never count, so the frame keeps its six; a save the persona
+				// makes itself (an Amazon story) is visible and reversible (audit 2026-09-07).
+				val other = otherCollection()
 				(COLLECTIONS + listOfNotNull(other)).chunked(2).forEach { pair ->
 					Row(horizontalArrangement = Arrangement.spacedBy((10 * u).dp), modifier = Modifier.fillMaxWidth()) {
 						pair.forEach { c ->

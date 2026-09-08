@@ -143,14 +143,18 @@ fun LeaderboardScreen(onBack: () -> Unit) {
 				}
 			}
 			TOP.forEach { LeaderRow(it) }
-			Text(
-				text = "· · ·",
-				// 1:4205 (exact-design audit 2026-09-04): Geist Medium 13 - was Regular 12.
-				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp, lineHeight = (17 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
-				color = Sim.Faint,
-				modifier = Modifier.align(Alignment.CenterHorizontally),
-			)
-			NEAR.forEach { LeaderRow(it) }
+			// The authored #46/#48 neighbours cluster around the persona's #47; an unranked
+			// first-time user sees the top five only (audit 2026-09-07).
+			if (PaperPortfolio.weekRank != null) {
+				Text(
+					text = "· · ·",
+					// 1:4205 (exact-design audit 2026-09-04): Geist Medium 13 - was Regular 12.
+					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp, lineHeight = (17 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
+					color = Sim.Faint,
+					modifier = Modifier.align(Alignment.CenterHorizontally),
+				)
+				NEAR.forEach { LeaderRow(it) }
+			}
 			Text(
 				text = "Percentage return, not dollar size, so everyone competes on the same scale. This week ranks the trailing 7 days.",
 				// 1:4124 centres the explainer.

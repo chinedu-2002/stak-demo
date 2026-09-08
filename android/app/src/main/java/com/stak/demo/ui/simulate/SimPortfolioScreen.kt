@@ -129,48 +129,54 @@ fun SimPortfolioScreen(
 						color = Sim.Muted,
 					)
 				}
-				Row(horizontalArrangement = Arrangement.spacedBy((8 * u).dp)) {
-					FilterChip("Top gainers", selected = true)
-					FilterChip("Newest", selected = false)
-					FilterChip("Worst", selected = false)
-				}
-				// Codex audit (2026-09-04): the live positions - a fresh buy sits
-				// at the top, a sold one drops to SOLD · REALIZED below.
-				PaperPortfolio.positions.forEach { pos ->
-					val p = pos.row
-					PortfolioRow(
-						badge = p.badge, ticker = p.ticker, sub = p.sub,
-						amount = p.amount, pct = p.pct, up = p.up,
-						// 1:4539 (exact-design audit 2026-09-04): this page's picked line is Geist Light.
-						subLight = true,
-						onClick = { onOpenPick(p.ticker) },
-						// B16 (1:4496 Motion): the Sell pill opens the Pick detail
-						// - the authored sell flow lives there; the in-page
-						// sheets below stay built but unwired.
-						trailing = { SellPill(onClick = { onOpenPick(p.ticker) }) },
-					)
-				}
-				// 1:4605 gk (exact-design audit 2026-09-04): the kicker sits 4 below the box top (13 in a 17), not centred.
-				Box(
-					contentAlignment = Alignment.BottomStart,
-					modifier = Modifier.fillMaxWidth().height((17 * u).dp).padding(start = (2 * u).dp),
-				) {
+				if (!PaperPortfolio.demo && PaperPortfolio.positions.isEmpty() && PaperPortfolio.realized.isEmpty()) {
+					// A first-time user's history before the first practice buy (audit 2026-09-07):
+					// the Simulate home's empty card instead of empty chrome.
+					EmptyStateCard(title = "No picks yet", body = "Your first practice buy lands here with its live gain.")
+				} else {
+					Row(horizontalArrangement = Arrangement.spacedBy((8 * u).dp)) {
+						FilterChip("Top gainers", selected = true)
+						FilterChip("Newest", selected = false)
+						FilterChip("Worst", selected = false)
+					}
+					// Codex audit (2026-09-04): the live positions - a fresh buy sits
+					// at the top, a sold one drops to SOLD · REALIZED below.
+					PaperPortfolio.positions.forEach { pos ->
+						val p = pos.row
+						PortfolioRow(
+							badge = p.badge, ticker = p.ticker, sub = p.sub,
+							amount = p.amount, pct = p.pct, up = p.up,
+							// 1:4539 (exact-design audit 2026-09-04): this page's picked line is Geist Light.
+							subLight = true,
+							onClick = { onOpenPick(p.ticker) },
+							// B16 (1:4496 Motion): the Sell pill opens the Pick detail
+							// - the authored sell flow lives there; the in-page
+							// sheets below stay built but unwired.
+							trailing = { SellPill(onClick = { onOpenPick(p.ticker) }) },
+						)
+					}
+					// 1:4605 gk (exact-design audit 2026-09-04): the kicker sits 4 below the box top (13 in a 17), not centred.
+					Box(
+						contentAlignment = Alignment.BottomStart,
+						modifier = Modifier.fillMaxWidth().height((17 * u).dp).padding(start = (2 * u).dp),
+					) {
+						Text(
+							text = "SOLD · REALIZED",
+							style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, lineHeight = (13 * u).sp, letterSpacing = (0.9 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
+							color = Sim.Faint,
+						)
+					}
+					PaperPortfolio.realized.forEach { r ->
+						RealizedRow(r.badge, r.ticker, r.sub, r.amount, r.up)
+					}
 					Text(
-						text = "SOLD · REALIZED",
-						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, lineHeight = (13 * u).sp, letterSpacing = (0.9 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
+						text = "Sell a pick and the cash returns to your balance, gain or loss.",
+						// 1:4621 (exact-design audit 2026-09-04): centre-aligned across the full column, so a wrap stays centred.
+						style = TextStyle(fontFamily = Geist, fontSize = (11 * u).sp, lineHeight = (14 * u).sp, textAlign = TextAlign.Center, lineHeightStyle = FIGMA_LINE_BOX),
 						color = Sim.Faint,
+						modifier = Modifier.fillMaxWidth(),
 					)
 				}
-				PaperPortfolio.realized.forEach { r ->
-					RealizedRow(r.badge, r.ticker, r.sub, r.amount, r.up)
-				}
-				Text(
-					text = "Sell a pick and the cash returns to your balance, gain or loss.",
-					// 1:4621 (exact-design audit 2026-09-04): centre-aligned across the full column, so a wrap stays centred.
-					style = TextStyle(fontFamily = Geist, fontSize = (11 * u).sp, lineHeight = (14 * u).sp, textAlign = TextAlign.Center, lineHeightStyle = FIGMA_LINE_BOX),
-					color = Sim.Faint,
-					modifier = Modifier.fillMaxWidth(),
-				)
 			}
 		}
 		// The unwired in-page host keeps the frame's NVDA (1:4698 / 73:855).

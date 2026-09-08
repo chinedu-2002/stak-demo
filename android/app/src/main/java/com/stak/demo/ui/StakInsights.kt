@@ -57,14 +57,17 @@ internal object StakInsights {
 
 	/** "You lean into tech and AI." */
 	fun readHeadline(): String {
-		val top = heldGroups().firstOrNull() ?: return "Your read starts with your first save."
+		val top = heldGroups().firstOrNull()
+			?: return if (MyStakHoldings.count > 0) "Your saves sit outside the six collections." else "Your read starts with your first save."
 		return "You lean into ${THEME[top.first.id]}."
 	}
 
 	fun readBody(): String {
 		val groups = heldGroups()
 		val total = groups.sumOf { it.second.size }
-		val top = groups.firstOrNull() ?: return "Save stocks from the Discover deck and STAK will read your taste from them."
+		val top = groups.firstOrNull()
+			?: return if (MyStakHoldings.count > 0) "Save a stock from one of the collections and STAK will read your taste from it."
+			else "Save stocks from the Discover deck and STAK will read your taste from them."
 		val theme = THEME[top.first.id]
 		if (total == 1) return "${top.second.first().ticker} is your first save, a $theme name. Save a few more and STAK will read the pattern."
 		val lead = "${top.second.size.word().cap()} of your ${total.word()} picks are $theme names."

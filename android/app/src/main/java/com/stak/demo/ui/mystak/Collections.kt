@@ -138,7 +138,8 @@ internal const val OTHER_ID = "other"
  */
 internal fun otherCollection(): StakCollection? {
 	val catalogued = COLLECTIONS.flatMap { it.stocks }.map { it.ticker }.toSet()
-	val extra = MyStakHoldings.tickers.filter { it !in catalogued }.sorted()
+	// The persona's seeded TSLA/SNOW are the frame's; only saves the account made itself count.
+	val extra = MyStakHoldings.tickers.filter { it !in catalogued && !(com.stak.demo.ui.Session.demoAccount && MyStakHoldings.isSeed(it)) }.sorted()
 	if (extra.isEmpty()) return null
 	val stocks = extra.map { t ->
 		val known = com.stak.demo.ui.news.NewsArticleFeed.hasStockFacts(t)

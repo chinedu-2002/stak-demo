@@ -288,8 +288,10 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
 					else -> null
 				}
 			},
-			// Prototype (sign-in frame): socials/CTA leave toward Home
-			// first run as Push Right; the "Create account" link dissolves
+			// Prototype (sign-in frame): socials/CTA leave toward Home as
+			// Push Right (the authored target is 1:958 "Home first run"; by
+			// the 2026-09-07 ruling an active user lands on Home Main - the
+			// transition is the same); the "Create account" link dissolves
 			// back over sign up; the post-logout back circle (via=back)
 			// leaves as Push Left — the authored Back edge's other half.
 			exitTransition = {
@@ -345,8 +347,10 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
 		}
 		composable(
 			StakRoutes.MAIN,
-			// Prototype (sign-in frame): "Home first run" arrives as Push
-			// Right — in from the left, 300ms ease out.
+			// Prototype (sign-in frame): Home arrives as Push Right — in
+			// from the left, 300ms ease out. Authored against 1:958 "Home
+			// first run"; an active user lands on Home Main (1:1097) by the
+			// 2026-09-07 ruling, with the same push.
 			enterTransition = {
 				when (initialState.destination.route) {
 					StakRoutes.SIGN_IN -> slideInHorizontally(tween(300, easing = EaseOut)) { -it }
@@ -686,9 +690,15 @@ private fun MainShell(
 	LaunchedEffect(pendingTab.value) {
 		pendingTab.value?.let { switchTab(it); pendingTab.value = null }
 	}
-	// First run shows only in the session that signed in / created the
-	// account; a launch that resumed a saved session lands on Home Main.
-	var homeFirstRun by rememberSaveable { mutableStateOf(!com.stak.demo.ui.Session.resumedSignedIn) }
+	// First run (1:958) is for a FIRST-TIME user only: the account was created
+	// here and the run has not been completed yet. An active/returning user -
+	// Sign in, or any relaunch after the first run - lands on Home Main
+	// (user, 2026-09-07). Completion persists in Session.
+	var homeFirstRun by rememberSaveable { mutableStateOf(com.stak.demo.ui.Session.firstRunPending) }
+	fun endFirstRun() {
+		homeFirstRun = false
+		com.stak.demo.ui.Session.completeFirstRun()
+	}
 	// Codex audit (2026-09-04): the Discover ticket serves the FRONT card's
 	// stock (NVDA / AAPL / GOOGL into the 1:1970 template) - the raised spec
 	// IS the open flag; null = no ticket.
@@ -752,12 +762,12 @@ private fun MainShell(
 							// -> Home must land on Main, never back on the scrim
 							// (prototype walk, 2026-09-05). Only the avatar's
 							// Profile push (1:1003, BACK) returns to first run.
-							onSeeTodaysPick = { homeFirstRun = false; switchTab(MainTab.Discover) },
+							onSeeTodaysPick = { endFirstRun(); switchTab(MainTab.Discover) },
 							onProfile = onOpenProfile,
 							onBell = onOpenNotifications,
-							onOpenNews = { homeFirstRun = false; switchTab(MainTab.News) },
-							onOpenMyStak = { homeFirstRun = false; switchTab(MainTab.MySTAK) },
-							onOpenDeck = { homeFirstRun = false; switchTab(MainTab.Discover) },
+							onOpenNews = { endFirstRun(); switchTab(MainTab.News) },
+							onOpenMyStak = { endFirstRun(); switchTab(MainTab.MySTAK) },
+							onOpenDeck = { endFirstRun(); switchTab(MainTab.Discover) },
 						)
 						MainTab.News -> NewsScreen(onOpenArticle = onOpenArticle)
 						MainTab.Discover -> DiscoverScreen(

@@ -19,13 +19,37 @@ object StakNotifications {
 		Item("weekly-recap", "Weekly recap", "You’re up +1.9% this week and #47 on the board. Nice.", "1d"),
 	)
 
-	private fun welcome(): List<Item> = listOf(
-		Item("welcome", "Welcome to STAK, ${UserProfile.greetingName}", "Your first deck is waiting in Discover. Swipe down for the next card, save what you like.", "Just now"),
-		Item("first-save", "Save a stock to start your STAK", "Saved stocks power My STAK and the Simulate leaderboard.", "Just now"),
-	)
+	/**
+	 * A first-time user's inbox, and how it ages: the welcome is stamped with the
+	 * account's creation day and "Save a stock" leaves once the first save exists,
+	 * so an active new account on a later day is not greeted as brand new
+	 * (audit 2026-09-07).
+	 */
+	private fun welcome(): List<Item> {
+		val age = createdAgo()
+		val welcome = Item(
+			"welcome", "Welcome to STAK, ${UserProfile.greetingName}",
+			if (com.stak.demo.ui.discover.DeckSession.seen > 0) "Your deck is in Discover. Swipe down for the next card, save what you like."
+			else "Your first deck is waiting in Discover. Swipe down for the next card, save what you like.",
+			age,
+		)
+		if (MyStakHoldings.count > 0) return listOf(welcome)
+		return listOf(welcome, Item("first-save", "Save a stock to start your STAK", "Saved stocks power My STAK and the Simulate leaderboard.", age))
+	}
 
-	var items by mutableStateOf(listOf<Item>())
-		private set
+	/** "Just now" on the creation day, then "1d", "6d", "2w" like the persona's authored rows. */
+	private fun createdAgo(): String {
+		val created = StakStore.getString("created_day")?.toLongOrNull() ?: return "Just now"
+		val days = (java.time.LocalDate.now().toEpochDay() - created).toInt()
+		return when {
+			days <= 0 -> "Just now"
+			days < 7 -> "${days}d"
+			else -> "${days / 7}w"
+		}
+	}
+
+	/** Derived from the account's live state, so a first save updates the inbox at once. */
+	val items: List<Item> get() = if (Session.demoAccount) DEMO else welcome()
 	var readIds by mutableStateOf(setOf<String>())
 		private set
 
@@ -35,7 +59,6 @@ object StakNotifications {
 
 	/** Restores the inbox for the current account. */
 	fun load() {
-		items = if (Session.demoAccount) DEMO else welcome()
 		readIds = StakStore.getSet("notif.read") ?: emptySet()
 	}
 

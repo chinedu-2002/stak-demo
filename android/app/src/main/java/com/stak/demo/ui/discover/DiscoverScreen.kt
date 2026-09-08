@@ -211,6 +211,11 @@ internal object DeckSession {
 
 	private fun today(): String = java.time.LocalDate.now().toString()
 
+	/** Re-entering Discover on a later day starts the day's deck without a relaunch (audit 2026-09-07). */
+	fun refreshDay() {
+		if (com.stak.demo.ui.StakStore.getString("deck.day") != today()) load()
+	}
+
 	/** Today's run, if one was saved; otherwise a fresh deck. */
 	fun load() {
 		val store = com.stak.demo.ui.StakStore
@@ -315,6 +320,7 @@ internal fun DiscoverScreen(
 	// saves in My STAK" -> Discover tab showed 1/12 instead of the kept end;
 	// mirrors iOS's onChange(of: resetKey)).
 	val initialResetKey = remember { resetKey }
+	LaunchedEffect(Unit) { DeckSession.refreshDay() }
 	LaunchedEffect(resetKey) {
 		if (resetKey != initialResetKey && seen >= DECK_SIZE) {
 			DeckSession.restart()

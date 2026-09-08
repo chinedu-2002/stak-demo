@@ -958,7 +958,9 @@ struct PracticeBuySheet: View {
 			.replacingOccurrences(of: "$", with: "")
 			.replacingOccurrences(of: ",", with: "")
 			.trimmingCharacters(in: .whitespaces)
-		if let value = Double(raw), value > 0, value <= PaperPortfolio.shared.cash { onAmount(value) }
+		// Custom publishes its field's value, or NO amount (0) until a valid one is
+		// typed - never the preset it replaced (Codex review, PR #167).
+		if let value = Double(raw), value > 0, value <= PaperPortfolio.shared.cash { onAmount(value) } else { onAmount(0) }
 	}
 
 	var body: some View {
@@ -1044,7 +1046,10 @@ struct PracticeBuySheet: View {
 				.frame(maxWidth: .infinity)
 				.padding(.top, 10 * u)
 				VStack(spacing: 16 * u) {
+					// Confirm only with a stake the cash covers (Codex review, PR #167).
 					SheetCta(text: "Confirm practice buy", action: onConfirm)
+						.disabled(!PaperPortfolio.shared.canBuy(amount))
+						.opacity(PaperPortfolio.shared.canBuy(amount) ? 1 : 0.5)
 					SheetSecondary(text: secondary, action: onDismiss)
 				}
 			}

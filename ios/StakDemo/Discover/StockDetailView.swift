@@ -154,7 +154,7 @@ struct StockDetailView: View {
 								DetailSecondary(text: "Unsave") {
 									// Unsave clears this run's deck save too (Codex review, PR #167).
 									DeckSession.shared.saved.remove(f.symbol)
-									MyStakHoldings.shared.remove(f.symbol)
+									MyStakHoldings.shared.remove(f.symbol); NewsSaves.shared.removeStories(ticker: f.symbol)
 									onBack()
 								}
 							} else if saved {
@@ -167,7 +167,7 @@ struct StockDetailView: View {
 								DetailSecondary(text: "Unsave") {
 									saved = false
 									DeckSession.shared.saved.remove(f.symbol)
-									MyStakHoldings.shared.remove(f.symbol)
+									MyStakHoldings.shared.remove(f.symbol); NewsSaves.shared.removeStories(ticker: f.symbol)
 								}
 							} else {
 								// Authored (1:2382 -> 92:969, SMART_ANIMATE 350): the

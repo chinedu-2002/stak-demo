@@ -173,14 +173,16 @@ final class PaperPortfolio: ObservableObject {
 		let newShares = amount / price
 		if let i = positions.firstIndex(where: { $0.spec.symbol == spec.symbol }) {
 			let held = positions[i]
+			let grown = held.spec.holding(
+				shares: (Double(held.spec.shares) ?? 0) + newShares,
+				stakeValue: PaperPortfolio.amount(held.spec.stakeValue) + amount,
+				// Review (2026-09-04): the basis grows by the stake put in ($100 + $25 -> "$125").
+				stakeBasis: PaperPortfolio.amount(held.spec.stakeBasis) + amount
+			)
+			// The row's return follows the recomputed gainPct (Codex review, PR #166 mirror).
 			positions[i] = Position(
-				spec: held.spec.holding(
-					shares: (Double(held.spec.shares) ?? 0) + newShares,
-					stakeValue: PaperPortfolio.amount(held.spec.stakeValue) + amount,
-					// Review (2026-09-04): the basis grows by the stake put in ($100 + $25 -> "$125").
-					stakeBasis: PaperPortfolio.amount(held.spec.stakeBasis) + amount
-				),
-				row: held.row
+				spec: grown,
+				row: SimPick(badge: held.row.badge, ticker: held.row.ticker, sub: held.row.sub, amount: held.row.amount, pct: (held.spec.up ? "+" : "-") + grown.gainPct, up: held.row.up)
 			)
 			persist()
 			return
@@ -324,10 +326,14 @@ extension PickSpec {
 	/// cost; the authored gain lines (and the week move) stand until
 	/// prices move. Review (2026-09-04): the basis follows the stake.
 	fileprivate func holding(shares: Double, stakeValue: Double, stakeBasis: Double) -> PickSpec {
-		PickSpec(
+		// The return is recomputed over the new basis: $24 on $100 was 24%, on $200
+		// it is 12% (Codex review, PR #166 mirror). The dollar gain itself stands.
+		let gain = abs(PaperPortfolio.amount(gainSigned))
+		let pct = stakeBasis > 0 ? gain / stakeBasis * 100 : 0
+		return PickSpec(
 			symbol: symbol, badge: badge, company: company, priceNow: priceNow, priceThen: priceThen,
 			pickedLine: pickedLine, gainWhole: gainWhole, gainCents: gainCents, gainSigned: gainSigned,
-			gainPct: gainPct, up: up, shares: PaperPortfolio.shares(shares), vsMarket: vsMarket, ahead: ahead,
+			gainPct: String(format: "%.1f%%", pct), up: up, shares: PaperPortfolio.shares(shares), vsMarket: vsMarket, ahead: ahead,
 			dayChange: dayChange, dayUp: dayUp, stakeValue: PaperPortfolio.money(stakeValue),
 			stakeBasis: PaperPortfolio.stakeLabel(stakeBasis), weekGain: weekGain
 		)

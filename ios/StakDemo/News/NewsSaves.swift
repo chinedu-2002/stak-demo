@@ -17,5 +17,13 @@ final class NewsSaves: ObservableObject {
 		StakStore.set(ids, for: "news.saved")
 	}
 
+	/// Unsaving a stock forgets the stories that saved it, so they offer Add to STAK again (Codex review, PR #167).
+	func removeStories(ticker: String) {
+		let next = ids.filter { NewsArticleFeed.ticker(of: $0) != ticker }
+		guard next.count != ids.count else { return }
+		ids = next
+		StakStore.set(ids, for: "news.saved")
+	}
+
 	private init() {}
 }

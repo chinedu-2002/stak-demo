@@ -65,6 +65,12 @@ struct RootFlowView: View {
 	@State private var phase = Phase.splash
 	@State private var stack: [FlowScreen] = [.createAccount]
 	@State private var anim = FlowAnim.dissolve
+	/// A protected account re-locks when the app leaves the foreground (Codex
+	/// review, PR #167): the gate sits OVER the tab shell, so the app-switcher
+	/// snapshot shows the splash backdrop and unlocking returns to the same
+	/// place. Mirrors android (LOCK pushed on ON_STOP, popped on unlock).
+	@State private var relocked = false
+	@Environment(\.scenePhase) private var scenePhase
 
 	var body: some View {
 		ZStack {
@@ -84,16 +90,22 @@ struct RootFlowView: View {
 				LockGateView { withAnimation(.easeOut(duration: 0.35)) { phase = .main } }
 					.transition(.opacity)
 			case .main:
-				MainTabsView(onLogOut: {
-					// Authored (171:995): Log out -> Sign in, the authored
-					// PUSH RIGHT 300 = the house back push (FlowAnim.pushLeft),
-					// with the session stack cleared. Sign up sits beneath so
-					// Sign in's authored Back edge (-> Sign up) still works.
-					Session.shared.signOut()
-					anim = .pushLeft
-					stack = [.createAccount, .signIn]
-					withAnimation(FlowAnim.pushLeft.animation) { phase = .flow }
-				})
+				ZStack {
+					MainTabsView(onLogOut: {
+						// Authored (171:995): Log out -> Sign in, the authored
+						// PUSH RIGHT 300 = the house back push (FlowAnim.pushLeft),
+						// with the session stack cleared. Sign up sits beneath so
+						// Sign in's authored Back edge (-> Sign up) still works.
+						Session.shared.signOut()
+						anim = .pushLeft
+						stack = [.createAccount, .signIn]
+						withAnimation(FlowAnim.pushLeft.animation) { phase = .flow }
+					})
+					if relocked {
+						LockGateView { withAnimation(.easeOut(duration: 0.35)) { relocked = false } }
+							.transition(.opacity)
+					}
+				}
 				.transition(anim.transition)
 			case .flow:
 				ZStack {
@@ -102,6 +114,10 @@ struct RootFlowView: View {
 				}
 				.transition(anim.transition)
 			}
+		}
+		.onChange(of: scenePhase) { _, next in
+			// Leaving the active state locks a protected account at once.
+			if next == .background, phase == .main, Session.shared.signedIn, UserProfile.shared.accountLock { relocked = true }
 		}
 		.background(StakColors.bg.ignoresSafeArea())
 	}

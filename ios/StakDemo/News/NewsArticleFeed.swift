@@ -384,6 +384,9 @@ enum NewsArticleFeed {
 		articles.first { $0.id == id } ?? articles[0]
 	}
 
+	/// The story's primary ticker, or nil for an unknown id (never the fallback story's).
+	static func ticker(of id: String) -> String? { articles.first { $0.id == id }?.ticker }
+
 	/// The article page's swipe order (user, 2026-08-31: "swipe to get the
 	/// previous/next news - social media vibes"): every served story in the
 	/// feed's canonical order - the order `articles` defines - through the

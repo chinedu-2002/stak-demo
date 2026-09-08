@@ -389,6 +389,9 @@ object NewsArticleFeed {
 	/** The served article for a story - the backend resolves this in production. */
 	fun article(id: String): Article = ARTICLES.firstOrNull { it.id == id } ?: ARTICLES.first()
 
+	/** The story's primary ticker, or null for an unknown id (never the fallback story's). */
+	fun tickerOf(id: String): String? = ARTICLES.firstOrNull { it.id == id }?.ticker
+
 	/**
 	 * The feed's canonical story order - the article page's SWIPE order
 	 * (user, 2026-08-31: "swipe to get the previous/next news - social

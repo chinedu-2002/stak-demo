@@ -255,7 +255,7 @@ fun StockDetailScreen(
 						// Codex audit (2026-09-04): Unsave drops the stock from the
 						// holdings store, so the collection page and every count follow.
 						// Unsave clears this run's deck save too (Codex review, PR #167 mirror).
-						DetailSecondary("Unsave") { DeckSession.saved = DeckSession.saved - f.symbol; com.stak.demo.ui.MyStakHoldings.remove(f.symbol); onBack() }
+						DetailSecondary("Unsave") { DeckSession.saved = DeckSession.saved - f.symbol; com.stak.demo.ui.MyStakHoldings.remove(f.symbol); com.stak.demo.ui.news.NewsSaves.removeStories(f.symbol); onBack() }
 					} else if (saved) {
 						// A saved stock reads the same from every entry: the authored
 						// saved block (16:1012) - Practice buy + Unsave. The "Saved to
@@ -267,7 +267,7 @@ fun StockDetailScreen(
 						DetailSecondary("Unsave") {
 							saved = false
 							DeckSession.saved = DeckSession.saved - f.symbol
-							com.stak.demo.ui.MyStakHoldings.remove(f.symbol)
+							com.stak.demo.ui.MyStakHoldings.remove(f.symbol); com.stak.demo.ui.news.NewsSaves.removeStories(f.symbol)
 						}
 					} else {
 						// The save is committed on the tap itself (Codex review, PR #166): the

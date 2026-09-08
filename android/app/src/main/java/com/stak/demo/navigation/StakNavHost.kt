@@ -91,6 +91,27 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
 		tab?.let { pendingShellTab.value = it }
 		navController.popBackStack(StakRoutes.MAIN, false)
 	}
+	// A protected account re-locks when the app leaves the foreground (Codex
+	// review, PR #167 mirror): ON_STOP pushes the gate over whatever was open
+	// - the task-switcher snapshot shows the splash backdrop - and unlocking
+	// pops back to it. Picture-in-picture never stops the activity, so a
+	// floating clip keeps playing.
+	@Suppress("DEPRECATION")
+	val lifecycleOwner = androidx.compose.ui.platform.LocalLifecycleOwner.current
+	androidx.compose.runtime.DisposableEffect(lifecycleOwner) {
+		val observer = androidx.lifecycle.LifecycleEventObserver { _, event ->
+			if (event == androidx.lifecycle.Lifecycle.Event.ON_STOP &&
+				com.stak.demo.ui.Session.signedIn && com.stak.demo.ui.UserProfile.accountLock
+			) {
+				val route = navController.currentBackStackEntry?.destination?.route
+				if (route != null && route != StakRoutes.LOCK && route != StakRoutes.SPLASH) {
+					navController.navigate(StakRoutes.LOCK) { launchSingleTop = true }
+				}
+			}
+		}
+		lifecycleOwner.lifecycle.addObserver(observer)
+		onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+	}
 	// The persisted session (sign-in state + profile) is restored in
 	// StakApp.onCreate, before any composition - composition must not
 	// mutate app state (RememberReturnType lint, audit 2026-09-04).
@@ -131,7 +152,10 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
 			exitTransition = { fadeOut(tween(350, easing = EaseOut)) },
 		) {
 			com.stak.demo.ui.onboarding.BiometricGate(onUnlocked = {
-				navController.navigate(StakRoutes.MAIN) { popUpTo(StakRoutes.LOCK) { inclusive = true } }
+				// From the splash the gate is the whole stack - Home follows; a re-lock
+				// sits over the place the user left, so unlocking pops back to it.
+				if (navController.previousBackStackEntry != null) navController.popBackStack()
+				else navController.navigate(StakRoutes.MAIN) { popUpTo(StakRoutes.LOCK) { inclusive = true } }
 			})
 		}
 		composable(

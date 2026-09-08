@@ -1,5 +1,6 @@
 package com.stak.demo.ui.profile
 
+import com.stak.demo.ui.theme.stakColor
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.animation.AnimatedVisibility
@@ -46,10 +47,10 @@ import com.stak.demo.ui.theme.Geist
 import com.stak.demo.ui.theme.Sora
 import com.stak.demo.ui.theme.StakColors
 
-private val CardBg = Color(0xFF10182B)
-private val Muted = Color(0xFF819ABB)
-private val Body = Color(0xFFC8D2E0)
-private val Teal = Color(0xFF69B3CA)
+private val CardBg: Color get() = stakColor(0xFF10182B)
+private val Muted: Color get() = stakColor(0xFF819ABB)
+private val Body: Color get() = stakColor(0xFFC8D2E0)
+private val Teal: Color get() = stakColor(0xFF69B3CA)
 
 /**
  * The settings pages behind the Profile hub's rows (product audit,
@@ -75,7 +76,7 @@ fun SettingsScaffold(title: String, onBack: () -> Unit, content: @Composable Col
 			Text(
 				text = title,
 				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (17 * u).sp, lineHeight = (22 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
-				color = Color.White,
+				color = StakColors.TextPrimary,
 				modifier = Modifier.align(Alignment.Center),
 			)
 		}
@@ -95,7 +96,7 @@ fun SettingsLinkRow(label: String, value: String? = null, chevron: Boolean = tru
 			.clickable(interactionSource = remember { MutableInteractionSource() }, indication = com.stak.demo.ui.theme.PressDim, onClick = onClick)
 			.padding(horizontal = (14 * u).dp),
 	) {
-		Text(label, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp), color = Color.White)
+		Text(label, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp), color = StakColors.TextPrimary)
 		Spacer(modifier = Modifier.weight(1f))
 		if (value != null) Text(value, style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp), color = Muted, modifier = Modifier.padding(end = (8 * u).dp))
 		if (chevron) Text("›", style = TextStyle(fontFamily = Geist, fontSize = (14 * u).sp), color = Muted)
@@ -140,7 +141,7 @@ private fun NotificationSettingsScreen(onBack: () -> Unit) {
 				verticalArrangement = Arrangement.spacedBy((8 * u).dp),
 				modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape((16 * u).dp)).background(CardBg).padding((16 * u).dp),
 			) {
-				Text("Notifications are off for STAK", style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp), color = Color.White)
+				Text("Notifications are off for STAK", style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp), color = StakColors.TextPrimary)
 				Text("Turn them on in your phone’s settings to get price moves and your daily deck.", style = TextStyle(fontFamily = Geist, fontSize = (13 * u).sp, lineHeight = (19 * u).sp, lineHeightStyle = FIGMA_LINE_BOX), color = Body)
 				Text(
 					"Open phone settings ›",
@@ -165,22 +166,31 @@ private fun AppearanceScreen(onBack: () -> Unit) {
 	val u = figmaUnit()
 	SettingsPage(title = "Appearance", onBack = onBack) {
 		Column(modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape((16 * u).dp)).background(CardBg).padding(vertical = (4 * u).dp)) {
-			listOf("dark" to "Dark", "system" to "Match system").forEach { (key, label) ->
+			// Light is the authored palette's mapping - white ground, navy ink (user, 2026-09-07).
+			val activity = LocalContext.current as? android.app.Activity
+			listOf("dark" to "Dark", "light" to "Light", "system" to "Match system").forEach { (key, label) ->
 				Row(
 					verticalAlignment = Alignment.CenterVertically,
 					modifier = Modifier
 						.fillMaxWidth()
 						.height((48 * u).dp)
-						.clickable(interactionSource = remember { MutableInteractionSource() }, indication = com.stak.demo.ui.theme.PressDim) { UserProfile.appearance = key; Session.saveProfile() }
+						.clickable(interactionSource = remember { MutableInteractionSource() }, indication = com.stak.demo.ui.theme.PressDim) {
+							if (UserProfile.appearance != key) {
+								UserProfile.appearance = key
+								Session.saveProfile()
+								// The appearance is the activity's configuration (MainActivity.attachBaseContext): recreate to apply.
+								activity?.recreate()
+							}
+						}
 						.padding(horizontal = (14 * u).dp),
 				) {
-					Text(label, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp), color = Color.White)
+					Text(label, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp), color = StakColors.TextPrimary)
 					Spacer(modifier = Modifier.weight(1f))
 					if (UserProfile.appearance == key) Text("✓", style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp), color = Teal)
 				}
 			}
 		}
-		Caption("STAK is designed for dark mode. Match system keeps it dark for now and follows your phone once a light theme ships.")
+		Caption("Dark is how STAK was designed. Light puts the same layout on a white ground; Match system follows your phone.")
 	}
 }
 
@@ -200,7 +210,7 @@ private fun LinkedAccountsScreen(onBack: () -> Unit) {
 private fun LinkedRow(name: String, linked: Boolean, onToggle: () -> Unit) {
 	val u = figmaUnit()
 	Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().height((48 * u).dp).padding(horizontal = (14 * u).dp)) {
-		Text(name, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp), color = Color.White)
+		Text(name, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp), color = StakColors.TextPrimary)
 		Spacer(modifier = Modifier.weight(1f))
 		Text(if (linked) "Linked" else "Not linked", style = TextStyle(fontFamily = Geist, fontSize = (12 * u).sp), color = if (linked) Teal else Muted, modifier = Modifier.padding(end = (12 * u).dp))
 		Text(
@@ -245,7 +255,7 @@ private fun FaqRow(question: String, answer: String) {
 				.clickable(interactionSource = remember { MutableInteractionSource() }, indication = com.stak.demo.ui.theme.PressDim) { open = !open }
 				.padding(horizontal = (14 * u).dp),
 		) {
-			Text(question, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp), color = Color.White)
+			Text(question, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp), color = StakColors.TextPrimary)
 			Spacer(modifier = Modifier.weight(1f))
 			Text(if (open) "⌃" else "⌄", style = TextStyle(fontFamily = Geist, fontSize = (14 * u).sp), color = Muted)
 		}

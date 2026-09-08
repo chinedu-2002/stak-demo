@@ -1,5 +1,6 @@
 package com.stak.demo.ui.onboarding
 
+import com.stak.demo.ui.theme.stakColor
 import android.graphics.BitmapFactory
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -163,7 +164,7 @@ fun ProfileSetupScreen(onBack: () -> Unit, onProceed: () -> Unit, editing: Boole
 				Box(
 					modifier = Modifier
 						.size((96 * u).dp)
-						.background(Color(0xFF242B3D), CircleShape)
+						.background(stakColor(0xFF242B3D), CircleShape)
 						.border((2 * u).dp, Auth.LinkTeal, CircleShape)
 						.clip(CircleShape)
 						.clickable(
@@ -185,7 +186,7 @@ fun ProfileSetupScreen(onBack: () -> Unit, onProceed: () -> Unit, editing: Boole
 						Text(
 							text = name.firstOrNull()?.uppercase() ?: "",
 							style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (36 * u).sp),
-							color = Color(0xFF9EADC7),
+							color = stakColor(0xFF9EADC7),
 						)
 					}
 				}

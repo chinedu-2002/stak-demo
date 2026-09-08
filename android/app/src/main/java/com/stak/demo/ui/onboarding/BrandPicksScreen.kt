@@ -1,5 +1,6 @@
 package com.stak.demo.ui.onboarding
 
+import com.stak.demo.ui.theme.stakColor
 import com.stak.demo.ui.theme.FIGMA_LINE_BOX
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -180,7 +181,7 @@ private fun BrandTile(
 		modifier = modifier
 			.background(Auth.InputBg, shape)
 			.then(
-				if (selected) Modifier.border((1.5 * u).dp, Color(0x8069B3CA), shape) else Modifier,
+				if (selected) Modifier.border((1.5 * u).dp, stakColor(0x8069B3CA), shape) else Modifier,
 			)
 			.clickable(
 				interactionSource = remember { MutableInteractionSource() },

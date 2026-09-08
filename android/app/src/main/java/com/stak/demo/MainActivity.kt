@@ -47,15 +47,41 @@ class MainActivity : androidx.fragment.app.FragmentActivity() {
 		}
 	}
 
+	/**
+	 * The Appearance setting (Dark / Light / Match system; user, 2026-09-07)
+	 * becomes the configuration's uiMode before anything is created: Compose's
+	 * isSystemInDarkTheme(), the light-mapped palette (StakAppearance) and the
+	 * `drawable-notnight` glyphs all follow one flag. Session restored the
+	 * setting in StakApp.onCreate. A change recreates the activity.
+	 */
+	override fun attachBaseContext(newBase: Context) {
+		val base = newBase.resources.configuration
+		val systemNight = (base.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
+		val night = when (com.stak.demo.ui.UserProfile.appearance) {
+			"light" -> false
+			"system" -> systemNight
+			else -> true
+		}
+		com.stak.demo.ui.theme.StakAppearance.light = !night
+		val cfg = Configuration(base)
+		cfg.uiMode = (base.uiMode and Configuration.UI_MODE_NIGHT_MASK.inv()) or
+			(if (night) Configuration.UI_MODE_NIGHT_YES else Configuration.UI_MODE_NIGHT_NO)
+		super.attachBaseContext(newBase.createConfigurationContext(cfg))
+	}
+
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		// The app is navy on every screen: force LIGHT status/navigation-bar
 		// icons. The parameterless call picks icon colours from the device
 		// theme, so a light-themed phone got black icons on the navy header
 		// (Codex audit 2026-09-04). iOS pins the same via UIUserInterfaceStyle.
+		// Light appearance: dark bar icons over the white ground (user, 2026-09-07).
+		val light = com.stak.demo.ui.theme.StakAppearance.light && savedInstanceState != null
 		enableEdgeToEdge(
-			statusBarStyle = androidx.activity.SystemBarStyle.dark(android.graphics.Color.TRANSPARENT),
-			navigationBarStyle = androidx.activity.SystemBarStyle.dark(android.graphics.Color.TRANSPARENT),
+			statusBarStyle = if (light) androidx.activity.SystemBarStyle.light(android.graphics.Color.TRANSPARENT, android.graphics.Color.TRANSPARENT)
+				else androidx.activity.SystemBarStyle.dark(android.graphics.Color.TRANSPARENT),
+			navigationBarStyle = if (light) androidx.activity.SystemBarStyle.light(android.graphics.Color.TRANSPARENT, android.graphics.Color.TRANSPARENT)
+				else androidx.activity.SystemBarStyle.dark(android.graphics.Color.TRANSPARENT),
 		)
 		ContextCompat.registerReceiver(
 			this, pipControls, IntentFilter(NewsPip.ACTION), ContextCompat.RECEIVER_NOT_EXPORTED,

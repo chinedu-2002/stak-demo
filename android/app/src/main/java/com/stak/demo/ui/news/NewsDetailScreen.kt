@@ -1,5 +1,6 @@
 package com.stak.demo.ui.news
 
+import com.stak.demo.ui.theme.stakColor
 import com.stak.demo.ui.theme.FIGMA_LINE_BOX
 import com.stak.demo.ui.theme.fractionalSpacedBy
 import androidx.compose.animation.AnimatedVisibility
@@ -123,14 +124,14 @@ import kotlinx.coroutines.launch
 
 /** The CHINEDU CTA gradient (Add to STAK / View in My STAK). */
 private val CtaGradient = Brush.verticalGradient(
-	0.0889f to Color(0xFFA6E4F7),
-	0.3919f to Color(0xFF5DA8BF),
-	0.7255f to Color(0xFF3C98B4),
-	1f to Color(0xFF3C98B4),
+	0.0889f to stakColor(0xFFA6E4F7),
+	0.3919f to stakColor(0xFF5DA8BF),
+	0.7255f to stakColor(0xFF3C98B4),
+	1f to stakColor(0xFF3C98B4),
 )
 private val CtaBorder = Brush.verticalGradient(
-	0f to Color(0xA1659EAD),
-	1f to Color(0x6E16363F),
+	0f to stakColor(0xA1659EAD),
+	1f to stakColor(0x6E16363F),
 )
 
 /**
@@ -336,7 +337,7 @@ private fun NewsArticlePage(
 					// RENDER-measured: the frame draws the headline ~800 device px
 					// wide (≈20sp), not the metadata's 24 — lh32 box stands.
 					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (20 * u).sp, lineHeight = (32 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
-					color = Color.White,
+					color = StakColors.TextPrimary,
 				)
 				Text(
 					text = article.subtitle,
@@ -411,7 +412,7 @@ private fun HeroImage(media: NewsMedia, category: String, saved: Boolean, player
 			.height((208 * u).dp)
 			// Authored radius 10 (1:1517 Inspect) - the earlier 24 was wrong.
 			.clip(RoundedCornerShape((10 * u).dp))
-			.background(Color(0xFFC4C4C4)),
+			.background(stakColor(0xFFC4C4C4)),
 	) {
 		val video = media as? NewsMedia.Video
 		if (playing && video != null) {
@@ -577,13 +578,13 @@ private fun HeroImage(media: NewsMedia, category: String, saved: Boolean, player
 					.padding(start = (9 * u).dp, bottom = (10 * u).dp)
 					// Authored r7.875 (1:1519) - exact-design audit 2026-09-04.
 					.clip(RoundedCornerShape((7.875 * u).dp))
-					.background(Color(0x40242B3D))
+					.background(stakColor(0x40242B3D))
 					.padding(horizontal = (7 * u).dp, vertical = (5 * u).dp),
 			) {
 				Text(
 					text = category,
 					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp, lineHeight = (13 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
-					color = Color.White,
+					color = StakColors.TextPrimary,
 				)
 			}
 		}
@@ -601,7 +602,7 @@ private fun HeroImage(media: NewsMedia, category: String, saved: Boolean, player
 					.padding(top = (8 * u).dp, end = (7 * u).dp)
 					// Authored r7.875 (1:1386) - exact-design audit 2026-09-04.
 					.clip(RoundedCornerShape((7.875 * u).dp))
-					.background(Color(0x40242B3D))
+					.background(stakColor(0x40242B3D))
 					// Authored toast is 21 tall (1:1386): 13 text + 4/4 pads.
 					.padding(horizontal = (7 * u).dp, vertical = (4 * u).dp),
 			) {
@@ -613,7 +614,7 @@ private fun HeroImage(media: NewsMedia, category: String, saved: Boolean, player
 				Text(
 					text = "Saved to My STAK",
 					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (10 * u).sp),
-					color = Color.White,
+					color = StakColors.TextPrimary,
 				)
 			}
 		} else {
@@ -653,14 +654,14 @@ private fun Byline(source: String, meta: String) {
 			Text(
 				text = source.take(1),
 				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (10 * u).sp, lineHeight = (13 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
-				color = Color(0xFF9EADC7),
+				color = stakColor(0xFF9EADC7),
 			)
 		}
 		Row(horizontalArrangement = Arrangement.spacedBy((5 * u).dp), verticalAlignment = Alignment.CenterVertically) {
 			Text(
 				text = source,
 				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
-				color = Color.White,
+				color = StakColors.TextPrimary,
 			)
 			Text(
 				text = meta,
@@ -692,7 +693,7 @@ private fun AddToStakButton(onClick: () -> Unit) {
 			text = "Add to STAK",
 			// Authored lh 20.69 (1:1535) - exact-design audit 2026-09-04.
 			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp, lineHeight = (20.69 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
-			color = Color.White,
+			color = StakColors.TextPrimary,
 		)
 		Image(
 			painter = painterResource(R.drawable.ic_plus_small),
@@ -733,7 +734,7 @@ private fun StockCard(saved: Boolean, ticker: String, facts: NewsArticleFeed.Sto
 				Text(
 					text = facts.name.take(1),
 					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (18 * u).sp, lineHeight = (23 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
-					color = Color(0xFF9EADC7),
+					color = stakColor(0xFF9EADC7),
 				)
 			}
 			Spacer(modifier = Modifier.width((12 * u).dp))
@@ -741,7 +742,7 @@ private fun StockCard(saved: Boolean, ticker: String, facts: NewsArticleFeed.Sto
 				Text(
 					text = facts.name,
 					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp, lineHeight = (19 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
-					color = Color.White,
+					color = StakColors.TextPrimary,
 				)
 				Text(
 					text = ticker,
@@ -755,13 +756,13 @@ private fun StockCard(saved: Boolean, ticker: String, facts: NewsArticleFeed.Sto
 				horizontalArrangement = Arrangement.spacedBy((5 * u).dp),
 				modifier = Modifier
 					.clip(RoundedCornerShape((6 * u).dp))
-					.background(Color(0x403E4958))
+					.background(stakColor(0x403E4958))
 					.padding(horizontal = (10 * u).dp, vertical = (4 * u).dp),
 			) {
 				Text(
 					text = "Daily",
 					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (8 * u).sp, lineHeight = (10 * u).sp, letterSpacing = (0.4 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
-					color = Color.White,
+					color = StakColors.TextPrimary,
 				)
 				Image(
 					painter = painterResource(R.drawable.ic_daily_chevron),
@@ -775,14 +776,14 @@ private fun StockCard(saved: Boolean, ticker: String, facts: NewsArticleFeed.Sto
 				Text(
 					text = facts.price,
 					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (26 * u).sp, lineHeight = (33 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
-					color = Color.White,
+					color = StakColors.TextPrimary,
 				)
 				Text(
 					text = facts.change,
 					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp, lineHeight = (17 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
 					// The app's authored up/down pair (green here, the
 					// My STAK / Simulate red for down moves).
-					color = if (facts.up) News.Green else Color(0xFFFF5A6A),
+					color = if (facts.up) News.Green else stakColor(0xFFFF5A6A),
 				)
 			}
 			Spacer(modifier = Modifier.weight(1f))
@@ -803,7 +804,7 @@ private fun StockCard(saved: Boolean, ticker: String, facts: NewsArticleFeed.Sto
 					text = "View $ticker in My STAK",
 					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp, lineHeight = (17 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
 					// 1:1359: the link reads #AEAEAE, not teal (Codex parity audit 2026-09-04).
-					color = Color(0xFFAEAEAE),
+					color = stakColor(0xFFAEAEAE),
 				)
 				Spacer(modifier = Modifier.weight(1f))
 				// The rotated chevron occupies its authored 3.75x6.875 box (1:1422), so its
@@ -837,7 +838,7 @@ private fun GistCard(bullets: List<String>) {
 			Text(
 				text = "The gist",
 				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (14 * u).sp, lineHeight = (18 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
-				color = Color.White,
+				color = StakColors.TextPrimary,
 			)
 		}
 		bullets.forEach { GistBullet(it) }
@@ -884,7 +885,7 @@ private fun PullQuote(text: String) {
 		Text(
 			text = text,
 			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp, lineHeight = (26 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
-			color = Color(0xFFD3D3DD),
+			color = stakColor(0xFFD3D3DD),
 			modifier = Modifier.weight(1f),
 		)
 	}
@@ -927,7 +928,7 @@ private fun SourceRow() {
 		Text(
 			text = "Source",
 			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = (13 * u).sp),
-			color = Color.White,
+			color = StakColors.TextPrimary,
 		)
 		Spacer(modifier = Modifier.weight(1f))
 		Image(painterResource(R.drawable.ic_news_external), null, modifier = Modifier.size((19 * u).dp))
@@ -950,7 +951,7 @@ private fun KeyStatsCard(facts: NewsArticleFeed.StockFacts) {
 			Text(
 				text = "Key stats",
 				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (14 * u).sp, lineHeight = (18 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
-				color = Color.White,
+				color = StakColors.TextPrimary,
 			)
 		}
 		StatRow("Market cap", facts.marketCap, "P/E ratio", facts.peRatio)
@@ -980,7 +981,7 @@ private fun StatCell(label: String, value: String, modifier: Modifier = Modifier
 		Text(
 			text = value,
 			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (13 * u).sp, lineHeight = (16 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
-			color = Color.White,
+			color = StakColors.TextPrimary,
 		)
 	}
 }
@@ -992,7 +993,7 @@ private fun ArticleTag(text: String) {
 	Box(
 		modifier = Modifier
 			.clip(RoundedCornerShape((12 * u).dp))
-			.background(Color(0x1A69B3CA))
+			.background(stakColor(0x1A69B3CA))
 			.padding(horizontal = (11 * u).dp, vertical = (5 * u).dp),
 	) {
 		Text(
@@ -1049,7 +1050,7 @@ private fun ReadNext(currentId: String, onOpen: (String) -> Unit) {
 					Text(
 						text = next.headline,
 						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp, lineHeight = (19 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
-						color = Color.White,
+						color = StakColors.TextPrimary,
 					)
 				}
 			}
@@ -1072,7 +1073,7 @@ private fun SaveSuccessOverlay(facts: NewsArticleFeed.StockFacts, onViewInMyStak
 				.fillMaxSize()
 				// Authored scrim rgba(12,19,32,0.55) (101:1168); it has NO
 				// prototype connection - tapping it does not dismiss.
-				.background(Color(0x8C0C1320)),
+				.background(stakColor(0x8C0C1320)),
 		)
 		Column(
 			horizontalAlignment = Alignment.CenterHorizontally,
@@ -1099,7 +1100,7 @@ private fun SaveSuccessOverlay(facts: NewsArticleFeed.StockFacts, onViewInMyStak
 				Text(
 					text = "Saved to My STAK",
 					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (18 * u).sp),
-					color = Color.White,
+					color = StakColors.TextPrimary,
 				)
 			}
 			Row(
@@ -1108,7 +1109,7 @@ private fun SaveSuccessOverlay(facts: NewsArticleFeed.StockFacts, onViewInMyStak
 				modifier = Modifier
 					.fillMaxWidth()
 					.clip(RoundedCornerShape((6 * u).dp))
-					.background(Color(0x1A69B3CA))
+					.background(stakColor(0x1A69B3CA))
 					.padding(horizontal = (14 * u).dp, vertical = (12 * u).dp),
 			) {
 				Box(
@@ -1118,14 +1119,14 @@ private fun SaveSuccessOverlay(facts: NewsArticleFeed.StockFacts, onViewInMyStak
 					Text(
 						text = facts.shortName.take(1),
 						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp),
-						color = Color(0xFF9EADC7),
+						color = stakColor(0xFF9EADC7),
 					)
 				}
 				Column(verticalArrangement = Arrangement.spacedBy((2 * u).dp), modifier = Modifier.weight(1f)) {
 					Text(
 						text = facts.shortName,
 						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp),
-						color = Color.White,
+						color = StakColors.TextPrimary,
 					)
 					Text(
 						text = "${facts.price} today",
@@ -1137,7 +1138,7 @@ private fun SaveSuccessOverlay(facts: NewsArticleFeed.StockFacts, onViewInMyStak
 					// "+4.84% today" -> "▲ 4.84%" (the sheet's authored format).
 					text = "${if (facts.up) "▲" else "▼"} ${facts.change.drop(1).removeSuffix(" today")}",
 					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp),
-					color = if (facts.up) News.Green else Color(0xFFFF5A6A),
+					color = if (facts.up) News.Green else stakColor(0xFFFF5A6A),
 				)
 			}
 			Text(
@@ -1163,7 +1164,7 @@ private fun SaveSuccessOverlay(facts: NewsArticleFeed.StockFacts, onViewInMyStak
 					Text(
 						text = "View in My STAK",
 						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp),
-						color = Color.White,
+						color = StakColors.TextPrimary,
 					)
 				}
 				Box(
@@ -1171,7 +1172,7 @@ private fun SaveSuccessOverlay(facts: NewsArticleFeed.StockFacts, onViewInMyStak
 					modifier = Modifier
 						.fillMaxWidth()
 						.height((52 * u).dp)
-						.border((0.36 * u).dp, Color(0x54343B4F), RoundedCornerShape((6 * u).dp))
+						.border((0.36 * u).dp, stakColor(0x54343B4F), RoundedCornerShape((6 * u).dp))
 						.clickable(
 							interactionSource = remember { MutableInteractionSource() },
 							indication = com.stak.demo.ui.theme.PressDim,
@@ -1360,9 +1361,9 @@ private object NewsVideoCache {
 
 
 /** STAK's accent: the reference's red progress line/thumb in the app's teal. */
-private val PlayerTeal = Color(0xFF69B3CA)
+private val PlayerTeal: Color get() = stakColor(0xFF69B3CA)
 /** The "..." sheet's icon / secondary-value gray (reference image 2). */
-private val SheetGray = Color(0xFF9AA3B5)
+private val SheetGray: Color get() = stakColor(0xFF9AA3B5)
 
 /**
  * The hero clip's shared player: ONE cached, pre-buffered, audible
@@ -1619,14 +1620,14 @@ private fun HeroControls(
 		}
 		if (!visible && player.buffering) {
 			CircularProgressIndicator(
-				color = Color.White,
+				color = StakColors.TextPrimary,
 				strokeWidth = (2.5f * u).dp,
 				modifier = Modifier.align(Alignment.Center).size((32 * u).dp),
 			)
 		}
 		if (visible) {
 			// The reference dims the frame behind the white chrome.
-			Box(modifier = Modifier.matchParentSize().background(Color(0x59000000)))
+			Box(modifier = Modifier.matchParentSize().background(stakColor(0x59000000)))
 			// TOP-RIGHT: mute · picture in picture · cast.
 			Row(
 				verticalAlignment = Alignment.CenterVertically,
@@ -1656,7 +1657,7 @@ private fun HeroControls(
 				Box(contentAlignment = Alignment.Center, modifier = Modifier.size((44 * u).dp)) {
 					if (player.buffering) {
 						CircularProgressIndicator(
-							color = Color.White,
+							color = StakColors.TextPrimary,
 							strokeWidth = (2.5f * u).dp,
 							modifier = Modifier.size((34 * u).dp),
 						)
@@ -1680,12 +1681,12 @@ private fun HeroControls(
 				Text(
 					text = clock(shownPosition) + " / " + clock(duration),
 					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (16 * u).sp),
-					color = Color(0xF2FFFFFF),
+					color = stakColor(0xF2FFFFFF),
 				)
 				Spacer(modifier = Modifier.weight(1f))
 				ControlGlyph(
 					icon = Icons.Filled.ClosedCaption, size = 20f, u = u, description = "Subtitles",
-					tint = if (player.captions) Color.White else Color(0xB3FFFFFF),
+					tint = if (player.captions) Color.White else stakColor(0xB3FFFFFF),
 				) {
 					if (player.textTracks.isEmpty()) notice = PlayerNotice("No subtitles for this clip", top = false)
 					else player.showCaptions(!player.captions)
@@ -1751,7 +1752,7 @@ private fun ControlGlyph(
 	size: Float,
 	u: Float,
 	description: String,
-	tint: Color = Color.White,
+	tint: Color = StakColors.TextPrimary,
 	modifier: Modifier = Modifier,
 	onTap: () -> Unit,
 ) {
@@ -1774,10 +1775,10 @@ private fun CueText(text: String, u: Float, modifier: Modifier = Modifier) {
 	Text(
 		text = text,
 		style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (13 * u).sp, lineHeight = (17 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
-		color = Color(0xFFFFE14D),
+		color = stakColor(0xFFFFE14D),
 		textAlign = TextAlign.Center,
 		modifier = modifier
-			.background(Color(0x99000000), RoundedCornerShape((3 * u).dp))
+			.background(stakColor(0x99000000), RoundedCornerShape((3 * u).dp))
 			.padding(horizontal = (6 * u).dp, vertical = (2 * u).dp),
 	)
 }
@@ -1787,13 +1788,13 @@ private fun NoticePill(text: String, u: Float, modifier: Modifier = Modifier) {
 	Box(
 		modifier = modifier
 			.clip(RoundedCornerShape((6 * u).dp))
-			.background(Color(0xE6161B27))
+			.background(stakColor(0xE6161B27))
 			.padding(horizontal = (10 * u).dp, vertical = (6 * u).dp),
 	) {
 		Text(
 			text = text,
 			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (11 * u).sp),
-			color = Color.White,
+			color = StakColors.TextPrimary,
 		)
 	}
 }
@@ -1839,14 +1840,14 @@ private fun SleekScrubber(
 		val trackH = (2 * u).dp.toPx()
 		val r = CornerRadius(trackH / 2f)
 		drawRoundRect(
-			color = Color(0x4DFFFFFF),
+			color = stakColor(0x4DFFFFFF),
 			topLeft = Offset(0f, y - trackH / 2f),
 			size = Size(size.width, trackH),
 			cornerRadius = r,
 		)
 		if (buffered > fraction) {
 			drawRoundRect(
-				color = Color(0x73FFFFFF),
+				color = stakColor(0x73FFFFFF),
 				topLeft = Offset(0f, y - trackH / 2f),
 				size = Size(size.width * buffered, trackH),
 				cornerRadius = r,
@@ -1872,7 +1873,7 @@ private fun PipPlaceholder(u: Float, modifier: Modifier = Modifier, onTap: () ->
 	Box(
 		contentAlignment = Alignment.Center,
 		modifier = modifier
-			.background(Color(0xFF0E1424))
+			.background(stakColor(0xFF0E1424))
 			.clickable(
 				interactionSource = remember { MutableInteractionSource() },
 				indication = com.stak.demo.ui.theme.PressDim,
@@ -1885,13 +1886,13 @@ private fun PipPlaceholder(u: Float, modifier: Modifier = Modifier, onTap: () ->
 			Icon(
 				imageVector = Icons.Outlined.PictureInPictureAlt,
 				contentDescription = null,
-				tint = Color(0x8CFFFFFF),
+				tint = stakColor(0x8CFFFFFF),
 				modifier = Modifier.size((48 * u).dp),
 			)
 			Text(
 				text = "This video is playing in picture in picture.",
 				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (12 * u).sp),
-				color = Color(0xB3FFFFFF),
+				color = stakColor(0xB3FFFFFF),
 			)
 		}
 	}
@@ -1961,7 +1962,7 @@ private fun MiniPlayer(player: HeroPlayer, u: Float) {
 				onRelease = { v -> v.release() },
 			)
 			if (chrome) {
-				Box(modifier = Modifier.matchParentSize().background(Color(0x40000000)))
+				Box(modifier = Modifier.matchParentSize().background(stakColor(0x40000000)))
 				MiniGlyph(
 					icon = Icons.Filled.Close, size = 16f, u = u, description = "Close",
 					modifier = Modifier.align(Alignment.TopStart).padding((5 * u).dp),
@@ -1989,7 +1990,7 @@ private fun MiniPlayer(player: HeroPlayer, u: Float) {
 					.align(Alignment.BottomStart)
 					.fillMaxWidth()
 					.height((1.5f * u).dp)
-					.background(Color(0x4DFFFFFF)),
+					.background(stakColor(0x4DFFFFFF)),
 			) {
 				Box(modifier = Modifier.fillMaxWidth(fraction).fillMaxHeight().background(PlayerTeal))
 			}
@@ -2011,7 +2012,7 @@ private fun MiniGlyph(
 		contentAlignment = Alignment.Center,
 		modifier = modifier
 			.size(((size + 10f) * u).dp)
-			.background(Color(0x73000000), CircleShape)
+			.background(stakColor(0x73000000), CircleShape)
 			.clickable(
 				interactionSource = remember { MutableInteractionSource() },
 				indication = com.stak.demo.ui.theme.PressDim,
@@ -2020,7 +2021,7 @@ private fun MiniGlyph(
 		Icon(
 			imageVector = icon,
 			contentDescription = description,
-			tint = Color.White,
+			tint = StakColors.TextPrimary,
 			modifier = Modifier.size((size * u).dp),
 		)
 	}
@@ -2138,8 +2139,8 @@ private fun PlayerSheetHost(
 		onDismissRequest = onDismiss,
 		sheetState = state,
 		shape = RoundedCornerShape(topStart = (16 * u).dp, topEnd = (16 * u).dp),
-		containerColor = Color(0xFF1B2030),
-		scrimColor = Color(0x80000000),
+		containerColor = stakColor(0xFF1B2030),
+		scrimColor = stakColor(0x80000000),
 		dragHandle = null,
 	) {
 		Column(
@@ -2221,7 +2222,7 @@ private fun SheetRow(
 		Text(
 			text = label,
 			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (16 * u).sp),
-			color = Color(0xE6FFFFFF),
+			color = stakColor(0xE6FFFFFF),
 		)
 		if (value != null) {
 			Text(
@@ -2279,6 +2280,6 @@ private fun SheetDivider(u: Float) {
 			.fillMaxWidth()
 			.padding(start = (20 * u).dp)
 			.height(0.5.dp)
-			.background(Color(0x14FFFFFF)),
+			.background(stakColor(0x14FFFFFF)),
 	)
 }

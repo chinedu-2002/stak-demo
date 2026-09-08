@@ -1,5 +1,6 @@
 package com.stak.demo.ui.news
 
+import com.stak.demo.ui.theme.stakColor
 import com.stak.demo.ui.theme.FIGMA_LINE_BOX
 import com.stak.demo.ui.theme.fractionalSpacedBy
 import androidx.compose.foundation.Image
@@ -49,17 +50,17 @@ import com.stak.demo.ui.theme.StakColors
 
 /** Palette of the CHINEDU "03 · News" frames. */
 internal object News {
-	val MoodBg = Color(0xFF171D2C)
-	val CardBg = Color(0xFF181F30)
-	val Teal = Color(0xFF69B3CA)
-	val Ink = Color(0xFF0E162B)
-	val Muted = Color(0xFF819ABB)
-	val Faint = Color(0xFF5C6B85)
-	val ChipBg = Color(0xFF242B3D)
-	val HeaderGray = Color(0xFFD3D3D3)
-	val Body = Color(0xFFC8D2E0)
-	val Green = Color(0xFF2FD08A)
-	val Divider = Color(0xFF2A3346)
+	val MoodBg: Color get() = stakColor(0xFF171D2C)
+	val CardBg: Color get() = stakColor(0xFF181F30)
+	val Teal: Color get() = stakColor(0xFF69B3CA)
+	val Ink: Color get() = stakColor(0xFF0E162B)
+	val Muted: Color get() = stakColor(0xFF819ABB)
+	val Faint: Color get() = stakColor(0xFF5C6B85)
+	val ChipBg: Color get() = stakColor(0xFF242B3D)
+	val HeaderGray: Color get() = stakColor(0xFFD3D3D3)
+	val Body: Color get() = stakColor(0xFFC8D2E0)
+	val Green: Color get() = stakColor(0xFF2FD08A)
+	val Divider: Color get() = stakColor(0xFF2A3346)
 }
 
 /**
@@ -96,7 +97,7 @@ fun NewsScreen(onOpenArticle: (String) -> Unit) {
 				Text(
 					text = "News",
 					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (26 * u).sp, lineHeight = (33 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
-					color = Color.White,
+					color = StakColors.TextPrimary,
 				)
 				// Authored date line (user, 2026-09-04 (CHINEDU 03 · News 1:1228): the authored look wins).
 				Text(
@@ -142,7 +143,7 @@ fun NewsScreen(onOpenArticle: (String) -> Unit) {
 				value = query,
 				onValueChange = { query = it },
 				singleLine = true,
-				textStyle = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (13 * u).sp, color = Color.White),
+				textStyle = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (13 * u).sp, color = StakColors.TextPrimary),
 				cursorBrush = SolidColor(News.Teal),
 				decorationBox = { inner ->
 					Box(contentAlignment = Alignment.CenterStart) {
@@ -228,7 +229,7 @@ private fun MoodMiniRow() {
 			Text(
 				text = "Market Mood",
 				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (13 * u).sp, lineHeight = (16 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
-				color = Color.White,
+				color = StakColors.TextPrimary,
 			)
 			Text(
 				text = "Low volatility",
@@ -276,7 +277,7 @@ private fun BriefCarousel(briefs: List<NewsBriefFeed.Brief>, onRead: (Int) -> Un
 				if (i == pager.currentPage) {
 					Box(modifier = Modifier.size((16 * u).dp, (6 * u).dp).background(News.Teal, RoundedCornerShape((3 * u).dp)))
 				} else {
-					Box(modifier = Modifier.size((6 * u).dp).background(Color(0xFF5C6B85), CircleShape))
+					Box(modifier = Modifier.size((6 * u).dp).background(stakColor(0xFF5C6B85), CircleShape))
 				}
 			}
 		}
@@ -411,7 +412,7 @@ private fun StoryTile(tag: String, tagWeight: FontWeight, headline: String, sour
 		Text(
 			text = headline,
 			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Light, fontSize = (12 * u).sp, lineHeight = (20 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
-			color = Color.White,
+			color = StakColors.TextPrimary,
 		)
 		Spacer(modifier = Modifier.weight(1f))
 		Text(
@@ -515,7 +516,7 @@ private fun NewsSection(
 					Text(
 						text = row.headline,
 						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Light, fontSize = (12 * u).sp, lineHeight = (19 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
-						color = Color.White,
+						color = StakColors.TextPrimary,
 					)
 				}
 			}

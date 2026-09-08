@@ -1,5 +1,6 @@
 package com.stak.demo.ui.mystak
 
+import com.stak.demo.ui.theme.stakColor
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -46,12 +47,12 @@ import com.stak.demo.ui.theme.Sora
 import com.stak.demo.ui.theme.fractionalSpacedBy
 import com.stak.demo.ui.theme.StakColors
 
-private val CardBg = Color(0xFF181F30)
-private val Muted = Color(0xFF819ABB)
-private val Faint = Color(0xFF5C6B85)
-private val Green = Color(0xFF2FD08A)
-private val RedDown = Color(0xFFE5484D)
-private val BadgeInk = Color(0xFF9EADC7)
+private val CardBg: Color get() = stakColor(0xFF181F30)
+private val Muted: Color get() = stakColor(0xFF819ABB)
+private val Faint: Color get() = stakColor(0xFF5C6B85)
+private val Green: Color get() = stakColor(0xFF2FD08A)
+private val RedDown: Color get() = stakColor(0xFFE5484D)
+private val BadgeInk: Color get() = stakColor(0xFF9EADC7)
 
 /**
  * 06 · My STAK — "Collection · Cards A · corrected" (CHINEDU 1:3333).
@@ -90,7 +91,7 @@ fun CollectionScreen(
 			Text(
 				text = c.name,
 				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp),
-				color = Color.White,
+				color = StakColors.TextPrimary,
 			)
 			Spacer(modifier = Modifier.weight(1f))
 			// No designed menu yet (Codex audit 2026-09-04) - decorative until the designer draws one.
@@ -122,7 +123,7 @@ fun CollectionScreen(
 				Text(
 					text = c.name,
 					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (26 * u).sp),
-					color = Color.White,
+					color = StakColors.TextPrimary,
 				)
 				Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy((7 * u).dp)) {
 					Text(heldCountLabel(held.size), style = TextStyle(fontFamily = Geist, fontSize = (13 * u).sp), color = Muted)
@@ -136,14 +137,14 @@ fun CollectionScreen(
 						Text(
 							if (ownMove == null) "+2.4% this week" else com.stak.demo.ui.StakInsights.signedPct(ownMove) + " this week",
 							style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp),
-							color = if (ownMove != null && ownMove < 0) Color(0xFFE5484D) else Green,
+							color = if (ownMove != null && ownMove < 0) stakColor(0xFFE5484D) else Green,
 						)
 					}
 				}
 				Text(
 					text = c.blurb,
 					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (13 * u).sp),
-					color = Color(0xFFC8D2E0),
+					color = stakColor(0xFFC8D2E0),
 				)
 			}
 			// Authored tiles are 139 tall (1:3333) and the grid gap 10: pinned, with
@@ -201,7 +202,7 @@ private fun StockTile(stock: CollStock, onClick: (() -> Unit)?, modifier: Modifi
 			.padding((14 * u).dp),
 	) {
 		Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-			Box(contentAlignment = Alignment.Center, modifier = Modifier.size((36 * u).dp).background(Color(0xFF242B3D), CircleShape)) {
+			Box(contentAlignment = Alignment.Center, modifier = Modifier.size((36 * u).dp).background(stakColor(0xFF242B3D), CircleShape)) {
 				Text(
 					stock.badge,
 					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (14 * u).sp),
@@ -219,14 +220,14 @@ private fun StockTile(stock: CollStock, onClick: (() -> Unit)?, modifier: Modifi
 			Text(
 				stock.ticker,
 				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp),
-				color = Color.White,
+				color = StakColors.TextPrimary,
 			)
 			Text(stock.company, style = TextStyle(fontFamily = Geist, fontSize = (11 * u).sp), color = Muted)
 		}
 		Text(
 			stock.price,
 			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Medium, fontSize = (15 * u).sp),
-			color = Color.White,
+			color = StakColors.TextPrimary,
 		)
 	}
 }
@@ -241,7 +242,7 @@ private fun AddStockTile(onClick: () -> Unit, modifier: Modifier = Modifier) {
 		modifier = modifier
 			.drawBehind {
 				drawRoundRect(
-					color = Color(0xFF2A3346),
+					color = stakColor(0xFF2A3346),
 					cornerRadius = CornerRadius((16 * u).dp.toPx()),
 					style = Stroke(
 						width = (1.5 * u).dp.toPx(),

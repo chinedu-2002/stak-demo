@@ -79,7 +79,7 @@ struct StockDetailView: View {
 					Spacer()
 					Text(f.symbol)
 						.font(StakFont.sora(16 * u, .semiBold))
-						.foregroundStyle(Color.white)
+						.foregroundStyle(StakColors.textPrimary)
 					Spacer()
 					ZStack {
 						Circle().fill(card)
@@ -88,7 +88,7 @@ struct StockDetailView: View {
 						Image("IcNewsShare")
 							.renderingMode(.template)
 							.resizable()
-							.foregroundStyle(Color.white)
+							.foregroundStyle(StakColors.textPrimary)
 							.frame(width: 17 * u, height: 17 * u)
 					}
 					.frame(width: 40 * u, height: 40 * u)
@@ -265,7 +265,7 @@ private struct DetailCta: View {
 		Button(action: action) {
 			Text(text)
 				.font(StakFont.geist(14 * u, .medium))
-				.foregroundStyle(Color.white)
+				.foregroundStyle(StakColors.textPrimary)
 				.frame(maxWidth: .infinity)
 				.frame(height: 52 * u)
 				.background(discCtaGradient, in: RoundedRectangle(cornerRadius: 6 * u))
@@ -751,7 +751,7 @@ private struct DetailSavedSheet: View {
 					.frame(width: 47 * u, height: 47 * u)
 				Text("Saved to My STAK")
 					.font(StakFont.sora(18 * u, .semiBold))
-					.foregroundStyle(Color.white)
+					.foregroundStyle(StakColors.textPrimary)
 				HStack(spacing: 11 * u) {
 					ZStack {
 						Circle().fill(Color(argb: 0xFF242B3D))
@@ -763,7 +763,7 @@ private struct DetailSavedSheet: View {
 					VStack(alignment: .leading, spacing: 2 * u) {
 						Text(f.sheetName)
 							.font(StakFont.geist(13 * u, .medium))
-							.foregroundStyle(Color.white)
+							.foregroundStyle(StakColors.textPrimary)
 						Text(f.sheetPrice)
 							.font(StakFont.geist(10 * u))
 							.foregroundStyle(muted)

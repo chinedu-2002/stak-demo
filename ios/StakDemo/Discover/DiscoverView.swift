@@ -277,7 +277,7 @@ struct DiscoverView: View {
 						Text("Discover")
 							.font(StakFont.sora(26 * u, .semiBold))
 							.stakLineHeight(33 * u, size: 26 * u, face: .sora)
-							.foregroundStyle(atEnd ? Disc.brightInk : Color.white)
+							.foregroundStyle(atEnd ? Disc.brightInk : StakColors.textPrimary)
 							.offset(y: atEnd ? -7.5 * u : 0)
 						Spacer()
 						// The authored "1/12" counter and ring (1:1627; user, 2026-09-04).
@@ -286,7 +286,7 @@ struct DiscoverView: View {
 							ProgressRing(progress: CGFloat(count) / CGFloat(deckSize))
 							Text("\(count)/\(deckSize)")
 								.font(StakFont.sora(11 * u))
-								.foregroundStyle(Color.white)
+								.foregroundStyle(StakColors.textPrimary)
 						}
 						.frame(width: 44 * u, height: 44 * u)
 					}
@@ -450,7 +450,7 @@ struct DiscoverView: View {
 							Button { onPracticeBuy(buySpec(for: deck[front].symbol)) } label: {
 								Text("Practice buy")
 									.font(StakFont.geist(14 * u, .medium))
-									.foregroundStyle(Color.white)
+									.foregroundStyle(StakColors.textPrimary)
 									.frame(width: 120 * u, height: 52 * u)
 									// Authored drop shadow (1:1783 Inspect): dy 12.28, blur
 									// 12.28, #52AAC7 at 9% (Learn more's is disabled).
@@ -493,7 +493,7 @@ struct DiscoverView: View {
 								.frame(width: 17 * u, height: 17 * u)
 							Text("Saved to My STAK")
 								.font(StakFont.geist(12 * u, .medium))
-								.foregroundStyle(Color.white)
+								.foregroundStyle(StakColors.textPrimary)
 						}
 						.padding(.horizontal, 16 * u)
 						.frame(height: 39 * u)
@@ -633,12 +633,12 @@ private struct DeckCardBody: View {
 					Text(card.headline)
 						.font(StakFont.geist(16 * u))
 						.stakLineHeight(23 * u, size: 16 * u, face: .geist)
-						.foregroundStyle(Color.white)
+						.foregroundStyle(StakColors.textPrimary)
 					HStack(alignment: .bottom, spacing: 9 * u) {
 						Text(card.price)
 							.font(StakFont.sora(20 * u, .semiBold))
 							.stakLineHeight(25 * u, size: 20 * u, face: .sora)
-							.foregroundStyle(Color.white)
+							.foregroundStyle(StakColors.textPrimary)
 						Text(card.change)
 							.font(StakFont.geist(11 * u, .medium))
 							.stakLineHeight(14 * u, size: 11 * u, face: .geist)
@@ -683,7 +683,7 @@ private struct SaveChip: View {
 		HStack(spacing: 6 * u) {
 			Text("Save")
 				.font(StakFont.geist(12 * u, .medium))
-				.foregroundStyle(Color.white)
+				.foregroundStyle(StakColors.textPrimary)
 			// The pill's own glyph (1:2050): 12 box, 8x10 bookmark, #AEAEAE stroke 1 -
 			// not the hero's dark #0A1020 export (user crop, 2026-09-04).
 			Image("IcSaveBookmark")
@@ -850,7 +850,7 @@ struct SheetStockRow: View {
 			VStack(alignment: .leading, spacing: 2 * u) {
 				Text(spec.name)
 					.font(StakFont.geist(13 * u, .medium))
-					.foregroundStyle(Color.white)
+					.foregroundStyle(StakColors.textPrimary)
 				Text(spec.priceLine)
 					.font(StakFont.geist(10 * u))
 					.foregroundStyle(Disc.muted)
@@ -875,7 +875,7 @@ struct SheetCta: View {
 		Button(action: action) {
 			Text(text)
 				.font(StakFont.geist(14 * u, .medium))
-				.foregroundStyle(Color.white)
+				.foregroundStyle(StakColors.textPrimary)
 				.frame(maxWidth: .infinity)
 				.frame(height: 52 * u)
 				// Authored drop shadow (85:1394 Inspect): dy 12.28, blur 12.28,
@@ -967,7 +967,7 @@ struct PracticeBuySheet: View {
 			VStack(alignment: .leading, spacing: 14 * u) {
 				Text(spec.title)
 					.font(StakFont.sora(18 * u, .semiBold))
-					.foregroundStyle(Color.white)
+					.foregroundStyle(StakColors.textPrimary)
 				SheetStockRow(spec: spec)
 				// The authored 14 column gap alone (1:1970 / 1:4232): the old +1 / +1.5
 				// ink nudges predate the full line boxes (mirrors Android, 2026-09-05).
@@ -1072,7 +1072,7 @@ struct OrderFilledSheet: View {
 					.frame(width: 47 * u, height: 47 * u)
 				Text("Order filled")
 					.font(StakFont.sora(18 * u, .semiBold))
-					.foregroundStyle(Color.white)
+					.foregroundStyle(StakColors.textPrimary)
 				SheetStockRow(spec: spec)
 				// Authored status line (85:1407): Geist 12 / lh 18, left-aligned, 14 below
 				// the stock row - exact-design audit 2026-09-04 (was 14).

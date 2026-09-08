@@ -27,7 +27,7 @@ struct SimPortfolioView: View {
 					Spacer()
 					Text("Your portfolio")
 						.font(StakFont.sora(16 * u, .semiBold))
-						.foregroundStyle(Color.white)
+						.foregroundStyle(StakColors.textPrimary)
 					Spacer()
 					ZStack {
 						Circle().fill(Sim.cardBg)
@@ -257,7 +257,7 @@ private struct PickSellRow: View {
 			VStack(alignment: .leading, spacing: 2 * u) {
 				Text(pick.company)
 					.font(StakFont.geist(13 * u, .medium))
-					.foregroundStyle(Color.white)
+					.foregroundStyle(StakColors.textPrimary)
 				Text("\(pick.priceNow) today")
 					.font(StakFont.geist(10 * u))
 					.foregroundStyle(Sim.muted)
@@ -305,7 +305,7 @@ struct SellConfirmSheet: View {
 			VStack(alignment: .leading, spacing: 14 * u) {
 				Text("Sell \(pick.symbol)?")
 					.font(StakFont.sora(18 * u, .semiBold))
-					.foregroundStyle(Color.white)
+					.foregroundStyle(StakColors.textPrimary)
 				PickSellRow(pick: pick)
 				// Review (2026-09-04): the pick's own cost basis ("$100" authored).
 				Text("You hold \(pick.shares) shares from your \(pick.stakeBasis) stake.")
@@ -390,7 +390,7 @@ struct SellConfirmSheet: View {
 					Button(action: { if portion > 0 { onConfirm(portion) } }) {
 						Text("Confirm sell")
 							.font(StakFont.sora(14 * u))
-							.foregroundStyle(Color.white)
+							.foregroundStyle(StakColors.textPrimary)
 							.frame(maxWidth: .infinity)
 							.frame(height: 51 * u)
 							.background(Sim.darkCta, in: RoundedRectangle(cornerRadius: 6 * u))
@@ -448,7 +448,7 @@ struct PositionClosedSheet: View {
 					.frame(width: 47 * u, height: 47 * u)
 				Text(full ? "Position closed" : "Position reduced")
 					.font(StakFont.sora(18 * u, .semiBold))
-					.foregroundStyle(Color.white)
+					.foregroundStyle(StakColors.textPrimary)
 				PickSellRow(pick: pick)
 				Text("Sold \(pick.shares) shares from your \(pick.stakeBasis) stake.")
 					.font(StakFont.geist(12 * u))
@@ -486,7 +486,7 @@ struct PositionClosedSheet: View {
 					Button(action: onBackToSimulate) {
 						Text("Back to Simulate")
 							.font(StakFont.geist(14 * u, .medium))
-							.foregroundStyle(Color.white)
+							.foregroundStyle(StakColors.textPrimary)
 							.frame(maxWidth: .infinity)
 							.frame(height: 52 * u)
 							.background(discCtaGradient, in: RoundedRectangle(cornerRadius: 6 * u))

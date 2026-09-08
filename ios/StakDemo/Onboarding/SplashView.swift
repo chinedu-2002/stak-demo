@@ -37,12 +37,12 @@ struct SplashView: View {
 							.accessibilityLabel("STAK")
 						Text("Welcome to STAK")
 							.font(StakFont.sora(29.87, .semiBold))
-							.foregroundStyle(StakColors.textPrimary)
+							.foregroundStyle(Color.white)
 					}
 					Text("The stock market finally speaks\nyour language")
 						.font(StakFont.geist(16, .light))
 						.multilineTextAlignment(.center)
-						.foregroundStyle(StakColors.textPrimary.opacity(0.7))
+						.foregroundStyle(Color.white.opacity(0.7))
 				}
 				.offset(x: 0.3, y: 334.49)
 			}
@@ -50,7 +50,8 @@ struct SplashView: View {
 			.scaleEffect(scale, anchor: .top)
 			.position(x: proxy.size.width / 2, y: 422)
 		}
-		.background(StakColors.bg)
+		// The splash is the brand moment: navy in both appearances (like the launch storyboard).
+		.background(Color(fixedArgb: 0xFF0A1020))
 		.ignoresSafeArea()
 		.task {
 			// Prototype: "After delay 1200ms" → Auth · Sign up.

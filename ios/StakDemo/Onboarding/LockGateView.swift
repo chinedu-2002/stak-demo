@@ -17,7 +17,7 @@ struct LockGateView: View {
 			if failed {
 				Text("Tap to unlock STAK")
 					.font(StakFont.geist(14))
-					.foregroundStyle(StakColors.textPrimary.opacity(0.7))
+					.foregroundStyle(Color.white.opacity(0.7))
 					.padding(.bottom, 80)
 			}
 		}

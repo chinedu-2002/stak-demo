@@ -41,7 +41,7 @@ struct LeaderboardView: View {
 				Spacer()
 				Text("Leaderboard")
 					.font(StakFont.sora(16 * u, .semiBold))
-					.foregroundStyle(Color.white)
+					.foregroundStyle(StakColors.textPrimary)
 				Spacer()
 				ZStack {
 					Circle().fill(Sim.cardBg)
@@ -92,7 +92,7 @@ struct LeaderboardView: View {
 						VStack(alignment: .leading, spacing: 2 * u) {
 							Text("You")
 								.font(StakFont.sora(12 * u, .medium)) // 1:4160 Sora Medium (exact-design audit 2026-09-04)
-								.foregroundStyle(Color.white)
+								.foregroundStyle(StakColors.textPrimary)
 							Text("\(portfolio.pickCountText) this week")
 								.font(StakFont.geist(10 * u))
 								.foregroundStyle(Sim.muted)
@@ -180,7 +180,7 @@ private struct LeaderRow: View {
 			VStack(alignment: .leading, spacing: 2 * u) {
 				Text(r.name)
 					.font(StakFont.sora(12 * u, .medium)) // 1:4170 Sora Medium, not Geist (exact-design audit 2026-09-04)
-					.foregroundStyle(Color.white)
+					.foregroundStyle(StakColors.textPrimary)
 				Text(r.picks)
 					.font(StakFont.geist(10 * u))
 					.foregroundStyle(Sim.faint) // 1:4171 #5c6b85 (exact-design audit 2026-09-04)

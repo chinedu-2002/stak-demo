@@ -214,7 +214,7 @@ private struct TopNav: View {
 				.onReceive(clock) { _ in greeting = Greeting.now() }
 				.font(StakFont.sora(16 * u, .semiBold))
 				.stakLineHeight(20 * u, size: 16 * u, face: .sora)
-				.foregroundStyle(Color.white)
+				.foregroundStyle(StakColors.textPrimary)
 		}
 		.padding(.top, 22 * u)
 		.frame(maxWidth: .infinity, alignment: .leading)
@@ -261,12 +261,12 @@ private struct MarketMoodCard: View {
 					Text("Market Mood")
 						.font(StakFont.sora(20 * u, .medium))
 						.stakLineHeight(25 * u, size: 20 * u, face: .sora)
-						.foregroundStyle(Color.white)
+						.foregroundStyle(StakColors.textPrimary)
 					// Backend-served with the mood score in production (the words
 					// change with the market); authored demo copy this phase.
 					(
 						Text(MarketMoodFeed.statusLead).foregroundColor(Home.teal)
-							+ Text(MarketMoodFeed.statusRest).foregroundColor(Color.white)
+							+ Text(MarketMoodFeed.statusRest).foregroundColor(StakColors.textPrimary)
 					)
 					.font(StakFont.geist(12 * u))
 					// 118:1693 renders a 16 pitch (32 for two lines). SwiftUI
@@ -423,7 +423,7 @@ private struct WhyThisMattersCard: View {
 					// centred and overflowing symmetrically, as Figma lays it out -
 					// exact-design audit 2026-09-04.
 					.frame(height: 15 * u)
-					.foregroundStyle(Color.white)
+					.foregroundStyle(StakColors.textPrimary)
 				// Backend-served summary of why today's news matters to THIS
 				// user (holdings + risk profile); authored demo copy this phase.
 				Text(WhyThisMattersFeed.body())
@@ -432,7 +432,7 @@ private struct WhyThisMattersCard: View {
 					// additive and cannot go negative, so 0 is the closest (the old
 					// +3 gave an 18.6 pitch); 0.6/line residual - exact-design audit
 					// 2026-09-04.
-					.foregroundStyle(Color.white)
+					.foregroundStyle(StakColors.textPrimary)
 					.frame(width: 198 * u, alignment: .leading)
 			}
 			.padding(.leading, 127 * u)
@@ -477,7 +477,7 @@ private struct DeckBanner: View {
 					Text("Go to Deck")
 						.font(StakFont.geist(11.49 * u, .medium))
 						.stakLineHeight(15 * u, size: 11.49 * u, face: .geist)
-						.foregroundStyle(Color.white)
+						.foregroundStyle(StakColors.textPrimary)
 					Image("IcArrowRightSmall")
 						.resizable()
 						.frame(width: 16 * u, height: 16 * u)
@@ -534,7 +534,7 @@ private struct FirstRunOverlay: View {
 				// user, 2026-09-04: grammar fixed, frame typo not copied.
 				Text("See Today’s Pick")
 					.font(StakFont.geist(12 * u, .medium))
-					.foregroundStyle(Color.white)
+					.foregroundStyle(StakColors.textPrimary)
 					// 1:1083/1:1093: the label box sits at pill centre +0.5 with a
 					// 7.524/5.643 top/bottom padding split, so its cap box rests
 					// 1.44 below centre (render: caps at 128-136 in the 105-156
@@ -551,10 +551,10 @@ private struct FirstRunOverlay: View {
 						Capsule().strokeBorder(
 							LinearGradient(
 								stops: [
-									.init(color: Color.white.opacity(0.57), location: 0),
-									.init(color: Color.white.opacity(0.21), location: 0.19),
-									.init(color: Color.white.opacity(0.21), location: 0.81),
-									.init(color: Color.white.opacity(0.49), location: 1)
+									.init(color: StakColors.textPrimary.opacity(0.57), location: 0),
+									.init(color: StakColors.textPrimary.opacity(0.21), location: 0.19),
+									.init(color: StakColors.textPrimary.opacity(0.21), location: 0.81),
+									.init(color: StakColors.textPrimary.opacity(0.49), location: 1)
 								],
 								startPoint: .leading,
 								endPoint: .trailing

@@ -168,7 +168,7 @@ private struct AppearanceView: View {
 		let u = figmaUnit
 		SettingsPage(title: "Appearance", onBack: onBack) {
 			VStack(spacing: 0) {
-				ForEach([("dark", "Dark"), ("system", "Match system")], id: \.0) { key, label in
+				ForEach([("dark", "Dark"), ("light", "Light"), ("system", "Match system")], id: \.0) { key, label in
 					Button {
 						profile.appearance = key
 						Session.shared.saveProfile()
@@ -194,7 +194,7 @@ private struct AppearanceView: View {
 			}
 			.padding(.vertical, 4 * u)
 			.background(cardBg, in: RoundedRectangle(cornerRadius: 16 * u))
-			Caption(text: "STAK is designed for dark mode. Match system keeps it dark for now and follows your phone once a light theme ships.")
+			Caption(text: "Dark is how STAK was designed. Light puts the same layout on a white ground; Match system follows your phone.")
 		}
 	}
 }

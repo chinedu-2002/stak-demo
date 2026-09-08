@@ -190,6 +190,8 @@ internal object DeckSession {
 	private val seenState = mutableIntStateOf(0)
 	private val savedState = mutableStateOf(setOf<String>())
 	private val boughtState = mutableIntStateOf(0)
+	/** Where the run is in the cards still on the deck - swipes move it, a save-driven removal does not (Codex review, PR #166). */
+	private val cursorState = mutableIntStateOf(0)
 
 	var seen: Int
 		get() = seenState.intValue
@@ -200,12 +202,16 @@ internal object DeckSession {
 	var bought: Int
 		get() = boughtState.intValue
 		set(value) { boughtState.intValue = value; persist() }
+	var cursor: Int
+		get() = cursorState.intValue
+		set(value) { cursorState.intValue = value; persist() }
 
 	/** "Swipe today's deck again" and the tab re-tap from the end. */
 	fun restart() {
 		seenState.intValue = 0
 		savedState.value = emptySet()
 		boughtState.intValue = 0
+		cursorState.intValue = 0
 		persist()
 	}
 
@@ -223,10 +229,12 @@ internal object DeckSession {
 			seenState.intValue = store.getInt("deck.seen", 0)
 			savedState.value = store.getSet("deck.saved") ?: emptySet()
 			boughtState.intValue = store.getInt("deck.bought", 0)
+			cursorState.intValue = store.getInt("deck.cursor", 0)
 		} else {
 			seenState.intValue = 0
 			savedState.value = emptySet()
 			boughtState.intValue = 0
+			cursorState.intValue = 0
 		}
 	}
 
@@ -236,6 +244,7 @@ internal object DeckSession {
 		store.putInt("deck.seen", seenState.intValue)
 		store.putSet("deck.saved", savedState.value)
 		store.putInt("deck.bought", boughtState.intValue)
+		store.putInt("deck.cursor", cursorState.intValue)
 	}
 }
 
@@ -326,6 +335,7 @@ internal fun DiscoverScreen(
 	// Prototype: tapping the front card itself also opens the Stock Detail.
 	// The buy ticket itself is raised by the shell (over the tab bar).
 	var seen by DeckSession::seen
+	var cursor by DeckSession::cursor
 	// THIS deck run's saves: the end-of-deck "Saved" count AND the chip
 	// state - the chip follows this run, not My STAK (1:1916 shows Save on
 	// NVDA even though My STAK lists it; user, 2026-09-04).
@@ -368,12 +378,14 @@ internal fun DiscoverScreen(
 	 * rest; user, 2026-09-08: a saved card must not stay on the deck) share
 	 * it, so Save reads exactly like a swipe.
 	 */
-	val advance: suspend (Float) -> Unit = { committed ->
+	val advance: suspend (Float, DeckCard?) -> Unit = { committed, saving ->
 		if (seen >= DECK_SIZE - 1) {
 			// The final card: the authored fly-off finishes
 			// before the end-of-deck receipt lands (1:2330).
 			scope.launch { topOffset.animateTo(with(density) { (500 * u).dp.toPx() }, tween(280, easing = EaseOut)) }
 			frontFade.animateTo(0f, tween(300, easing = EaseOut))
+			// The save lands once the card has left, so the card flying off is the one saved.
+			saving?.let { com.stak.demo.ui.MyStakHoldings.add(it.symbol) }
 			seen += 1
 			topOffset.snapTo(0f)
 			frontFade.snapTo(1f)
@@ -382,10 +394,14 @@ internal fun DiscoverScreen(
 			// the swiped card becomes the ghost and the deck
 			// advances NOW - a second swipe grabs the next
 			// card even while the ghost is still flying.
-			flyingCard = deckCardAt(seen)
+			flyingCard = saving ?: deckCardAt(cursor)
 			flyFade.snapTo(1f)
 			flyOffset.snapTo(committed)
+			// A saved card leaves the pool now - the next card shifts into this cursor,
+			// so only a swipe moves the cursor (Codex review, PR #166: AAPL was skipped).
+			saving?.let { com.stak.demo.ui.MyStakHoldings.add(it.symbol) }
 			seen += 1
+			if (saving == null) cursor += 1
 			topOffset.snapTo(0f)
 			// The new front takes over at the mid-slab geometry
 			// the finger just revealed, then promotes forward.
@@ -460,11 +476,12 @@ internal fun DiscoverScreen(
 					onPracticeBuySaves = onPracticeBuySaves,
 					// A fresh run: the deck AND its counters start over.
 					onSwipeAgain = { DeckSession.restart() },
+					canReplay = deckCards().isNotEmpty(),
 					onReviewSaves = onReviewSaves,
 				)
 			} else {
 			// The front card cycles the three designs across the twelve-card run.
-			val frontCard = deckCardAt(seen)
+			val frontCard = deckCardAt(cursor)
 			// Deck — a fixed composition: every dimension scales by the 390dp
 			// artboard unit so proportions match the frame on any device.
 			Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f).fillMaxWidth()) {
@@ -497,7 +514,7 @@ internal fun DiscoverScreen(
 										if (committed > with(density) { (110 * u).dp.toPx() } ||
 											(flung && committed > with(density) { (20 * u).dp.toPx() })
 										) {
-											advance(committed)
+											advance(committed, null)
 										} else {
 											topOffset.animateTo(0f, tween(180))
 										}
@@ -545,7 +562,7 @@ internal fun DiscoverScreen(
 							.graphicsLayer { alpha = 1f - (topOffset.value / commitPx).coerceIn(0f, 1f) },
 					)
 					if (seen < DECK_SIZE - 1) {
-						val next = deckCardAt(seen + 1)
+						val next = deckCardAt(cursor + 1)
 						FrontDeckCard(
 							card = next,
 							onSave = {},
@@ -569,7 +586,7 @@ internal fun DiscoverScreen(
 					FrontDeckCard(
 						card = frontCard,
 						// Saving takes the card off the deck like a swipe (user, 2026-09-08).
-						onSave = { savedCards = savedCards + frontCard.symbol; com.stak.demo.ui.MyStakHoldings.add(frontCard.symbol); savedToast = true; scope.launch { advance(0f) } },
+						onSave = { savedCards = savedCards + frontCard.symbol; savedToast = true; scope.launch { advance(0f, frontCard) } },
 						saved = frontCard.symbol in savedCards,
 						u = u,
 						modifier = Modifier
@@ -1320,7 +1337,7 @@ private fun ProgressRing(progress: Float, u: Float) {
  * DE-STAK 04 · Discover 1:1916: the authored deck look wins).
  */
 @Composable
-private fun EndOfDeck(seen: Int, saved: Int, bought: Int, onPracticeBuySaves: () -> Unit, onSwipeAgain: () -> Unit, onReviewSaves: () -> Unit) {
+private fun EndOfDeck(seen: Int, saved: Int, bought: Int, onPracticeBuySaves: () -> Unit, onSwipeAgain: () -> Unit, onReviewSaves: () -> Unit, canReplay: Boolean = true) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Column(
 		horizontalAlignment = Alignment.CenterHorizontally,
@@ -1394,23 +1411,26 @@ private fun EndOfDeck(seen: Int, saved: Int, bought: Int, onPracticeBuySaves: ()
 			color = Disc.Muted,
 		)
 		Spacer(modifier = Modifier.height((40.5 * u).dp))
-		Box(
-			contentAlignment = Alignment.Center,
-			modifier = Modifier
-				.fillMaxWidth()
-				.height((32 * u).dp)
-				.clip(RoundedCornerShape((14 * u).dp))
-				.clickable(
-					interactionSource = remember { MutableInteractionSource() },
-					indication = com.stak.demo.ui.theme.PressDim,
-					onClick = onSwipeAgain,
-				),
-		) {
-			Text(
-				text = "Swipe today’s deck again",
-				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = (13 * u).sp),
-				color = Disc.Muted,
-			)
+		// No replay when every card is saved: the run would only show the receipt again (Codex review, PR #166).
+		if (canReplay) {
+			Box(
+				contentAlignment = Alignment.Center,
+				modifier = Modifier
+					.fillMaxWidth()
+					.height((32 * u).dp)
+					.clip(RoundedCornerShape((14 * u).dp))
+					.clickable(
+						interactionSource = remember { MutableInteractionSource() },
+						indication = com.stak.demo.ui.theme.PressDim,
+						onClick = onSwipeAgain,
+					),
+			) {
+				Text(
+					text = "Swipe today’s deck again",
+					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = (13 * u).sp),
+					color = Disc.Muted,
+				)
+			}
 		}
 	}
 }

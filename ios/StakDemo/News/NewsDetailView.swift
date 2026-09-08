@@ -225,7 +225,8 @@ private struct NewsArticlePage: View {
 						ForEach(Array(article.paragraphs.dropFirst(2).enumerated()), id: \.offset) { _, text in
 							Paragraph(text: text)
 						}
-						SourceRow()
+						// The Source row opens where the story came from (user, 2026-09-08).
+						SourceRow(link: article.media.sourceLink)
 						if let ticker = article.ticker { KeyStatsCard(facts: NewsArticleFeed.stockFacts(ticker)) }
 						NewsHairline()
 						HStack(spacing: 8 * u) {
@@ -704,18 +705,31 @@ private struct NewToThisCard: View {
 }
 
 private struct SourceRow: View {
+	var link: String? = nil
+	@Environment(\.openURL) private var openURL
+
 	var body: some View {
 		let u = figmaUnit
-		HStack {
-			Text("Source")
-				.font(StakFont.sora(13 * u))
-				.foregroundStyle(StakColors.textPrimary)
-			Spacer()
-			Image("IcNewsExternal")
-				.resizable()
-				.frame(width: 19 * u, height: 19 * u)
+		// The row - label and the external-link glyph - opens the story's source
+		// (user, 2026-09-08: "take users where the news is gotten from").
+		Button {
+			if let link, let url = URL(string: link) { openURL(url) }
+		} label: {
+			HStack {
+				Text("Source")
+					.font(StakFont.sora(13 * u))
+					.foregroundStyle(StakColors.textPrimary)
+				Spacer()
+				Image("IcNewsExternal")
+					.resizable()
+					.frame(width: 19 * u, height: 19 * u)
+			}
+			.frame(width: 81 * u)
 		}
-		.frame(width: 81 * u)
+		.buttonStyle(.pressDim)
+		.disabled(link == nil)
+		.accessibilityLabel("Source")
+		.accessibilityHint(link == nil ? "" : "Opens the story's source")
 	}
 }
 

@@ -30,6 +30,14 @@ enum NewsMedia {
 	/// A video behind a poster: YouTube links embed, other links play directly.
 	case video(url: String, posterAsset: String?, posterUrl: String?, sourceLink: String?)
 
+	/// The story's own link, whichever media carries it.
+	var sourceLink: String? {
+		switch self {
+		case let .image(_, _, link): return link
+		case let .video(_, _, _, link): return link
+		}
+	}
+
 	/// YouTube watch/short links -> the embeddable player URL; nil for direct media.
 	static func youTubeEmbedURL(for url: String) -> URL? {
 		let pattern = #"(?:youtube\.com/(?:watch\?v=|embed/|shorts/)|youtu\.be/)([A-Za-z0-9_-]{6,})"#

@@ -364,7 +364,8 @@ private fun NewsArticlePage(
 				article.pullQuote?.let { PullQuote(it) }
 				article.explainer?.let { NewToThisCard(it) }
 				article.paragraphs.drop(2).forEach { Paragraph(it) }
-				SourceRow()
+				// The Source row opens where the story came from (user, 2026-09-08).
+				SourceRow(link = article.media.sourceLinkOrNull())
 				article.ticker?.let { KeyStatsCard(facts = NewsArticleFeed.stockFacts(it)) }
 				Divider()
 				Row(horizontalArrangement = Arrangement.spacedBy((8 * u).dp)) {
@@ -919,11 +920,23 @@ private fun NewToThisCard(body: String) {
 }
 
 @Composable
-private fun SourceRow() {
+private fun SourceRow(link: String? = null) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
+	val uriHandler = androidx.compose.ui.platform.LocalUriHandler.current
 	Row(
 		verticalAlignment = Alignment.CenterVertically,
-		modifier = Modifier.width((81 * u).dp),
+		modifier = Modifier
+			.width((81 * u).dp)
+			// The row - label and the external-link glyph - opens the story's source in
+			// the browser (user, 2026-09-08: "take users where the news is gotten from").
+			.then(
+				if (link != null) Modifier.clickable(
+					interactionSource = remember { MutableInteractionSource() },
+					indication = com.stak.demo.ui.theme.PressDim,
+					onClickLabel = "Open the source",
+					onClick = { runCatching { uriHandler.openUri(link) } },
+				) else Modifier,
+			),
 	) {
 		Text(
 			text = "Source",
@@ -931,8 +944,14 @@ private fun SourceRow() {
 			color = StakColors.TextPrimary,
 		)
 		Spacer(modifier = Modifier.weight(1f))
-		Image(painterResource(R.drawable.ic_news_external), null, modifier = Modifier.size((19 * u).dp))
+		Image(painterResource(R.drawable.ic_news_external), if (link != null) "Open the source" else null, modifier = Modifier.size((19 * u).dp))
 	}
+}
+
+/** The story's own link, whichever media carries it. */
+private fun NewsMedia.sourceLinkOrNull(): String? = when (this) {
+	is NewsMedia.Image -> sourceLink
+	is NewsMedia.Video -> sourceLink
 }
 
 @Composable

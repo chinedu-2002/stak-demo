@@ -308,10 +308,34 @@ private fun savedStakRows(): List<SavedStak> {
 			SavedStak(COST_BUY, savedStakSub("COST", com.stak.demo.ui.StakClock.savedLabel(2) + " · not in portfolio yet")),
 		)
 	}
-	val tickets = listOf(com.stak.demo.ui.discover.NVDA_BUY, com.stak.demo.ui.discover.AAPL_BUY, com.stak.demo.ui.discover.GOOGL_BUY, PLTR_BUY, COST_BUY)
-	return tickets.filter { it.symbol in com.stak.demo.ui.MyStakHoldings.tickers }
+	// Every save the account made is a candidate - a Tesla or Amazon story's save
+	// gets a ticket built from the catalogue quote, the way the Other collection
+	// tile does - and the sub line reads the real save day (audit 2026-09-07:
+	// a TSLA-only account was told nothing was saved, and every row said "today").
+	val designed = listOf(com.stak.demo.ui.discover.NVDA_BUY, com.stak.demo.ui.discover.AAPL_BUY, com.stak.demo.ui.discover.GOOGL_BUY, PLTR_BUY, COST_BUY)
+	val held = com.stak.demo.ui.MyStakHoldings
+	return held.tickers
+		// Newest save first, then by symbol - a Set's order is nothing to show a user by.
+		.sortedWith(compareBy({ held.daysSinceSaved(it) ?: Int.MAX_VALUE }, { it }))
+		.map { t -> designed.firstOrNull { it.symbol == t } ?: catalogueTicket(t) }
 		.take(2)
-		.map { SavedStak(it, savedStakSub(it.symbol, com.stak.demo.ui.StakClock.savedLabel(0) + " · not in portfolio yet")) }
+		.map { SavedStak(it, savedStakSub(it.symbol, com.stak.demo.ui.StakClock.savedLabel(com.stak.demo.ui.MyStakHoldings.daysSinceSaved(it.symbol) ?: 0) + " · not in portfolio yet")) }
+}
+
+/** A $25 paper ticket for a saved stock without a designed one, priced off the catalogue quote. */
+private fun catalogueTicket(symbol: String): BuySpec {
+	val feed = com.stak.demo.ui.news.NewsArticleFeed
+	val known = feed.hasStockFacts(symbol)
+	val sf = feed.stockFacts(symbol)
+	val price = if (known) sf.price.removePrefix("$").replace(",", "").toDoubleOrNull() ?: 0.0 else 0.0
+	val pct = sf.change.filter { it.isDigit() || it == '.' }.ifBlank { "0.0" }
+	return BuySpec(
+		"Buy $symbol?", symbol.take(1), if (known) sf.name else symbol,
+		if (known) "${sf.price} today" else "\u2014 today",
+		if (known) (if (sf.up) "\u25B2 " else "\u25BC ") + pct + "%" else "\u2014",
+		"$8,800.00", "$8,775.00",
+		if (price > 0) String.format(java.util.Locale.US, "%.4f", 25.0 / price) else "0", symbol,
+	)
 }
 
 /** The card an empty section shows a new account (CardBg r14, Sora title, Geist body, optional teal link). */

@@ -104,7 +104,7 @@ fun StockDetailScreen(
 	onTab: ((MainTab) -> Unit)? = null,
 ) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
-	val f = DETAIL_FACTS[symbol] ?: DETAIL_FACTS.getValue("AAPL")
+	val f = detailFactsFor(symbol)
 	// The Discover entry follows THIS RUN's saves, like the deck's Save chip:
 	// 1:2382/1:2579 author "Unsaved" for a stock My STAK already lists, and
 	// the chip ruling (user, 2026-09-04: 1:1627 shows Save on NVDA even
@@ -263,7 +263,7 @@ fun StockDetailScreen(
 						// "something is off when I saved my stock"). Unsave here drops
 						// the stock from this run's saves and the holdings store and
 						// stays on the page with the Save CTA back.
-						DetailCta("Practice buy") { if (onPracticeBuy != null) onPracticeBuy() else showBuy = true }
+						DetailCta("Practice buy") { if (onPracticeBuy != null && hopsToSimulate(f.symbol)) onPracticeBuy() else showBuy = true }
 						DetailSecondary("Unsave") {
 							saved = false
 							DeckSession.saved = DeckSession.saved - f.symbol
@@ -278,7 +278,7 @@ fun StockDetailScreen(
 							com.stak.demo.ui.MyStakHoldings.add(f.symbol)
 							showSuccess = true
 						}
-						DetailSecondary("Practice buy") { if (onPracticeBuy != null) onPracticeBuy() else showBuy = true }
+						DetailSecondary("Practice buy") { if (onPracticeBuy != null && hopsToSimulate(f.symbol)) onPracticeBuy() else showBuy = true }
 					}
 				}
 			}
@@ -896,8 +896,12 @@ private fun CompareRow(label: String, a: String, m: String, g: String, header: B
  * since is this week's change once a day has passed.
  */
 private fun sinceSavedFor(f: DetailFacts): Triple<String, String, Boolean> {
-	val demo = com.stak.demo.ui.Session.demoAccount
-	val days = if (demo) null else com.stak.demo.ui.MyStakHoldings.daysSinceSaved(f.symbol)
+	// A save with a recorded day reads its real age on either account; the authored
+	// "5 weeks ago" belongs to the demo persona's SEED saves, which predate the record
+	// (audit 2026-09-07: the persona's own saves read "5 weeks ago" a minute later).
+	val recorded = com.stak.demo.ui.MyStakHoldings.daysSinceSaved(f.symbol)
+	val demo = com.stak.demo.ui.Session.demoAccount && recorded == null
+	val days = if (demo) null else recorded
 	val move = f.change.filter { it.isDigit() || it == '.' }.ifBlank { "0.0" }
 	val up = !f.change.contains('\u25BC') && !f.change.trimStart().startsWith("-")
 	return when {
@@ -968,6 +972,10 @@ private data class DetailCompare(val label: String, val a: String, val b: String
  * stock's volatility; TasteModel.riskStyle is the user's answer.
  */
 private fun riskFitFor(f: DetailFacts): Pair<String, String> {
+	// The active user (Sign in) is the authored persona: its page reads the frame's
+	// "Matches you"; only a first-time user's own 05 Risk answer drives the variants
+	// (audit 2026-09-07 - the persona never answers 05, so its risk is -1).
+	if (com.stak.demo.ui.Session.demoAccount) return "Matches you" to f.riskCopy
 	val style = com.stak.demo.ui.onboarding.TasteModel.riskStyle(com.stak.demo.ui.UserProfile.risk)
 	val highVol = f.riskPillX > 170f
 	val lowVol = f.riskPillX < 120f
@@ -978,6 +986,37 @@ private fun riskFitFor(f: DetailFacts): Pair<String, String> {
 		else -> "Matches you" to f.riskCopy
 	}
 }
+
+/**
+ * The page's facts for a symbol. The nineteen designed pages carry their own; any
+ * other stock a first-time user saved (a Tesla or Amazon story, the Other
+ * collection) keeps ITS identity - symbol, name, quote - over the Apple
+ * template's body, so the header, the Since-you-saved line and Unsave are about
+ * the stock the user tapped (audit 2026-09-07: they opened Apple's page).
+ */
+private fun detailFactsFor(symbol: String): DetailFacts {
+	DETAIL_FACTS[symbol]?.let { return it }
+	val base = DETAIL_FACTS.getValue("AAPL")
+	val feed = com.stak.demo.ui.news.NewsArticleFeed
+	if (!feed.hasStockFacts(symbol)) return base.copy(symbol = symbol, title = symbol)
+	val sf = feed.stockFacts(symbol)
+	val pct = sf.change.filter { it.isDigit() || it == '.' }.ifBlank { "0.0" }
+	return base.copy(
+		symbol = symbol,
+		title = "$symbol · ${sf.name}",
+		price = sf.price,
+		change = (if (sf.up) "\u25B2 " else "\u25BC ") + pct + "% today",
+	)
+}
+
+/**
+ * The authored Discover-entry Practice buy hops to the Simulate tab (1:2382,
+ * Instant), whose Saved staks list the ACCOUNT's saves. For the demo persona that
+ * is the authored frame; for a first-time user the hop is a dead end unless the
+ * stock is one of their saves - then the in-page ticket (16:1012) serves it.
+ */
+private fun hopsToSimulate(symbol: String): Boolean =
+	com.stak.demo.ui.Session.demoAccount || symbol in com.stak.demo.ui.MyStakHoldings.tickers
 
 private data class DetailFacts(
 	val symbol: String,

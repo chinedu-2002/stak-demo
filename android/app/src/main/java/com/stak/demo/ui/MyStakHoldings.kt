@@ -55,6 +55,9 @@ object MyStakHoldings {
 	}
 
 	/** Days since the stock was saved on this account; null when the save predates the record (the demo's authored saves). */
+	/** A ticker the demo persona's authored history carries (never an "Other" tile). */
+	fun isSeed(ticker: String): Boolean = symbolOf(ticker) in SEED
+
 	fun daysSinceSaved(ticker: String): Int? = savedAt[symbolOf(ticker)]?.let { (java.time.LocalDate.now().toEpochDay() - it).toInt() }
 
 	/** How many stocks the user holds - the Overview's "Across N stocks". */

@@ -127,13 +127,18 @@ fun CollectionScreen(
 				Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy((7 * u).dp)) {
 					Text(heldCountLabel(held.size), style = TextStyle(fontFamily = Geist, fontSize = (13 * u).sp), color = Muted)
 					Text("·", style = TextStyle(fontFamily = Geist, fontSize = (13 * u).sp), color = Faint)
-					// The weekly move is not in the shared demo data - the
-					// authored 1:3333 literal stays for every collection.
-					Text(
-						"+2.4% this week",
-						style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp),
-						color = Green,
-					)
+					// The persona keeps the authored 1:3333 literal; a first-time user's
+					// collection reads the week move of ITS held stocks, none while it is
+					// empty (audit 2026-09-07: "0 stocks · +2.4% this week").
+					val ownMove = if (com.stak.demo.ui.Session.demoAccount) null
+						else held.takeIf { it.isNotEmpty() }?.let { hs -> hs.sumOf { com.stak.demo.ui.StakInsights.changePct(it) } / hs.size }
+					if (com.stak.demo.ui.Session.demoAccount || ownMove != null) {
+						Text(
+							if (ownMove == null) "+2.4% this week" else com.stak.demo.ui.StakInsights.signedPct(ownMove) + " this week",
+							style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp),
+							color = if (ownMove != null && ownMove < 0) Color(0xFFE5484D) else Green,
+						)
+					}
 				}
 				Text(
 					text = c.blurb,

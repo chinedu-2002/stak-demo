@@ -105,8 +105,8 @@ fun CreateAccountScreen(onBack: () -> Unit, onCreateAccount: () -> Unit, onSignI
 				}
 				Spacer(modifier = Modifier.height((4 * u).dp))
 
-				SocialPill(text = "Continue with Google", iconRes = R.drawable.ic_google_g, onClick = onCreateAccount)
-				SocialPill(text = "Continue with Apple", iconRes = R.drawable.ic_apple_logo, onClick = onCreateAccount)
+				SocialPill(text = "Continue with Google", iconRes = R.drawable.ic_google_g, onClick = { com.stak.demo.ui.UserProfile.linkedGoogle = true; onCreateAccount() })
+				SocialPill(text = "Continue with Apple", iconRes = R.drawable.ic_apple_logo, onClick = { com.stak.demo.ui.UserProfile.linkedApple = true; onCreateAccount() })
 
 				AuthOrDivider()
 

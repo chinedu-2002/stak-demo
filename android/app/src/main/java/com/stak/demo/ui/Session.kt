@@ -32,6 +32,7 @@ object Session {
 	private const val KEY_LINKED_GOOGLE = "linked_google"
 	private const val KEY_LINKED_APPLE = "linked_apple"
 	private const val KEY_JOINED = "joined"
+	private const val KEY_FIRST_RUN = "first_run_pending"
 
 	private var prefs: SharedPreferences? = null
 
@@ -51,6 +52,17 @@ object Session {
 	var demoAccount by mutableStateOf(true)
 		private set
 
+	/**
+	 * True for a FIRST-TIME user: the account was created here (Create account ->
+	 * onboarding) and Home's first run (1:958) has not been completed yet. An
+	 * active/returning user - Sign in (the demo persona) or any relaunch after the
+	 * first run - lands on Home Main (user, 2026-09-07: "there should be a first
+	 * time user and active/returning user"). Persisted, so a relaunch in the middle
+	 * of the first run keeps it.
+	 */
+	var firstRunPending by mutableStateOf(false)
+		private set
+
 	/** Load once per process; restores the profile the user set before. */
 	fun init(context: Context) {
 		if (prefs != null) return
@@ -60,6 +72,7 @@ object Session {
 		signedIn = p.getBoolean(KEY_SIGNED_IN, false)
 		resumedSignedIn = signedIn
 		demoAccount = p.getBoolean(KEY_DEMO, true)
+		firstRunPending = p.getBoolean(KEY_FIRST_RUN, false)
 		UserProfile.displayName = p.getString(KEY_NAME, "") ?: ""
 		UserProfile.photoUri = p.getString(KEY_PHOTO, null)
 		UserProfile.riskStyle = p.getString(KEY_RISK, UserProfile.riskStyle) ?: UserProfile.riskStyle
@@ -83,12 +96,27 @@ object Session {
 	fun signIn(demo: Boolean) {
 		signedIn = true
 		demoAccount = demo
+		// Only a brand-new account is a first-time user; Sign in is an active user.
+		firstRunPending = !demo
+		if (demo) {
+			// The persona's own profile: an onboarding started and abandoned before
+			// "Already have an account? Sign in" must not leak its brand picks or
+			// risk answer into the active user's account (audit 2026-09-07).
+			UserProfile.riskStyle = "Growth-Oriented"
+			UserProfile.brandPicks = emptySet()
+			UserProfile.goal = -1
+			UserProfile.risk = -1
+		}
 		// The demo persona joined in July; a new account joins now (product audit, 2026-09-05).
 		UserProfile.joined = if (demo) "July 2026" else StakClock.monthYear()
 		persist()
 		// A brand-new account starts from nothing; the demo account keeps
 		// whatever it did last time it was signed in.
-		if (!demo) StakStore.clearAccount(demo = false)
+		if (!demo) {
+			StakStore.clearAccount(demo = false)
+			// The day the account was created: the inbox ages its welcome from it.
+			StakStore.putString("created_day", java.time.LocalDate.now().toEpochDay().toString())
+		}
 		applyAccount()
 	}
 
@@ -104,11 +132,19 @@ object Session {
 	/** Profile edits after sign-in (name/photo) stay with the session. */
 	fun saveProfile() = persist()
 
+	/** Home's first run is over (the pill or any tab hop, 1:958 -> 1:1097): the user is a returning user from here on. */
+	fun completeFirstRun() {
+		if (!firstRunPending) return
+		firstRunPending = false
+		persist()
+	}
+
 	/** Log out: forget the session and the profile; next launch asks to sign in. */
 	fun signOut() {
 		signedIn = false
 		resumedSignedIn = false
 		demoAccount = true
+		firstRunPending = false
 		UserProfile.displayName = ""
 		UserProfile.photoUri = null
 		UserProfile.riskStyle = "Growth-Oriented"
@@ -147,6 +183,7 @@ object Session {
 			?.putBoolean(KEY_LINKED_GOOGLE, UserProfile.linkedGoogle)
 			?.putBoolean(KEY_LINKED_APPLE, UserProfile.linkedApple)
 			?.putString(KEY_JOINED, UserProfile.joined)
+			?.putBoolean(KEY_FIRST_RUN, firstRunPending)
 			?.apply()
 	}
 }

@@ -558,6 +558,8 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
 			},
 		) {
 			ProfileScreen(
+				// launchSingleTop: two fingers on the block must not stack two edit pages (review 2026-09-07).
+				onEditProfile = { navController.navigate(StakRoutes.EDIT_PROFILE) { launchSingleTop = true } },
 				onBack = { navController.popBackStack() },
 				// Product audit (2026-09-05): the rows open their settings pages.
 				onOpenSetting = { kind -> navController.navigate(StakRoutes.settings(kind)) },
@@ -569,6 +571,18 @@ fun StakRoot(navController: NavHostController = rememberNavController()) {
 					}
 				},
 			)
+		}
+		composable(StakRoutes.EDIT_PROFILE) {
+			// 09 Profile setup (1:793) doubles as the hub's edit page - its own copy
+			// promises "You can change this anytime in Profile." (user, 2026-09-07:
+			// a photo of their choice, and editable after sign-up). House push in,
+			// house back out; Save pops back to the hub, which re-reads the profile.
+			// Pops only while this page is still on top: a second tap on Save during
+			// the 300 ms pop must not take the hub with it (review 2026-09-07).
+			val popEdit: () -> Unit = {
+				if (navController.currentBackStackEntry?.destination?.route == StakRoutes.EDIT_PROFILE) navController.popBackStack()
+			}
+			com.stak.demo.ui.onboarding.ProfileSetupScreen(editing = true, onBack = popEdit, onProceed = popEdit)
 		}
 		composable(StakRoutes.NOTIFICATIONS) {
 			com.stak.demo.ui.inbox.NotificationsScreen(

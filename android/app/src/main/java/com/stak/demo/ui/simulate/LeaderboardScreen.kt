@@ -129,7 +129,8 @@ fun LeaderboardScreen(onBack: () -> Unit) {
 				}
 				Box(contentAlignment = Alignment.Center, modifier = Modifier.size((36 * u).dp).background(Sim.ChipBg, CircleShape)) {
 					// The authored "E" is the demo persona's; a new account shows its own initial (product audit, 2026-09-05).
-					Text(if (PaperPortfolio.demo) "E" else com.stak.demo.ui.UserProfile.greetingName.take(1).uppercase(), style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (14 * u).sp, lineHeight = (18 * u).sp, lineHeightStyle = FIGMA_LINE_BOX), color = Sim.BadgeInk) // 1:4158 is 14 (exact-design audit 2026-09-04)
+					// A renamed persona reaches the board too (the edit page promises it; review 2026-09-07).
+					Text(if (PaperPortfolio.demo && com.stak.demo.ui.UserProfile.displayName.isBlank()) "E" else com.stak.demo.ui.UserProfile.greetingName.take(1).uppercase(), style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (14 * u).sp, lineHeight = (18 * u).sp, lineHeightStyle = FIGMA_LINE_BOX), color = Sim.BadgeInk) // 1:4158 is 14 (exact-design audit 2026-09-04)
 				}
 				Column(verticalArrangement = Arrangement.spacedBy((2 * u).dp), modifier = Modifier.weight(1f)) {
 					Text("You", style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (15 * u).sp, lineHeightStyle = FIGMA_LINE_BOX), color = Color.White) // 1:4160 Sora Medium (exact-design audit 2026-09-04)

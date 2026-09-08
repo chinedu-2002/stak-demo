@@ -54,7 +54,7 @@ private val ChipInk = Color(0xFF7FD4E8)
  */
 @OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
 @Composable
-fun ProfileScreen(onBack: () -> Unit, onLogOut: () -> Unit = {}, onOpenSetting: (String) -> Unit = {}) {
+fun ProfileScreen(onBack: () -> Unit, onLogOut: () -> Unit = {}, onOpenSetting: (String) -> Unit = {}, onEditProfile: () -> Unit = {}) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Column(modifier = Modifier.fillMaxSize().background(StakColors.Bg)) {
 		Box(
@@ -85,10 +85,25 @@ fun ProfileScreen(onBack: () -> Unit, onLogOut: () -> Unit = {}, onOpenSetting: 
 				.padding(horizontal = (20 * u).dp)
 				.padding(top = (16 * u).dp, bottom = (40 * u).dp),
 		) {
-			Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy((8 * u).dp)) {
+			// The whole block - avatar, name, joined line - is ONE target that opens the
+			// edit page: 09 Profile setup's own promise, "You can change this anytime in
+			// Profile." (user, 2026-09-07: a photo of their choice, editable after sign-up).
+			Column(
+				horizontalAlignment = Alignment.CenterHorizontally,
+				verticalArrangement = Arrangement.spacedBy((8 * u).dp),
+				modifier = Modifier
+					.clip(RoundedCornerShape((12 * u).dp))
+					.clickable(
+						interactionSource = remember { MutableInteractionSource() },
+						indication = com.stak.demo.ui.theme.PressDim,
+						onClickLabel = "Edit profile",
+						onClick = onEditProfile,
+					)
+					.padding(horizontal = (12 * u).dp),
+			) {
 				Box(
 					contentAlignment = Alignment.Center,
-					modifier = Modifier.size((64 * u).dp).background(Color(0xFF242B3D), CircleShape),
+					modifier = Modifier.size((64 * u).dp).background(Color(0xFF242B3D), CircleShape).clip(CircleShape),
 				) {
 					// The picked photo when one exists; else the live initial of
 					// the display name ("H" was hardcoded - audit 2026-08-25).

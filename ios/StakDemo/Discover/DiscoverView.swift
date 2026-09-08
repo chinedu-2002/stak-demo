@@ -257,6 +257,57 @@ struct DiscoverView: View {
 	/// replaces the deck.
 	private var front: Int { seen % deck.count }
 
+	/// The deck advances: the front card leaves and the next promotes - the swipe
+	/// commit (from `committed` pt of travel) and the Save chip (from rest; user,
+	/// 2026-09-08: a saved card must not stay on the deck) share it, so Save reads
+	/// exactly like a swipe.
+	private func advance(committed: CGFloat) {
+		let u = figmaUnit
+		if seen >= deckSize - 1 {
+			// The final card: the authored fly-off finishes
+			// before the end-of-deck receipt lands (1:2330).
+			withAnimation(.easeOut(duration: 0.28)) { dragOffset = 500 * u }
+			withAnimation(.easeOut(duration: 0.3)) { frontOpacity = 0 }
+			DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+				seen += 1
+				dragOffset = 0
+				frontOpacity = 1
+				promote = 1
+			}
+		} else {
+			// The frame's card shuffle (1:1627), commit-first:
+			// the swiped card becomes the ghost and the deck
+			// advances NOW - a second swipe grabs the next
+			// card even while the ghost is still flying.
+			flyingCard = deck[front]
+			flyGen += 1
+			let gen = flyGen
+			var reset = Transaction()
+			reset.disablesAnimations = true
+			withTransaction(reset) {
+				flyOffset = committed
+				flyFade = 1
+				seen += 1
+				dragOffset = 0
+				// The new front takes over at the mid-slab geometry
+				// the finger just revealed, then promotes forward.
+				promote = 0
+				// A velocity flick can commit before the crossfade
+				// finished - pick the alpha up from the reveal.
+				frontOpacity = Double(min(1, committed / (110 * u)))
+			}
+			DispatchQueue.main.async {
+				withAnimation(.easeOut(duration: 0.28)) { flyOffset = 500 * u }
+				withAnimation(.easeOut(duration: 0.3)) { flyFade = 0 }
+				withAnimation(.easeOut(duration: 0.2)) { promote = 1 }
+				withAnimation(.easeOut(duration: 0.12)) { frontOpacity = 1 }
+			}
+			DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+				if gen == flyGen { flyingCard = nil }
+			}
+		}
+	}
+
 	/// 1:2330 "Swipe today's deck again" and the tab re-tap restart the run:
 	/// the deck, this run's saves and its fills all return to zero.
 	private func restart() { session.restart() }
@@ -352,7 +403,8 @@ struct DiscoverView: View {
 									.allowsHitTesting(false)
 							}
 							let frontCard = deck[front]
-							FrontDeckCard(card: frontCard, onSave: { savedCards.insert(frontCard.symbol); MyStakHoldings.shared.add(frontCard.symbol); savedToast = true }, u: u, saved: savedCards.contains(frontCard.symbol))
+							// Saving takes the card off the deck like a swipe (user, 2026-09-08).
+							FrontDeckCard(card: frontCard, onSave: { savedCards.insert(frontCard.symbol); MyStakHoldings.shared.add(frontCard.symbol); savedToast = true; advance(committed: 0) }, u: u, saved: savedCards.contains(frontCard.symbol))
 								.scaleEffect(0.8947 + 0.1053 * promote, anchor: .top)
 								.opacity(frontOpacity)
 								.offset(y: 54.65 * u - 18.26 * u * (1 - promote) + dragOffset)
@@ -384,49 +436,7 @@ struct DiscoverView: View {
 									// advances too, the Instagram rule (2026-09-02).
 									let flung = value.predictedEndTranslation.height > 110 * u && committed > 20 * u
 									if committed > 110 * u || flung {
-										if seen >= deckSize - 1 {
-											// The final card: the authored fly-off finishes
-											// before the end-of-deck receipt lands (1:2330).
-											withAnimation(.easeOut(duration: 0.28)) { dragOffset = 500 * u }
-											withAnimation(.easeOut(duration: 0.3)) { frontOpacity = 0 }
-											DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-												seen += 1
-												dragOffset = 0
-												frontOpacity = 1
-												promote = 1
-											}
-										} else {
-											// The frame's card shuffle (1:1627), commit-first:
-											// the swiped card becomes the ghost and the deck
-											// advances NOW - a second swipe grabs the next
-											// card even while the ghost is still flying.
-											flyingCard = deck[front]
-											flyGen += 1
-											let gen = flyGen
-											var reset = Transaction()
-											reset.disablesAnimations = true
-											withTransaction(reset) {
-												flyOffset = committed
-												flyFade = 1
-												seen += 1
-												dragOffset = 0
-												// The new front takes over at the mid-slab geometry
-												// the finger just revealed, then promotes forward.
-												promote = 0
-												// A velocity flick can commit before the crossfade
-												// finished - pick the alpha up from the reveal.
-												frontOpacity = Double(min(1, committed / (110 * u)))
-											}
-											DispatchQueue.main.async {
-												withAnimation(.easeOut(duration: 0.28)) { flyOffset = 500 * u }
-												withAnimation(.easeOut(duration: 0.3)) { flyFade = 0 }
-												withAnimation(.easeOut(duration: 0.2)) { promote = 1 }
-												withAnimation(.easeOut(duration: 0.12)) { frontOpacity = 1 }
-											}
-											DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
-												if gen == flyGen { flyingCard = nil }
-											}
-										}
+										advance(committed: committed)
 									} else {
 										withAnimation(.easeOut(duration: 0.18)) { dragOffset = 0 }
 									}

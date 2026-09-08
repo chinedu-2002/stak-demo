@@ -238,6 +238,8 @@ struct DiscoverView: View {
 	}
 	// Codex audit (2026-09-04): the shell's DISCOVER ticket reports fills here.
 	@ObservedObject private var session = DeckSession.shared
+	/// Observed so a save (or an Unsave in My STAK) re-reads the cards on the deck.
+	@ObservedObject private var holdings = MyStakHoldings.shared
 	@State private var dragOffset: CGFloat = 0
 	@State private var frontOpacity: Double = 1
 	// Promote progress: 0 = the authored mid-slab geometry (1:1701,
@@ -255,7 +257,22 @@ struct DiscoverView: View {
 	/// The front card's index - the twelve-card run cycles the three designed
 	/// cards (user, 2026-09-04, 1:1916); past the twelfth the receipt (1:2330)
 	/// replaces the deck.
-	private var front: Int { seen % deck.count }
+	/// The designed cards this account has NOT saved in the app: a save recorded on
+	/// this account (MyStakHoldings.add stamps its day) takes the card off the deck
+	/// until it is unsaved from My STAK; the persona's seeded holdings carry no day,
+	/// so its authored deck stands (user, 2026-09-08: a card already in My STAK
+	/// should not be on Discover, and Save only shows on cards not yet saved).
+	private var cards: [DeckCard] {
+		deck.filter { !holdings.tickers.contains($0.symbol) || holdings.daysSinceSaved($0.symbol) == nil }
+	}
+
+	/// The card at a run position over the cards still on the deck (the full design set when none are).
+	private func card(at position: Int) -> DeckCard {
+		let pool = cards.isEmpty ? deck : cards
+		return pool[((position % pool.count) + pool.count) % pool.count]
+	}
+
+	private var front: Int { seen % max(1, cards.count) }
 
 	/// The deck advances: the front card leaves and the next promotes - the swipe
 	/// commit (from `committed` pt of travel) and the Save chip (from rest; user,
@@ -279,7 +296,7 @@ struct DiscoverView: View {
 			// the swiped card becomes the ghost and the deck
 			// advances NOW - a second swipe grabs the next
 			// card even while the ghost is still flying.
-			flyingCard = deck[front]
+			flyingCard = card(at: seen)
 			flyGen += 1
 			let gen = flyGen
 			var reset = Transaction()
@@ -319,7 +336,7 @@ struct DiscoverView: View {
 				// Header — Discover + progress ring, kicker below.
 				// 1:2330 authors the whole header 10 lower than 1:1627 (ring y64 vs
 				// 54) with an 8 kicker gap (y116) - exact-design audit 2026-09-04.
-				let atEnd = seen >= deckSize
+				let atEnd = seen >= deckSize || cards.isEmpty
 				VStack(alignment: .leading, spacing: (atEnd ? 8 : 5) * u) {
 					// 1:1627 centres the 33-tall title in the 44-tall ring row (measured exact);
 					// the end-of-deck frame (1:2330) authors the title 7.5 higher against the
@@ -355,7 +372,7 @@ struct DiscoverView: View {
 
 				Spacer().frame(height: 27 * u)
 
-				if seen >= deckSize {
+				if seen >= deckSize || cards.isEmpty {
 					EndOfDeck(
 						onPracticeBuySaves: onPracticeBuySaves,
 						onReviewSaves: onReviewSaves,
@@ -395,14 +412,14 @@ struct DiscoverView: View {
 								// 2026-09-02): as the drag exposes the mid slab it
 								// crossfades into the LIVE next card at the SAME
 								// authored geometry, so the queue tells the truth.
-								let next = deck[(seen + 1) % deck.count]
+								let next = card(at: seen + 1)
 								FrontDeckCard(card: next, onSave: {}, u: u, saved: savedCards.contains(next.symbol))
 									.scaleEffect(0.8947, anchor: .top)
 									.opacity(min(1, max(0, dragOffset / (110 * u))))
 									.offset(y: 36.39 * u)
 									.allowsHitTesting(false)
 							}
-							let frontCard = deck[front]
+							let frontCard = card(at: seen)
 							// Saving takes the card off the deck like a swipe (user, 2026-09-08).
 							FrontDeckCard(card: frontCard, onSave: { savedCards.insert(frontCard.symbol); MyStakHoldings.shared.add(frontCard.symbol); savedToast = true; advance(committed: 0) }, u: u, saved: savedCards.contains(frontCard.symbol))
 								.scaleEffect(0.8947 + 0.1053 * promote, anchor: .top)
@@ -457,7 +474,7 @@ struct DiscoverView: View {
 						Spacer().frame(height: 19 * u)
 						HStack(spacing: 36 * u) {
 							// Codex audit (2026-09-04): the ticket serves the FRONT card.
-							Button { onPracticeBuy(buySpec(for: deck[front].symbol)) } label: {
+							Button { onPracticeBuy(buySpec(for: card(at: seen).symbol)) } label: {
 								Text("Practice buy")
 									.font(StakFont.geist(14 * u, .medium))
 									.foregroundStyle(Color.white)
@@ -475,7 +492,7 @@ struct DiscoverView: View {
 									.overlay(RoundedRectangle(cornerRadius: 6 * u).strokeBorder(Disc.ctaBorder, lineWidth: 0.36 * u))
 							}
 							.buttonStyle(.pressDim)
-							Button(action: { onLearnMore(deck[front].symbol) }) {
+							Button(action: { onLearnMore(card(at: seen).symbol) }) {
 								Text("Learn more")
 									.font(StakFont.sora(12 * u))
 									.foregroundStyle(Disc.muted)

@@ -84,7 +84,9 @@ object Session {
 		UserProfile.priceAlerts = p.getBoolean(KEY_PRICE_ALERTS, true)
 		UserProfile.dailyDeck = p.getBoolean(KEY_DAILY_DECK, true)
 		UserProfile.marketNews = p.getBoolean(KEY_MARKET_NEWS, false)
-		UserProfile.appearance = p.getString(KEY_APPEARANCE, "dark") ?: "dark"
+		// Only Dark and Match system exist (the Light build of 2026-09-08 was withdrawn): a
+		// value that build stored reads as Dark, so the Appearance page always shows a choice.
+		UserProfile.appearance = p.getString(KEY_APPEARANCE, "dark").let { if (it == "system") "system" else "dark" }
 		UserProfile.linkedGoogle = p.getBoolean(KEY_LINKED_GOOGLE, false)
 		UserProfile.linkedApple = p.getBoolean(KEY_LINKED_APPLE, false)
 		UserProfile.joined = p.getString(KEY_JOINED, "July 2026") ?: "July 2026"

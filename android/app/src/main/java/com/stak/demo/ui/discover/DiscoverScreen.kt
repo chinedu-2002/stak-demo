@@ -976,7 +976,7 @@ private fun NvdaStockRow(spec: BuySpec = NVDA_BUY) {
 }
 
 @Composable
-private fun SheetCta(text: String, onClick: () -> Unit) {
+private fun SheetCta(text: String, onClick: () -> Unit, enabled: Boolean = true) {
 	val u = com.stak.demo.ui.onboarding.figmaUnit()
 	Box(
 		contentAlignment = Alignment.Center,
@@ -992,9 +992,11 @@ private fun SheetCta(text: String, onClick: () -> Unit) {
 			}
 			.background(CtaGradient, RoundedCornerShape((6 * u).dp))
 			.border((0.36 * u).dp, CtaBorder, RoundedCornerShape((6 * u).dp))
+			.alpha(if (enabled) 1f else 0.5f)
 			.clickable(
 				interactionSource = remember { MutableInteractionSource() },
 				indication = com.stak.demo.ui.theme.PressDim,
+				enabled = enabled,
 				onClick = onClick,
 			),
 	) {
@@ -1104,8 +1106,10 @@ private fun PracticeBuyContent(
 								if (value != null) {
 									if (value <= com.stak.demo.ui.simulate.PaperPortfolio.cash) { selected = i; onAmount(value) }
 								} else {
+									// Custom publishes its field's value, or NO amount (0) until a valid
+									// one is typed - never the preset it replaced (Codex review, PR #166).
 									selected = i
-									custom.toDoubleOrNull()?.takeIf { it > 0.0 && it <= com.stak.demo.ui.simulate.PaperPortfolio.cash }?.let(onAmount)
+									onAmount(custom.toDoubleOrNull()?.takeIf { it > 0.0 && it <= com.stak.demo.ui.simulate.PaperPortfolio.cash } ?: 0.0)
 								}
 							}
 							.padding(vertical = (8 * u).dp),
@@ -1129,7 +1133,7 @@ private fun PracticeBuyContent(
 					onValueChange = { raw ->
 						val text = raw.filter { it.isDigit() || it == '.' }.take(9)
 						custom = text
-						text.toDoubleOrNull()?.takeIf { it > 0.0 && it <= com.stak.demo.ui.simulate.PaperPortfolio.cash }?.let(onAmount)
+						onAmount(text.toDoubleOrNull()?.takeIf { it > 0.0 && it <= com.stak.demo.ui.simulate.PaperPortfolio.cash } ?: 0.0)
 					},
 					singleLine = true,
 					keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
@@ -1186,7 +1190,8 @@ private fun PracticeBuyContent(
 			)
 		}
 		Column(verticalArrangement = Arrangement.spacedBy((16 * u).dp), modifier = Modifier.fillMaxWidth()) {
-			SheetCta(text = "Confirm practice buy", onClick = onConfirm)
+			// Confirm only with a stake the cash covers (Codex review, PR #166).
+			SheetCta(text = "Confirm practice buy", onClick = onConfirm, enabled = com.stak.demo.ui.simulate.PaperPortfolio.canBuy(amount))
 			SheetSecondary(text = secondary, onClick = onDismiss)
 		}
 	}

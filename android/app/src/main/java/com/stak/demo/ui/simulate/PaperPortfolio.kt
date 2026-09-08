@@ -232,12 +232,19 @@ internal object PaperPortfolio {
 			// A top-up grows the COST basis by the money put in ($100 + $25 ->
 			// "$125"), not the current value; weekGain stays. Mirrors ios.
 			val basis = held.spec.stakeBasis.removePrefix("$").replace(",", "").toDoubleOrNull() ?: 0.0
+			val newBasis = basis + amount
+			// The return is recomputed over the new basis: $24 on $100 was 24%, on
+			// $200 it is 12% (Codex review, PR #166). The dollar gain itself stands.
+			val gainAmt = held.spec.gain.filter { it.isDigit() || it == '.' }.toDoubleOrNull() ?: 0.0
+			val pctText = String.format(Locale.US, "%.1f%%", if (newBasis > 0.0) gainAmt / newBasis * 100.0 else 0.0)
 			val grown = held.copy(
 				spec = held.spec.copy(
 					shares = String.format(Locale.US, "%.4f", (held.spec.shares.toDoubleOrNull() ?: 0.0) + shares),
 					stakeValue = usd(held.stake + amount),
-					stakeBasis = stakeLabel(basis + amount),
+					stakeBasis = stakeLabel(newBasis),
+					gainPct = pctText,
 				),
+				row = held.row.copy(pct = (if (held.spec.up) "+" else "-") + pctText),
 			)
 			positions = positions.map { if (it === held) grown else it }
 			persist()

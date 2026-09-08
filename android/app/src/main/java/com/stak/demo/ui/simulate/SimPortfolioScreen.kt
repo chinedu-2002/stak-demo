@@ -1,6 +1,5 @@
 package com.stak.demo.ui.simulate
 
-import com.stak.demo.ui.theme.stakColor
 import com.stak.demo.ui.theme.FIGMA_LINE_BOX
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ContentTransform
@@ -94,7 +93,7 @@ fun SimPortfolioScreen(
 				Text(
 					text = "Your portfolio",
 					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp, lineHeight = (20 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
-					color = StakColors.TextPrimary,
+					color = Color.White,
 				)
 				Spacer(modifier = Modifier.weight(1f))
 				Box(
@@ -226,7 +225,7 @@ private fun SellPill(onClick: () -> Unit) {
 		modifier = Modifier
 			.size((60 * u).dp, (30 * u).dp)
 			// 1:4543 (exact-design audit 2026-09-04): a 1px white-14% hairline - not the sheets' 0.36 #343B4F.
-			.border((1 * u).dp, stakColor(0x24FFFFFF), RoundedCornerShape((6 * u).dp))
+			.border((1 * u).dp, Color(0x24FFFFFF), RoundedCornerShape((6 * u).dp))
 			.clickable(
 				interactionSource = remember { MutableInteractionSource() },
 				indication = com.stak.demo.ui.theme.PressDim,
@@ -282,7 +281,7 @@ private fun SimSheet(onDismiss: () -> Unit, content: @Composable () -> Unit) {
 		Box(
 			modifier = Modifier
 				.fillMaxSize()
-				.background(stakColor(0x9E02050E))
+				.background(Color(0x9E02050E))
 				.clickable(
 					interactionSource = remember { MutableInteractionSource() },
 					indication = com.stak.demo.ui.theme.PressDim,
@@ -328,7 +327,7 @@ private fun PickSellRow(pick: PickSpec) {
 			Text(pick.badge, style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (15 * u).sp), color = Sim.BadgeInk)
 		}
 		Column(verticalArrangement = Arrangement.spacedBy((2 * u).dp), modifier = Modifier.weight(1f)) {
-			Text(pick.company, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp), color = StakColors.TextPrimary)
+			Text(pick.company, style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp), color = Color.White)
 			Text("${pick.priceNow} today", style = TextStyle(fontFamily = Geist, fontSize = (10 * u).sp), color = Sim.Muted)
 		}
 		Text(
@@ -357,7 +356,7 @@ private fun SellConfirmContent(pick: PickSpec, onConfirm: (Double) -> Unit, onDi
 		Text(
 			"Sell ${pick.symbol}?",
 			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (18 * u).sp),
-			color = StakColors.TextPrimary,
+			color = Color.White,
 		)
 		PickSellRow(pick)
 		Text(
@@ -386,10 +385,10 @@ private fun SellConfirmContent(pick: PickSpec, onConfirm: (Double) -> Unit, onDi
 							.weight(1f)
 							// 1:4853 (exact-design audit 2026-09-04): the sell chips are r6 - the buy ticket's r10 had been carried over.
 							.clip(RoundedCornerShape((6 * u).dp))
-							.background(if (sel) stakColor(0xFF0F2A38) else stakColor(0xFF0B1430))
+							.background(if (sel) Color(0xFF0F2A38) else Color(0xFF0B1430))
 							.border(
 								if (sel) (0.5 * u).dp else (1 * u).dp,
-								if (sel) stakColor(0xFF5DA8BF) else stakColor(0x1FFFFFFF),
+								if (sel) Color(0xFF5DA8BF) else Color(0x1FFFFFFF),
 								RoundedCornerShape((6 * u).dp),
 							)
 							.clickable(
@@ -401,7 +400,7 @@ private fun SellConfirmContent(pick: PickSpec, onConfirm: (Double) -> Unit, onDi
 						Text(
 							label,
 							style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
-							color = if (sel) stakColor(0xFFA6E4F7) else stakColor(0xFFDCE7F7),
+							color = if (sel) Color(0xFFA6E4F7) else Color(0xFFDCE7F7),
 						)
 					}
 				}
@@ -413,8 +412,8 @@ private fun SellConfirmContent(pick: PickSpec, onConfirm: (Double) -> Unit, onDi
 					onValueChange = { raw -> custom = raw.filter { it.isDigit() || it == '.' }.take(9) },
 					singleLine = true,
 					keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-					textStyle = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, color = stakColor(0xFFDCE7F7)),
-					cursorBrush = SolidColor(stakColor(0xFF5DA8BF)),
+					textStyle = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, color = Color(0xFFDCE7F7)),
+					cursorBrush = SolidColor(Color(0xFF5DA8BF)),
 					decorationBox = { inner ->
 						Row(
 							verticalAlignment = Alignment.CenterVertically,
@@ -422,11 +421,11 @@ private fun SellConfirmContent(pick: PickSpec, onConfirm: (Double) -> Unit, onDi
 							modifier = Modifier
 								.fillMaxWidth()
 								.clip(RoundedCornerShape((6 * u).dp))
-								.background(stakColor(0xFF0B1430))
-								.border((0.5 * u).dp, stakColor(0xFF5DA8BF), RoundedCornerShape((6 * u).dp))
+								.background(Color(0xFF0B1430))
+								.border((0.5 * u).dp, Color(0xFF5DA8BF), RoundedCornerShape((6 * u).dp))
 								.padding(horizontal = (12 * u).dp, vertical = (8 * u).dp),
 						) {
-							Text("$", style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp), color = stakColor(0xFFDCE7F7))
+							Text("$", style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp), color = Color(0xFFDCE7F7))
 							Box(modifier = Modifier.weight(1f)) {
 								if (custom.isEmpty()) Text("0.00", style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp), color = Sim.Muted)
 								inner()
@@ -470,7 +469,7 @@ private fun SellConfirmContent(pick: PickSpec, onConfirm: (Double) -> Unit, onDi
 				Text(
 					"Confirm sell",
 					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = (14 * u).sp, lineHeight = (20.69 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
-					color = StakColors.TextPrimary,
+					color = Color.White,
 				)
 			}
 			// 1:4868 (exact-design audit 2026-09-04): hairline only - the 4% white fill was never authored.
@@ -479,7 +478,7 @@ private fun SellConfirmContent(pick: PickSpec, onConfirm: (Double) -> Unit, onDi
 				modifier = Modifier
 					.fillMaxWidth()
 					.height((52 * u).dp)
-					.border((0.361 * u).dp, stakColor(0x54343B4F), RoundedCornerShape((6 * u).dp))
+					.border((0.361 * u).dp, Color(0x54343B4F), RoundedCornerShape((6 * u).dp))
 					.clickable(
 						interactionSource = remember { MutableInteractionSource() },
 						indication = com.stak.demo.ui.theme.PressDim,
@@ -505,7 +504,7 @@ private fun PositionClosedContent(pick: PickSpec, onBackToSimulate: () -> Unit, 
 		Text(
 			if (full) "Position closed" else "Position reduced",
 			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (18 * u).sp),
-			color = StakColors.TextPrimary,
+			color = Color.White,
 		)
 		PickSellRow(pick)
 		Text(
@@ -552,10 +551,10 @@ private fun PositionClosedContent(pick: PickSpec, onBackToSimulate: () -> Unit, 
 					.tealShadow(u, dy = 28.183f, blur = 16.62f, alpha = 0.03f)
 					.background(
 						androidx.compose.ui.graphics.Brush.verticalGradient(
-							0.0889f to stakColor(0xFFA6E4F7),
-							0.3919f to stakColor(0xFF5DA8BF),
-							0.7255f to stakColor(0xFF3C98B4),
-							1f to stakColor(0xFF3C98B4),
+							0.0889f to Color(0xFFA6E4F7),
+							0.3919f to Color(0xFF5DA8BF),
+							0.7255f to Color(0xFF3C98B4),
+							1f to Color(0xFF3C98B4),
 						),
 						RoundedCornerShape((6 * u).dp),
 					)
@@ -569,7 +568,7 @@ private fun PositionClosedContent(pick: PickSpec, onBackToSimulate: () -> Unit, 
 				Text(
 					"Back to Simulate",
 					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp, lineHeight = (20.69 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
-					color = StakColors.TextPrimary,
+					color = Color.White,
 				)
 			}
 			// 73:1025 (exact-design audit 2026-09-04): hairline only - the 4% white fill was never authored.
@@ -578,7 +577,7 @@ private fun PositionClosedContent(pick: PickSpec, onBackToSimulate: () -> Unit, 
 				modifier = Modifier
 					.fillMaxWidth()
 					.height((52 * u).dp)
-					.border((0.361 * u).dp, stakColor(0x54343B4F), RoundedCornerShape((6 * u).dp))
+					.border((0.361 * u).dp, Color(0x54343B4F), RoundedCornerShape((6 * u).dp))
 					.clickable(
 						interactionSource = remember { MutableInteractionSource() },
 						indication = com.stak.demo.ui.theme.PressDim,

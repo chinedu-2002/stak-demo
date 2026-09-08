@@ -1,6 +1,5 @@
 package com.stak.demo.ui.onboarding
 
-import com.stak.demo.ui.theme.stakColor
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
@@ -178,7 +177,7 @@ internal fun PermissionCard(title: String, description: String, checked: Boolean
 @Composable
 internal fun StakToggle(checked: Boolean, onToggle: () -> Unit, label: String? = null) {
 	val u = figmaUnit()
-	val track by animateColorAsState(if (checked) stakColor(0xFF2C9DBC) else stakColor(0xFF242B3D), label = "track")
+	val track by animateColorAsState(if (checked) Color(0xFF2C9DBC) else Color(0xFF242B3D), label = "track")
 	val thumbOffset by animateDpAsState(if (checked) (21 * u).dp else (3 * u).dp, label = "thumb")
 	Box(
 		modifier = Modifier

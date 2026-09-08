@@ -1,6 +1,5 @@
 package com.stak.demo.ui.profile
 
-import com.stak.demo.ui.theme.stakColor
 import com.stak.demo.ui.theme.FIGMA_LINE_BOX
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -38,14 +37,14 @@ import com.stak.demo.ui.theme.Sora
 import com.stak.demo.ui.theme.StakColors
 import androidx.compose.foundation.layout.requiredSize
 
-private val CardBg: Color get() = stakColor(0xFF10182B)
-private val Muted: Color get() = stakColor(0xFF819ABB)
-private val Body: Color get() = stakColor(0xFFC8D2E0)
-private val Bright: Color get() = stakColor(0xFFF2F6FC)
-private val Green: Color get() = stakColor(0xFF2FD08A)
-private val ChipBg: Color get() = stakColor(0xFF1A2333)
-private val ChipBorder: Color get() = stakColor(0xFF2C9DBC)
-private val ChipInk: Color get() = stakColor(0xFF7FD4E8)
+private val CardBg = Color(0xFF10182B)
+private val Muted = Color(0xFF819ABB)
+private val Body = Color(0xFFC8D2E0)
+private val Bright = Color(0xFFF2F6FC)
+private val Green = Color(0xFF2FD08A)
+private val ChipBg = Color(0xFF1A2333)
+private val ChipBorder = Color(0xFF2C9DBC)
+private val ChipInk = Color(0xFF7FD4E8)
 
 /**
  * 05 · Profile — "Profile · hub" (CHINEDU 171:995), reached from the
@@ -72,7 +71,7 @@ fun ProfileScreen(onBack: () -> Unit, onLogOut: () -> Unit = {}, onOpenSetting: 
 			Text(
 				text = "Profile",
 				style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (16 * u).sp, lineHeight = (20 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
-				color = StakColors.TextPrimary,
+				color = Color.White,
 				modifier = Modifier.align(Alignment.Center),
 			)
 		}
@@ -104,7 +103,7 @@ fun ProfileScreen(onBack: () -> Unit, onLogOut: () -> Unit = {}, onOpenSetting: 
 			) {
 				Box(
 					contentAlignment = Alignment.Center,
-					modifier = Modifier.size((64 * u).dp).background(stakColor(0xFF242B3D), CircleShape).clip(CircleShape),
+					modifier = Modifier.size((64 * u).dp).background(Color(0xFF242B3D), CircleShape).clip(CircleShape),
 				) {
 					// The picked photo when one exists; else the live initial of
 					// the display name ("H" was hardcoded - audit 2026-08-25).
@@ -120,14 +119,14 @@ fun ProfileScreen(onBack: () -> Unit, onLogOut: () -> Unit = {}, onOpenSetting: 
 						Text(
 							text = com.stak.demo.ui.UserProfile.greetingName.take(1).uppercase(),
 							style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (22 * u).sp, lineHeight = (28 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
-							color = stakColor(0xFF9EADC7),
+							color = Color(0xFF9EADC7),
 						)
 					}
 				}
 				Text(
 					text = com.stak.demo.ui.UserProfile.greetingName,
 					style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (20 * u).sp, lineHeight = (25 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
-					color = StakColors.TextPrimary,
+					color = Color.White,
 				)
 				Text(
 					text = "Paper investor · joined ${com.stak.demo.ui.UserProfile.joined}",
@@ -210,7 +209,7 @@ fun ProfileScreen(onBack: () -> Unit, onLogOut: () -> Unit = {}, onOpenSetting: 
 				Text(
 					text = "${if (gain >= 0) "▲" else "▼"} ${com.stak.demo.ui.simulate.PaperPortfolio.signedUsd(gain)} all time on $10,000 paper",
 					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
-					color = if (gain >= 0) Green else stakColor(0xFFE5484D),
+					color = if (gain >= 0) Green else Color(0xFFE5484D),
 				)
 			}
 			// Settings card.
@@ -236,7 +235,7 @@ fun ProfileScreen(onBack: () -> Unit, onLogOut: () -> Unit = {}, onOpenSetting: 
 						Text(
 							text = label,
 							style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp, lineHeight = (17 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
-							color = StakColors.TextPrimary,
+							color = Color.White,
 						)
 						Spacer(modifier = Modifier.weight(1f))
 						// Chevron line height 18 as authored (171:1027 - exact-design audit 2026-09-04).
@@ -258,7 +257,7 @@ fun ProfileScreen(onBack: () -> Unit, onLogOut: () -> Unit = {}, onOpenSetting: 
 					// hairline at 33% renders nothing: the 2x export's rows under the button
 					// are pure #0A1020, while the old rect glow read (24,45,62) fading over
 					// 35u (StakTest, 2026-09-05). No glow.
-					.border((0.36 * u).dp, stakColor(0x54343B4F), RoundedCornerShape((6 * u).dp))
+					.border((0.36 * u).dp, Color(0x54343B4F), RoundedCornerShape((6 * u).dp))
 					.clickable(
 						interactionSource = remember { MutableInteractionSource() },
 						indication = com.stak.demo.ui.theme.PressDim,

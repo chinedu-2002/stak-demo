@@ -1,6 +1,5 @@
 package com.stak.demo.ui.onboarding
 
-import com.stak.demo.ui.theme.stakColor
 import com.stak.demo.ui.theme.FIGMA_LINE_BOX
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -162,7 +161,7 @@ private fun MatrixCard(option: MatrixOption, selected: Boolean, onClick: () -> U
 	) {
 		Spacer(modifier = Modifier.height((option.iconDy * u).dp))
 		Box(
-			modifier = Modifier.size(option.circleSize * u).background(stakColor(0xFF242B3D), CircleShape),
+			modifier = Modifier.size(option.circleSize * u).background(Color(0xFF242B3D), CircleShape),
 			contentAlignment = Alignment.Center,
 		) {
 			Image(

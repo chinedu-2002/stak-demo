@@ -1,6 +1,5 @@
 package com.stak.demo.ui.onboarding
 
-import com.stak.demo.ui.theme.stakColor
 import com.stak.demo.ui.theme.FIGMA_LINE_BOX
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -203,7 +202,7 @@ internal fun RiskStyleSheet(onDismiss: () -> Unit) {
 	androidx.compose.material3.ModalBottomSheet(
 		onDismissRequest = onDismiss,
 		containerColor = Auth.InputBg,
-		scrimColor = stakColor(0x80000000),
+		scrimColor = Color(0x80000000),
 		dragHandle = null,
 		shape = RoundedCornerShape(topStart = (16 * u).dp, topEnd = (16 * u).dp),
 	) {
@@ -225,7 +224,7 @@ internal fun RiskStyleSheet(onDismiss: () -> Unit) {
 					modifier = Modifier
 						.fillMaxWidth()
 						.background(StakColors.Bg, RoundedCornerShape((12 * u).dp))
-						.border((1 * u).dp, if (selected) stakColor(0x8069B3CA) else stakColor(0x1AFFFFFF), RoundedCornerShape((12 * u).dp))
+						.border((1 * u).dp, if (selected) Color(0x8069B3CA) else Color(0x1AFFFFFF), RoundedCornerShape((12 * u).dp))
 						.clickable(interactionSource = remember { MutableInteractionSource() }, indication = com.stak.demo.ui.theme.PressDim) {
 							com.stak.demo.ui.UserProfile.risk = index
 							com.stak.demo.ui.UserProfile.riskStyle = TasteModel.riskStyle(index)

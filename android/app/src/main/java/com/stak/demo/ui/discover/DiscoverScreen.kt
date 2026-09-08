@@ -1,6 +1,5 @@
 package com.stak.demo.ui.discover
 
-import com.stak.demo.ui.theme.stakColor
 import com.stak.demo.ui.theme.FIGMA_LINE_BOX
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
@@ -88,40 +87,40 @@ import kotlinx.coroutines.launch
 
 /** Palette of the CHINEDU "04 · Discover" frames. */
 private object Disc {
-	val SheetBg: Color get() = stakColor(0xFF181F30)
-	val Muted: Color get() = stakColor(0xFF819ABB)
-	val Faint: Color get() = stakColor(0xFF5C6B85)
-	val Body: Color get() = stakColor(0xFFC8D2E0)
-	val Teal: Color get() = stakColor(0xFF69B3CA)
-	val Green: Color get() = stakColor(0xFF2FD08A)
+	val SheetBg = Color(0xFF181F30)
+	val Muted = Color(0xFF819ABB)
+	val Faint = Color(0xFF5C6B85)
+	val Body = Color(0xFFC8D2E0)
+	val Teal = Color(0xFF69B3CA)
+	val Green = Color(0xFF2FD08A)
 	/** Down moves on a ticket (Codex parity audit 2026-09-04) - the Simulate red. */
-	val Red: Color get() = stakColor(0xFFFF5A6A)
-	val ChipBg: Color get() = stakColor(0xFF242B3D)
-	val Divider: Color get() = stakColor(0xFF2A3346)
-	val BadgeInk: Color get() = stakColor(0xFF9EADC7)
-	val TipBg: Color get() = stakColor(0x1A69B3CA)
+	val Red = Color(0xFFFF5A6A)
+	val ChipBg = Color(0xFF242B3D)
+	val Divider = Color(0xFF2A3346)
+	val BadgeInk = Color(0xFF9EADC7)
+	val TipBg = Color(0x1A69B3CA)
 	// #FFFFFF @ 9% - the Save pill on BOTH Discover frames (DE-STAK 1:2048,
 	// CHINEDU 1:1759). 882ee783's "authored 15%" no longer reads anywhere
 	// (user crop, 2026-09-04).
-	val SaveChipBg: Color get() = stakColor(0x17FFFFFF)
-	val AmountBg: Color get() = stakColor(0xFF0B1430)
-	val AmountBorder: Color get() = stakColor(0x1FFFFFFF)
-	val AmountInk: Color get() = stakColor(0xFFDCE7F7)
-	val AmountSelBg: Color get() = stakColor(0xFF0F2A38)
-	val AmountSelBorder: Color get() = stakColor(0xFF5DA8BF)
-	val AmountSelInk: Color get() = stakColor(0xFFA6E4F7)
-	val BrightInk: Color get() = stakColor(0xFFF2F6FC)
+	val SaveChipBg = Color(0x17FFFFFF)
+	val AmountBg = Color(0xFF0B1430)
+	val AmountBorder = Color(0x1FFFFFFF)
+	val AmountInk = Color(0xFFDCE7F7)
+	val AmountSelBg = Color(0xFF0F2A38)
+	val AmountSelBorder = Color(0xFF5DA8BF)
+	val AmountSelInk = Color(0xFFA6E4F7)
+	val BrightInk = Color(0xFFF2F6FC)
 }
 
 private val CtaGradient = Brush.verticalGradient(
-	0.0889f to stakColor(0xFFA6E4F7),
-	0.3919f to stakColor(0xFF5DA8BF),
-	0.7255f to stakColor(0xFF3C98B4),
-	1f to stakColor(0xFF3C98B4),
+	0.0889f to Color(0xFFA6E4F7),
+	0.3919f to Color(0xFF5DA8BF),
+	0.7255f to Color(0xFF3C98B4),
+	1f to Color(0xFF3C98B4),
 )
 private val CtaBorder = androidx.compose.ui.graphics.Brush.verticalGradient(
-	0f to stakColor(0xA1659EAD),
-	1f to stakColor(0x6E16363F),
+	0f to Color(0xA1659EAD),
+	1f to Color(0x6E16363F),
 )
 
 /** A practice-buy ticket's stock values (Buy NVDA? 1:2159 / Buy AAPL? 1:3423). */
@@ -260,13 +259,13 @@ internal val DECK = listOf(
 		R.drawable.disc_card_nvda, "NVDA · NVIDIA Corp",
 		"Chip demand is outrunning supply, and NVIDIA sets the prices.",
 		"$122.10", "▲ 2.4% today", "Chip stocks swing hard. Small stakes, long views.",
-		stakColor(0xFF152A47), stakColor(0xFF142844),
+		Color(0xFF152A47), Color(0xFF142844),
 	),
 	DeckCard(
 		R.drawable.disc_card_aapl, "AAPL · Apple Inc",
 		"Two billion devices, and every one of them keeps paying Apple.",
 		"$229.35", "▲ 1.2% today", "Steady giants move slower. Stable stocks often do.",
-		stakColor(0xFF283E5D), stakColor(0xFF253A59),
+		Color(0xFF283E5D), Color(0xFF253A59),
 	),
 	DeckCard(
 		R.drawable.disc_card_googl, "GOOGL · Alphabet Inc",
@@ -274,7 +273,7 @@ internal val DECK = listOf(
 		// One authored line (1:2061, 265 wide): the peek-card/tutorial copy
 		// "Ad money moves with the economy, so some quarters just drift." runs 315u.
 		"$178.90", "▲ 0.8% today", "Ad money tracks the economy. Some quarters drift.",
-		stakColor(0xFF263D5D), stakColor(0xFF2F486E),
+		Color(0xFF263D5D), Color(0xFF2F486E),
 	),
 )
 
@@ -369,7 +368,7 @@ internal fun DiscoverScreen(
 					Text(
 						text = "Discover",
 						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (26 * u).sp, lineHeight = (33 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
-						color = if (atEnd) Disc.BrightInk else StakColors.TextPrimary,
+						color = if (atEnd) Disc.BrightInk else Color.White,
 						modifier = Modifier.offset(y = if (atEnd) (-7.5 * u).dp else 0.dp),
 					)
 					Spacer(modifier = Modifier.weight(1f))
@@ -380,7 +379,7 @@ internal fun DiscoverScreen(
 						Text(
 							text = "$count/$DECK_SIZE",
 							style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.Normal, fontSize = (11 * u).sp, lineHeight = (14 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
-							color = StakColors.TextPrimary,
+							color = Color.White,
 						)
 					}
 				}
@@ -625,14 +624,14 @@ internal fun DiscoverScreen(
 							text = "Practice buy",
 							// 1:1784 authors lh 20.69 - exact-design audit 2026-09-04.
 							style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp, lineHeight = (20.69 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
-							color = StakColors.TextPrimary,
+							color = Color.White,
 						)
 					}
 					Box(
 						contentAlignment = Alignment.Center,
 						modifier = Modifier
 							.size((120 * u).dp, (52 * u).dp)
-							.border((0.36 * u).dp, stakColor(0x54343B4F), RoundedCornerShape((6 * u).dp))
+							.border((0.36 * u).dp, Color(0x54343B4F), RoundedCornerShape((6 * u).dp))
 							.clickable(
 								interactionSource = remember { MutableInteractionSource() },
 								indication = com.stak.demo.ui.theme.PressDim,
@@ -673,7 +672,7 @@ internal fun DiscoverScreen(
 				Text(
 					text = "Saved to My STAK",
 					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp),
-					color = StakColors.TextPrimary,
+					color = Color.White,
 				)
 			}
 		}
@@ -710,7 +709,7 @@ internal fun FrontDeckCard(
 				while (d < reach) {
 					val t = d / reach
 					drawRoundRect(
-						color = stakColor(0xFF060B16).copy(alpha = 0.5f * (1f - t) * (1f - t)),
+						color = Color(0xFF060B16).copy(alpha = 0.5f * (1f - t) * (1f - t)),
 						topLeft = Offset(-d, -d),
 						size = Size(size.width + 2 * d, size.height + 2 * d),
 						cornerRadius = CornerRadius(corner + d),
@@ -756,7 +755,7 @@ private fun DeckCardBody(card: DeckCard, onSave: (() -> Unit)?, u: Float, rows: 
 		modifier = Modifier
 			.fillMaxWidth()
 			.clip(RoundedCornerShape((22 * u).dp))
-			.background(Brush.verticalGradient(0f to card.cardTop, 1f to stakColor(0xFF0C1526)))
+			.background(Brush.verticalGradient(0f to card.cardTop, 1f to Color(0xFF0C1526)))
 			.padding(top = (4 * u).dp, bottom = (4 * u).dp),
 	) {
 		Box(
@@ -804,7 +803,7 @@ private fun DeckCardBody(card: DeckCard, onSave: (() -> Unit)?, u: Float, rows: 
 				Text(
 					text = card.headline,
 					style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Normal, fontSize = (16 * u).sp, lineHeight = (23 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
-					color = StakColors.TextPrimary,
+					color = Color.White,
 					modifier = Modifier.topInset((rows.headline * u).dp),
 				)
 				Row(
@@ -815,7 +814,7 @@ private fun DeckCardBody(card: DeckCard, onSave: (() -> Unit)?, u: Float, rows: 
 					Text(
 						text = card.price,
 						style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (20 * u).sp, lineHeight = (25 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
-						color = StakColors.TextPrimary,
+						color = Color.White,
 					)
 					Text(
 						text = card.change,
@@ -869,7 +868,7 @@ private fun SaveChip(u: Float, modifier: Modifier = Modifier) {
 		Text(
 			text = "Save",
 			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (12 * u).sp, lineHeight = (16 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
-			color = StakColors.TextPrimary,
+			color = Color.White,
 		)
 		// The pill's own glyph (1:2050): 12 box, 8x10 bookmark, #AEAEAE stroke 1 -
 		// not the hero's dark #0A1020 export (user crop, 2026-09-04).
@@ -903,7 +902,7 @@ private fun SheetScaffold(onDismiss: () -> Unit, content: @Composable () -> Unit
 			modifier = Modifier
 				.fillMaxSize()
 				// Authored ticket scrim rgba(0,0,0,0.6) (1:2158).
-				.background(stakColor(0x99000000))
+				.background(Color(0x99000000))
 				.clickable(
 					interactionSource = remember { MutableInteractionSource() },
 					indication = null,
@@ -960,7 +959,7 @@ private fun NvdaStockRow(spec: BuySpec = NVDA_BUY) {
 			Text(
 				text = spec.name,
 				style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (13 * u).sp, lineHeight = (17 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
-				color = StakColors.TextPrimary,
+				color = Color.White,
 			)
 			Text(
 				text = spec.priceLine,
@@ -1002,7 +1001,7 @@ private fun SheetCta(text: String, onClick: () -> Unit) {
 		Text(
 			text = text,
 			style = TextStyle(fontFamily = Geist, fontWeight = FontWeight.Medium, fontSize = (14 * u).sp),
-			color = StakColors.TextPrimary,
+			color = Color.White,
 		)
 	}
 }
@@ -1017,7 +1016,7 @@ private fun SheetSecondary(text: String, onClick: () -> Unit) {
 			.height((52 * u).dp)
 			// 1:2197 authors NO fill - the render's lighter band under Confirm is
 			// the CTA's own glow (exact-design audit 2026-09-04); hairline only.
-			.border((0.36 * u).dp, stakColor(0x54343B4F), RoundedCornerShape((6 * u).dp))
+			.border((0.36 * u).dp, Color(0x54343B4F), RoundedCornerShape((6 * u).dp))
 			.clickable(
 				interactionSource = remember { MutableInteractionSource() },
 				indication = com.stak.demo.ui.theme.PressDim,
@@ -1056,7 +1055,7 @@ private fun PracticeBuyContent(
 		Text(
 			text = spec.title,
 			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (18 * u).sp, lineHeight = (23 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
-			color = StakColors.TextPrimary,
+			color = Color.White,
 		)
 		NvdaStockRow(spec)
 		// The authored 14 column gap alone (1:1970 / 1:4232). The old +1 / +1.5
@@ -1206,7 +1205,7 @@ private fun OrderFilledContent(onPrimary: () -> Unit, onSecondary: () -> Unit, s
 		Text(
 			text = "Order filled",
 			style = TextStyle(fontFamily = Sora, fontWeight = FontWeight.SemiBold, fontSize = (18 * u).sp, lineHeight = (23 * u).sp, lineHeightStyle = FIGMA_LINE_BOX),
-			color = StakColors.TextPrimary,
+			color = Color.White,
 		)
 		NvdaStockRow(spec)
 		// Authored status line (85:1407): Geist 12 / lh 18, left-aligned, 14 below
@@ -1266,7 +1265,7 @@ private fun ProgressRing(progress: Float, u: Float) {
 		val inset = (4 * u).dp.toPx()
 		val arcSize = androidx.compose.ui.geometry.Size(size.width - inset * 2f, size.height - inset * 2f)
 		drawArc(
-			color = stakColor(0xFF2A3346),
+			color = Color(0xFF2A3346),
 			startAngle = 0f, sweepAngle = 360f, useCenter = false,
 			topLeft = Offset(inset, inset), size = arcSize,
 			style = Stroke(width = stroke, cap = StrokeCap.Round),
@@ -1340,7 +1339,7 @@ private fun EndOfDeck(seen: Int, saved: Int, bought: Int, onPracticeBuySaves: ()
 			modifier = Modifier
 				.fillMaxWidth()
 				.height((52 * u).dp)
-				.border((0.36 * u).dp, stakColor(0x54343B4F), RoundedCornerShape((6 * u).dp))
+				.border((0.36 * u).dp, Color(0x54343B4F), RoundedCornerShape((6 * u).dp))
 				.clickable(
 					interactionSource = remember { MutableInteractionSource() },
 					indication = com.stak.demo.ui.theme.PressDim,
